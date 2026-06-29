@@ -176,3 +176,5 @@ Hepsi pure CSS keyframe. React/Tailwind'e portda `@keyframes` global CSS'e veya 
 - Bölümlerde `data-screen-label` attribute'ları yorum/anchor referansı içindir; production'da kaldırılabilir.
 - Classroom tab içerik geçişleri ve FAQ accordion için JS henüz mock — gerçek state management eklenmeli.
 - Pricing fiyatları yer tutucu olabilir; finalize edilmeli.
+#   b i l e n y u m d e v  
+ 
