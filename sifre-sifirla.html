@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Yeni Şifre Belirle — Bilenyum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    background: #fafaff;
+    color: var(--ink-dark-0);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* Topbar */
+  .auth-topbar {
+    background: white;
+    border-bottom: 1px solid rgba(20,22,50,0.06);
+    padding: 14px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+  }
+  .auth-topbar .logo-img { height: 32px; width: auto; display: block; }
+  .auth-topbar-help {
+    font-size: 14px; font-weight: 600;
+    color: var(--ink-dark-1);
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 10px;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .auth-topbar-help:hover { background: rgba(62,58,142,0.08); color: var(--p-deep); }
+  .auth-topbar-help svg { width: 16px; height: 16px; }
+
+  /* Layout */
+  .auth-wrap {
+    flex: 1;
+    display: grid; grid-template-columns: 1fr 1fr;
+    min-height: 0;
+  }
+  .auth-form-side {
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px 32px 60px;
+  }
+  .auth-card { width: 100%; max-width: 460px; }
+
+  .auth-icon-badge {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(160deg, rgba(74,214,255,0.22), rgba(74,214,255,0.08));
+    border: 1px solid rgba(74,214,255,0.30);
+    color: #1a7ba8;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+  }
+  .auth-icon-badge svg { width: 26px; height: 26px; }
+
+  .auth-title {
+    font-size: 32px; font-weight: 800;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin: 0 0 10px;
+  }
+  .auth-sub {
+    font-size: 15px; color: var(--ink-dark-1);
+    line-height: 1.6;
+    margin: 0 0 28px;
+  }
+
+  /* Form */
+  .auth-form { display: flex; flex-direction: column; gap: 16px; }
+  .form-field { display: flex; flex-direction: column; gap: 6px; }
+  .form-field label {
+    font-size: 13px; font-weight: 600;
+    color: var(--ink-dark-1);
+  }
+  .form-field-input { position: relative; display: flex; align-items: center; }
+  .form-field-input .field-icon {
+    position: absolute; left: 16px;
+    width: 18px; height: 18px;
+    color: var(--ink-dark-2);
+    pointer-events: none;
+  }
+  .form-field input {
+    width: 100%; height: 52px;
+    padding: 0 56px 0 46px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(40,38,90,0.12);
+    background: white;
+    color: var(--ink-dark-0);
+    font-family: inherit; font-size: 15px;
+    outline: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+  .form-field input::placeholder { color: var(--ink-dark-2); }
+  .form-field input:focus {
+    border-color: var(--p-purple);
+    box-shadow: 0 0 0 4px rgba(62,58,142,0.12);
+  }
+  .password-toggle {
+    position: absolute; right: 14px;
+    width: 30px; height: 30px;
+    background: none; border: none; cursor: pointer;
+    color: var(--ink-dark-2);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  .password-toggle:hover { color: var(--p-purple); background: rgba(62,58,142,0.08); }
+  .password-toggle svg { width: 18px; height: 18px; }
+  .password-toggle .icon-hide { display: none; }
+  .password-toggle.shown .icon-show { display: none; }
+  .password-toggle.shown .icon-hide { display: block; }
+
+  /* Password strength bar */
+  .pwd-strength {
+    display: flex; gap: 5px;
+    margin-top: 4px;
+  }
+  .pwd-bar {
+    flex: 1; height: 4px;
+    background: rgba(40,38,90,0.10);
+    border-radius: 999px;
+    transition: background 0.22s ease;
+  }
+  .pwd-bar.active-weak { background: #ef4444; }
+  .pwd-bar.active-medium { background: var(--p-sun); }
+  .pwd-bar.active-strong { background: var(--p-green); }
+  .pwd-label {
+    font-size: 12px; font-weight: 600;
+    margin-top: 6px;
+    color: var(--ink-dark-2);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+  .pwd-label.weak { color: #ef4444; }
+  .pwd-label.medium { color: #b87814; }
+  .pwd-label.strong { color: #2a8a5a; }
+
+  /* Requirements list */
+  .pwd-requirements {
+    margin: 14px 0 0;
+    padding: 14px 16px;
+    background: rgba(62,58,142,0.04);
+    border-radius: 12px;
+    border: 1px solid rgba(62,58,142,0.10);
+  }
+  .pwd-req-title {
+    font-size: 12px; font-weight: 700;
+    color: var(--ink-dark-1);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .pwd-req-list {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .pwd-req {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--ink-dark-2);
+    transition: color 0.18s ease;
+  }
+  .pwd-req .check-icon {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: rgba(40,38,90,0.10);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.22s ease;
+  }
+  .pwd-req .check-icon svg { width: 10px; height: 10px; opacity: 0; transition: opacity 0.18s ease; }
+  .pwd-req.met { color: var(--ink-dark-0); }
+  .pwd-req.met .check-icon { background: var(--p-green); }
+  .pwd-req.met .check-icon svg { opacity: 1; }
+
+  /* Mismatch warning */
+  .mismatch-warning {
+    display: none;
+    margin-top: 6px;
+    font-size: 12.5px; font-weight: 500;
+    color: #ef4444;
+  }
+  .mismatch-warning.show { display: block; }
+
+  /* Button */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    height: 56px; padding: 0 28px;
+    border-radius: 14px;
+    font-weight: 600; font-size: 16px; cursor: pointer;
+    border: 1px solid transparent;
+    font-family: inherit;
+    transition: transform 0.15s ease, opacity 0.18s ease;
+    text-decoration: none;
+    margin-top: 8px;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-1px); }
+  .btn-primary {
+    background: linear-gradient(180deg, var(--p-brand-light), var(--p-brand));
+    color: white;
+    box-shadow: 0 12px 32px -8px rgba(229,4,123,0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .btn-block { width: 100%; }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+  /* Success state (after reset) */
+  .success-state { display: none; text-align: center; padding: 24px 0; }
+  .success-state.show { display: block; animation: fadeUp 0.32s ease; }
+  .auth-form.hidden, .pwd-requirements.hidden { display: none; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .success-big-icon {
+    width: 76px; height: 76px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, var(--p-green), #2a8a5a);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 16px 36px -10px rgba(109,212,158,0.55);
+  }
+  .success-big-icon svg { width: 36px; height: 36px; }
+
+  /* Brand side */
+  .auth-brand-side {
+    position: relative;
+    background:
+      radial-gradient(1300px 700px at 78% 10%, rgba(62,58,142,0.40), transparent 60%),
+      radial-gradient(900px 380px at 8% 22%, rgba(74,214,255,0.18), transparent 60%),
+      #0d0c25;
+    color: white;
+    padding: 60px 56px;
+    display: flex; flex-direction: column; justify-content: center;
+    overflow: hidden;
+  }
+  .auth-brand-side::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .brand-content { position: relative; z-index: 1; max-width: 460px; }
+  .brand-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 700;
+    color: var(--p-brand-light);
+    letter-spacing: 0.10em; text-transform: uppercase;
+    margin-bottom: 14px;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .brand-eyebrow::before {
+    content: ""; width: 24px; height: 1.5px;
+    background: var(--p-brand-light);
+  }
+  .brand-title {
+    font-size: 34px; font-weight: 800;
+    color: white;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin: 0 0 16px;
+  }
+  .brand-sub {
+    font-size: 16px; color: rgba(255,255,255,0.78);
+    line-height: 1.6;
+    margin: 0;
+    max-width: 420px;
+  }
+  /* Space layer (stars, planets, shooting stars) */
+  .space-layer {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .star { position: absolute; background: white; border-radius: 50%; opacity: 0.7; }
+  .star.s1 { width: 1px; height: 1px; }
+  .star.s2 { width: 2px; height: 2px; opacity: 0.85; }
+  .star.s3 { width: 3px; height: 3px; }
+  .star.tw { animation: twinkle 3s ease-in-out infinite; }
+  @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+  .distant-planet {
+    position: absolute; border-radius: 50%; pointer-events: none;
+    animation: distantFloat 16s ease-in-out infinite;
+  }
+  .distant-planet::after {
+    content: ""; position: absolute; inset: -5px;
+    border: 1px solid rgba(255,255,255,0.22); border-radius: 50%;
+    transform: rotate(-25deg) scaleY(0.3);
+  }
+  .distant-planet.p1 {
+    width: 36px; height: 36px; top: 12%; left: 14%;
+    background: radial-gradient(circle at 30% 30%, #a8a4f0, #3e3a8e 60%, #1a1842);
+    box-shadow: 0 0 22px rgba(62,58,142,0.45), inset -3px -4px 6px rgba(0,0,0,0.4);
+    opacity: 0.55;
+  }
+  .distant-planet.p2 {
+    width: 26px; height: 26px; top: 68%; right: 16%; left: auto;
+    background: radial-gradient(circle at 30% 30%, #b8e8ff, #4ad6ff 60%, #1a7ba8);
+    box-shadow: 0 0 14px rgba(74,214,255,0.4), inset -2px -3px 5px rgba(0,0,0,0.4);
+    opacity: 0.55; animation-duration: 19s; animation-delay: -4s;
+  }
+  .distant-planet.p3 {
+    width: 22px; height: 22px; top: 40%; right: 8%; left: auto;
+    background: radial-gradient(circle at 30% 30%, #ffd8e8, #ff7ab8 60%, #aa3070);
+    box-shadow: 0 0 14px rgba(255,122,184,0.35), inset -2px -3px 5px rgba(0,0,0,0.4);
+    opacity: 0.5; animation-duration: 22s; animation-delay: -10s;
+  }
+  @keyframes distantFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  .shooting-star {
+    position: absolute; width: 80px; height: 1px;
+    background: linear-gradient(to right, white, rgba(255,255,255,0));
+    border-radius: 999px; opacity: 0; pointer-events: none;
+    transform-origin: 0% 50%;
+    animation: shootStar 8s linear infinite;
+  }
+  .shooting-star::after {
+    content: ""; position: absolute; left: 0; top: 50%;
+    width: 3px; height: 3px; background: white; border-radius: 50%;
+    box-shadow: 0 0 8px white, 0 0 16px white;
+    transform: translateY(-50%);
+  }
+  @keyframes shootStar {
+    0% { transform: translate(0, 0) rotate(-22deg); opacity: 0; }
+    4% { opacity: 1; }
+    18% { opacity: 1; }
+    22% { opacity: 0; }
+    100% { transform: translate(-500px, 200px) rotate(-22deg); opacity: 0; }
+  }
+  .shooting-star.ss1 { top: 8%; right: 10%; animation-delay: 3s; }
+  .shooting-star.ss2 { top: 36%; right: 4%; animation-delay: 10s; animation-duration: 11s; }
+
+  .brand-orbit {
+    position: absolute;
+    width: 380px; height: 380px;
+    right: -120px; bottom: -120px;
+    border: 1px dashed rgba(255,255,255,0.16);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: orbit 80s linear infinite;
+  }
+  .brand-orbit::before {
+    content: "";
+    position: absolute; inset: 40px;
+    border-radius: 50%;
+    border: 1px dashed rgba(255,255,255,0.10);
+  }
+  .brand-orbit::after {
+    content: "";
+    position: absolute;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--p-aqua);
+    top: -8px; left: 50%; transform: translateX(-50%);
+  }
+  @keyframes orbit { to { transform: rotate(360deg); } }
+
+  @media (max-width: 980px) {
+    .auth-wrap { grid-template-columns: 1fr; }
+    .auth-brand-side { display: none; }
+    .auth-form-side { padding: 32px 24px 56px; }
+  }
+  @media (max-width: 480px) {
+    .auth-topbar { padding: 12px 20px; }
+    .auth-form-side { padding: 24px 20px 48px; }
+    .auth-title { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="auth-topbar">
+  <a href="index.html" class="logo"><img src="assets/bilenyum-logo.svg" alt="Bilenyum" class="logo-img" /></a>
+  <a href="iletisim.html" class="auth-topbar-help">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Yardım
+  </a>
+</header>
+
+<main class="auth-wrap">
+
+  <section class="auth-form-side">
+    <div class="auth-card">
+      <div class="auth-icon-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
+      </div>
+      <h1 class="auth-title">Yeni şifre belirle</h1>
+      <p class="auth-sub">Hesabın güvende kalsın diye en az 8 karakter, bir büyük harf ve bir rakam içeren bir şifre seç.</p>
+
+      <form class="auth-form" id="resetForm" autocomplete="off">
+        <div class="form-field">
+          <label for="rf-password">Yeni şifre</label>
+          <div class="form-field-input">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="rf-password" name="password" required placeholder="••••••••" autocomplete="new-password" minlength="8" />
+            <button type="button" class="password-toggle" data-target="rf-password" aria-label="Şifreyi göster">
+              <svg class="icon-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="icon-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+          <div class="pwd-strength" id="pwdStrength">
+            <span class="pwd-bar"></span>
+            <span class="pwd-bar"></span>
+            <span class="pwd-bar"></span>
+            <span class="pwd-bar"></span>
+          </div>
+          <span class="pwd-label" id="pwdLabel">Şifre gücü</span>
+        </div>
+
+        <div class="form-field">
+          <label for="rf-confirm">Yeni şifre (tekrar)</label>
+          <div class="form-field-input">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="rf-confirm" name="confirm" required placeholder="••••••••" autocomplete="new-password" minlength="8" />
+            <button type="button" class="password-toggle" data-target="rf-confirm" aria-label="Şifreyi göster">
+              <svg class="icon-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="icon-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+          <span class="mismatch-warning" id="mismatchWarning">Şifreler eşleşmiyor.</span>
+        </div>
+
+        <div class="pwd-requirements" id="pwdReq">
+          <div class="pwd-req-title">Gereksinimler</div>
+          <ul class="pwd-req-list">
+            <li class="pwd-req" data-rule="length">
+              <span class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+              En az 8 karakter
+            </li>
+            <li class="pwd-req" data-rule="upper">
+              <span class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+              En az bir büyük harf
+            </li>
+            <li class="pwd-req" data-rule="digit">
+              <span class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+              En az bir rakam
+            </li>
+            <li class="pwd-req" data-rule="special">
+              <span class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+              Özel karakter (önerilen)
+            </li>
+          </ul>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="submitBtn" disabled>
+          Şifreyi Güncelle
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+      </form>
+
+      <div class="success-state" id="successState">
+        <div class="success-big-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2 class="auth-title">Şifren güncellendi</h2>
+        <p class="auth-sub">Yeni şifrenle giriş yapabilirsin. Hesabının güvenliği bizim için önemli.</p>
+        <a href="giris.html" class="btn btn-primary btn-block">
+          Giriş Ekranına Dön
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <aside class="auth-brand-side" aria-hidden="true">
+    <div class="space-layer">
+      <div class="distant-planet p1"></div>
+      <div class="distant-planet p2"></div>
+      <div class="distant-planet p3"></div>
+      <div class="star s1" style="top:5%;left:18%;"></div>
+      <div class="star s2 tw" style="top:9%;right:24%;animation-delay:0.4s;"></div>
+      <div class="star s1" style="top:14%;left:34%;"></div>
+      <div class="star s3" style="top:20%;right:42%;"></div>
+      <div class="star s2 tw" style="top:26%;left:8%;animation-delay:1.5s;"></div>
+      <div class="star s1" style="top:32%;right:18%;"></div>
+      <div class="star s2" style="top:42%;left:22%;"></div>
+      <div class="star s1 tw" style="top:50%;right:32%;animation-delay:2.2s;"></div>
+      <div class="star s2" style="top:56%;left:48%;"></div>
+      <div class="star s3" style="top:62%;left:6%;"></div>
+      <div class="star s1" style="top:68%;right:8%;"></div>
+      <div class="star s2 tw" style="top:74%;left:36%;animation-delay:0.9s;"></div>
+      <div class="star s1" style="top:82%;left:14%;"></div>
+      <div class="star s2" style="top:88%;right:24%;"></div>
+      <div class="star s1 tw" style="top:92%;left:42%;animation-delay:1.8s;"></div>
+      <div class="shooting-star ss1"></div>
+      <div class="shooting-star ss2"></div>
+    </div>
+    <div class="brand-content">
+      <span class="brand-eyebrow">Hesap güvenliği</span>
+      <h2 class="brand-title">Güçlü bir şifre, hesabının kalkanıdır.</h2>
+      <p class="brand-sub">Tahmin edilmesi zor, sana özel bir şifre seç. Şifreni kimseyle paylaşma, tarayıcılar ve güvenli şifre yöneticileri dışında bir yerde saklama.</p>
+    </div>
+    <div class="brand-orbit" aria-hidden="true"></div>
+  </aside>
+</main>
+
+<script>
+  (function() {
+    const form = document.getElementById('resetForm');
+    const successState = document.getElementById('successState');
+    const pwdInput = document.getElementById('rf-password');
+    const confirmInput = document.getElementById('rf-confirm');
+    const pwdLabel = document.getElementById('pwdLabel');
+    const submitBtn = document.getElementById('submitBtn');
+    const mismatchWarning = document.getElementById('mismatchWarning');
+    const pwdReq = document.getElementById('pwdReq');
+    const bars = document.querySelectorAll('.pwd-bar');
+    const reqs = document.querySelectorAll('.pwd-req');
+
+    // Password show/hide (works on any toggle with data-target)
+    document.querySelectorAll('.password-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.dataset.target);
+        if (!target) return;
+        const isPwd = target.type === 'password';
+        target.type = isPwd ? 'text' : 'password';
+        btn.classList.toggle('shown', isPwd);
+        btn.setAttribute('aria-label', isPwd ? 'Şifreyi gizle' : 'Şifreyi göster');
+      });
+    });
+
+    function checkPwd(pwd) {
+      return {
+        length: pwd.length >= 8,
+        upper: /[A-ZÇĞİÖŞÜ]/.test(pwd),
+        digit: /[0-9]/.test(pwd),
+        special: /[^A-Za-zÇĞİÖŞÜçğıöşü0-9]/.test(pwd)
+      };
+    }
+
+    function updateUI() {
+      const pwd = pwdInput.value;
+      const conf = confirmInput.value;
+      const checks = checkPwd(pwd);
+      let score = 0;
+      Object.keys(checks).forEach((k, i) => {
+        if (checks[k]) score++;
+        const req = document.querySelector('.pwd-req[data-rule="' + k + '"]');
+        if (req) req.classList.toggle('met', checks[k]);
+      });
+
+      // Strength bars
+      bars.forEach((bar, i) => {
+        bar.classList.remove('active-weak', 'active-medium', 'active-strong');
+        if (i < score) {
+          if (score <= 1) bar.classList.add('active-weak');
+          else if (score === 2 || score === 3) bar.classList.add('active-medium');
+          else bar.classList.add('active-strong');
+        }
+      });
+
+      // Label
+      pwdLabel.classList.remove('weak', 'medium', 'strong');
+      if (pwd.length === 0) pwdLabel.textContent = 'Şifre gücü';
+      else if (score <= 1) { pwdLabel.textContent = 'Zayıf'; pwdLabel.classList.add('weak'); }
+      else if (score <= 3) { pwdLabel.textContent = 'Orta'; pwdLabel.classList.add('medium'); }
+      else { pwdLabel.textContent = 'Güçlü'; pwdLabel.classList.add('strong'); }
+
+      // Mismatch
+      const mismatch = conf.length > 0 && conf !== pwd;
+      mismatchWarning.classList.toggle('show', mismatch);
+
+      // Required (length + upper + digit) AND confirm matches
+      const required = checks.length && checks.upper && checks.digit;
+      submitBtn.disabled = !(required && pwd === conf && pwd.length > 0);
+    }
+
+    pwdInput.addEventListener('input', updateUI);
+    confirmInput.addEventListener('input', updateUI);
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Güncelleniyor...';
+      setTimeout(() => {
+        form.classList.add('hidden');
+        pwdReq.classList.add('hidden');
+        successState.classList.add('show');
+      }, 800);
+    });
+  })();
+</script>
+
+<script src="assets/input-rules.js"></script>
+</body>
+</html>

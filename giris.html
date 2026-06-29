@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bilenyum - Giriş Yap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    background: #fafaff;
+    color: var(--ink-dark-0);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ---------- Minimal topbar ---------- */
+  .auth-topbar {
+    background: white;
+    border-bottom: 1px solid rgba(20,22,50,0.06);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .auth-topbar .logo-img { height: 32px; width: auto; display: block; }
+  .auth-topbar-actions { display: flex; align-items: center; gap: 4px; }
+  .auth-topbar-link {
+    font-size: 14px; font-weight: 600;
+    color: var(--ink-dark-1);
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 10px;
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .auth-topbar-link:hover { background: rgba(62,58,142,0.08); color: var(--p-deep); }
+  .auth-topbar-link svg { width: 16px; height: 16px; }
+  @media (max-width: 560px) {
+    .auth-topbar-link span,
+    .auth-topbar-link { font-size: 12.5px; padding: 6px 10px; gap: 4px; }
+  }
+
+  /* ---------- Split layout ---------- */
+  .auth-wrap {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 0;
+  }
+
+  /* ---------- Form side ---------- */
+  .auth-form-side {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 40px 32px 28px;
+  }
+  .auth-card {
+    width: 100%;
+    max-width: 440px;
+    margin-top: auto; /* form alanı dikey ortalansın */
+  }
+  /* Anasayfaya Dön — text link, form'un sol başlangıç hizasında */
+  .auth-form-foot {
+    width: 100%;
+    max-width: 440px;
+    margin-top: auto;
+  }
+  .auth-form-home-link {
+    display: inline-flex; align-items: center; gap: 7px;
+    margin-left: -10px;       /* iç padding'i offset'le → metin form sol kenarıyla aynı x'te */
+    padding: 10px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13.5px; font-weight: 600;
+    color: var(--ink-dark-2);
+    text-decoration: none;
+    transition: color 0.18s ease, background 0.18s ease;
+  }
+  .auth-form-home-link:hover {
+    color: var(--p-purple);
+    background: rgba(62,58,142,0.06);
+  }
+  .auth-form-home-link svg { width: 14px; height: 14px; }
+  .auth-brand-name {
+    font-size: 18px; font-weight: 800;
+    letter-spacing: -0.005em;
+    line-height: 1;
+    margin: 0 0 4px;
+    display: inline-flex;
+    color: var(--p-brand);
+  }
+  .auth-brand-name .auth-bilen,
+  .auth-brand-name .auth-yum { color: var(--p-brand); }
+  .auth-title {
+    font-size: 32px; font-weight: 800;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin: 0 0 8px;
+  }
+  .auth-sub {
+    font-size: 15px; color: var(--ink-dark-1);
+    line-height: 1.55;
+    margin: 0 0 32px;
+  }
+
+  /* Form fields */
+  .auth-form { display: flex; flex-direction: column; gap: 16px; }
+  .form-field { display: flex; flex-direction: column; gap: 6px; }
+  .form-field label {
+    font-size: 13px; font-weight: 600;
+    color: var(--ink-dark-1);
+    letter-spacing: -0.005em;
+  }
+  .form-field-input {
+    position: relative;
+    display: flex; align-items: center;
+  }
+  .form-field-input .field-icon {
+    position: absolute;
+    left: 16px;
+    width: 18px; height: 18px;
+    color: var(--ink-dark-2);
+    pointer-events: none;
+  }
+  .form-field input {
+    width: 100%;
+    height: 52px;
+    padding: 0 16px 0 46px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(40,38,90,0.12);
+    background: white;
+    color: var(--ink-dark-0);
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  }
+  .form-field input::placeholder { color: var(--ink-dark-2); }
+  .form-field input:focus {
+    border-color: var(--p-purple);
+    box-shadow: 0 0 0 4px rgba(62,58,142,0.12);
+    background: white;
+  }
+  .form-field input.has-toggle { padding-right: 56px; }
+
+  .password-toggle {
+    position: absolute;
+    right: 14px;
+    width: 30px; height: 30px;
+    background: none; border: none; cursor: pointer;
+    color: var(--ink-dark-2);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  .password-toggle:hover { color: var(--p-purple); background: rgba(62,58,142,0.08); }
+  .password-toggle svg { width: 18px; height: 18px; }
+  .password-toggle .icon-hide { display: none; }
+  .password-toggle.shown .icon-show { display: none; }
+  .password-toggle.shown .icon-hide { display: block; }
+
+  /* Row: remember + forgot */
+  .form-row-extra {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    margin-top: -2px;
+  }
+  .remember-me {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13.5px; color: var(--ink-dark-1);
+    cursor: pointer;
+    user-select: none;
+  }
+  .remember-me input {
+    width: 16px; height: 16px;
+    accent-color: var(--p-brand);
+    cursor: pointer;
+  }
+  .forgot-link {
+    font-size: 13.5px; font-weight: 600;
+    color: var(--p-brand);
+    transition: color 0.15s ease;
+  }
+  .forgot-link:hover { color: var(--p-brand-deep); }
+
+  /* Submit button uses .btn .btn-primary from design system */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    height: 56px; padding: 0 28px;
+    border-radius: 14px;
+    font-weight: 600; font-size: 16px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    font-family: inherit;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    text-decoration: none;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-primary {
+    background: linear-gradient(180deg, var(--p-brand-light), var(--p-brand));
+    color: white;
+    box-shadow: 0 12px 32px -8px rgba(229,4,123,0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .btn-block { width: 100%; }
+
+  /* Footer text */
+  .auth-footer-text {
+    text-align: center;
+    margin: 32px 0 0;
+    font-size: 14px;
+    color: var(--ink-dark-1);
+  }
+  .auth-footer-text a {
+    color: var(--p-brand); font-weight: 700;
+    transition: color 0.15s ease;
+  }
+  .auth-footer-text a:hover { color: var(--p-brand-deep); }
+
+  /* ---------- Brand side ---------- */
+  .auth-brand-side {
+    position: relative;
+    background:
+      radial-gradient(1300px 700px at 78% 10%, rgba(62,58,142,0.40), transparent 60%),
+      radial-gradient(900px 380px at 8% 22%, rgba(74,214,255,0.18), transparent 60%),
+      #0d0c25;
+    color: white;
+    padding: 60px 56px;
+    display: flex; flex-direction: column; justify-content: center;
+    overflow: hidden;
+  }
+  .auth-brand-side::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .brand-content { position: relative; z-index: 1; max-width: 480px; }
+  .brand-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 700;
+    color: var(--p-brand-light);
+    letter-spacing: 0.10em; text-transform: uppercase;
+    margin-bottom: 14px;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .brand-eyebrow::before {
+    content: ""; width: 24px; height: 1.5px;
+    background: var(--p-brand-light);
+  }
+  .brand-title {
+    font-size: 38px; font-weight: 800;
+    color: white;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 0 16px;
+  }
+  .brand-sub {
+    font-size: 16px; color: rgba(255,255,255,0.78);
+    line-height: 1.6;
+    margin: 0 0 36px;
+    max-width: 420px;
+  }
+  .brand-badges {
+    display: flex; flex-direction: column; gap: 14px;
+    list-style: none; padding: 0; margin: 0;
+  }
+  .brand-badge {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 14.5px;
+    color: rgba(255,255,255,0.92);
+  }
+  .brand-badge-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.16);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--p-aqua);
+  }
+  .brand-badge:nth-child(2) .brand-badge-icon { color: var(--p-brand-light); }
+  .brand-badge:nth-child(3) .brand-badge-icon { color: var(--p-sun); }
+  .brand-badge-icon svg { width: 18px; height: 18px; }
+  .brand-badge strong { font-weight: 700; color: white; }
+
+  /* ---------- Space layer (stars, planets, shooting stars) ---------- */
+  .space-layer {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .star { position: absolute; background: white; border-radius: 50%; opacity: 0.7; }
+  .star.s1 { width: 1px; height: 1px; }
+  .star.s2 { width: 2px; height: 2px; opacity: 0.85; }
+  .star.s3 { width: 3px; height: 3px; }
+  .star.tw { animation: twinkle 3s ease-in-out infinite; }
+  @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+  .distant-planet {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: distantFloat 16s ease-in-out infinite;
+  }
+  .distant-planet::after {
+    content: ""; position: absolute; inset: -5px;
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 50%;
+    transform: rotate(-25deg) scaleY(0.3);
+  }
+  .distant-planet.p1 {
+    width: 36px; height: 36px;
+    top: 12%; left: 14%;
+    background: radial-gradient(circle at 30% 30%, #a8a4f0, #3e3a8e 60%, #1a1842);
+    box-shadow: 0 0 22px rgba(62,58,142,0.45), inset -3px -4px 6px rgba(0,0,0,0.4);
+    opacity: 0.55;
+  }
+  .distant-planet.p2 {
+    width: 26px; height: 26px;
+    top: 68%; right: 16%; left: auto;
+    background: radial-gradient(circle at 30% 30%, #b8e8ff, #4ad6ff 60%, #1a7ba8);
+    box-shadow: 0 0 14px rgba(74,214,255,0.4), inset -2px -3px 5px rgba(0,0,0,0.4);
+    opacity: 0.55;
+    animation-duration: 19s; animation-delay: -4s;
+  }
+  .distant-planet.p3 {
+    width: 22px; height: 22px;
+    top: 40%; right: 8%; left: auto;
+    background: radial-gradient(circle at 30% 30%, #ffd8e8, #ff7ab8 60%, #aa3070);
+    box-shadow: 0 0 14px rgba(255,122,184,0.35), inset -2px -3px 5px rgba(0,0,0,0.4);
+    opacity: 0.5;
+    animation-duration: 22s; animation-delay: -10s;
+  }
+  @keyframes distantFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  .shooting-star {
+    position: absolute;
+    width: 80px; height: 1px;
+    background: linear-gradient(to right, white, rgba(255,255,255,0));
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transform-origin: 0% 50%;
+    animation: shootStar 8s linear infinite;
+  }
+  .shooting-star::after {
+    content: ""; position: absolute;
+    left: 0; top: 50%;
+    width: 3px; height: 3px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 8px white, 0 0 16px white;
+    transform: translateY(-50%);
+  }
+  @keyframes shootStar {
+    0% { transform: translate(0, 0) rotate(-22deg); opacity: 0; }
+    4% { opacity: 1; }
+    18% { opacity: 1; }
+    22% { opacity: 0; }
+    100% { transform: translate(-500px, 200px) rotate(-22deg); opacity: 0; }
+  }
+  .shooting-star.ss1 { top: 8%; right: 10%; animation-delay: 3s; }
+  .shooting-star.ss2 { top: 36%; right: 4%; animation-delay: 10s; animation-duration: 11s; }
+
+  /* Decorative orbit */
+  .brand-orbit {
+    position: absolute;
+    width: 380px; height: 380px;
+    right: -120px; bottom: -120px;
+    border: 1px dashed rgba(255,255,255,0.16);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: orbit 80s linear infinite;
+  }
+  .brand-orbit::before {
+    content: "";
+    position: absolute; inset: 40px;
+    border-radius: 50%;
+    border: 1px dashed rgba(255,255,255,0.10);
+  }
+  .brand-orbit::after {
+    content: "";
+    position: absolute;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--p-brand-light);
+    top: -8px; left: 50%; transform: translateX(-50%);
+  }
+  @keyframes orbit { to { transform: rotate(360deg); } }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 980px) {
+    .auth-wrap { grid-template-columns: 1fr; }
+    .auth-brand-side { display: none; }
+    .auth-form-side { padding: 32px 24px 56px; }
+  }
+  @media (max-width: 480px) {
+    .auth-topbar { padding: 12px 20px; }
+    .auth-form-side { padding: 24px 20px 48px; }
+    .auth-title { font-size: 28px; }
+  }
+
+  /* Toast notification */
+  .toast {
+    position: fixed;
+    bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: var(--ink-dark-0);
+    color: white;
+    padding: 14px 20px;
+    border-radius: 14px;
+    font-size: 14px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 10px;
+    box-shadow: 0 18px 40px -10px rgba(0,0,0,0.40);
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22,0.61,0.36,1), visibility 0.3s;
+    z-index: 1000;
+    max-width: 90vw;
+  }
+  .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+  .toast svg { width: 18px; height: 18px; color: var(--p-green); flex-shrink: 0; }
+  .toast-email { color: var(--p-brand-light); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- Minimal topbar -->
+<header class="auth-topbar">
+  <a href="index.html" class="logo"><img src="assets/bilenyum-logo.svg" alt="Bilenyum" class="logo-img" /></a>
+  <div class="auth-topbar-actions">
+    <a href="iletisim.html" class="auth-topbar-link auth-topbar-help">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Yardım
+    </a>
+  </div>
+</header>
+
+<!-- Auth split layout -->
+<main class="auth-wrap">
+
+  <!-- LEFT: Form -->
+  <section class="auth-form-side">
+    <div class="auth-card">
+      <span class="auth-brand-name"><span class="auth-bilen">Bilen</span><span class="auth-yum">yum</span></span>
+      <h1 class="auth-title">Hesabına Giriş Yap</h1>
+      <p class="auth-sub">E-posta ile veya sosyal hesabınla giriş yap, kaldığın yerden devam et.</p>
+
+      <form class="auth-form" id="loginForm" autocomplete="on">
+        <div class="form-field">
+          <label for="lf-email">E-posta</label>
+          <div class="form-field-input">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+            <input type="email" id="lf-email" name="email" required placeholder="ornek@email.com" autocomplete="email" data-rule="email" maxlength="120" />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="lf-password">Şifre</label>
+          <div class="form-field-input">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="lf-password" name="password" required placeholder="••••••••" class="has-toggle" autocomplete="current-password" minlength="6" />
+            <button type="button" class="password-toggle" id="passwordToggle" aria-label="Şifreyi göster">
+              <svg class="icon-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="icon-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row-extra">
+          <label class="remember-me">
+            <input type="checkbox" id="lf-remember" />
+            <span>Beni hatırla</span>
+          </label>
+          <a href="sifremi-unuttum.html" class="forgot-link">Şifremi unuttum?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          Giriş Yap
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </form>
+
+    </div>
+    <div class="auth-form-foot">
+      <a href="index.html" class="auth-form-home-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Anasayfaya Dön
+      </a>
+    </div>
+  </section>
+
+  <!-- RIGHT: Brand panel -->
+  <aside class="auth-brand-side" aria-hidden="true">
+    <div class="space-layer">
+      <div class="distant-planet p1"></div>
+      <div class="distant-planet p2"></div>
+      <div class="distant-planet p3"></div>
+      <div class="star s1" style="top:5%;left:18%;"></div>
+      <div class="star s2 tw" style="top:9%;right:24%;animation-delay:0.4s;"></div>
+      <div class="star s1" style="top:14%;left:34%;"></div>
+      <div class="star s3" style="top:20%;right:42%;"></div>
+      <div class="star s2 tw" style="top:26%;left:8%;animation-delay:1.5s;"></div>
+      <div class="star s1" style="top:32%;right:18%;"></div>
+      <div class="star s2" style="top:42%;left:22%;"></div>
+      <div class="star s1 tw" style="top:50%;right:32%;animation-delay:2.2s;"></div>
+      <div class="star s2" style="top:56%;left:48%;"></div>
+      <div class="star s3" style="top:62%;left:6%;"></div>
+      <div class="star s1" style="top:68%;right:8%;"></div>
+      <div class="star s2 tw" style="top:74%;left:36%;animation-delay:0.9s;"></div>
+      <div class="star s1" style="top:82%;left:14%;"></div>
+      <div class="star s2" style="top:88%;right:24%;"></div>
+      <div class="star s1 tw" style="top:92%;left:42%;animation-delay:1.8s;"></div>
+      <div class="shooting-star ss1"></div>
+      <div class="shooting-star ss2"></div>
+    </div>
+    <div class="brand-content">
+      <span class="brand-eyebrow">BİLENYUM'A HOŞ GELDİN !</span>
+      <h2 class="brand-title">Yolculuğunda Yalnız Değilsin.</h2>
+      <p class="brand-sub">En fazla 12 kişilik canlı sınıflarda branş öğretmeninle öğren; akademik yolculuğunun her adımında yanındayız.</p>
+      <ul class="brand-badges">
+        <li class="brand-badge">
+          <span class="brand-badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>
+          <span><strong>500+</strong> Şeffaf akademik takip Kontrol Merkezi'nde</span>
+        </li>
+        <li class="brand-badge">
+          <span class="brand-badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 5v6c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11V5l-8-3z"/><path d="M9 12l2 2 4-4"/></svg>
+          </span>
+          <span><strong>Canlı dersler</strong>+ <strong>sınırsız ders tekrarı</strong>izleme</span>
+        </li>
+        <li class="brand-badge">
+          <span class="brand-badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </span>
+          <span><strong>Klanlar ve XP</strong> ile oyunlaştırılmış öğrenme</span>
+        </li>
+      </ul>
+    </div>
+    <div class="brand-orbit" aria-hidden="true"></div>
+  </aside>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toastText">Mesaj</span>
+</div>
+
+<script>
+  // Toast: triggered from sifremi-unuttum.html via sessionStorage
+  (function() {
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toastText');
+    if (!toast) return;
+    const resetEmail = sessionStorage.getItem('resetEmail');
+    const showResetToast = sessionStorage.getItem('showResetToast');
+    if (showResetToast === '1') {
+      sessionStorage.removeItem('showResetToast');
+      sessionStorage.removeItem('resetEmail');
+      const emailHtml = resetEmail
+        ? '<span class="toast-email">' + resetEmail + '</span>'
+        : 'belirttiğin adrese';
+      toastText.innerHTML = 'Sıfırlama linki ' + emailHtml + ' adresine gönderildi. Gelen kutunu kontrol et.';
+      setTimeout(() => toast.classList.add('show'), 150);
+      setTimeout(() => toast.classList.remove('show'), 6500);
+    }
+  })();
+
+  // Password show/hide toggle
+  (function() {
+    const toggle = document.getElementById('passwordToggle');
+    const input = document.getElementById('lf-password');
+    if (!toggle || !input) return;
+    toggle.addEventListener('click', () => {
+      const isPwd = input.type === 'password';
+      input.type = isPwd ? 'text' : 'password';
+      toggle.classList.toggle('shown', isPwd);
+      toggle.setAttribute('aria-label', isPwd ? 'Şifreyi gizle' : 'Şifreyi göster');
+    });
+  })();
+
+  // Form submit → demo loading state → dashboard'a yönlendir
+  (function() {
+    const form = document.getElementById('loginForm');
+    if (!form) return;
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.innerHTML = 'Giriş yapılıyor...';
+      submitBtn.disabled = true;
+      // Simulate request, then redirect to dashboard
+      setTimeout(() => {
+        window.location.href = 'onboarding.html';
+      }, 900);
+    });
+  })();
+</script>
+
+<script src="assets/input-rules.js"></script>
+</body>
+</html>

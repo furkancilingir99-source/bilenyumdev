@@ -1,0 +1,196 @@
+/* Öğretmen deneme sınavları — öğrenci sonuç görünümü */
+
+.thw-main-col .tds-student-exams.sn-page {
+  padding: 0 2px 16px;
+  gap: 16px;
+  overflow: visible;
+}
+
+.tds-student-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px 20px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.99) 0%, rgba(246, 245, 255, 0.97) 100%);
+  border: 1px solid rgba(168, 164, 240, 0.22);
+  box-shadow: 0 4px 18px rgba(62, 58, 142, 0.06);
+}
+
+.tds-student-hero-main { min-width: 0; flex: 1 1 280px; }
+.tds-student-hero-profile {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.tds-student-avatar {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 18px;
+  border: 2px solid rgba(168, 164, 240, 0.28);
+  box-shadow: 0 4px 14px rgba(62, 58, 142, 0.1);
+}
+.tds-student-hero-text { min-width: 0; flex: 1; }
+.tds-student-name {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--brand-navy, #3e3a8e);
+  letter-spacing: -0.02em;
+}
+.tds-student-badges { margin-bottom: 6px; }
+.tds-student-meta {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-dark-1, #5c567a);
+}
+.tds-student-info-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.tds-student-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(168, 164, 240, 0.08);
+  border: 1px solid rgba(168, 164, 240, 0.18);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-dark-1, #5c567a);
+  line-height: 1.2;
+}
+.tds-student-chip-ico {
+  font-size: 14px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.tds-student-chip-text {
+  min-width: 0;
+}
+
+.tds-student-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(72px, 1fr));
+  gap: 8px;
+  flex: 1 1 320px;
+  max-width: 420px;
+}
+.tds-student-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 8px 9px;
+  border-radius: 12px;
+  background: var(--bg-subtle, rgba(246, 245, 255, 0.9));
+  border: 1px solid rgba(168, 164, 240, 0.16);
+  text-align: center;
+}
+.tds-student-stat-ico {
+  display: block;
+  font-size: 18px;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+.tds-student-stat-val {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--brand-navy, #3e3a8e);
+  line-height: 1.15;
+}
+.tds-student-stat-lbl {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-dark-1, #5c567a);
+}
+
+.tds-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.thw-main-col .tds-student-exams .sn-section-head {
+  margin-bottom: 4px;
+}
+
+.tds-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  flex-wrap: wrap;
+}
+
+.tds-section-head-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.tds-edu-nav {
+  flex: 0 0 auto;
+  margin-left: auto;
+  width: auto;
+  min-width: min(280px, 100%);
+  max-width: 360px;
+  grid-area: unset;
+  justify-self: unset;
+}
+
+.tds-edu-nav .td-week-edu-range { color: var(--brand-navy, #3e3a8e); }
+.tds-edu-nav .td-week-edu-btn { color: var(--brand-navy, #3e3a8e); }
+.tds-edu-nav .td-week-edu-cal-btn { color: var(--brand-navy, #3e3a8e); }
+.tds-edu-nav .td-week-edu-eyebrow { color: var(--ink-dark-1, #5c567a); }
+
+.thw-main-col .tds-student-exams .sn-section-title {
+  color: var(--brand-navy, #3e3a8e) !important;
+}
+
+@media (max-width: 720px) {
+  .tds-student-hero-profile { gap: 12px; }
+  .tds-student-avatar { width: 60px; height: 60px; border-radius: 15px; }
+  .tds-student-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+  .tds-section-head { flex-direction: column; align-items: stretch; }
+  .tds-edu-nav { margin-left: 0; width: 100%; max-width: none; }
+}
+
+.tds-detail-student {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--brand-purple, #5b54c9);
+}
+
+/* Birebir öğrenci kartları — deneme listesi */
+body[data-tkg-context="deneme"] .tkg-card-student.is-clickable:hover {
+  border-color: rgba(43, 159, 212, 0.4);
+  box-shadow: 0 8px 22px rgba(43, 159, 212, 0.12);
+}
+
+body[data-tkg-context="deneme"] .tkg-card-student.is-clickable:hover .tkg-card-action {
+  background: #1a6f96;
+  border-color: #1a6f96;
+  color: #fff;
+}
+
+body[data-tkg-context="deneme"] .tkg-card-clan.is-clickable:hover .tkg-card-action {
+  background: var(--brand-purple, #5b54c9);
+  border-color: var(--brand-purple, #5b54c9);
+  color: #fff;
+}

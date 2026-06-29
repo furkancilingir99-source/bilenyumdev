@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Ödev Kontrol · Bilenyum</title>
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-d3-mega.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
+<link rel="stylesheet" href="assets/dashboard-polish.css">
+<link rel="stylesheet" href="assets/teacher-dashboard.css">
+<script src="assets/dashboard-switcher.js" defer></script>
+<script src="assets/teacher-shell.js" defer></script>
+<script src="assets/shell.js" defer></script>
+</head>
+<body data-teacher-active="odev">
+
+<div class="scene" aria-hidden="true">
+  <div class="scene-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
+<header class="hud" data-teacher-hud></header>
+
+<main class="stage thw-stage">
+  <div class="stage-nav" data-teacher-nav></div>
+
+  <div class="thw-main-col" id="thwMain">
+    <nav class="tkg-breadcrumb thw-breadcrumb" id="thwBreadcrumb" hidden></nav>
+
+    <div class="thw-context-panel" id="thwContextPanel">
+      <div class="thw-detail-head-row" id="thwDetailHeadRow">
+        <span class="thw-context-cal-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </span>
+        <div class="thw-page-head">
+          <h1 class="thw-page-title" id="thwPageTitle">Ödev Kontrol</h1>
+          <p class="thw-page-subtitle" id="thwPageSubtitle">Matematik dersi verdiğiniz klanların ödev durumlarını ve eksik teslimleri takip edin.</p>
+        </div>
+        <aside class="thw-homework-clan-aside" id="thwHomeworkClanAside" hidden aria-label="Klan bilgisi"></aside>
+        <span class="thw-detail-head-divider" aria-hidden="true"></span>
+        <div class="thw-toolbar" id="thwToolbar">
+      <nav class="tkg-tabs" id="thwTabs" role="tablist" aria-label="Liste türü">
+        <button type="button" class="tkg-tab is-active" data-thw-tab="clans" role="tab" aria-selected="true">Klanlarım</button>
+        <button type="button" class="tkg-tab" data-thw-tab="birebir" role="tab" aria-selected="false">Birebir Ders Öğrencileri</button>
+      </nav>
+      <div class="thw-edu-nav-wrap">
+        <div class="td-week-edu-nav thw-edu-nav" id="thwEduNav">
+          <button type="button" class="td-week-edu-btn is-prev" id="thwEduPrev" aria-label="Önceki eğitim haftası">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="td-week-edu-center">
+            <div class="td-week-edu-label">
+              <span class="td-week-edu-eyebrow" id="thwEduEyebrow">17. Eğitim Haftası</span>
+              <strong class="td-week-edu-range" id="thwEduRange">—</strong>
+            </div>
+            <button type="button" class="td-week-edu-cal-btn" id="thwEduCalBtn" aria-label="Eğitim haftası seç" aria-expanded="false" aria-controls="thwEduPicker">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </button>
+          </div>
+          <button type="button" class="td-week-edu-btn is-next" id="thwEduNext" aria-label="Sonraki eğitim haftası">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <div class="td-week-edu-picker" id="thwEduPicker" hidden role="dialog" aria-label="Eğitim haftası seç">
+            <div class="td-week-edu-picker-head">Eğitim Haftası Seç</div>
+            <div class="td-week-edu-picker-list" id="thwEduPickerList"></div>
+          </div>
+        </div>
+      </div>
+      </div>
+      </div>
+      <p class="thw-edu-bar-desc" id="thwEduBarDesc">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span id="thwEduBarDescText">Bu bölümde gördüğünüz ödev verileri, seçtiğiniz eğitim haftası tarih aralığına göre listelenir.</span>
+      </p>
+    </div>
+
+    <div id="thwLoading" class="td-state">
+      <div class="td-skeleton"><div class="td-skeleton-bar"></div><div class="td-skeleton-bar"></div></div>
+      Ödev kontrol verileri yükleniyor...
+    </div>
+    <p id="thwError" class="td-state is-error" hidden>Ödev kontrol verileri yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>
+    <p id="thwEmpty" class="td-state" hidden></p>
+    <div id="thwContent" hidden></div>
+  </div>
+</main>
+
+<div class="d3-drawer" id="thwDrawer" data-subject="mat" aria-hidden="true">
+  <div class="d3-drawer-overlay" id="thwDrawerOverlay"></div>
+  <aside class="d3-drawer-panel" role="dialog" aria-label="Öğrenci ödev detayı">
+    <button type="button" class="d3-drawer-close" id="thwDrawerClose" aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div id="thwDrawerBody" class="thw-drawer-body"></div>
+  </aside>
+</div>
+
+<script src="assets/teacher-groups-mock.js"></script>
+<script src="assets/teacher-dashboard-mock.js"></script>
+<script src="assets/teacher-avatars.js"></script>
+<script src="assets/teacher-homework-mock.js"></script>
+<script src="assets/teacher-homework-control.js"></script>
+</body>
+</html>

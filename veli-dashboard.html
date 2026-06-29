@@ -1,0 +1,4208 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Veli Kontrol Merkezi · Bilenyum</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="description" content="Bilenyum — Veli Kontrol Merkezi. Öğrencinizin ders, gelişim ve bildirimlerini tek yerden takip edin." />
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Öğrenci dashboard tema sistemi (yeni tema yaratılmadı) -->
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/veli-shell.css">
+<script src="assets/dashboard-switcher.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<style>
+/* ============================================================
+ * Veli Dashboard — yalnızca parent-spesifik parçalar.
+ * Renk/font/spacing/radius/gölge tamamen tokens.css + shell.css'ten gelir.
+ * Bildirim drawer'ı açık tema token'larıyla (sağdan kayan) kuruludur.
+ * Class prefix: .pv- (parent-view)
+ * ============================================================ */
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  background: var(--bg-page);
+  color: var(--ink-dark-0);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  overflow: hidden;
+}
+button, a { font-family: inherit; cursor: pointer; }
+a { text-decoration: none; color: inherit; }
+
+/* ---- Header / context / modal / drawer → assets/veli-shell.css ---- */
+
+/* ============ MAIN ============ */
+.pv-main {
+  position: relative; z-index: 5;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 28px 28px 64px;
+}
+
+.pv-placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  gap: 14px;
+  padding: 64px 32px;
+  background: var(--bg-surface);
+  border: 1.5px dashed var(--brand-purple-18);
+  border-radius: var(--r-l);
+  box-shadow: var(--shadow-sm);
+}
+.pv-placeholder-ico {
+  width: 72px; height: 72px; border-radius: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--brand-purple-10), var(--brand-magenta-08));
+  color: var(--brand-purple);
+}
+.pv-placeholder-ico svg { width: 34px; height: 34px; }
+.pv-placeholder-title { margin: 0; font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--brand-navy); max-width: 38ch; }
+.pv-placeholder-desc  { margin: 0; font-size: 14px; font-weight: 400; color: var(--ink-dark-2); max-width: 46ch; line-height: 1.6; }
+.pv-soon-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  width: 100%; max-width: 720px; margin-top: 10px;
+}
+.pv-soon {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 16px 10px;
+  border-radius: var(--r-m);
+  background: var(--brand-purple-06);
+  border: 1px solid var(--brand-purple-10);
+}
+.pv-soon svg { width: 22px; height: 22px; color: var(--brand-purple); }
+.pv-soon span { font-size: 12px; font-weight: 600; color: var(--ink-dark-1); }
+
+/* ============================================================
+ * Veli dashboard ölçek sistemi — viewport içi rahat yerleşim
+ * ============================================================ */
+.pv-shell {
+  --pv-gap: 12px;
+  --pv-pad-y: 10px;
+  --pv-pad-x: 22px;
+  --pv-radius: 16px;
+  --pv-head-pad: 12px 16px 10px;
+  --pv-title-lg: 18px;
+  --pv-title-md: 14px;
+  --pv-text: 12.5px;
+  --pv-text-sm: 10.5px;
+  --pv-text-xs: 10px;
+  --pv-cta-pad: 10px 12px;
+  --pv-cta-size: 12.5px;
+}
+.pv-hw-card,
+.pv-abs-card { border-radius: var(--pv-radius); }
+.pv-hw-head,
+.pv-abs-head { padding: var(--pv-head-pad); }
+.pv-hw-title { font-size: var(--pv-title-lg); line-height: 1.2; font-family: var(--font-display); font-weight: 800; }
+.pv-abs-head-title { font-size: var(--pv-title-lg); line-height: 1.2; font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; }
+.pv-hw-title { white-space: nowrap; }
+.pv-nav .nav-item svg { width: 22px; height: 22px; }
+.pv-nav .nav-item-label { font-size: 9px; letter-spacing: 0.08em; }
+
+/* ============================================================
+ * Shell: sol nav rail + içerik kolonu
+ * ============================================================ */
+.pv-shell {
+  position: relative; z-index: 5;
+  margin: 0;
+  padding: var(--pv-pad-y) var(--pv-pad-x) 14px;
+  height: calc(100vh - 88px);
+  max-height: calc(100vh - 88px);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: "nav perf hw";
+  gap: var(--pv-gap);
+  align-items: stretch;
+  overflow: hidden;
+}
+.pv-nav { grid-area: nav; min-height: 0; align-self: start; display: flex; flex-direction: column; }
+.pv-nav .nav-rail { height: auto; flex-shrink: 0; }
+.pv-nav .nav-item { padding: 10px 4px 8px; gap: 4px; }
+.pv-perfcol { grid-area: perf; min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.pv-hwcol   { grid-area: hw;   min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.pv-perfcol > .pv-abs-card { min-height: 0; min-width: 0; height: 100%; flex: 1; }
+.pv-hw-card { min-width: 0; min-height: 0; flex: 1; height: 100%; overflow: hidden; display: flex; flex-direction: column; }
+
+/* ============================================================
+ * Haftalık Performans Takibi — özet + yatay ders kartları
+ * ============================================================ */
+.pv-abs-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--brand-purple-14);
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  display: flex; flex-direction: column;
+  flex: 1; min-height: 0;
+  font-family: var(--font-sans);
+  overflow: hidden;
+}
+.pv-abs-head {
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px dashed var(--brand-purple-18);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  row-gap: 10px;
+}
+.pv-abs-head-title {
+  flex-shrink: 0;
+  font-size: var(--pv-title-lg); line-height: 1.2;
+  font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em;
+}
+.pv-abs-head .pv-hw-edu-nav { max-width: 280px; }
+.pv-abs-filters {
+  display: flex; align-items: center; gap: 6px;
+  margin-left: auto; flex-shrink: 0; flex-wrap: wrap;
+}
+.pv-hw-filter.is-active[data-abs-filter="attended"] {
+  background: rgba(61,166,110,0.14); border-color: rgba(61,166,110,0.45); color: #2d8a5e;
+}
+.pv-hw-filter.is-active[data-abs-filter="absent"] {
+  background: rgba(229,4,123,0.10); border-color: rgba(229,4,123,0.38); color: var(--brand-magenta);
+}
+.pv-abs-head-link {
+  flex-shrink: 0;
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px; border-radius: 999px;
+  background: var(--brand-purple-06); border: 1px solid var(--brand-purple-18);
+  font-size: 10.5px; font-weight: 700; color: var(--brand-purple);
+  text-decoration: none;
+  transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.18s;
+}
+.pv-abs-head-link:hover {
+  background: var(--brand-magenta-08); border-color: var(--brand-magenta-35);
+  color: var(--brand-magenta); transform: translateY(-1px);
+}
+.pv-abs-head-link svg { width: 11px; height: 11px; }
+.pv-abs-body {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.pv-abs-summary-wrap {
+  flex-shrink: 0;
+  padding: 6px 10px 6px;
+  border-bottom: 1px dashed var(--brand-purple-12);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.pv-abs-summary-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(91,84,201,0.07) 0%, rgba(43,159,212,0.05) 100%);
+  border: 1px solid var(--brand-purple-14);
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink-dark-1);
+}
+.pv-abs-summary-note svg {
+  width: 15px; height: 15px; flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--brand-purple);
+}
+.pv-abs-summary-note strong {
+  font-weight: 800;
+  color: var(--brand-navy);
+}
+.pv-abs-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.pv-abs-summary-secondary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.pv-abs-summary-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: var(--brand-purple-06);
+  border: 1px solid var(--brand-purple-10);
+}
+.pv-abs-summary-text {
+  display: flex; flex-direction: column; gap: 3px; min-width: 0;
+}
+.pv-abs-summary-val {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--brand-navy);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.pv-abs-summary-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-dark-2);
+  line-height: 1.2;
+}
+.pv-abs-summary-item.is-attended {
+  background: rgba(46,168,106,0.07);
+  border-color: rgba(46,168,106,0.24);
+}
+.pv-abs-summary-item.is-attended .pv-abs-summary-val { color: #15803d; }
+.pv-abs-summary-item.is-absent {
+  background: rgba(220,38,38,0.07);
+  border-color: rgba(220,38,38,0.24);
+}
+.pv-abs-summary-item.is-absent .pv-abs-summary-val { color: #b91c1c; }
+.pv-abs-sum-ico {
+  width: 30px; height: 30px; flex-shrink: 0;
+}
+.pv-abs-sum-ico svg { width: 14px; height: 14px; }
+.is-attended .pv-abs-sum-ico { background: rgba(46,168,106,0.14); color: #15803d; }
+.is-absent .pv-abs-sum-ico { background: rgba(220,38,38,0.12); color: #b91c1c; }
+.pv-abs-summary-item.is-participation {
+  background: rgba(43,159,212,0.07);
+  border-color: rgba(43,159,212,0.22);
+}
+.pv-abs-summary-item.is-participation .pv-abs-summary-val { color: #1a6f96; }
+.pv-abs-summary-item.is-correct {
+  background: rgba(91,84,201,0.07);
+  border-color: rgba(91,84,201,0.22);
+}
+.pv-abs-summary-item.is-correct .pv-abs-summary-val { color: var(--brand-purple); }
+.is-participation .pv-abs-sum-ico { background: rgba(43,159,212,0.14); color: #1a6f96; }
+.is-correct .pv-abs-sum-ico { background: rgba(91,84,201,0.14); color: var(--brand-purple); }
+.pv-abs-list-section {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+.pv-abs-week-wrap {
+  flex: 1; min-height: 0;
+  padding: 6px 8px 8px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+.pv-abs-week-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+}
+.pv-abs-week-row {
+  display: grid;
+  gap: 8px;
+  min-height: 0;
+  min-width: 0;
+  align-items: stretch;
+}
+.pv-abs-week-row.is-top {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  flex: 1;
+}
+.pv-abs-week-row.is-bottom {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  margin: 0;
+  flex: 1;
+}
+.pv-abs-week-row.is-single {
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  max-width: 280px;
+  margin: 0 auto;
+  width: 100%;
+}
+.pv-abs-day-group {
+  display: flex; flex-direction: column; gap: 0;
+  min-width: 0; min-height: 0; height: 100%;
+  background: var(--bg-surface);
+  border: 1px solid var(--brand-purple-14);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(62, 58, 142, 0.06);
+}
+.pv-abs-day-col-hd {
+  font-family: var(--font-sans);
+  font-size: 11px; font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--brand-purple);
+  padding: 5px 4px;
+  line-height: 1.15;
+  text-align: center;
+  background: var(--brand-purple-08);
+  border-bottom: 1px solid var(--brand-purple-14);
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pv-abs-day-cards {
+  display: flex; flex-direction: column; align-items: stretch;
+  flex: 1; min-height: 0;
+  padding: 6px;
+}
+.pv-abs-day-carousel {
+  flex: 1; min-height: 0; min-width: 0;
+  display: flex; align-items: stretch; gap: 5px;
+}
+.pv-abs-day-viewport {
+  flex: 1; min-width: 0; min-height: 0;
+  overflow: hidden;
+}
+.pv-abs-day-list {
+  display: flex; align-items: stretch; gap: 5px;
+  height: 100%; min-height: 96px;
+  overflow-x: auto; overflow-y: hidden;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.pv-abs-day-list::-webkit-scrollbar { display: none; }
+.pv-abs-day-list .pv-abs-item {
+  flex: 0 0 auto;
+  width: auto;
+  min-height: 96px;
+  height: 100%;
+  align-self: stretch;
+  scroll-snap-align: start;
+}
+.pv-abs-day-carousel .pv-abs-nav-btn {
+  align-self: center;
+  flex-shrink: 0;
+  position: static;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 2px solid var(--brand-purple);
+  color: var(--brand-purple);
+  box-shadow: 0 2px 10px rgba(62, 58, 142, 0.16);
+}
+.pv-abs-day-carousel .pv-abs-nav-btn svg { width: 13px; height: 13px; }
+.pv-abs-day-carousel .pv-abs-nav-btn:hover:not(:disabled) {
+  background: var(--brand-purple);
+  border-color: var(--brand-purple);
+  color: #fff;
+  transform: scale(1.06);
+  box-shadow: 0 4px 14px rgba(62, 58, 142, 0.28);
+}
+.pv-abs-day-carousel:not(.has-multiple) .pv-abs-nav-btn { display: none; }
+.pv-abs-day-carousel:not(.can-scroll-left) .pv-abs-nav-prev,
+.pv-abs-day-carousel:not(.can-scroll-right) .pv-abs-nav-next {
+  opacity: 0.22; pointer-events: none;
+}
+.pv-abs-day-empty {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; flex: 1; min-height: 96px;
+  border-radius: 10px;
+  border: 1px dashed var(--brand-purple-14);
+  background: var(--brand-purple-04);
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  color: var(--ink-dark-2); opacity: 0.5;
+}
+.pv-abs-filter-empty {
+  display: none;
+  padding: 16px 14px 8px;
+  font-size: 12px; font-weight: 600; color: var(--ink-dark-2);
+  text-align: center;
+}
+.pv-abs-filter-empty.is-visible { display: block; }
+button.pv-abs-item {
+  font: inherit; text-align: left; cursor: pointer;
+  appearance: none; -webkit-appearance: none;
+}
+.pv-abs-item {
+  flex: 1 1 auto; width: 100%;
+  min-height: 96px;
+  min-width: 0;
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 8px 9px 7px;
+  border-radius: 10px;
+  scroll-snap-align: start;
+  overflow: hidden;
+  transition: background 0.18s, transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+}
+.pv-abs-item.is-absent {
+  background: linear-gradient(165deg, rgba(220,38,38,0.05) 0%, rgba(220,38,38,0.02) 100%);
+  border: 1px solid rgba(220,38,38,0.16);
+  border-top: 3px solid rgba(220,38,38,0.5);
+  box-shadow: 0 4px 12px -8px rgba(220,38,38,0.22);
+}
+.pv-abs-item.is-absent:hover {
+  background: rgba(220,38,38,0.09);
+  transform: translateY(-2px);
+}
+.pv-abs-item.is-attended {
+  background: linear-gradient(165deg, rgba(46,168,106,0.06) 0%, rgba(46,168,106,0.02) 100%);
+  border: 1px solid rgba(46,168,106,0.18);
+  border-top: 3px solid rgba(46,168,106,0.5);
+  box-shadow: 0 4px 12px -8px rgba(46,168,106,0.18);
+}
+.pv-abs-item.is-attended:hover {
+  background: rgba(46,168,106,0.10);
+  transform: translateY(-2px);
+}
+.pv-abs-item-subject {
+  font-family: var(--font-display);
+  font-size: 12px; font-weight: 800;
+  color: var(--brand-navy);
+  line-height: 1.2; letter-spacing: -0.015em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pv-abs-item-topic {
+  font-size: 10px; font-weight: 600;
+  color: var(--ink-dark-2);
+  line-height: 1.25;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+.pv-abs-item-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 4px; margin-top: auto; padding-top: 2px;
+  flex-wrap: wrap;
+}
+.pv-abs-item-type {
+  padding: 4px 9px; border-radius: 7px;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+  letter-spacing: 0.1em; line-height: 1.2;
+  flex-shrink: 0;
+}
+.pv-abs-item-type.is-kid {
+  background: rgba(91,84,201,0.16); border: 1.5px solid rgba(91,84,201,0.42); color: #4338ca;
+}
+.pv-abs-item-type.is-rud {
+  background: rgba(43,159,212,0.16); border: 1.5px solid rgba(43,159,212,0.42); color: #0369a1;
+}
+.pv-abs-item-chip {
+  flex-shrink: 0;
+  padding: 2px 6px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 7.5px; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.is-absent .pv-abs-item-chip {
+  background: rgba(220,38,38,0.10); color: #b91c1c;
+}
+.is-attended .pv-abs-item-chip {
+  background: rgba(46,168,106,0.10); color: #15803d;
+}
+.pv-abs-item.is-pending {
+  cursor: not-allowed;
+  background: linear-gradient(165deg, rgba(100,116,139,0.06) 0%, rgba(100,116,139,0.02) 100%);
+  border: 1px solid rgba(100,116,139,0.18);
+  border-top: 3px solid rgba(100,116,139,0.35);
+  box-shadow: none;
+  opacity: 0.92;
+}
+.pv-abs-item.is-pending:hover {
+  transform: none;
+  background: linear-gradient(165deg, rgba(100,116,139,0.08) 0%, rgba(100,116,139,0.03) 100%);
+}
+.is-pending .pv-abs-item-chip {
+  background: rgba(100,116,139,0.12); color: #475569;
+}
+.pv-abs-item-time {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  color: var(--ink-dark-2); letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+.pv-abs-nav-btn {
+  position: static; flex-shrink: 0;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--bg-surface); border: 1px solid var(--brand-purple-20);
+  color: var(--brand-purple);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: 0 1px 0 rgba(40,38,90,0.04);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  margin-top: 0;
+}
+.pv-abs-nav-btn svg { width: 12px; height: 12px; }
+.pv-abs-nav-btn:hover:not(:disabled) { background: var(--brand-magenta-08); border-color: var(--brand-magenta-35); color: var(--brand-magenta); }
+.pv-abs-nav-btn:disabled { opacity: 0.22; cursor: default; pointer-events: none; }
+.pv-abs-carousel:not(.can-scroll-left) .pv-abs-nav-prev,
+.pv-abs-carousel:not(.can-scroll-right) .pv-abs-nav-next {
+  opacity: 0.22; pointer-events: none;
+}
+
+/* ============================================================
+ * Açıklama tooltip — JS floating (overflow kırpması yok)
+ * ============================================================ */
+[data-tip] { position: relative; }
+.pv-abs-summary-item[data-tip],
+.pv-hw-summary-item[data-tip],
+.pv-hw-drawer-summary-item[data-tip] { cursor: help; }
+[data-tip]::after,
+[data-tip]::before {
+  display: none !important;
+  content: none !important;
+}
+
+.pv-floattip {
+  position: fixed; z-index: 10002;
+  max-width: 260px; padding: 10px 14px; border-radius: 10px;
+  background: var(--brand-navy); color: #fff;
+  font-family: var(--font-sans); font-size: 12px; font-weight: 500;
+  line-height: 1.5; text-align: center; white-space: normal;
+  pointer-events: none; box-shadow: 0 10px 28px rgba(40,38,90,0.22);
+  opacity: 0; transform: translate(-50%, calc(-100% - 8px));
+  transition: opacity 0.16s ease;
+}
+.pv-floattip.is-visible { opacity: 1; }
+.pv-floattip[hidden] { display: none !important; }
+
+/* ============================================================
+ * Seminer / Ödev Detay Drawer — sağdan, açık tema
+ * ============================================================ */
+.pv-sem-drawer { position: fixed; inset: 0; z-index: 10000; pointer-events: none; visibility: hidden; transition: visibility 0.22s ease; }
+.pv-sem-drawer.is-open { pointer-events: auto; visibility: visible; }
+.pv-sem-drawer-overlay {
+  position: absolute; inset: 0;
+  background: rgba(40,38,90,0.55);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  opacity: 0; transition: opacity 0.22s ease;
+}
+.pv-sem-drawer.is-open .pv-sem-drawer-overlay { opacity: 1; }
+.pv-sem-drawer-panel {
+  position: absolute; top: 0; right: 0; bottom: 0;
+  width: 540px; max-width: 92vw;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--brand-purple-14);
+  padding: 28px;
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+  gap: 22px;
+  transform: translateX(100%);
+  transition: transform 0.30s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pv-sem-drawer.is-open .pv-sem-drawer-panel { transform: translateX(0); }
+.pv-sem-drawer-close {
+  position: absolute; top: 18px; right: 18px;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--brand-purple-06);
+  border: 1px solid var(--brand-purple-14);
+  color: var(--ink-dark-2); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; z-index: 2;
+  transition: background 0.18s;
+}
+.pv-sem-drawer-close:hover { background: var(--brand-purple-10); color: var(--brand-navy); }
+.pv-sem-drawer-close svg { width: 16px; height: 16px; }
+
+.pv-sem-drawer-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 44px 16px 0;
+  margin-bottom: 4px;
+  border-bottom: 1px dashed var(--brand-purple-18);
+}
+/* Çıplak emoji — bg yok, sadece drop-shadow (d3-drawer-icon ile aynı boyut/yapı) */
+.pv-sem-drawer-ico {
+  width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 46px; line-height: 1;
+  flex-shrink: 0;
+  background: none; border: none;
+  filter:
+    drop-shadow(0 5px 10px rgba(40,38,90,0.22))
+    drop-shadow(0 0 14px var(--sem-glow, transparent));
+}
+.pv-sem-drawer-meta { flex: 1; min-width: 0; }
+.pv-sem-drawer-eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11.5px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--sem-accent, var(--brand-purple));
+  margin-bottom: 6px;
+}
+.pv-sem-drawer-title {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 800;
+  color: var(--brand-navy);
+  letter-spacing: -0.02em; line-height: 1.2;
+  margin: 0;
+}
+.pv-sem-drawer-due {
+  display: flex; align-items: baseline;
+  flex-wrap: wrap; gap: 4px 8px;
+  margin-top: 12px;
+}
+.pv-sem-drawer-due-label {
+  font-family: var(--font-mono);
+  font-size: 12px; font-weight: 800;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-dark-2); flex-shrink: 0;
+}
+.pv-sem-drawer-due-value {
+  display: inline-flex; align-items: baseline;
+  gap: 8px; font-size: 15px; font-weight: 700;
+  color: var(--brand-navy); letter-spacing: -0.01em; min-width: 0;
+}
+.pv-sem-drawer-due-value strong { font-weight: 800; }
+.pv-sem-drawer-due-sub {
+  font-family: var(--font-mono);
+  font-size: 12.5px; font-weight: 700;
+  color: var(--brand-purple);
+  letter-spacing: 0.04em; white-space: nowrap;
+}
+.pv-sem-drawer-month {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+  padding: 5px 10px; border-radius: 999px;
+  background: var(--brand-purple-06); border: 1px solid var(--brand-purple-18);
+  font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+  letter-spacing: 0.03em; color: var(--brand-purple);
+}
+.pv-sem-drawer-section { display: flex; flex-direction: column; gap: 8px; }
+.pv-sem-drawer-label {
+  font-family: var(--font-mono);
+  font-size: 11.5px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--brand-purple);
+}
+.pv-sem-drawer-text { margin: 0; font-size: 15px; line-height: 1.6; color: var(--ink-dark-1); }
+
+/* İçerik kutusu — d3-drawer-quote birebir yapı, açık tema renkleri */
+.pv-sem-drawer-quote {
+  display: flex; flex-direction: column; gap: 0;
+  padding: 16px 18px 14px; border-radius: 14px;
+  background: var(--brand-purple-06);
+  border: 1px solid var(--brand-purple-14);
+}
+.pv-sem-drawer-quote-header {
+  display: flex; align-items: center; gap: 11px;
+}
+.pv-sem-drawer-quote-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  object-fit: cover; border: 2px solid var(--brand-magenta-35);
+  flex-shrink: 0;
+}
+.pv-sem-drawer-quote-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pv-sem-drawer-quote-name {
+  font-size: 16px; font-weight: 800; color: var(--brand-navy);
+  letter-spacing: -0.015em; line-height: 1.2;
+}
+.pv-sem-drawer-quote-role {
+  font-family: var(--font-mono); font-size: 11.5px; font-weight: 700;
+  letter-spacing: 0.10em; text-transform: uppercase;
+  color: var(--brand-magenta);
+}
+
+.pv-sem-drawer-footer { margin-top: auto; padding-top: 4px; }
+
+/* CTA — d3-drawer-cta is-waiting / is-active birebir yapı */
+.pv-sem-drawer-cta {
+  width: 100%;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 10px; padding: 16px; border-radius: 14px;
+  font-family: inherit; font-size: 14.5px; font-weight: 700;
+  letter-spacing: -0.005em; border: none; cursor: default;
+  transition: transform 0.15s;
+}
+.pv-sem-drawer-cta.is-waiting {
+  background: var(--brand-purple-06);
+  border: 1px solid var(--brand-purple-18);
+  color: var(--ink-dark-1);
+}
+.pv-sem-drawer-cta.is-active {
+  background: linear-gradient(135deg, var(--brand-magenta), #c0066a);
+  border-color: transparent; color: white; cursor: pointer;
+  box-shadow: 0 20px 40px -12px rgba(230,8,123,0.50), inset 0 2px 0 rgba(255,255,255,0.22);
+}
+.pv-sem-drawer-cta.is-active:hover { transform: translateY(-2px); }
+.pv-sem-drawer-cta .cta-label { font-weight: 700; }
+.pv-sem-drawer-cta .cta-time {
+  font-family: var(--font-mono); font-size: 14px; font-weight: 800;
+  letter-spacing: 0.04em; padding: 3px 9px; border-radius: 7px;
+  background: var(--brand-purple-10); border: 1px solid var(--brand-purple-18);
+  font-feature-settings: "tnum";
+}
+.pv-sem-drawer-cta.is-active .cta-time {
+  background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.28); color: white;
+}
+@media (max-width: 560px) { .pv-sem-drawer-panel { width: 100vw; max-width: 100vw; } }
+
+/* Ödev drawer — liste + detay (pv-sem-drawer kabuğunu paylaşır) */
+.pv-hw-drawer .pv-sem-drawer-panel { width: 520px; }
+.pv-hw-drawer-head-actions {
+  display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+}
+.pv-hw-drawer-status {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.04em; white-space: nowrap;
+}
+.pv-hw-drawer-status.is-overdue { background: rgba(220,38,38,0.12); border: 1px solid rgba(220,38,38,0.35); color: #b91c1c; }
+.pv-hw-drawer-status.is-in-progress { background: rgba(74,148,232,0.12); border: 1px solid rgba(74,148,232,0.35); color: #1d4ed8; }
+.pv-hw-drawer-status.is-not-started { background: var(--brand-purple-08); border: 1px solid var(--brand-purple-18); color: var(--brand-purple); }
+.pv-hw-drawer-status.is-done { background: rgba(46,168,106,0.12); border: 1px solid rgba(46,168,106,0.35); color: #15803d; }
+.pv-hw-drawer-progress {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 14px 16px; border-radius: 14px;
+  background: var(--brand-purple-06); border: 1px solid var(--brand-purple-14);
+}
+.pv-hw-drawer-progress-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.pv-hw-drawer-progress-label {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand-purple);
+}
+.pv-hw-drawer-progress-val {
+  font-family: var(--font-display); font-size: 18px; font-weight: 800;
+  color: var(--brand-navy); letter-spacing: -0.02em;
+}
+.pv-hw-drawer-progress-track {
+  height: 8px; border-radius: 999px;
+  background: var(--brand-purple-10); overflow: hidden;
+}
+.pv-hw-drawer-progress-fill {
+  height: 100%; border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand-magenta), var(--brand-purple));
+  transition: width 0.35s ease;
+}
+.pv-hw-answer-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pv-hw-answer-row {
+  display: grid;
+  grid-template-columns: minmax(108px, 34%) 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--brand-purple-12);
+  background: var(--brand-purple-04, rgba(62,58,142,0.04));
+}
+.pv-hw-answer-row-data {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.pv-hw-answer-row-val {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 800; color: var(--brand-navy);
+  line-height: 1; letter-spacing: -0.02em;
+}
+.pv-hw-answer-row-val sub {
+  font-size: 13px; font-weight: 700; color: var(--ink-dark-2);
+  vertical-align: baseline;
+}
+.pv-hw-answer-row-label {
+  font-size: 10.5px; font-weight: 700; color: var(--ink-dark-1);
+  line-height: 1.25;
+}
+.pv-hw-answer-row-desc {
+  margin: 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--brand-purple-14);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--ink-dark-2);
+}
+.pv-hw-answer-row.is-correct {
+  background: rgba(46,168,106,0.06); border-color: rgba(46,168,106,0.22);
+}
+.pv-hw-answer-row.is-correct .pv-hw-answer-row-val { color: #15803d; }
+.pv-hw-answer-row.is-correct .pv-hw-answer-row-desc { border-left-color: rgba(46,168,106,0.35); }
+.pv-hw-answer-row.is-wrong {
+  background: rgba(220,38,38,0.06); border-color: rgba(220,38,38,0.22);
+}
+.pv-hw-answer-row.is-wrong .pv-hw-answer-row-val { color: #b91c1c; }
+.pv-hw-answer-row.is-wrong .pv-hw-answer-row-desc { border-left-color: rgba(220,38,38,0.35); }
+.pv-hw-answer-row.is-blank {
+  background: var(--brand-purple-04, rgba(62,58,142,0.04));
+  border-color: var(--brand-purple-14);
+}
+.pv-hw-answer-row.is-blank .pv-hw-answer-row-val { color: var(--ink-dark-1); }
+.pv-hw-answer-row.is-xp {
+  background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.28);
+}
+.pv-hw-answer-row.is-xp .pv-hw-answer-row-val { color: #b45309; }
+.pv-hw-answer-row.is-xp .pv-hw-answer-row-desc { border-left-color: rgba(245,158,11,0.4); }
+.pv-hw-answer-row.is-muted {
+  background: rgba(100,116,139,0.05); border-color: rgba(100,116,139,0.18);
+}
+.pv-hw-answer-row.is-muted .pv-hw-answer-row-val { color: var(--ink-dark-2); font-size: 18px; }
+.pv-hw-answer-row.is-muted .pv-hw-answer-row-desc { border-left-color: rgba(100,116,139,0.28); }
+
+/* Ders performans drawer */
+.pv-abs-drawer .pv-sem-drawer-panel { width: 520px; }
+.pv-abs-drawer-status {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.pv-abs-drawer-status.is-attended {
+  background: rgba(46,168,106,0.10); border: 1px solid rgba(46,168,106,0.24); color: #15803d;
+}
+.pv-abs-drawer-status.is-absent {
+  background: rgba(220,38,38,0.10); border: 1px solid rgba(220,38,38,0.24); color: #b91c1c;
+}
+.pv-abs-drawer-format-hint {
+  margin: 10px 0 0;
+  padding: 11px 13px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink-dark-1);
+}
+.pv-abs-drawer-format-hint.is-kid {
+  background: rgba(91,84,201,0.10);
+  border: 1px solid rgba(91,84,201,0.28);
+  border-left: 4px solid #6d28d9;
+  color: #4338ca;
+}
+.pv-abs-drawer-format-hint.is-rud {
+  background: rgba(43,159,212,0.10);
+  border: 1px solid rgba(43,159,212,0.28);
+  border-left: 4px solid #0284c7;
+  color: #0369a1;
+}
+.pv-hw-drawer-format-hint {
+  margin: 10px 0 0;
+  padding: 11px 13px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink-dark-1);
+}
+.pv-hw-drawer-format-hint.is-kid {
+  background: rgba(91,84,201,0.10);
+  border: 1px solid rgba(91,84,201,0.28);
+  border-left: 4px solid #6d28d9;
+  color: #4338ca;
+}
+.pv-hw-drawer-format-hint.is-rud {
+  background: rgba(43,159,212,0.10);
+  border: 1px solid rgba(43,159,212,0.28);
+  border-left: 4px solid #0284c7;
+  color: #0369a1;
+}
+.pv-abs-perf-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pv-abs-perf-row {
+  display: grid;
+  grid-template-columns: minmax(108px, 34%) 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--brand-purple-12);
+  background: var(--brand-purple-04, rgba(62,58,142,0.04));
+}
+.pv-abs-perf-row-data {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.pv-abs-perf-stat-val {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 800; color: var(--brand-navy);
+  line-height: 1; letter-spacing: -0.02em;
+}
+.pv-abs-perf-stat-val sub {
+  font-size: 13px; font-weight: 700; color: var(--ink-dark-2);
+  vertical-align: baseline;
+}
+.pv-abs-perf-stat-label {
+  font-size: 10.5px; font-weight: 700; color: var(--ink-dark-1);
+  line-height: 1.25;
+}
+.pv-abs-perf-row-desc {
+  margin: 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--brand-purple-14);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--ink-dark-2);
+}
+.pv-abs-perf-row.is-correct {
+  background: rgba(46,168,106,0.06); border-color: rgba(46,168,106,0.22);
+}
+.pv-abs-perf-row.is-correct .pv-abs-perf-stat-val { color: #15803d; }
+.pv-abs-perf-row.is-correct .pv-abs-perf-row-desc { border-left-color: rgba(46,168,106,0.35); }
+.pv-abs-perf-row.is-hand {
+  background: rgba(91,84,201,0.06); border-color: rgba(91,84,201,0.22);
+}
+.pv-abs-perf-row.is-hand .pv-abs-perf-stat-val { color: #5b54c9; }
+.pv-abs-perf-row.is-hand .pv-abs-perf-row-desc { border-left-color: rgba(91,84,201,0.35); }
+.pv-abs-perf-row.is-time {
+  background: rgba(43,159,212,0.06); border-color: rgba(43,159,212,0.22);
+}
+.pv-abs-perf-row.is-time .pv-abs-perf-stat-val { color: #1d7aa8; }
+.pv-abs-perf-row.is-time .pv-abs-perf-row-desc { border-left-color: rgba(43,159,212,0.35); }
+.pv-abs-perf-row.is-xp {
+  background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.28);
+}
+.pv-abs-perf-row.is-xp .pv-abs-perf-stat-val { color: #b45309; }
+.pv-abs-perf-row.is-xp .pv-abs-perf-row-desc { border-left-color: rgba(245,158,11,0.4); }
+.pv-abs-perf-row.is-board {
+  background: rgba(139,92,246,0.07); border-color: rgba(139,92,246,0.24);
+}
+.pv-abs-perf-row.is-board .pv-abs-perf-stat-val { color: #6d28d9; }
+.pv-abs-perf-row.is-board .pv-abs-perf-row-desc { border-left-color: rgba(139,92,246,0.35); }
+.pv-abs-perf-row.is-participation {
+  background: rgba(230,8,123,0.06); border-color: rgba(230,8,123,0.22);
+}
+.pv-abs-perf-row.is-participation .pv-abs-perf-stat-val { color: var(--brand-magenta); }
+.pv-abs-perf-row.is-participation .pv-abs-perf-row-desc { border-left-color: rgba(230,8,123,0.32); }
+.pv-abs-perf-row.is-muted {
+  background: rgba(100,116,139,0.05); border-color: rgba(100,116,139,0.18);
+}
+.pv-abs-perf-row.is-muted .pv-abs-perf-stat-val { color: var(--ink-dark-2); font-size: 18px; }
+.pv-abs-perf-row.is-muted .pv-abs-perf-row-desc { border-left-color: rgba(100,116,139,0.28); }
+.pv-abs-drawer-note {
+  margin: 0; font-size: 12px; line-height: 1.5; color: var(--ink-dark-2);
+}
+.pv-abs-drawer-replay-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(220,38,38,0.11) 0%, rgba(251,146,60,0.09) 100%);
+  border: 1.5px solid rgba(220,38,38,0.38);
+  box-shadow: 0 6px 22px -10px rgba(220,38,38,0.45);
+}
+.pv-abs-drawer-replay-alert[hidden] { display: none !important; }
+.pv-abs-drawer-replay-alert-ico {
+  flex-shrink: 0;
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 11px;
+  background: rgba(220,38,38,0.14);
+  border: 1px solid rgba(220,38,38,0.28);
+  color: #b91c1c;
+}
+.pv-abs-drawer-replay-alert-ico svg { width: 20px; height: 20px; display: block; }
+.pv-abs-drawer-replay-alert-body {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.pv-abs-drawer-replay-alert-title {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 14px; font-weight: 800;
+  color: #991b1b;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+.pv-abs-drawer-replay-alert-text {
+  margin: 0;
+  font-size: 12.5px; font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink-dark-1);
+}
+.pv-abs-drawer-replay-alert-text strong {
+  font-weight: 800;
+  color: var(--brand-navy);
+}
+.pv-abs-drawer-replay-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #dc2626 0%, #c2410c 100%);
+  border: 1px solid rgba(185,28,28,0.45);
+  color: #fff;
+  font-size: 12px; font-weight: 800;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 14px -6px rgba(220,38,38,0.55);
+  transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
+}
+.pv-abs-drawer-replay-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 6px 18px -6px rgba(220,38,38,0.6);
+  color: #fff;
+}
+.pv-abs-drawer-replay-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+.pv-hw-drawer-quote-text {
+  margin: 14px 0 0; padding-top: 14px;
+  border-top: 1px dashed var(--brand-purple-18);
+  font-size: 15px; line-height: 1.6; color: var(--ink-dark-1);
+}
+.pv-hw-drawer-quote-text::before {
+  content: '“'; font-size: 28px; line-height: 0; color: var(--brand-magenta);
+  display: block; margin-bottom: 6px; opacity: 0.55;
+}
+.pv-hw-drawer-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 4px; padding: 0; border: none; background: none;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--brand-purple); cursor: pointer;
+  transition: color 0.18s, gap 0.18s;
+}
+.pv-hw-drawer-back:hover { color: var(--brand-magenta); gap: 8px; }
+.pv-hw-drawer-back svg { width: 14px; height: 14px; }
+.pv-hw-drawer-list {
+  display: flex; flex-direction: column; gap: 8px;
+  max-height: calc(100vh - 220px); overflow-y: auto;
+  padding-right: 4px;
+}
+.pv-hw-drawer-row {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; padding: 12px 14px; border-radius: 12px;
+  background: var(--brand-purple-06); border: 1px solid var(--brand-purple-10);
+  cursor: pointer; text-align: left; font-family: inherit;
+  transition: background 0.18s, border-color 0.18s, transform 0.18s;
+}
+.pv-hw-drawer-row:hover {
+  background: var(--brand-magenta-08); border-color: var(--brand-purple-18);
+  transform: translateX(3px);
+}
+.pv-hw-drawer-head--plain { gap: 0; }
+.pv-hw-drawer-head-line {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;
+}
+.pv-hw-drawer-type-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 5px 10px; border-radius: 8px;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+  letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.2;
+  text-align: center; box-shadow: 0 1px 0 rgba(40,38,90,0.06);
+}
+.pv-hw-drawer-type-badge.is-kid {
+  background: rgba(91,84,201,0.16); border: 1.5px solid rgba(91,84,201,0.42); color: #4338ca;
+}
+.pv-hw-drawer-type-badge.is-rud {
+  background: rgba(43,159,212,0.16); border: 1.5px solid rgba(43,159,212,0.42); color: #0369a1;
+}
+.pv-hw-drawer-schedule {
+  display: flex; flex-direction: column; gap: 8px; margin-top: 10px;
+}
+.pv-hw-drawer-schedule-row {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px;
+}
+.pv-hw-drawer-schedule-label {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-dark-2);
+  min-width: 108px; flex-shrink: 0;
+}
+.pv-hw-drawer-schedule-value {
+  font-size: 14px; font-weight: 700; color: var(--brand-navy);
+}
+.pv-hw-drawer-schedule-sub {
+  font-size: 11px; font-weight: 600; color: var(--ink-dark-2);
+}
+.pv-hw-drawer-row-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.pv-hw-drawer-row-top {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.pv-hw-drawer-row-dates {
+  font-size: 11px; color: var(--ink-dark-2); line-height: 1.35;
+}
+.pv-hw-drawer-row-week {
+  flex-shrink: 0; font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  color: var(--brand-purple); text-align: right; white-space: nowrap;
+}
+.pv-hw-drawer-row-name { font-size: 14px; font-weight: 800; color: var(--brand-navy); }
+.pv-hw-drawer-row-topic {
+  font-size: 12px; color: var(--ink-dark-2); line-height: 1.3;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pv-hw-drawer-row-format {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.pv-hw-drawer-row-format.is-kid { color: #5b21b6; }
+.pv-hw-drawer-row-format.is-rud { color: #047857; }
+.pv-hw-drawer-row-due {
+  flex-shrink: 0; font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  color: var(--ink-dark-2); text-align: right; white-space: nowrap;
+}
+.pv-hw-drawer-row-end {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0;
+}
+.pv-hw-drawer-row-status {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 4px 9px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.04em; white-space: nowrap; line-height: 1.2;
+}
+
+/* Drawer satır durumları — carousel kartlarıyla aynı dil */
+.pv-hw-drawer-row.is-overdue {
+  background: rgba(220,38,38,0.06);
+  border-color: rgba(220,38,38,0.28);
+  border-left: 3px solid rgba(220,38,38,0.55);
+}
+.pv-hw-drawer-row.is-overdue:hover {
+  background: rgba(220,38,38,0.10);
+  border-color: rgba(220,38,38,0.38);
+}
+.pv-hw-drawer-row.is-overdue .pv-hw-drawer-row-dates { color: #b91c1c; font-weight: 600; }
+.pv-hw-drawer-row.is-overdue .pv-hw-drawer-row-status {
+  background: rgba(220,38,38,0.10); border: 1px solid rgba(220,38,38,0.28); color: #b91c1c;
+}
+
+.pv-hw-drawer-row.is-in-progress {
+  background: var(--brand-magenta-08);
+  border-color: var(--brand-magenta-35);
+}
+.pv-hw-drawer-row.is-in-progress:hover {
+  background: rgba(230,8,123,0.12);
+  border-color: var(--brand-magenta-35);
+}
+.pv-hw-drawer-row.is-in-progress .pv-hw-drawer-row-status {
+  background: rgba(230,8,123,0.10); border: 1px solid var(--brand-magenta-35); color: var(--brand-magenta);
+}
+
+.pv-hw-drawer-row.is-not-started .pv-hw-drawer-row-status {
+  background: var(--brand-purple-06); border: 1px solid var(--brand-purple-18); color: var(--brand-purple);
+}
+
+.pv-hw-drawer-row.is-done {
+  opacity: 0.78;
+  filter: grayscale(0.85);
+  background: var(--brand-purple-04, rgba(62,58,142,0.04));
+  border-color: var(--brand-purple-10);
+}
+.pv-hw-drawer-row.is-done:hover {
+  opacity: 0.9; filter: grayscale(0.75); transform: translateX(2px);
+}
+.pv-hw-drawer-row.is-done .pv-hw-drawer-row-name,
+.pv-hw-drawer-row.is-done .pv-hw-drawer-row-topic,
+.pv-hw-drawer-row.is-done .pv-hw-drawer-row-dates { color: var(--ink-dark-2); }
+.pv-hw-drawer-row.is-done .pv-hw-drawer-row-status {
+  background: rgba(46,168,106,0.10); border: 1px solid rgba(46,168,106,0.28); color: #2a8a5a;
+}
+
+.pv-hw-drawer-summary {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  padding: 0 20px 16px;
+}
+.pv-hw-drawer-summary-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 12px 8px; border-radius: 12px;
+  background: var(--brand-purple-06); border: 1px solid var(--brand-purple-10);
+}
+.pv-hw-drawer-summary-item.is-done {
+  background: rgba(46,168,106,0.06);
+  border-color: rgba(46,168,106,0.22);
+}
+.pv-hw-drawer-summary-item.is-done .pv-hw-drawer-summary-val { color: #15803d; }
+.pv-hw-drawer-summary-item.is-active {
+  background: var(--brand-magenta-08);
+  border-color: var(--brand-magenta-35);
+}
+.pv-hw-drawer-summary-item.is-active .pv-hw-drawer-summary-val { color: var(--brand-magenta); }
+.pv-hw-drawer-summary-item.is-overdue.is-has-overdue {
+  background: rgba(220,38,38,0.08);
+  border-color: rgba(220,38,38,0.28);
+}
+.pv-hw-drawer-summary-item.is-overdue.is-has-overdue .pv-hw-drawer-summary-val { color: #b91c1c; }
+.pv-hw-drawer-summary-item.is-overdue.is-has-overdue .pv-hw-drawer-summary-label { color: #b91c1c; font-weight: 700; }
+.pv-hw-drawer-summary-val {
+  font-family: var(--font-display); font-size: 20px; font-weight: 800; color: var(--brand-navy);
+}
+.pv-hw-drawer-summary-label {
+  font-size: 10px; font-weight: 600; color: var(--ink-dark-2); text-align: center; line-height: 1.25;
+}
+
+/* Ödev özeti ikonları — kart + drawer */
+.pv-hw-sum-ico {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  background: var(--brand-purple-08); color: var(--ink-dark-2);
+}
+.pv-hw-sum-ico svg { width: 12px; height: 12px; display: block; }
+.pv-hw-drawer-summary-item .pv-hw-sum-ico { width: 24px; height: 24px; }
+.pv-hw-drawer-summary-item .pv-hw-sum-ico svg { width: 13px; height: 13px; }
+.is-done .pv-hw-sum-ico { background: rgba(46,168,106,0.14); color: #15803d; }
+.is-active .pv-hw-sum-ico { background: rgba(230,8,123,0.12); color: var(--brand-magenta); }
+.is-overdue.is-has-overdue .pv-hw-sum-ico { background: rgba(220,38,38,0.12); color: #b91c1c; }
+.pv-hw-drawer-info-cta {
+  width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 16px; border-radius: 12px;
+  background: var(--brand-purple-06); border: 1px solid var(--brand-purple-18);
+  color: var(--brand-navy); font-size: 13.5px; font-weight: 700;
+  cursor: default;
+}
+
+/* ============================================================
+ * Haftalık Ödev Takibi kartı — "Ödevlerim" (.d3-card-tasks) yapısı, açık tema
+ * ============================================================ */
+.pv-hw-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--brand-purple-14);
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  padding: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.pv-hw-head {
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px dashed var(--brand-purple-18);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  row-gap: 10px;
+}
+.pv-hw-head-divider {
+  width: 1px; height: 34px; flex-shrink: 0; align-self: center;
+  background: linear-gradient(180deg, transparent, var(--brand-purple-22, var(--brand-purple-18)), transparent);
+}
+.pv-hw-edu-nav {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 28px;
+  align-items: center;
+  column-gap: 8px;
+  position: relative;
+  min-width: 0;
+  flex: 1 1 180px;
+  max-width: 300px;
+}
+.pv-hw-edu-nav-btn {
+  width: 28px; height: 28px; flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--brand-purple-14);
+  background: var(--bg-subtle, var(--brand-purple-04));
+  color: var(--ink-dark-1);
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0; cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+.pv-hw-edu-nav-btn.is-prev { grid-column: 1; grid-row: 1; }
+.pv-hw-edu-nav-btn.is-next { grid-column: 3; grid-row: 1; }
+.pv-hw-edu-nav-btn:hover:not(:disabled) {
+  background: var(--brand-purple-08);
+  border-color: var(--brand-purple-22);
+  color: var(--brand-navy);
+}
+.pv-hw-edu-nav-btn:disabled { opacity: 0.28; cursor: default; }
+.pv-hw-edu-nav-btn svg { width: 12px; height: 12px; }
+.pv-hw-edu-nav-center {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 0 2px;
+}
+.pv-hw-edu-nav-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  text-align: center;
+}
+.pv-hw-edu-nav-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9.5px; font-weight: 800;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--brand-magenta);
+  white-space: nowrap;
+  line-height: 1.2;
+}
+.pv-hw-edu-nav-range {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 11.5px; font-weight: 800;
+  color: var(--brand-navy);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.pv-hw-edu-nav-cal-btn {
+  width: 28px; height: 28px; flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--brand-purple-14);
+  background: var(--brand-purple-06);
+  color: var(--brand-purple);
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0; cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+.pv-hw-edu-nav-cal-btn:hover,
+.pv-hw-edu-nav-cal-btn.is-open {
+  background: var(--brand-purple-10);
+  border-color: var(--brand-purple-22);
+  color: var(--brand-navy);
+}
+.pv-hw-edu-nav-cal-btn svg { width: 13px; height: 13px; }
+.pv-hw-edu-picker {
+  grid-column: 1 / -1;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  width: min(300px, calc(100vw - 40px));
+  background: var(--bg-surface);
+  border: 1px solid var(--brand-purple-18);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg, 0 16px 40px -12px rgba(40,38,90,0.22));
+  overflow: hidden;
+}
+.pv-hw-edu-picker[hidden] { display: none !important; }
+.pv-hw-edu-picker-head {
+  padding: 10px 12px;
+  font-family: var(--font-mono);
+  font-size: 9.5px; font-weight: 800;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-dark-2);
+  border-bottom: 1px solid var(--brand-purple-10);
+}
+.pv-hw-edu-picker-list {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 6px; max-height: 240px; overflow-y: auto;
+}
+.pv-hw-edu-picker-item {
+  display: flex; flex-direction: column; align-items: flex-start;
+  gap: 2px; width: 100%;
+  padding: 8px 10px; border-radius: 9px;
+  border: 1px solid transparent; background: transparent;
+  color: var(--brand-navy); font-family: inherit;
+  text-align: left; cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.pv-hw-edu-picker-item:hover {
+  background: var(--brand-purple-06);
+  border-color: var(--brand-purple-12);
+}
+.pv-hw-edu-picker-item.is-active {
+  background: var(--brand-magenta-08);
+  border-color: var(--brand-magenta-35);
+}
+.pv-hw-edu-picker-item strong {
+  font-size: 12px; font-weight: 800; letter-spacing: -0.01em;
+}
+.pv-hw-edu-picker-item span {
+  font-size: 10.5px; color: var(--ink-dark-2);
+}
+.pv-hw-edu-picker-item.is-active strong { color: var(--brand-magenta); }
+.pv-hw-week-empty {
+  display: none;
+  align-items: center; justify-content: center;
+  min-height: 140px; padding: 20px 16px;
+  font-size: 13px; font-weight: 600; color: var(--ink-dark-2);
+  text-align: center; line-height: 1.45;
+}
+.pv-hw-week-empty.is-visible { display: flex; }
+.pv-hw-filters {
+  display: flex; align-items: center; gap: 5px;
+  margin-left: auto;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  padding: 2px 0;
+}
+.pv-hw-filter {
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--brand-purple-14);
+  background: var(--brand-purple-04, rgba(91,84,201,0.04));
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--ink-dark-2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+.pv-hw-filter:hover {
+  background: var(--brand-purple-08);
+  border-color: var(--brand-purple-22, var(--brand-purple-18));
+  color: var(--brand-navy);
+}
+.pv-hw-filter.is-active {
+  color: var(--brand-navy);
+  border-color: var(--brand-purple-28, var(--brand-purple-18));
+  background: var(--brand-purple-10);
+  box-shadow: 0 1px 0 rgba(40,38,90,0.06);
+}
+.pv-hw-filter.is-active[data-hw-filter="done"] {
+  background: rgba(46,168,106,0.12); border-color: rgba(46,168,106,0.35); color: #15803d;
+}
+.pv-hw-filter.is-active[data-hw-filter="active"] {
+  background: rgba(230,8,123,0.10); border-color: rgba(230,8,123,0.28); color: var(--brand-magenta);
+}
+.pv-hw-filter.is-active[data-hw-filter="overdue"] {
+  background: rgba(220,38,38,0.10); border-color: rgba(220,38,38,0.32); color: #b91c1c;
+}
+.pv-hw-filter:focus-visible {
+  outline: 2px solid var(--brand-purple); outline-offset: 2px;
+}
+.pv-hw-task.is-filter-hidden { display: none !important; }
+.pv-hw-filter-empty {
+  display: none;
+  align-items: center; justify-content: center;
+  min-height: 120px;
+  padding: 24px 16px;
+  font-size: 13px; font-weight: 600; color: var(--ink-dark-2);
+  text-align: center;
+}
+.pv-hw-filter-empty.is-visible { display: flex; }
+.pv-hw-subject.is-filter-empty { display: none !important; }
+.pv-hw-titlebtn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0; margin: 0; border: none; background: none;
+  font: inherit; color: inherit; cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.18s ease;
+}
+.pv-hw-titlebtn:hover .pv-hw-title { color: var(--brand-purple); }
+.pv-hw-titlebtn:focus-visible { outline: 2px solid var(--brand-purple); outline-offset: 3px; border-radius: 6px; }
+.pv-hw-overdue {
+  margin-left: auto;
+  flex-shrink: 0; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 999px;
+  background: rgba(212,146,10,0.14); border: 1px solid rgba(212,146,10,0.42);
+  font-size: 11.5px; font-weight: 700; color: #a86d08;
+  cursor: pointer; text-decoration: none;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+.pv-hw-overdue:hover { background: rgba(212,146,10,0.24); transform: translateY(-1px); }
+.pv-hw-overdue strong { font-weight: 800; }
+.pv-hw-overdue svg { width: 12px; height: 12px; transition: transform 0.18s ease; }
+.pv-hw-overdue:hover svg { transform: translateX(3px); }
+
+.pv-hw-summary-wrap {
+  flex-shrink: 0;
+  padding: 8px 12px 10px;
+  border-bottom: 1px dashed var(--brand-purple-12);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pv-hw-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 0;
+  border-bottom: none;
+  flex-shrink: 0;
+}
+.pv-hw-summary-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 2px;
+  min-height: 50px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--brand-purple-06);
+  border: 1px solid var(--brand-purple-10);
+}
+.pv-hw-summary-item .pv-hw-sum-ico {
+  grid-row: 1 / -1;
+  align-self: center;
+  width: 28px; height: 28px;
+}
+.pv-hw-summary-item .pv-hw-sum-ico svg { width: 13px; height: 13px; }
+.pv-hw-summary-val {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--brand-navy);
+  line-height: 1;
+  align-self: end;
+}
+.pv-hw-summary-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-dark-2);
+  text-align: left;
+  line-height: 1.2;
+  align-self: start;
+}
+.pv-hw-summary-item.is-done {
+  background: rgba(46,168,106,0.06);
+  border-color: rgba(46,168,106,0.22);
+}
+.pv-hw-summary-item.is-done .pv-hw-summary-val { color: #15803d; }
+.pv-hw-summary-item.is-active {
+  background: var(--brand-magenta-08);
+  border-color: var(--brand-magenta-35);
+}
+.pv-hw-summary-item.is-active .pv-hw-summary-val { color: var(--brand-magenta); }
+.pv-hw-summary-item.is-overdue.is-has-overdue {
+  background: rgba(220,38,38,0.08);
+  border-color: rgba(220,38,38,0.28);
+}
+.pv-hw-summary-item.is-overdue.is-has-overdue .pv-hw-summary-val { color: #b91c1c; }
+.pv-hw-summary-item.is-overdue.is-has-overdue .pv-hw-summary-label { color: #b91c1c; font-weight: 700; }
+
+/* Ders bölümleri — 3 satır × 2 sütun, her hücre içi kaydırılabilir */
+.pv-hw-sections {
+  flex: 1; min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 10px 12px 12px;
+  overflow: hidden;
+}
+.pv-hw-subject {
+  border: 1px solid var(--brand-purple-12);
+  border-radius: 14px;
+  background: var(--brand-purple-04, rgba(62,58,142,0.04));
+  display: flex; flex-direction: column;
+  min-height: 0; min-width: 0;
+  overflow: hidden;
+}
+.pv-hw-subject-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 11px;
+  border-bottom: 1px solid var(--brand-purple-14);
+  background: linear-gradient(180deg, var(--bg-surface) 0%, var(--brand-purple-04, rgba(62,58,142,0.04)) 100%);
+  flex-shrink: 0;
+  min-height: 44px;
+}
+.pv-hw-subject-ico {
+  width: 28px; height: 28px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 16px; line-height: 1;
+  border-radius: 8px;
+  background: var(--brand-purple-08);
+  border: 1px solid var(--brand-purple-12);
+}
+.pv-hw-subject-name {
+  font-family: var(--font-display);
+  font-size: 14px; font-weight: 800;
+  color: var(--brand-navy);
+  letter-spacing: -0.02em;
+  flex: 1; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  line-height: 1.2;
+}
+.pv-hw-subject-count {
+  font-family: var(--font-mono);
+  font-size: 10.5px; font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--brand-purple);
+  flex-shrink: 0;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--brand-purple-10);
+  border: 1px solid var(--brand-purple-20, var(--brand-purple-18));
+  white-space: nowrap;
+  line-height: 1;
+  box-shadow: 0 1px 0 rgba(40,38,90,0.04);
+}
+.pv-hw-subject-carousel {
+  flex: 1; min-height: 0;
+  display: flex; align-items: center; gap: 4px;
+  padding: 0 4px 5px;
+}
+.pv-hw-subject-viewport { flex: 1; min-width: 0; min-height: 0; overflow: hidden; }
+.pv-hw-subject-list {
+  display: flex; align-items: stretch; gap: 6px;
+  overflow-x: auto; overflow-y: hidden;
+  padding: 5px 2px;
+  height: 100%;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.pv-hw-subject-list::-webkit-scrollbar { display: none; }
+.pv-hw-subject-nav {
+  flex-shrink: 0;
+  position: relative; z-index: 2;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--bg-surface);
+  border: 2px solid var(--brand-purple);
+  color: var(--brand-purple);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(62, 58, 142, 0.16);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+}
+.pv-hw-subject-nav svg { width: 13px; height: 13px; pointer-events: none; }
+.pv-hw-subject-nav:hover:not(:disabled) {
+  background: var(--brand-purple);
+  border-color: var(--brand-purple);
+  color: #fff;
+  transform: scale(1.06);
+  box-shadow: 0 4px 14px rgba(62, 58, 142, 0.28);
+}
+.pv-hw-subject-nav:disabled { opacity: 0.22; cursor: default; pointer-events: none; }
+.pv-hw-subject-carousel:not(.can-scroll-left) .pv-hw-subject-nav.is-prev,
+.pv-hw-subject-carousel:not(.can-scroll-right) .pv-hw-subject-nav.is-next {
+  opacity: 0.22; pointer-events: none;
+}
+.pv-hw-subject[data-subject="mat"] .pv-hw-subject-ico { background: rgba(230,8,123,0.10); }
+.pv-hw-subject[data-subject="fen"] .pv-hw-subject-ico { background: rgba(46,168,106,0.10); }
+.pv-hw-subject[data-subject="trk"] .pv-hw-subject-ico { background: rgba(43,159,212,0.10); }
+.pv-hw-subject[data-subject="sos"] .pv-hw-subject-ico { background: rgba(91,84,201,0.10); }
+.pv-hw-subject[data-subject="din"] .pv-hw-subject-ico { background: rgba(79,134,214,0.10); }
+.pv-hw-subject[data-subject="ing"] .pv-hw-subject-ico { background: rgba(212,146,10,0.12); }
+
+.pv-hw-subject-list .pv-hw-task {
+  min-height: 104px;
+  scroll-snap-align: start;
+}
+.pv-hw-task {
+  display: flex; flex-direction: row; align-items: stretch;
+  gap: 8px; padding: 9px 10px 9px 8px;
+  border-radius: 12px;
+  background: var(--brand-purple-06);
+  border: 1px solid var(--brand-purple-10);
+  text-align: left; cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, opacity 0.18s ease, filter 0.18s ease;
+  position: relative;
+  z-index: 1;
+  appearance: none; -webkit-appearance: none;
+  font: inherit; color: inherit;
+  flex-shrink: 0;
+  min-width: 0;
+}
+.pv-hw-task-side-ico {
+  flex-shrink: 0;
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+}
+.pv-hw-task-side-ico .pv-hw-task-status-ico {
+  width: 28px; height: 28px;
+}
+.pv-hw-task-side-ico .pv-hw-task-status-ico svg { width: 13px; height: 13px; }
+.pv-hw-task-side-ico.is-empty {
+  width: 6px;
+  min-width: 6px;
+}
+.pv-hw-task-content {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+}
+.pv-hw-task:hover { z-index: 30; }
+.pv-hw-task:hover:not(.is-done):not(.is-overdue):not(.is-in-progress):not(.is-not-started) {
+  background: var(--brand-magenta-08); border-color: var(--brand-purple-18); transform: translateY(-1px);
+}
+.pv-hw-task-type {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+  letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.2;
+  text-align: center;
+  box-shadow: 0 1px 0 rgba(40,38,90,0.06);
+}
+.pv-hw-task-type.is-kid {
+  background: rgba(91,84,201,0.16); border: 1.5px solid rgba(91,84,201,0.42); color: #4338ca;
+}
+.pv-hw-task-type.is-rud {
+  background: rgba(43,159,212,0.16); border: 1.5px solid rgba(43,159,212,0.42); color: #0369a1;
+}
+.pv-hw-task-type-num {
+  display: block;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  margin-top: 1px;
+}
+.pv-hw-task-subject {
+  font-family: var(--font-display);
+  font-size: 11.5px; font-weight: 800;
+  color: var(--brand-purple);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pv-hw-task-topic {
+  font-size: 13px; font-weight: 800; color: var(--brand-navy);
+  line-height: 1.3; letter-spacing: -0.015em;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+  padding-right: 2px;
+}
+.pv-hw-body { display: flex; flex-direction: column; align-items: stretch; gap: 4px; width: 100%; flex: 1; min-width: 0; min-height: 0; }
+.pv-hw-task-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 6px; width: 100%; margin-top: auto; padding-top: 2px;
+}
+.pv-hw-task-foot .pv-hw-status {
+  align-self: center;
+  max-width: calc(100% - 54px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pv-hw-due { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-dark-2); letter-spacing: 0.03em; line-height: 1.35; }
+
+/* Durum rozeti — özet kartlarıyla aynı ikon + renk teması */
+.pv-hw-task-status-ico {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+  background: var(--brand-purple-08); color: var(--ink-dark-2);
+}
+.pv-hw-task-status-ico svg { width: 9px; height: 9px; display: block; }
+.pv-hw-status {
+  flex-shrink: 0;
+  display: inline-flex; align-items: center;
+  align-self: flex-start;
+  padding: 3px 8px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.04em; white-space: nowrap; line-height: 1.2;
+}
+
+/* Tamamlandı — yeşil tik */
+.pv-hw-task.is-done {
+  background: rgba(46,168,106,0.06);
+  border-color: rgba(46,168,106,0.22);
+}
+.pv-hw-task.is-done .pv-hw-task-status-ico {
+  background: rgba(46,168,106,0.14); color: #15803d;
+}
+.pv-hw-task.is-done .pv-hw-status {
+  background: rgba(46,168,106,0.10); border: 1px solid rgba(46,168,106,0.28); color: #15803d;
+}
+.pv-hw-task.is-done .pv-hw-task-topic { color: var(--brand-navy); }
+.pv-hw-task.is-done .pv-hw-due { color: var(--ink-dark-2); }
+.pv-hw-task.is-done:hover {
+  background: rgba(46,168,106,0.10); border-color: rgba(46,168,106,0.32);
+  transform: translateY(-1px); filter: none; opacity: 1;
+}
+
+/* Gecikmiş — kırmızı çarpı */
+.pv-hw-task.is-overdue {
+  background: rgba(220,38,38,0.08);
+  border-color: rgba(220,38,38,0.28);
+}
+.pv-hw-task.is-overdue .pv-hw-task-status-ico {
+  background: rgba(220,38,38,0.12); color: #b91c1c;
+}
+.pv-hw-task.is-overdue .pv-hw-status {
+  background: rgba(220,38,38,0.10); border: 1px solid rgba(220,38,38,0.28); color: #b91c1c;
+}
+.pv-hw-task.is-overdue .pv-hw-due { color: #b91c1c; font-weight: 600; }
+.pv-hw-task.is-overdue:hover {
+  background: rgba(220,38,38,0.12); border-color: rgba(220,38,38,0.36);
+  transform: translateY(-1px);
+}
+
+/* Devam ediyor — magenta oynat */
+.pv-hw-task.is-in-progress {
+  background: var(--brand-magenta-08);
+  border-color: var(--brand-magenta-35);
+}
+.pv-hw-task.is-in-progress .pv-hw-task-status-ico {
+  background: rgba(230,8,123,0.12); color: var(--brand-magenta);
+}
+.pv-hw-task.is-in-progress .pv-hw-status {
+  background: rgba(230,8,123,0.10); border: 1px solid var(--brand-magenta-35); color: var(--brand-magenta);
+}
+.pv-hw-task.is-in-progress:hover {
+  background: rgba(230,8,123,0.12); border-color: var(--brand-magenta);
+  transform: translateY(-1px);
+}
+
+/* Başlanmadı — nötr mor */
+.pv-hw-task.is-not-started .pv-hw-status {
+  background: var(--brand-purple-06); border: 1px solid var(--brand-purple-18); color: var(--brand-purple);
+}
+.pv-hw-task.is-not-started:hover {
+  background: var(--brand-purple-10); border-color: var(--brand-purple-18);
+  transform: translateY(-1px);
+}
+.pv-hw-progress {
+  width: 100%; height: 4px; border-radius: 999px;
+  background: rgba(230,8,123,0.12); overflow: hidden; margin-top: 2px;
+}
+.pv-hw-progress-fill {
+  height: 100%; border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand-magenta), var(--brand-purple));
+}
+
+/* ============ RESPONSIVE ============ */
+/* Orta genişlik: performans + ödev dikey */
+@media (max-width: 900px) {
+  body { overflow-y: auto; overflow-x: hidden; }
+  .pv-profiles { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .pv-shell {
+    height: auto;
+    max-height: none;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-template-areas: "perf" "hw";
+    gap: 16px; padding: 20px 18px 56px;
+    overflow: visible;
+  }
+  .pv-nav { display: none; }
+  .pv-perfcol, .pv-hwcol { overflow: visible; min-height: auto; display: flex; flex-direction: column; }
+  .pv-hw-card, .pv-abs-card { height: auto; min-height: auto; display: flex; flex-direction: column; }
+  .pv-perfcol > .pv-abs-card { height: auto; max-height: none; }
+  .pv-abs-carousel { min-height: 120px; }
+  .pv-abs-head { align-items: stretch; row-gap: 8px; }
+  .pv-abs-head .pv-hw-head-divider { display: none; }
+  .pv-abs-head-title { flex: 1 1 100%; }
+  .pv-abs-head .pv-hw-edu-nav { flex: 1 1 100%; max-width: none; }
+  .pv-abs-filters {
+    flex: 1 1 100%; margin-left: 0;
+    justify-content: flex-start;
+    overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none;
+    border-top: 1px dashed var(--brand-purple-12);
+    padding-top: 8px; margin-top: 2px;
+  }
+  .pv-abs-filters::-webkit-scrollbar { display: none; }
+  .pv-abs-head-link { margin-left: auto; }
+  .pv-hw-sections {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    min-height: 360px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  .pv-hw-subject { min-height: 140px; }
+  .pv-hw-head { align-items: stretch; row-gap: 8px; }
+  .pv-hw-head-divider { display: none; }
+  .pv-hw-titlebtn { flex: 1 1 100%; }
+  .pv-hw-edu-nav { flex: 1 1 100%; max-width: none; }
+  .pv-hw-filters {
+    margin-left: 0; flex: 1 1 100%;
+    justify-content: flex-start;
+    overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none;
+    border-top: 1px dashed var(--brand-purple-12);
+    padding-top: 8px; margin-top: 2px;
+  }
+  .pv-hw-filters::-webkit-scrollbar { display: none; }
+}
+
+@media (max-width: 760px) {
+  .pv-actions { gap: 8px; }
+  .pv-trigger-text { display: none; }
+  .pv-modal-card { padding: 28px 20px 22px; }
+  .pv-modal-title { font-size: 21px; }
+}
+
+@media (max-width: 380px) {
+  .pv-hud .hud-stats .stat-pill { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Arka plan sahnesi (öğrenci dashboard ile aynı) -->
+<div class="scene" aria-hidden="true">
+  <div class="scene-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div id="stars"></div>
+</div>
+
+<!-- ============ HEADER ============ -->
+<header class="hud pv-hud">
+  <!-- SOL: Bilenyum logosu -->
+  <a class="hud-brand" href="index.html" aria-label="Bilenyum anasayfa">
+    <img src="assets/bilenyum-logo.svg" alt="Bilenyum" />
+  </a>
+
+  <!-- ORTA: Takip edilen öğrenci -->
+  <div class="pv-hud-student" aria-label="Takip edilen öğrenci">
+    <button type="button" class="pv-hud-student-btn" id="ctxSwitchBtn" aria-haspopup="dialog" aria-expanded="false" aria-label="Öğrenci değiştir">
+      <span class="pv-ava pv-ava--sm pv-ava--student" id="ctxAva" aria-hidden="true">F</span>
+      <span class="pv-hud-student-text">
+        <span class="pv-hud-student-name" id="ctxName">—</span>
+        <span class="pv-hud-student-meta">
+          <span id="ctxClan">—</span>
+          <span class="pv-hud-student-sep" aria-hidden="true">·</span>
+          <span id="ctxProgram">—</span>
+        </span>
+      </span>
+      <svg class="pv-hud-student-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+  </div>
+
+  <!-- SAĞ: bildirim + profil -->
+  <div class="hud-stats pv-actions">
+
+    <!-- Bildirim → sağdan drawer açar -->
+    <div class="pv-notif-wrap">
+      <button type="button" class="stat-icon-btn is-notif" id="notifBtn"
+              aria-haspopup="dialog" aria-expanded="false" aria-label="Bildirimler">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="pv-badge is-hidden" id="notifBadge">0</span>
+      </button>
+    </div>
+
+    <!-- Veli profil -->
+    <div class="hud-profile pv-profile-wrap" id="profileWrap">
+      <button type="button" class="pv-trigger pv-profile-trigger" id="parentProfileBtn"
+              aria-haspopup="true" aria-expanded="false" aria-label="Veli profili menüsü">
+        <span class="pv-ava pv-ava--sm pv-ava--parent" id="parentAva" aria-hidden="true">AÇ</span>
+        <span class="pv-trigger-text">
+          <span class="pv-trigger-name" id="parentName">—</span>
+        </span>
+        <svg class="pv-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="hud-menu" id="parentProfileMenu" role="menu">
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profilim
+        </button>
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Hesap ayarları
+        </button>
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Bildirim tercihleri
+        </button>
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Yardım
+        </button>
+        <div class="hud-menu-divider"></div>
+        <button type="button" class="hud-menu-item is-danger" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Çıkış yap
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ ÖĞRENCİ SEÇME MODAL'I ============ -->
+<div class="pv-modal" id="studentModal" aria-hidden="true">
+  <div class="pv-modal-overlay" data-pv-modal-close></div>
+  <div class="pv-modal-card" role="dialog" aria-modal="true" aria-labelledby="pvModalTitle">
+    <button type="button" class="pv-modal-close" data-pv-modal-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="pv-modal-head">
+      <span class="pv-modal-eyebrow">Veli Kontrol Merkezi</span>
+      <h2 class="pv-modal-title" id="pvModalTitle">Öğrenci Seç</h2>
+      <p class="pv-modal-desc">Takip etmek istediğin öğrenciyi seç veya yeni öğrenci ekle.</p>
+    </div>
+    <div class="pv-profiles" id="profileGrid" role="listbox" aria-label="Öğrenciler"></div>
+    <div class="pv-modal-foot">
+      <button type="button" class="pv-add-btn" id="addStudentBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Öğrenci Ekle
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BİLDİRİM DRAWER'I (sağdan açılır, açık tema) ============ -->
+<div class="pv-drawer" id="pvNotifDrawer" aria-hidden="true">
+  <div class="pv-drawer-overlay" data-pv-drawer-close></div>
+  <aside class="pv-drawer-panel" role="dialog" aria-labelledby="pvNotifTitle" aria-modal="true">
+    <header class="pv-drawer-head">
+      <h3 class="pv-drawer-title" id="pvNotifTitle">Bildirimler</h3>
+      <button type="button" class="pv-drawer-close" data-pv-drawer-close aria-label="Kapat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </header>
+    <div class="pv-drawer-body" id="pvNotifBody"></div>
+  </aside>
+</div>
+
+<!-- ============ MAIN: sol nav + içerik ============ -->
+<main class="pv-shell">
+
+  <!-- SOL MENÜ (yavaş yavaş özelleştirilecek) -->
+  <div class="pv-nav">
+    <aside class="nav-rail" aria-label="Veli menüsü">
+      <a class="nav-item is-active" href="veli-dashboard.html" title="Merkez" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-item-label">Merkez</span>
+      </a>
+      <a class="nav-item" href="veli-ogrenci-detay.html" title="Öğrenci Detay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-item-label">Öğrenci Detay</span>
+      </a>
+      <a class="nav-item" href="veli-program.html" title="Öğrenci Ders Programı">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="nav-item-label">Ders Programı</span>
+      </a>
+      <a class="nav-item" href="veli-seminerler.html" title="Seminerler">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <span class="nav-item-label">Seminerler</span>
+      </a>
+      <a class="nav-item" href="veli-sonuclar.html" title="Sonuçlar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 14 11 16 15 12"/></svg>
+        <span class="nav-item-label">Sonuçlar</span>
+      </a>
+      <a class="nav-item" href="veli-performans.html" title="Performans">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span class="nav-item-label">Performans</span>
+      </a>
+    </aside>
+  </div>
+
+    <!-- Sol kolon: Haftalık Performans Takibi (50%) -->
+    <div class="pv-perfcol">
+<section class="pv-abs-card" aria-label="Haftalık Performans Takibi">
+        <div class="pv-abs-head">
+          <span class="pv-abs-head-title">Haftalık Performans Takibi</span>
+          <a class="pv-abs-head-link" href="veli-performans.html" title="Tüm performans verilerini gör">
+            Tümünü Gör
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          <span class="pv-hw-head-divider" aria-hidden="true"></span>
+          <div class="pv-hw-edu-nav" id="pvAbsEduNav">
+            <button type="button" class="pv-hw-edu-nav-btn is-prev" id="pvAbsWeekPrev" aria-label="Önceki eğitim haftası">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div class="pv-hw-edu-nav-center">
+              <div class="pv-hw-edu-nav-label">
+                <span class="pv-hw-edu-nav-eyebrow" id="pvAbsWeekEyebrow">24. Eğitim Haftası</span>
+                <strong class="pv-hw-edu-nav-range" id="pvAbsWeekRange">15 — 21 Haziran 2026</strong>
+              </div>
+              <button type="button" class="pv-hw-edu-nav-cal-btn" id="pvAbsWeekCalBtn" aria-label="Eğitim haftası seç" aria-expanded="false" aria-controls="pvAbsWeekPicker">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </button>
+            </div>
+            <button type="button" class="pv-hw-edu-nav-btn is-next" id="pvAbsWeekNext" aria-label="Sonraki eğitim haftası">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <div class="pv-hw-edu-picker" id="pvAbsWeekPicker" hidden role="dialog" aria-label="Eğitim haftası seç">
+              <div class="pv-hw-edu-picker-head">Eğitim Haftası Seç</div>
+              <div class="pv-hw-edu-picker-list" id="pvAbsWeekPickerList"></div>
+            </div>
+          </div>
+          <span class="pv-hw-head-divider" aria-hidden="true"></span>
+          <div class="pv-abs-filters pv-hw-filters" id="pvAbsFilters" role="tablist" aria-label="Ders katılım durumuna göre filtrele">
+            <button type="button" class="pv-hw-filter is-active" data-abs-filter="all" role="tab" aria-selected="true">Tümü</button>
+            <button type="button" class="pv-hw-filter" data-abs-filter="attended" role="tab" aria-selected="false">Katıldı</button>
+            <button type="button" class="pv-hw-filter" data-abs-filter="absent" role="tab" aria-selected="false">Katılmadı</button>
+          </div>
+        </div>
+
+        <div class="pv-abs-body">
+          <div class="pv-abs-summary-wrap">
+            <p class="pv-abs-summary-note" id="pvAbsSummaryNote">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span id="pvAbsSummaryNoteText">Bu bölümdeki katılım ve performans verileri, seçtiğiniz eğitim haftasına aittir.</span>
+            </p>
+            <div class="pv-abs-summary" aria-label="Haftalık katılım özeti">
+              <div class="pv-abs-summary-item is-attended" data-tip="Seçili eğitim haftasında öğrencinizin katıldığı canlı ders sayısı.">
+                <span class="pv-hw-sum-ico pv-abs-sum-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                <span class="pv-abs-summary-text">
+                  <span class="pv-abs-summary-val" id="pvAbsSumAttended">18</span>
+                  <span class="pv-abs-summary-label">Katıldığı Ders Sayısı</span>
+                </span>
+              </div>
+              <div class="pv-abs-summary-item is-absent" data-tip="Seçili eğitim haftasında öğrencinizin katılmadığı canlı ders sayısı.">
+                <span class="pv-hw-sum-ico pv-abs-sum-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span>
+                <span class="pv-abs-summary-text">
+                  <span class="pv-abs-summary-val" id="pvAbsSumAbsent">6</span>
+                  <span class="pv-abs-summary-label">Katılmadığı Ders Sayısı</span>
+                </span>
+              </div>
+            </div>
+            <div class="pv-abs-summary-secondary" aria-label="Haftalık performans özeti">
+              <div class="pv-abs-summary-item is-participation" data-tip="Seçili eğitim haftasında öğrencinizin canlı derslerde parmak kaldırma ve tahtaya kalkma sayısının toplamı.">
+                <span class="pv-hw-sum-ico pv-abs-sum-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v6"/><path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.7-2.2L.5 18.5"/></svg></span>
+                <span class="pv-abs-summary-text">
+                  <span class="pv-abs-summary-val" id="pvAbsSumParticipation">50</span>
+                  <span class="pv-abs-summary-label">Derse Katılma Sayısı</span>
+                </span>
+              </div>
+              <div class="pv-abs-summary-item is-correct" data-tip="Seçili eğitim haftasında öğrencinizin canlı derslerde doğru yanıtladığı soru sayısının toplamı.">
+                <span class="pv-hw-sum-ico pv-abs-sum-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg></span>
+                <span class="pv-abs-summary-text">
+                  <span class="pv-abs-summary-val" id="pvAbsSumCorrect">182</span>
+                  <span class="pv-abs-summary-label">Doğru Cevap Sayısı</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pv-abs-list-section">
+            <p class="pv-abs-filter-empty" id="pvAbsFilterEmpty" hidden>Seçtiğiniz katılım durumuna uygun ders bulunamadı.</p>
+            <div class="pv-abs-week-wrap">
+              <div class="pv-abs-week-grid" id="pvAbsList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+<div class="pv-hwcol">
+
+    <!-- ====== HAFTALIK ÖDEV TAKİBİ (Ödevlerim kart yapısı) ====== -->
+    <aside class="pv-hw-card" aria-labelledby="pvHwTitle">
+      <div class="pv-hw-head">
+        <button type="button" class="pv-hw-titlebtn" id="pvHwTitleBtn" aria-haspopup="dialog">
+          <span class="pv-hw-title" id="pvHwTitle">Haftalık Ödev Takibi</span>
+        </button>
+        <span class="pv-hw-head-divider" aria-hidden="true"></span>
+        <div class="pv-hw-edu-nav" id="pvHwEduNav">
+          <button type="button" class="pv-hw-edu-nav-btn is-prev" id="pvHwWeekPrev" aria-label="Önceki eğitim haftası">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="pv-hw-edu-nav-center">
+            <div class="pv-hw-edu-nav-label">
+              <span class="pv-hw-edu-nav-eyebrow" id="pvHwWeekEyebrow">24. Eğitim Haftası</span>
+              <strong class="pv-hw-edu-nav-range" id="pvHwWeekRange">15 — 21 Haziran 2026</strong>
+            </div>
+            <button type="button" class="pv-hw-edu-nav-cal-btn" id="pvHwWeekCalBtn" aria-label="Eğitim haftası seç" aria-expanded="false" aria-controls="pvHwWeekPicker">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </button>
+          </div>
+          <button type="button" class="pv-hw-edu-nav-btn is-next" id="pvHwWeekNext" aria-label="Sonraki eğitim haftası">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <div class="pv-hw-edu-picker" id="pvHwWeekPicker" hidden role="dialog" aria-label="Eğitim haftası seç">
+            <div class="pv-hw-edu-picker-head">Eğitim Haftası Seç</div>
+            <div class="pv-hw-edu-picker-list" id="pvHwWeekPickerList"></div>
+          </div>
+        </div>
+        <span class="pv-hw-head-divider" aria-hidden="true"></span>
+        <div class="pv-hw-filters" id="pvHwFilters" role="tablist" aria-label="Ödev durumuna göre filtrele">
+          <button type="button" class="pv-hw-filter is-active" data-hw-filter="all" role="tab" aria-selected="true">Tümü</button>
+          <button type="button" class="pv-hw-filter" data-hw-filter="done" role="tab" aria-selected="false">Tamamlanan</button>
+          <button type="button" class="pv-hw-filter" data-hw-filter="active" role="tab" aria-selected="false">Devam Eden</button>
+          <button type="button" class="pv-hw-filter" data-hw-filter="overdue" role="tab" aria-selected="false">Geciken</button>
+        </div>
+      </div>
+
+      <div class="pv-hw-summary-wrap">
+        <p class="pv-abs-summary-note" id="pvHwSummaryNote">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span id="pvHwSummaryNoteText">Bu bölümdeki ödev verileri, seçtiğiniz eğitim haftasına aittir.</span>
+        </p>
+        <div class="pv-hw-summary" id="pvHwCardSummary" aria-label="Haftalık ödev özeti">
+        <div class="pv-hw-summary-item is-done" data-tip="Bu eğitim haftasında öğrencinizin zamanında tamamladığı ödev sayısı.">
+          <span class="pv-hw-sum-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                <span class="pv-hw-summary-val" id="pvHwCardSumDone">4</span>
+          <span class="pv-hw-summary-label">Tamamlanan</span>
+        </div>
+        <div class="pv-hw-summary-item is-active" data-tip="Bu eğitim haftasında öğrencinizin hâlâ devam ettiği ödev sayısı.">
+          <span class="pv-hw-sum-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></span>
+                <span class="pv-hw-summary-val" id="pvHwCardSumActive">12</span>
+          <span class="pv-hw-summary-label">Devam Eden</span>
+        </div>
+        <div class="pv-hw-summary-item is-overdue" id="pvHwCardSumOverdueWrap" data-tip="Bu eğitim haftasında teslim tarihi geçmiş ödev sayısı. Öğrencinizle birlikte tamamlama planı yapmanızı öneririz.">
+          <span class="pv-hw-sum-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span>
+                <span class="pv-hw-summary-val" id="pvHwCardSumOverdue">2</span>
+          <span class="pv-hw-summary-label">Geciken</span>
+        </div>
+        </div>
+      </div>
+
+      <div class="pv-hw-sections" id="hwSections" aria-label="Derslere göre haftalık ödevler"></div>
+      <p class="pv-hw-filter-empty" id="pvHwFilterEmpty" hidden>Bu kategoride gösterilecek ödev bulunmuyor.</p>
+      <p class="pv-hw-week-empty" id="pvHwWeekEmpty" hidden>Bu eğitim haftası için ödev kaydı bulunmuyor. Takvimden başka bir hafta seçebilirsiniz.</p>
+    </aside>
+
+    </div><!-- /pv-hwcol -->
+
+</main>
+
+<!-- ====== HAFTALIK ÖDEV LİSTE DRAWER ====== -->
+<div class="pv-sem-drawer pv-hw-drawer" id="pvHwListDrawer" aria-hidden="true">
+  <div class="pv-sem-drawer-overlay" data-hw-list-close></div>
+  <aside class="pv-sem-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="pvHwListDrTitle">
+    <button type="button" class="pv-sem-drawer-close" data-hw-list-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="pv-sem-drawer-head pv-hw-drawer-head--plain">
+      <div class="pv-sem-drawer-meta">
+        <span class="pv-sem-drawer-eyebrow">VELİ TAKİP</span>
+        <h2 class="pv-sem-drawer-title" id="pvHwListDrTitle">Haftalık Ödev Takibi</h2>
+        <div class="pv-sem-drawer-due">
+          <span class="pv-sem-drawer-due-label">Bu Hafta:</span>
+          <span class="pv-sem-drawer-due-value">
+            <strong id="pvHwListDrCount">5 ödev</strong>
+            <span class="pv-sem-drawer-due-sub" id="pvHwListDrSub">1 tamamlandı</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pv-hw-drawer-summary" id="pvHwListDrSummary">
+      <div class="pv-hw-drawer-summary-item is-done" data-tip="Bu eğitim haftasında öğrencinizin zamanında tamamladığı ödev sayısı.">
+        <span class="pv-hw-sum-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="pv-hw-drawer-summary-val" id="pvHwSumDone">1</span>
+        <span class="pv-hw-drawer-summary-label">Tamamlanan</span>
+      </div>
+      <div class="pv-hw-drawer-summary-item is-active" data-tip="Bu eğitim haftasında öğrencinizin hâlâ devam ettiği ödev sayısı.">
+        <span class="pv-hw-sum-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></span>
+        <span class="pv-hw-drawer-summary-val" id="pvHwSumActive">3</span>
+        <span class="pv-hw-drawer-summary-label">Devam Eden</span>
+      </div>
+      <div class="pv-hw-drawer-summary-item is-overdue" id="pvHwSumOverdueWrap" data-tip="Bu eğitim haftasında teslim tarihi geçmiş ödev sayısı. Öğrencinizle birlikte tamamlama planı yapmanızı öneririz.">
+        <span class="pv-hw-sum-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span>
+        <span class="pv-hw-drawer-summary-val" id="pvHwSumOverdue">1</span>
+        <span class="pv-hw-drawer-summary-label">Geciken</span>
+      </div>
+    </div>
+
+    <div class="pv-sem-drawer-section">
+      <span class="pv-sem-drawer-label">Tüm Ödevler</span>
+      <div class="pv-hw-drawer-list" id="pvHwDrawerList"></div>
+    </div>
+
+    <div class="pv-sem-drawer-footer">
+      <p class="pv-hw-drawer-info-cta">Öğrencinizin bir ödevinin detayını görmek için listeden seçin.</p>
+    </div>
+  </aside>
+</div>
+
+<!-- ====== ÖDEV DETAY DRAWER ====== -->
+<div class="pv-sem-drawer pv-hw-drawer" id="pvHwDetailDrawer" aria-hidden="true">
+  <div class="pv-sem-drawer-overlay" data-hw-detail-close></div>
+  <aside class="pv-sem-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="pvHwDrTitle">
+    <button type="button" class="pv-sem-drawer-close" data-hw-detail-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <button type="button" class="pv-hw-drawer-back" id="pvHwDrBack" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Listeye Dön
+    </button>
+
+    <div class="pv-sem-drawer-head pv-hw-drawer-head--plain">
+      <div class="pv-sem-drawer-meta">
+        <div class="pv-hw-drawer-head-line">
+          <span class="pv-sem-drawer-eyebrow" id="pvHwDrName">Matematik</span>
+          <span class="pv-hw-drawer-type-badge" id="pvHwDrTypeBadge">KİD</span>
+        </div>
+        <h2 class="pv-sem-drawer-title" id="pvHwDrTitle">—</h2>
+        <div class="pv-hw-drawer-schedule">
+          <div class="pv-hw-drawer-schedule-row">
+            <span class="pv-hw-drawer-schedule-label">Veriliş Tarihi</span>
+            <span class="pv-hw-drawer-schedule-value" id="pvHwDrAssigned">—</span>
+          </div>
+          <div class="pv-hw-drawer-schedule-row">
+            <span class="pv-hw-drawer-schedule-label">Teslim Tarihi</span>
+            <span class="pv-hw-drawer-schedule-value" id="pvHwDrDue">—</span>
+            <span class="pv-hw-drawer-schedule-sub" id="pvHwDrDueSub"></span>
+          </div>
+          <div class="pv-hw-drawer-schedule-row">
+            <span class="pv-hw-drawer-schedule-label">Eğitim Haftası</span>
+            <span class="pv-hw-drawer-schedule-value" id="pvHwDrWeek">—</span>
+          </div>
+        </div>
+        <div class="pv-hw-drawer-head-actions">
+          <span class="pv-hw-drawer-status" id="pvHwDrStatus">—</span>
+        </div>
+        <p class="pv-hw-drawer-format-hint" id="pvHwDrFormatHint">—</p>
+      </div>
+    </div>
+
+    <div class="pv-hw-drawer-progress">
+      <div class="pv-hw-drawer-progress-head">
+        <span class="pv-hw-drawer-progress-label">Soru İlerlemesi</span>
+        <span class="pv-hw-drawer-progress-val" id="pvHwDrProgress">—</span>
+      </div>
+      <div class="pv-hw-drawer-progress-track">
+        <div class="pv-hw-drawer-progress-fill" id="pvHwDrProgressBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="pv-sem-drawer-section">
+      <span class="pv-sem-drawer-label">Ödev Özeti</span>
+      <div class="pv-hw-answer-stats">
+        <div class="pv-hw-answer-row is-correct" id="pvHwDrRowCorrect">
+          <div class="pv-hw-answer-row-data">
+            <span class="pv-hw-answer-row-label">Doğru</span>
+            <span class="pv-hw-answer-row-val" id="pvHwDrCorrect">—</span>
+          </div>
+          <p class="pv-hw-answer-row-desc" id="pvHwDrCorrectDesc">—</p>
+        </div>
+        <div class="pv-hw-answer-row is-wrong" id="pvHwDrRowWrong">
+          <div class="pv-hw-answer-row-data">
+            <span class="pv-hw-answer-row-label">Yanlış</span>
+            <span class="pv-hw-answer-row-val" id="pvHwDrWrong">—</span>
+          </div>
+          <p class="pv-hw-answer-row-desc" id="pvHwDrWrongDesc">—</p>
+        </div>
+        <div class="pv-hw-answer-row is-blank" id="pvHwDrRowBlank">
+          <div class="pv-hw-answer-row-data">
+            <span class="pv-hw-answer-row-label">Boş</span>
+            <span class="pv-hw-answer-row-val" id="pvHwDrBlank">—</span>
+          </div>
+          <p class="pv-hw-answer-row-desc" id="pvHwDrBlankDesc">—</p>
+        </div>
+        <div class="pv-hw-answer-row is-xp" id="pvHwDrRowXp">
+          <div class="pv-hw-answer-row-data">
+            <span class="pv-hw-answer-row-label">Kazanılan XP</span>
+            <span class="pv-hw-answer-row-val" id="pvHwDrXp">—</span>
+          </div>
+          <p class="pv-hw-answer-row-desc" id="pvHwDrXpDesc">—</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pv-sem-drawer-footer">
+      <p class="pv-hw-drawer-info-cta" id="pvHwDrFooterNote">Öğrencinizin ödev ilerlemesini buradan takip edebilirsiniz.</p>
+    </div>
+  </aside>
+</div>
+
+<!-- ====== DERS PERFORMANS DRAWER ====== -->
+<div class="pv-sem-drawer pv-abs-drawer" id="pvAbsLessonDrawer" aria-hidden="true">
+  <div class="pv-sem-drawer-overlay" data-abs-lesson-close></div>
+  <aside class="pv-sem-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="pvAbsDrTitle" tabindex="-1">
+    <button type="button" class="pv-sem-drawer-close" data-abs-lesson-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="pv-sem-drawer-head">
+      <span class="pv-sem-drawer-ico" id="pvAbsDrIco" aria-hidden="true">📐</span>
+      <div class="pv-sem-drawer-meta">
+        <div class="pv-hw-drawer-head-line">
+          <span class="pv-sem-drawer-eyebrow" id="pvAbsDrEyebrow">CANLI DERS</span>
+          <span class="pv-hw-drawer-type-badge" id="pvAbsDrTypeBadge">KİD</span>
+        </div>
+        <h2 class="pv-sem-drawer-title" id="pvAbsDrTitle">—</h2>
+        <div class="pv-sem-drawer-due">
+          <span class="pv-sem-drawer-due-label">Tarih &amp; Saat:</span>
+          <span class="pv-sem-drawer-due-value">
+            <strong id="pvAbsDrDate">—</strong>
+            <span class="pv-sem-drawer-due-sub" id="pvAbsDrTime">—</span>
+          </span>
+        </div>
+        <div class="pv-hw-drawer-head-actions">
+          <span class="pv-abs-drawer-status" id="pvAbsDrStatus">—</span>
+        </div>
+        <p class="pv-abs-drawer-format-hint" id="pvAbsDrFormatHint">—</p>
+      </div>
+    </div>
+
+    <div class="pv-abs-drawer-replay-alert" id="pvAbsDrReplayAlert" hidden role="alert">
+      <span class="pv-abs-drawer-replay-alert-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </span>
+      <div class="pv-abs-drawer-replay-alert-body">
+        <strong class="pv-abs-drawer-replay-alert-title">Öğrenciniz Bu Derse Katılmamış</strong>
+        <p class="pv-abs-drawer-replay-alert-text" id="pvAbsDrReplayText">—</p>
+        <a class="pv-abs-drawer-replay-btn" id="pvAbsDrReplayBtn" href="#">
+          Tekrar Videosunu İzletin
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="pv-sem-drawer-section">
+      <span class="pv-sem-drawer-label">Performans Detayları</span>
+      <div class="pv-abs-perf-stats">
+        <div class="pv-abs-perf-row is-correct" id="pvAbsDrRowCorrect">
+          <div class="pv-abs-perf-row-data">
+            <span class="pv-abs-perf-stat-label">Doğru / Toplam Soru</span>
+            <span class="pv-abs-perf-stat-val" id="pvAbsDrCorrect">—</span>
+          </div>
+          <p class="pv-abs-perf-row-desc" id="pvAbsDrCorrectDesc">—</p>
+        </div>
+        <div class="pv-abs-perf-row is-xp" id="pvAbsDrRowXp">
+          <div class="pv-abs-perf-row-data">
+            <span class="pv-abs-perf-stat-label">Kazanılan XP</span>
+            <span class="pv-abs-perf-stat-val" id="pvAbsDrXp">—</span>
+          </div>
+          <p class="pv-abs-perf-row-desc" id="pvAbsDrXpDesc">—</p>
+        </div>
+        <div class="pv-abs-perf-row is-hand" id="pvAbsDrRowHands">
+          <div class="pv-abs-perf-row-data">
+            <span class="pv-abs-perf-stat-label">Parmak Kaldırma</span>
+            <span class="pv-abs-perf-stat-val" id="pvAbsDrHands">—</span>
+          </div>
+          <p class="pv-abs-perf-row-desc" id="pvAbsDrHandsDesc">—</p>
+        </div>
+        <div class="pv-abs-perf-row is-board" id="pvAbsDrRowBoard">
+          <div class="pv-abs-perf-row-data">
+            <span class="pv-abs-perf-stat-label">Tahtaya Kalkma Sayısı</span>
+            <span class="pv-abs-perf-stat-val" id="pvAbsDrBoard">—</span>
+          </div>
+          <p class="pv-abs-perf-row-desc" id="pvAbsDrBoardDesc">—</p>
+        </div>
+        <div class="pv-abs-perf-row is-participation" id="pvAbsDrRowParticipation">
+          <div class="pv-abs-perf-row-data">
+            <span class="pv-abs-perf-stat-label">Derse Katılma Sayısı</span>
+            <span class="pv-abs-perf-stat-val" id="pvAbsDrParticipation">—</span>
+          </div>
+          <p class="pv-abs-perf-row-desc" id="pvAbsDrParticipationDesc">—</p>
+        </div>
+        <div class="pv-abs-perf-row is-time" id="pvAbsDrRowDuration">
+          <div class="pv-abs-perf-row-data">
+            <span class="pv-abs-perf-stat-label">Derste Geçirilen Süre</span>
+            <span class="pv-abs-perf-stat-val" id="pvAbsDrDuration">—</span>
+          </div>
+          <p class="pv-abs-perf-row-desc" id="pvAbsDrDurationDesc">—</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pv-sem-drawer-footer">
+      <p class="pv-abs-drawer-note" id="pvAbsDrNote">Öğrencinizin canlı ders performansını buradan inceleyebilirsiniz.</p>
+    </div>
+  </aside>
+</div>
+
+<script src="assets/veli-parent.js"></script>
+<script>
+/* ============================================================
+ * Veli Dashboard — mock data + state + etkileşim (self-contained)
+ * ============================================================ */
+(function () {
+  'use strict';
+
+  function $(id) { return document.getElementById(id); }
+  function escapeText(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+
+  /* ---------------- Ödev özeti (kart + drawer) ---------------- */
+  function getHwTasks() {
+    var container = $('hwSections');
+    if (!container) return [];
+    return [].slice.call(container.querySelectorAll('.pv-hw-task'));
+  }
+
+  function countHwSummary(tasks) {
+    var done = 0, active = 0, overdue = 0, total = 0;
+    if (tasks && tasks.length && tasks[0].getAttribute) {
+      total = tasks.length;
+      tasks.forEach(function (t) {
+        var st = t.getAttribute('data-status') || '';
+        if (st === 'done') done++;
+        else if (st === 'overdue') overdue++;
+        else active++;
+      });
+    } else {
+      (tasks || PV_HW_TASKS).forEach(function (t) {
+        total++;
+        var st = (t.status || t.getAttribute && t.getAttribute('data-status')) || '';
+        if (st === 'done') done++;
+        else if (st === 'overdue') overdue++;
+        else active++;
+      });
+    }
+    return { done: done, active: active, overdue: overdue, total: total };
+  }
+
+  function updateHwCardSummary() {
+    var s = countHwSummary(typeof getActiveHwTasksData === 'function' ? getActiveHwTasksData() : PV_HW_TASKS);
+    var elDone = $('pvHwCardSumDone');
+    var elActive = $('pvHwCardSumActive');
+    var elOverdue = $('pvHwCardSumOverdue');
+    var wrapOverdue = $('pvHwCardSumOverdueWrap');
+    if (elDone) elDone.textContent = String(s.done);
+    if (elActive) elActive.textContent = String(s.active);
+    if (elOverdue) elOverdue.textContent = String(s.overdue);
+    if (wrapOverdue) wrapOverdue.classList.toggle('is-has-overdue', s.overdue > 0);
+  }
+
+  /* ---------------- Haftalık Ödev Takibi — ders bölümleri ---------------- */
+  var HW_STATUS_TIP = {
+    done: 'Öğrenciniz bu ödevi tamamladı. İlerleme ve performans detaylarını görmek için tıklayın.',
+    'in-progress': 'Bu ödev hâlâ devam ediyor. Öğrencinizin ilerleme detaylarını görmek için tıklayın.',
+    'not-started': 'Öğrenciniz bu ödeve henüz başlamadı. Durum detaylarını görmek için tıklayın.',
+    overdue: 'Bu ödevin teslim tarihi geçti. Durum detaylarını görmek için tıklayın.'
+  };
+  var HW_KID_TIP = 'Kavram İnşa Dersi (KİD) ödevi';
+  var HW_RUD_TIP = 'Rehberli Uygulama Dersi (RUD) ödevi';
+  var HW_KID_DESC = 'Kavram İnşa Dersi (KİD) ödevi — öğrenci konuyu adım adım inşa eder ve kavram haritası oluşturur.';
+  var HW_RUD_DESC = 'Rehberli Uygulama Dersi (RUD) ödevi — rehberlik eşliğinde uygulama yapılır ve soru çözümü pekiştirilir.';
+
+  var HW_STATUS_LABELS_CARD = {
+    overdue: 'Geciken',
+    'in-progress': 'Devam Eden',
+    'not-started': 'Başlanmadı',
+    done: 'Tamamlandı'
+  };
+
+  var HW_STATUS_ICONS_CARD = {
+    done: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    'in-progress': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>',
+    overdue: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    'not-started': ''
+  };
+
+  var PV_HW_SUBJECTS = [
+    { id: 'mat', name: 'Matematik', icon: '📐' },
+    { id: 'fen', name: 'Fen Bilimleri', icon: '🧬' },
+    { id: 'trk', name: 'Türkçe', icon: '📖' },
+    { id: 'sos', name: 'Sosyal Bilgiler', icon: '🌍' },
+    { id: 'din', name: 'Din Kültürü', icon: '🕌' },
+    { id: 'ing', name: 'İngilizce', icon: '🔤' }
+  ];
+
+  var PV_HW_TASKS = [
+    /* Matematik — 3 ödev */
+    { id: 'mat-koklu', subject: 'mat', hwType: 'regular', status: 'overdue', icon: '📐', name: 'Matematik', topic: 'Köklü Sayılar · 15 Soru', topicShort: 'Köklü Sayılar', dueLine: '15 soru · Bugün 23:59', detail: 'Köklü sayılarda dört işlem ve sadeleştirme konulu 15 soruluk ödev.', teacher: 'Mehmet Yılmaz', teacherRole: 'Matematik Öğretmeni', teacherAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Bugün 23:59', dueSub: '5 saat kaldı', done: 6, total: 15, correct: 4, wrong: 2, blank: 9 },
+    { id: 'mat-kid', subject: 'mat', hwType: 'kid', status: 'not-started', icon: '🧩', name: 'Matematik', topic: 'Kavram İnşa (KİD) Dersi Ödevi · Matematik', topicShort: 'Köklü Sayılar', dueLine: 'Kavram inşa · Salı 20:00', detail: 'Köklü sayılar konusunda kavram haritası ve örnek problem inşası içeren KİD ödevi.', teacher: 'Ayça Demir', teacherRole: 'Rehber Öğretmen', teacherAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Salı 20:00', dueSub: '2 gün kaldı', done: 0, total: 1, correct: 0, wrong: 0, blank: 1 },
+    { id: 'mat-rud', subject: 'mat', hwType: 'rud', status: 'in-progress', icon: '🎯', name: 'Matematik', topic: 'Rehberli Uygulama Dersi (RUD) Ödevi · Matematik', topicShort: 'Köklü Sayılar', dueLine: 'Uygulama · Perşembe 18:00', detail: 'Rehberli uygulama oturumunda çözülen problemlerin pekiştirilmesi için RUD ödev paketi.', teacher: 'Ayça Demir', teacherRole: 'Rehber Öğretmen', teacherAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Perşembe 18:00', dueSub: '4 gün kaldı', done: 1, total: 3, correct: 1, wrong: 0, blank: 2, progress: 33 },
+    /* Fen Bilimleri */
+    { id: 'fen-dongu', subject: 'fen', hwType: 'regular', status: 'in-progress', icon: '🧬', name: 'Fen Bilimleri', topic: 'Madde Döngüleri · Etkinlik', topicShort: 'Madde Döngüleri', dueLine: 'Etkinlik · Yarın 18:00', detail: 'Karbon, su ve azot döngülerini kavram haritasıyla tamamlama etkinliği.', teacher: 'Ayşe Demir', teacherRole: 'Fen Bilimleri Öğretmeni', teacherAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Yarın 18:00', dueSub: '1 gün 9 saat kaldı', done: 3, total: 10, correct: 2, wrong: 1, blank: 7, progress: 30 },
+    { id: 'fen-kid', subject: 'fen', hwType: 'kid', status: 'done', icon: '🧩', name: 'Fen Bilimleri', topic: 'Kavram İnşa (KİD) Dersi Ödevi · Fen Bilimleri', topicShort: 'Madde Döngüleri', dueLine: 'Kavram inşa · Tamamlandı', detail: 'Madde ve enerji konusunda kavram ağı oluşturma KİD ödevi tamamlandı.', teacher: 'Ayça Demir', teacherRole: 'Rehber Öğretmen', teacherAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Tamamlandı', dueSub: 'Dün 15:30', done: 1, total: 1, correct: 1, wrong: 0, blank: 0 },
+    { id: 'fen-rud', subject: 'fen', hwType: 'rud', status: 'not-started', icon: '🎯', name: 'Fen Bilimleri', topic: 'Rehberli Uygulama Dersi (RUD) Ödevi · Fen Bilimleri', topicShort: 'Madde Döngüleri', dueLine: 'Uygulama · Cuma 17:00', detail: 'Deney sonuçlarını yorumlama ve uygulama soruları içeren RUD ödevi.', teacher: 'Ayça Demir', teacherRole: 'Rehber Öğretmen', teacherAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Cuma 17:00', dueSub: '4 gün kaldı', done: 0, total: 3, correct: 0, wrong: 0, blank: 3 },
+    /* Türkçe */
+    { id: 'trk-paragraf', subject: 'trk', hwType: 'regular', status: 'done', icon: '📖', name: 'Türkçe', topic: 'Paragraf Anlamı · 8 Soru', topicShort: 'Paragraf Anlamı', dueLine: '8 soru · Tamamlandı', detail: 'Paragrafta ana fikir ve yardımcı fikir konulu 8 soruluk ödev tamamlandı.', teacher: 'Zeynep Kaya', teacherRole: 'Türkçe Öğretmeni', teacherAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Tamamlandı', dueSub: '2 saat önce', done: 8, total: 8, correct: 7, wrong: 1, blank: 0 },
+    { id: 'trk-kid', subject: 'trk', hwType: 'kid', status: 'not-started', icon: '🧩', name: 'Türkçe', topic: 'Kavram İnşa (KİD) Dersi Ödevi · Türkçe', topicShort: 'Paragraf Anlamı', dueLine: 'Kavram inşa · Çarşamba 19:00', detail: 'Anlatım biçimleri üzerine kavram ilişkileri kurma KİD ödevi.', teacher: 'Ayça Demir', teacherRole: 'Rehber Öğretmen', teacherAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Çarşamba 19:00', dueSub: '3 gün kaldı', done: 0, total: 1, correct: 0, wrong: 0, blank: 1 },
+    { id: 'trk-rud', subject: 'trk', hwType: 'rud', status: 'in-progress', icon: '🎯', name: 'Türkçe', topic: 'Rehberli Uygulama Dersi (RUD) Ödevi · Türkçe', topicShort: 'Paragraf Anlamı', dueLine: 'Uygulama · Cumartesi 14:00', detail: 'Paragraf sorularında rehberli çözüm sonrası uygulama seti RUD ödevi.', teacher: 'Ayça Demir', teacherRole: 'Rehber Öğretmen', teacherAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Cumartesi 14:00', dueSub: '5 gün kaldı', done: 1, total: 4, correct: 1, wrong: 0, blank: 3, progress: 25 },
+    /* Sosyal Bilgiler */
+    { id: 'sos-osmanli', subject: 'sos', hwType: 'regular', status: 'not-started', icon: '🌍', name: 'Sosyal Bilgiler', topic: 'Osmanlı Kültür · Özet', topicShort: 'Osmanlı Kültür', dueLine: 'Özet · Çarşamba 22:00', detail: 'Osmanlı kültür ve medeniyetini kapsayan özet çalışması ve 8 soruluk quiz.', teacher: 'Ali Vural', teacherRole: 'Sosyal Bilgiler Öğretmeni', teacherAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Çarşamba 22:00', dueSub: '2 gün kaldı', done: 0, total: 8, correct: 0, wrong: 0, blank: 8 },
+    { id: 'sos-kid', subject: 'sos', hwType: 'kid', status: 'in-progress', icon: '🧩', name: 'Sosyal Bilgiler', topic: 'Kavram İnşa (KİD) Dersi Ödevi · Sosyal Bilgiler', topicShort: 'Osmanlı Kültür', dueLine: 'Kavram inşa · Perşembe 20:00', detail: 'Tarihsel olaylar arası neden-sonuç ilişkisi kuran KİD ödevi.', teacher: 'Ayça Demir', teacherRole: 'Rehber Öğretmen', teacherAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Perşembe 20:00', dueSub: '4 gün kaldı', done: 0, total: 1, correct: 0, wrong: 0, blank: 1, progress: 40 },
+    { id: 'sos-rud', subject: 'sos', hwType: 'rud', status: 'not-started', icon: '🎯', name: 'Sosyal Bilgiler', topic: 'Rehberli Uygulama Dersi (RUD) Ödevi · Sosyal Bilgiler', topicShort: 'Osmanlı Kültür', dueLine: 'Uygulama · Pazar 16:00', detail: 'Harita ve zaman çizelgesi uygulamalarını içeren RUD ödev paketi.', teacher: 'Ayça Demir', teacherRole: 'Rehber Öğretmen', teacherAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Pazar 16:00', dueSub: '6 gün kaldı', done: 0, total: 3, correct: 0, wrong: 0, blank: 3 },
+    /* Din Kültürü */
+    { id: 'din-ibadet', subject: 'din', hwType: 'regular', status: 'done', icon: '🕌', name: 'Din Kültürü', topic: 'İbadet Bilgisi · 6 Soru', topicShort: 'İbadet Bilgisi', dueLine: '6 soru · Tamamlandı', detail: 'Namaz ve oruç ibadetlerinin temel bilgilerini kapsayan test tamamlandı.', teacher: 'Hüseyin Ak', teacherRole: 'Din Kültürü Öğretmeni', teacherAvatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Tamamlandı', dueSub: 'Dün 14:20', done: 6, total: 6, correct: 6, wrong: 0, blank: 0 },
+    { id: 'din-kid', subject: 'din', hwType: 'kid', status: 'overdue', icon: '🧩', name: 'Din Kültürü', topic: 'Kavram İnşa (KİD) Dersi Ödevi · Din Kültürü', topicShort: 'İbadet Bilgisi', dueLine: 'Kavram inşa · Dün 22:00', detail: 'Ahlaki değerler konusunda kavram ağı oluşturma KİD ödevi.', teacher: 'Ayça Demir', teacherRole: 'Rehber Öğretmen', teacherAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Dün 22:00', dueSub: 'Gecikmiş', done: 0, total: 1, correct: 0, wrong: 0, blank: 1 },
+    { id: 'din-rud', subject: 'din', hwType: 'rud', status: 'not-started', icon: '🎯', name: 'Din Kültürü', topic: 'Rehberli Uygulama Dersi (RUD) Ödevi · Din Kültürü', topicShort: 'İbadet Bilgisi', dueLine: 'Uygulama · Cuma 19:00', detail: 'Değerler eğitimi uygulama sorularını içeren RUD ödevi.', teacher: 'Ayça Demir', teacherRole: 'Rehber Öğretmen', teacherAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Cuma 19:00', dueSub: '4 gün kaldı', done: 0, total: 3, correct: 0, wrong: 0, blank: 3 },
+    /* İngilizce */
+    { id: 'ing-friendship', subject: 'ing', hwType: 'regular', status: 'in-progress', icon: '🔤', name: 'İngilizce', topic: 'Friendship · Reading', topicShort: 'Friendship Reading', dueLine: '12 soru · Perşembe 17:00', detail: 'Friendship ünitesindeki reading comprehension testi.', teacher: 'Sarah Johnson', teacherRole: 'İngilizce Öğretmeni', teacherAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Perşembe 17:00', dueSub: '4 gün kaldı', done: 5, total: 12, correct: 3, wrong: 2, blank: 7, progress: 42 },
+    { id: 'ing-kid', subject: 'ing', hwType: 'kid', status: 'done', icon: '🧩', name: 'İngilizce', topic: 'Kavram İnşa (KİD) Dersi Ödevi · İngilizce', topicShort: 'Friendship Reading', dueLine: 'Kavram inşa · Tamamlandı', detail: 'Günlük rutinler kelime ağı KİD ödevi tamamlandı.', teacher: 'Ayça Demir', teacherRole: 'Rehber Öğretmen', teacherAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Tamamlandı', dueSub: 'Dün 11:00', done: 1, total: 1, correct: 1, wrong: 0, blank: 0 },
+    { id: 'ing-rud', subject: 'ing', hwType: 'rud', status: 'not-started', icon: '🎯', name: 'İngilizce', topic: 'Rehberli Uygulama Dersi (RUD) Ödevi · İngilizce', topicShort: 'Friendship Reading', dueLine: 'Uygulama · Pazartesi 18:00', detail: 'Konuşma pratiği ve yazılı uygulama içeren RUD ödevi.', teacher: 'Ayça Demir', teacherRole: 'Rehber Öğretmen', teacherAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80', due: 'Pazartesi 18:00', dueSub: '1 gün kaldı', done: 0, total: 3, correct: 0, wrong: 0, blank: 3 }
+  ];
+
+  PV_HW_TASKS.forEach(function (t) {
+    if (t.hwType === 'kid' || t.hwType === 'rud') {
+      t.hwFormat = t.hwType;
+    } else {
+      t.hwFormat = 'rud';
+    }
+  });
+
+  var PV_HW_EDU_WEEK = '24. Eğitim Haftası';
+  var DEMO_NOW = new Date(2026, 5, 21, 12, 0, 0);
+  var EDU_TERM_START = new Date(2026, 2, 10);
+  var MAX_EDU_WEEK = 30;
+  var MIN_EDU_WEEK = 1;
+  var selectedEduWeek = 24;
+  var HW_MONTH_NAMES = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+
+  var PV_HW_WEEK_IDS = {
+    22: ['trk-paragraf', 'fen-kid', 'din-ibadet', 'ing-kid', 'mat-koklu', 'sos-osmanli'],
+    23: ['mat-koklu', 'mat-kid', 'mat-rud', 'fen-dongu', 'fen-kid', 'fen-rud', 'trk-paragraf', 'trk-kid', 'trk-rud', 'sos-osmanli', 'sos-kid', 'din-ibadet']
+  };
+
+  var PV_HW_WEEK_OVERRIDES = {
+    22: {
+      'mat-koklu': { status: 'done', due: 'Tamamlandı', dueSub: '5 Haziran', dueLine: '15 soru · Tamamlandı', done: 15, total: 15, correct: 13, wrong: 1, blank: 1 },
+      'trk-paragraf': { status: 'done', due: 'Tamamlandı', dueSub: '4 Haziran', dueLine: '8 soru · Tamamlandı', done: 8, total: 8, correct: 8, wrong: 0, blank: 0 },
+      'fen-kid': { status: 'done', due: 'Tamamlandı', dueSub: '6 Haziran', dueLine: 'Kavram inşa · Tamamlandı', done: 1, total: 1, correct: 1, wrong: 0, blank: 0 },
+      'din-ibadet': { status: 'done', due: 'Tamamlandı', dueSub: '3 Haziran', dueLine: '6 soru · Tamamlandı', done: 6, total: 6, correct: 6, wrong: 0, blank: 0 },
+      'ing-kid': { status: 'done', due: 'Tamamlandı', dueSub: '7 Haziran', dueLine: 'Kavram inşa · Tamamlandı', done: 1, total: 1, correct: 1, wrong: 0, blank: 0 },
+      'sos-osmanli': { status: 'in-progress', due: 'Cuma 22:00', dueSub: '2 gün kaldı', dueLine: 'Özet · Cuma 22:00', done: 4, total: 8, correct: 3, wrong: 1, blank: 4, progress: 50 }
+    },
+    23: {
+      'mat-koklu': { status: 'in-progress', due: 'Cumartesi 23:59', dueSub: '1 gün kaldı', dueLine: '15 soru · Cumartesi 23:59', done: 9, total: 15, correct: 7, wrong: 2, blank: 6, progress: 60 },
+      'fen-dongu': { status: 'overdue', due: 'Dün 18:00', dueSub: 'Gecikmiş', dueLine: 'Etkinlik · Dün 18:00', done: 2, total: 10, correct: 1, wrong: 1, blank: 8 },
+      'trk-rud': { status: 'not-started', due: 'Pazar 14:00', dueSub: '3 gün kaldı', dueLine: 'Uygulama · Pazar 14:00', done: 0, total: 4, correct: 0, wrong: 0, blank: 4 },
+      'sos-kid': { status: 'done', due: 'Tamamlandı', dueSub: '12 Haziran', dueLine: 'Kavram inşa · Tamamlandı', done: 1, total: 1, correct: 1, wrong: 0, blank: 0 },
+      'din-ibadet': { status: 'done', due: 'Tamamlandı', dueSub: '11 Haziran', dueLine: '6 soru · Tamamlandı', done: 6, total: 6, correct: 5, wrong: 1, blank: 0 }
+    }
+  };
+
+  var PV_HW_WEEK_RANGES = {
+    22: '1 — 7 Haziran 2026',
+    23: '8 — 14 Haziran 2026',
+    24: '15 — 21 Haziran 2026'
+  };
+
+  function hwAddDays(d, n) {
+    var x = new Date(d);
+    x.setDate(x.getDate() + n);
+    return x;
+  }
+  function hwStartOfWeekMonday(d) {
+    var x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    var dow = x.getDay();
+    var diff = dow === 0 ? -6 : 1 - dow;
+    x.setDate(x.getDate() + diff);
+    return x;
+  }
+  function hwEduWeekStart(weekNum) {
+    return hwStartOfWeekMonday(hwAddDays(EDU_TERM_START, (weekNum - 1) * 7));
+  }
+  function hwEduWeekEndExclusive(weekNum) {
+    return hwAddDays(hwEduWeekStart(weekNum), 7);
+  }
+  function hwFindEduWeekForDate(d) {
+    for (var w = MIN_EDU_WEEK; w <= MAX_EDU_WEEK; w++) {
+      if (d >= hwEduWeekStart(w) && d < hwEduWeekEndExclusive(w)) return w;
+    }
+    return MAX_EDU_WEEK;
+  }
+  function formatHwEduWeek(week) {
+    var n = parseInt(week, 10);
+    if (!n || n < 1) return '';
+    return n + '. Eğitim Haftası';
+  }
+  function formatHwWeekRange(weekNum) {
+    if (PV_HW_WEEK_RANGES[weekNum]) return PV_HW_WEEK_RANGES[weekNum];
+    var start = hwEduWeekStart(weekNum);
+    var end = hwAddDays(start, 6);
+    if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+      return start.getDate() + ' — ' + end.getDate() + ' ' + HW_MONTH_NAMES[end.getMonth()] + ' ' + end.getFullYear();
+    }
+    return start.getDate() + ' ' + HW_MONTH_NAMES[start.getMonth()] + ' — ' + end.getDate() + ' ' + HW_MONTH_NAMES[end.getMonth()] + ' ' + end.getFullYear();
+  }
+  function getTaskForDisplay(task, week) {
+    var overrides = (PV_HW_WEEK_OVERRIDES[week] || {})[task.id];
+    if (!overrides) return task;
+    var merged = Object.assign({}, task, overrides);
+    if (overrides.progress == null && merged.status === 'in-progress' && merged.done != null && merged.total) {
+      merged.progress = Math.round((merged.done / merged.total) * 100);
+    }
+    return merged;
+  }
+  function getActiveHwTasksData() {
+    var ids = PV_HW_WEEK_IDS[selectedEduWeek];
+    var list;
+    if (ids) {
+      list = PV_HW_TASKS.filter(function (t) { return ids.indexOf(t.id) >= 0; });
+    } else if (selectedEduWeek === 24) {
+      list = PV_HW_TASKS.slice();
+    } else {
+      list = [];
+    }
+    return list.map(function (t) { return getTaskForDisplay(t, selectedEduWeek); });
+  }
+  function getCurrentEduWeekLabel() {
+    return formatHwEduWeek(selectedEduWeek);
+  }
+
+  var PV_HW_SCHEDULE = {
+    'mat-koklu': { assigned: '18 Haziran 2026', dueDate: '21 Haziran 2026' },
+    'mat-kid': { assigned: '21 Haziran 2026', dueDate: '24 Haziran 2026' },
+    'mat-rud': { assigned: '22 Haziran 2026', dueDate: '26 Haziran 2026' },
+    'fen-dongu': { assigned: '19 Haziran 2026', dueDate: '22 Haziran 2026' },
+    'fen-kid': { assigned: '17 Haziran 2026', dueDate: '20 Haziran 2026' },
+    'fen-rud': { assigned: '22 Haziran 2026', dueDate: '27 Haziran 2026' },
+    'trk-paragraf': { assigned: '16 Haziran 2026', dueDate: '20 Haziran 2026' },
+    'trk-kid': { assigned: '21 Haziran 2026', dueDate: '25 Haziran 2026' },
+    'trk-rud': { assigned: '22 Haziran 2026', dueDate: '28 Haziran 2026' },
+    'sos-osmanli': { assigned: '20 Haziran 2026', dueDate: '25 Haziran 2026' },
+    'sos-kid': { assigned: '21 Haziran 2026', dueDate: '26 Haziran 2026' },
+    'sos-rud': { assigned: '22 Haziran 2026', dueDate: '29 Haziran 2026' },
+    'din-ibadet': { assigned: '17 Haziran 2026', dueDate: '19 Haziran 2026' },
+    'din-kid': { assigned: '18 Haziran 2026', dueDate: '20 Haziran 2026' },
+    'din-rud': { assigned: '22 Haziran 2026', dueDate: '27 Haziran 2026' },
+    'ing-friendship': { assigned: '21 Haziran 2026', dueDate: '26 Haziran 2026' },
+    'ing-kid': { assigned: '18 Haziran 2026', dueDate: '20 Haziran 2026' },
+    'ing-rud': { assigned: '20 Haziran 2026', dueDate: '23 Haziran 2026' }
+  };
+
+  function resolveHwFormat(task) {
+    var isEl = task && task.getAttribute;
+    if (isEl) {
+      var fmt = task.getAttribute('data-hw-format');
+      if (fmt === 'kid' || fmt === 'rud') return fmt;
+      var legacy = task.getAttribute('data-hw-type');
+      if (legacy === 'kid' || legacy === 'rud') return legacy;
+      return 'rud';
+    }
+    if (task.hwFormat === 'kid' || task.hwFormat === 'rud') return task.hwFormat;
+    if (task.hwType === 'kid' || task.hwType === 'rud') return task.hwType;
+    return 'rud';
+  }
+
+  function hwTaskTypeBadgeHtml(fmt) {
+    var tip = fmt === 'kid' ? HW_KID_TIP : HW_RUD_TIP;
+    return '<span class="pv-hw-task-type is-' + fmt + '" title="' + tip + '">' + (fmt === 'kid' ? 'KİD' : 'RUD') + '</span>';
+  }
+
+  function hwDrawerTypeBadgeHtml(fmt) {
+    var tip = fmt === 'kid' ? HW_KID_TIP : HW_RUD_TIP;
+    return '<span class="pv-hw-drawer-type-badge is-' + fmt + '" title="' + tip + '">' + (fmt === 'kid' ? 'KİD' : 'RUD') + '</span>';
+  }
+
+  var HW_TYPE_ORDER = { regular: 0, kid: 1, rud: 2 };
+
+  function getHwTasksForSubject(subjectId) {
+    return getActiveHwTasksData().filter(function (t) { return t.subject === subjectId; }).sort(function (a, b) {
+      return (HW_TYPE_ORDER[a.hwType] || 0) - (HW_TYPE_ORDER[b.hwType] || 0);
+    });
+  }
+
+  function getHwXpFromTask(task) {
+    var isEl = task && task.getAttribute;
+    var total = isEl ? parseInt(task.getAttribute('data-total') || '0', 10) : (task.total || 0);
+    var correct = isEl ? parseInt(task.getAttribute('data-correct') || '0', 10) : (task.correct || 0);
+    if (isEl && task.getAttribute('data-xp-max')) {
+      return {
+        earned: parseInt(task.getAttribute('data-xp') || '0', 10),
+        max: parseInt(task.getAttribute('data-xp-max') || '0', 10)
+      };
+    }
+    var max = task.xpMax != null ? task.xpMax : (total > 0 ? total * 4 : 0);
+    var earned = task.xp != null ? task.xp : (total > 0 ? Math.round((correct / total) * max) : 0);
+    return { earned: earned, max: max };
+  }
+
+  function hwFractHtml(part, total) {
+    if (!total) return '—';
+    return escapeText(String(part)) + ' <sub>/ ' + escapeText(String(total)) + '</sub>';
+  }
+
+  function buildHwTaskButton(task) {
+    var status = task.status || 'not-started';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pv-hw-task is-' + status;
+    btn.setAttribute('data-subject', task.subject);
+    btn.setAttribute('data-status', status);
+    btn.setAttribute('data-hw-id', task.id);
+    btn.setAttribute('data-icon', task.icon);
+    btn.setAttribute('data-name', task.name);
+    btn.setAttribute('data-topic', task.topic);
+    btn.setAttribute('data-detail', task.detail);
+    btn.setAttribute('data-teacher', task.teacher);
+    btn.setAttribute('data-teacher-role', task.teacherRole);
+    btn.setAttribute('data-teacher-avatar', task.teacherAvatar);
+    btn.setAttribute('data-due', task.due);
+    btn.setAttribute('data-due-sub', task.dueSub);
+    btn.setAttribute('data-done', String(task.done));
+    btn.setAttribute('data-total', String(task.total));
+    btn.setAttribute('data-correct', String(task.correct));
+    btn.setAttribute('data-wrong', String(task.wrong));
+    btn.setAttribute('data-blank', String(task.blank));
+    btn.setAttribute('data-tip', HW_STATUS_TIP[status] || HW_STATUS_TIP['not-started']);
+    if (task.progress != null) btn.setAttribute('data-progress', String(task.progress));
+
+    if (task.hwType) btn.setAttribute('data-hw-type', task.hwType);
+    var hwFmt = resolveHwFormat(task);
+    btn.setAttribute('data-hw-format', hwFmt);
+
+    var sched = PV_HW_SCHEDULE[task.id] || {};
+    btn.setAttribute('data-assigned', task.assigned || sched.assigned || '');
+    btn.setAttribute('data-due-date', task.dueDate || sched.dueDate || '');
+    btn.setAttribute('data-edu-week', task.eduWeek || getCurrentEduWeekLabel());
+    btn.setAttribute('data-topic-short', task.topicShort || '');
+
+    var xpInfo = getHwXpFromTask(task);
+    btn.setAttribute('data-xp', String(xpInfo.earned));
+    btn.setAttribute('data-xp-max', String(xpInfo.max));
+
+    var typeBadge = hwTaskTypeBadgeHtml(hwFmt);
+
+    var progressHtml = '';
+    if (status === 'in-progress' && task.progress != null) {
+      progressHtml = '<span class="pv-hw-progress" aria-hidden="true"><span class="pv-hw-progress-fill" style="width:' + task.progress + '%"></span></span>';
+    }
+
+    var statusIcon = HW_STATUS_ICONS_CARD[status] || '';
+    var sideIcoHtml = statusIcon
+      ? '<span class="pv-hw-task-side-ico" aria-hidden="true"><span class="pv-hw-task-status-ico">' + statusIcon + '</span></span>'
+      : '<span class="pv-hw-task-side-ico is-empty" aria-hidden="true"></span>';
+    var statusHtml = '<span class="pv-hw-status">' + escapeText(HW_STATUS_LABELS_CARD[status] || status) + '</span>';
+
+    btn.innerHTML =
+      sideIcoHtml +
+      '<div class="pv-hw-task-content">' +
+        '<span class="pv-hw-task-subject">' + escapeText(task.name) + '</span>' +
+        '<span class="pv-hw-task-topic">' + escapeText(task.topicShort) + '</span>' +
+        '<div class="pv-hw-body">' +
+          '<span class="pv-hw-due">' + escapeText(task.dueLine) + '</span>' +
+          progressHtml +
+        '</div>' +
+        '<div class="pv-hw-task-foot">' +
+          statusHtml +
+          typeBadge +
+        '</div>' +
+      '</div>';
+    return btn;
+  }
+
+  function renderHwSections() {
+    var container = $('hwSections');
+    var weekEmptyEl = $('pvHwWeekEmpty');
+    if (!container) return;
+
+    var activeTasks = getActiveHwTasksData();
+    container.innerHTML = '';
+
+    if (!activeTasks.length) {
+      if (weekEmptyEl) {
+        weekEmptyEl.hidden = false;
+        weekEmptyEl.classList.add('is-visible');
+      }
+      updateHwCardSummary();
+      return;
+    }
+    if (weekEmptyEl) {
+      weekEmptyEl.hidden = true;
+      weekEmptyEl.classList.remove('is-visible');
+    }
+
+    PV_HW_SUBJECTS.forEach(function (subj) {
+      var tasks = getHwTasksForSubject(subj.id);
+      if (!tasks.length) return;
+
+      var section = document.createElement('section');
+      section.className = 'pv-hw-subject';
+      section.setAttribute('data-subject', subj.id);
+      section.setAttribute('aria-label', subj.name + ' ödevleri');
+
+      var head = document.createElement('div');
+      head.className = 'pv-hw-subject-head';
+      head.innerHTML =
+        '<span class="pv-hw-subject-ico" aria-hidden="true">' + subj.icon + '</span>' +
+        '<span class="pv-hw-subject-name">' + escapeText(subj.name) + '</span>' +
+        '<span class="pv-hw-subject-count">' + tasks.length + ' ödev</span>';
+
+      var carousel = document.createElement('div');
+      carousel.className = 'pv-hw-subject-carousel';
+
+      var prevBtn = document.createElement('button');
+      prevBtn.type = 'button';
+      prevBtn.className = 'pv-hw-subject-nav is-prev';
+      prevBtn.setAttribute('aria-label', subj.name + ' — önceki ödev');
+      prevBtn.disabled = true;
+      prevBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+
+      var viewport = document.createElement('div');
+      viewport.className = 'pv-hw-subject-viewport';
+
+      var list = document.createElement('div');
+      list.className = 'pv-hw-subject-list';
+      tasks.forEach(function (task) {
+        list.appendChild(buildHwTaskButton(task));
+      });
+
+      var nextBtn = document.createElement('button');
+      nextBtn.type = 'button';
+      nextBtn.className = 'pv-hw-subject-nav is-next';
+      nextBtn.setAttribute('aria-label', subj.name + ' — sonraki ödev');
+      nextBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+
+      viewport.appendChild(list);
+      carousel.appendChild(prevBtn);
+      carousel.appendChild(viewport);
+      carousel.appendChild(nextBtn);
+
+      section.appendChild(head);
+      section.appendChild(carousel);
+      container.appendChild(section);
+    });
+
+    initHwSubjectCarousels();
+    updateHwWeekLabel();
+    applyHwFilter(hwStatusFilter);
+    updateHwCardSummary();
+    refreshFloatingTooltips();
+  }
+
+  function initHwSubjectCarousels() {
+    var HW_LIST_GAP = 6;
+    var HW_CARD_PEEK = 0.86;
+
+    Array.prototype.forEach.call(document.querySelectorAll('.pv-hw-subject-carousel'), function (carousel) {
+      var list = carousel.querySelector('.pv-hw-subject-list');
+      var prev = carousel.querySelector('.pv-hw-subject-nav.is-prev');
+      var next = carousel.querySelector('.pv-hw-subject-nav.is-next');
+      if (!list || !prev || !next) return;
+
+      function syncWidths() {
+        var viewport = carousel.querySelector('.pv-hw-subject-viewport');
+        if (!viewport) return;
+        var cards = list.querySelectorAll('.pv-hw-task:not(.is-filter-hidden)');
+        var hasMore = cards.length > 1;
+        var peekRatio = hasMore ? HW_CARD_PEEK : 1;
+        var w = Math.floor(viewport.clientWidth * peekRatio);
+        w = Math.max(w, 100);
+        Array.prototype.forEach.call(cards, function (card) {
+          card.style.flex = '0 0 ' + w + 'px';
+          card.style.width = w + 'px';
+        });
+        update();
+      }
+
+      function step() {
+        var card = list.querySelector('.pv-hw-task:not(.is-filter-hidden)');
+        return card ? Math.round(card.getBoundingClientRect().width) + HW_LIST_GAP : 120;
+      }
+
+      function update() {
+        var max = list.scrollWidth - list.clientWidth - 1;
+        prev.disabled = list.scrollLeft <= 0;
+        next.disabled = list.scrollLeft >= max;
+        carousel.classList.toggle('can-scroll-left', list.scrollLeft > 0);
+        carousel.classList.toggle('can-scroll-right', list.scrollLeft < max);
+      }
+
+      prev.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        list.scrollBy({ left: -step(), behavior: 'smooth' });
+      });
+      next.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        list.scrollBy({ left: step(), behavior: 'smooth' });
+      });
+      list.addEventListener('scroll', update);
+      window.addEventListener('resize', syncWidths);
+      syncWidths();
+    });
+  }
+
+  var HW_STATUS_ORDER = { overdue: 0, 'in-progress': 1, 'not-started': 2, done: 99 };
+  var hwStatusFilter = 'all';
+
+  function taskMatchesHwFilter(task, filter) {
+    if (!filter || filter === 'all') return true;
+    var st = task.status || (task.getAttribute && task.getAttribute('data-status')) || 'not-started';
+    if (filter === 'done') return st === 'done';
+    if (filter === 'overdue') return st === 'overdue';
+    if (filter === 'active') return st === 'in-progress' || st === 'not-started';
+    return true;
+  }
+
+  function applyHwFilter(filter) {
+    hwStatusFilter = filter || 'all';
+    var container = $('hwSections');
+    var emptyEl = $('pvHwFilterEmpty');
+    if (!container) return;
+
+    var visibleTotal = 0;
+    PV_HW_SUBJECTS.forEach(function (subj) {
+      var section = container.querySelector('.pv-hw-subject[data-subject="' + subj.id + '"]');
+      if (!section) return;
+      var visible = 0;
+      section.querySelectorAll('.pv-hw-task').forEach(function (btn) {
+        var id = btn.getAttribute('data-hw-id');
+        var taskData = getActiveHwTasksData().find(function (t) { return t.id === id; });
+        var show = taskData ? taskMatchesHwFilter(taskData, hwStatusFilter) : false;
+        btn.classList.toggle('is-filter-hidden', !show);
+        if (show) visible++;
+      });
+      section.classList.toggle('is-filter-empty', visible === 0);
+      visibleTotal += visible;
+      var countEl = section.querySelector('.pv-hw-subject-count');
+      if (countEl) countEl.textContent = visible + ' ödev';
+      var list = section.querySelector('.pv-hw-subject-list');
+      if (list) list.scrollLeft = 0;
+    });
+
+    if (emptyEl) {
+      var showEmpty = visibleTotal === 0;
+      emptyEl.hidden = !showEmpty;
+      emptyEl.classList.toggle('is-visible', showEmpty);
+    }
+
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  function initHwFilters() {
+    var wrap = $('pvHwFilters');
+    if (!wrap || wrap.getAttribute('data-hw-filters-ready')) return;
+    wrap.setAttribute('data-hw-filters-ready', '1');
+
+    wrap.addEventListener('click', function (e) {
+      var btn = e.target.closest('.pv-hw-filter');
+      if (!btn || !wrap.contains(btn)) return;
+      var filter = btn.getAttribute('data-hw-filter') || 'all';
+      if (filter === hwStatusFilter) return;
+
+      wrap.querySelectorAll('.pv-hw-filter').forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      applyHwFilter(filter);
+    });
+  }
+
+  function countHwTasksForWeek(week) {
+    var ids = PV_HW_WEEK_IDS[week];
+    if (ids) return ids.length;
+    if (week === 24) return PV_HW_TASKS.length;
+    return 0;
+  }
+
+  function updateHwWeekLabel() {
+    var eyebrow = $('pvHwWeekEyebrow');
+    var range = $('pvHwWeekRange');
+    var prev = $('pvHwWeekPrev');
+    var next = $('pvHwWeekNext');
+    var hwNoteTextEl = $('pvHwSummaryNoteText');
+    if (eyebrow) eyebrow.textContent = formatHwEduWeek(selectedEduWeek);
+    if (range) range.textContent = formatHwWeekRange(selectedEduWeek);
+    if (prev) prev.disabled = selectedEduWeek <= MIN_EDU_WEEK;
+    if (next) next.disabled = selectedEduWeek >= MAX_EDU_WEEK;
+    if (hwNoteTextEl) {
+      hwNoteTextEl.innerHTML = 'Bu bölümde gördüğünüz ödev verileri, seçtiğiniz <strong>' + escapeText(formatHwEduWeek(selectedEduWeek)) + '</strong> (' + escapeText(formatHwWeekRange(selectedEduWeek)) + ') tarihleri arasındaki ödevlere aittir.';
+    }
+    PV_HW_EDU_WEEK = getCurrentEduWeekLabel();
+    var listSub = $('pvHwListDrSub');
+    if (listSub) {
+      var n = getActiveHwTasksData().length;
+      listSub.textContent = formatHwWeekRange(selectedEduWeek) + ' · ' + n + ' ödev';
+    }
+  }
+
+  function renderHwWeekPicker() {
+    var list = $('pvHwWeekPickerList');
+    if (!list) return;
+    var html = '';
+    for (var w = MIN_EDU_WEEK; w <= MAX_EDU_WEEK; w++) {
+      var activeCls = w === selectedEduWeek ? ' is-active' : '';
+      var count = countHwTasksForWeek(w);
+      var countLabel = count ? count + ' ödev' : 'Ödev yok';
+      html += '<button type="button" class="pv-hw-edu-picker-item' + activeCls + '" data-week="' + w + '">'
+        + '<strong>' + formatHwEduWeek(w) + '</strong>'
+        + '<span>' + formatHwWeekRange(w) + ' · ' + countLabel + '</span>'
+        + '</button>';
+    }
+    list.innerHTML = html;
+  }
+
+  function closeHwWeekPicker() {
+    var picker = $('pvHwWeekPicker');
+    var btn = $('pvHwWeekCalBtn');
+    if (picker) picker.hidden = true;
+    if (btn) {
+      btn.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function openHwWeekPicker() {
+    renderHwWeekPicker();
+    var picker = $('pvHwWeekPicker');
+    var btn = $('pvHwWeekCalBtn');
+    if (picker) picker.hidden = false;
+    if (btn) {
+      btn.classList.add('is-open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  function selectHwEduWeek(weekNum) {
+    var w = parseInt(weekNum, 10);
+    if (!w || w < MIN_EDU_WEEK || w > MAX_EDU_WEEK || w === selectedEduWeek) return;
+    selectedEduWeek = w;
+    closeHwWeekPicker();
+    updateHwWeekLabel();
+    renderHwSections();
+    applyHwFilter(hwStatusFilter);
+  }
+
+  function shiftHwEduWeek(delta) {
+    var next = selectedEduWeek + delta;
+    if (next < MIN_EDU_WEEK || next > MAX_EDU_WEEK) return;
+    selectHwEduWeek(next);
+  }
+
+  function initHwEduWeekNav() {
+    var nav = $('pvHwEduNav');
+    if (!nav || nav.getAttribute('data-hw-week-ready')) return;
+    nav.setAttribute('data-hw-week-ready', '1');
+
+    selectedEduWeek = 24;
+    updateHwWeekLabel();
+
+    var prev = $('pvHwWeekPrev');
+    var next = $('pvHwWeekNext');
+    var calBtn = $('pvHwWeekCalBtn');
+    var picker = $('pvHwWeekPicker');
+    var pickerList = $('pvHwWeekPickerList');
+
+    if (prev) prev.addEventListener('click', function (e) { e.stopPropagation(); shiftHwEduWeek(-1); });
+    if (next) next.addEventListener('click', function (e) { e.stopPropagation(); shiftHwEduWeek(1); });
+    if (calBtn) {
+      calBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var p = $('pvHwWeekPicker');
+        if (!p) return;
+        if (p.hidden) openHwWeekPicker();
+        else closeHwWeekPicker();
+      });
+    }
+    if (pickerList) {
+      pickerList.addEventListener('click', function (e) {
+        var item = e.target.closest('[data-week]');
+        if (!item) return;
+        selectHwEduWeek(item.getAttribute('data-week'));
+      });
+    }
+
+    document.addEventListener('click', function (e) {
+      if (!picker || picker.hidden) return;
+      if (nav.contains(e.target)) return;
+      closeHwWeekPicker();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeHwWeekPicker();
+    });
+  }
+
+  function sortHwByStatus(tasks) {
+    return tasks.slice().sort(function (a, b) {
+      var sa = HW_STATUS_ORDER[a.getAttribute('data-status')] ?? 2;
+      var sb = HW_STATUS_ORDER[b.getAttribute('data-status')] ?? 2;
+      if (sa !== sb) return sa - sb;
+      return (a.getAttribute('data-subject') || '').localeCompare(b.getAttribute('data-subject') || '');
+    });
+  }
+
+  function placeFloattip(el, tipEl, gap) {
+    var r = el.getBoundingClientRect();
+    var g = gap || 8;
+    tipEl.style.left = Math.round(r.left + r.width / 2) + 'px';
+    tipEl.style.top = Math.round(r.top - g) + 'px';
+  }
+
+  var TIP_BIND_SELECTORS = [
+    '.pv-abs-summary-item[data-tip]',
+    '.pv-hw-summary-item[data-tip]',
+    '.pv-hw-drawer-summary-item[data-tip]',
+    '.pv-hw-sections [data-tip]',
+    '.pv-hw-drawer-list [data-tip]',
+    '.pv-abs-item[data-tip]'
+  ];
+
+  var tipBinder = null;
+
+  function refreshFloatingTooltips() {
+    if (!tipBinder) return;
+    TIP_BIND_SELECTORS.forEach(function (sel) {
+      Array.prototype.forEach.call(document.querySelectorAll(sel), tipBinder);
+    });
+  }
+
+  function initFloatingTooltips() {
+    var tip = document.createElement('div');
+    tip.className = 'pv-floattip';
+    tip.setAttribute('role', 'tooltip');
+    tip.hidden = true;
+    document.body.appendChild(tip);
+
+    function bindTextTip(el) {
+      if (el.getAttribute('data-tip-bound')) return;
+      var text = el.getAttribute('data-tip');
+      if (!text) return;
+      el.setAttribute('data-tip-bound', '1');
+      el.addEventListener('mouseenter', function () {
+        tip.textContent = text;
+        tip.hidden = false;
+        tip.classList.add('is-visible');
+        placeFloattip(el, tip, 8);
+      });
+      el.addEventListener('mousemove', function () { placeFloattip(el, tip, 8); });
+      el.addEventListener('mouseleave', function () {
+        tip.classList.remove('is-visible');
+        tip.hidden = true;
+      });
+    }
+
+    tipBinder = bindTextTip;
+    refreshFloatingTooltips();
+  }
+
+  /* ---------------- Ödev drawer — liste + detay ---------------- */
+  function initHwDrawers() {
+    var listDrawer = $('pvHwListDrawer');
+    var detailDrawer = $('pvHwDetailDrawer');
+    var hwSections = $('hwSections');
+    if (!listDrawer || !detailDrawer || !hwSections) return;
+
+    var listPanel = listDrawer.querySelector('.pv-sem-drawer-panel');
+    var detailPanel = detailDrawer.querySelector('.pv-sem-drawer-panel');
+    var drawerList = $('pvHwDrawerList');
+    var hwTitleBtn = $('pvHwTitleBtn');
+    var hwDrBack = $('pvHwDrBack');
+    var openedFromList = false;
+
+    var STATUS_LABELS = {
+      overdue: 'Gecikmiş',
+      'in-progress': 'Devam Ediyor',
+      'not-started': 'Başlanmadı',
+      done: 'Tamamlandı'
+    };
+
+    function getTasks() {
+      return getHwTasks();
+    }
+
+    function sortTasksByStatus(tasks) {
+      return sortHwByStatus(tasks);
+    }
+
+    function countSummary(tasks) {
+      return countHwSummary(tasks);
+    }
+
+    function setDrawerOpen(drawer, panel, open) {
+      drawer.classList.toggle('is-open', open);
+      drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+      if (open && panel) panel.focus();
+    }
+
+    function closeAllHwDrawers() {
+      setDrawerOpen(listDrawer, listPanel, false);
+      setDrawerOpen(detailDrawer, detailPanel, false);
+      openedFromList = false;
+      if (hwDrBack) hwDrBack.hidden = true;
+    }
+
+    function buildListRows() {
+      if (!drawerList) return;
+      drawerList.innerHTML = '';
+      sortTasksByStatus(getTasks()).forEach(function (task) {
+        var row = document.createElement('button');
+        row.type = 'button';
+        var status = task.getAttribute('data-status') || 'not-started';
+        row.className = 'pv-hw-drawer-row is-' + status;
+        row.setAttribute('data-hw-id', task.getAttribute('data-hw-id') || '');
+        row.setAttribute('data-status', status);
+        row.setAttribute('data-tip', HW_STATUS_TIP[status] || HW_STATUS_TIP['not-started']);
+        var hwType = task.getAttribute('data-hw-format') || resolveHwFormat(task);
+        var assigned = task.getAttribute('data-assigned') || '—';
+        var dueDate = task.getAttribute('data-due-date') || task.getAttribute('data-due') || '—';
+        var eduWeek = task.getAttribute('data-edu-week') || getCurrentEduWeekLabel();
+        var topicShort = task.getAttribute('data-topic-short') || task.getAttribute('data-topic') || '';
+        var statusLabel = STATUS_LABELS[status] || status;
+        var formatLabel = hwType === 'kid' ? 'Kavram İnşa Dersi (KİD) ödevi' : 'Rehberli Uygulama Dersi (RUD) ödevi';
+        row.innerHTML =
+          '<span class="pv-hw-drawer-row-meta">' +
+            '<span class="pv-hw-drawer-row-top">' +
+              '<span class="pv-hw-drawer-row-name">' + escapeText(task.getAttribute('data-name') || 'Ödev') + '</span>' +
+              hwDrawerTypeBadgeHtml(hwType) +
+            '</span>' +
+            '<span class="pv-hw-drawer-row-topic">' + escapeText(topicShort) + '</span>' +
+            '<span class="pv-hw-drawer-row-format is-' + hwType + '">' + escapeText(formatLabel) + '</span>' +
+            '<span class="pv-hw-drawer-row-dates">Veriliş: ' + escapeText(assigned) + ' · Teslim: ' + escapeText(dueDate) + '</span>' +
+          '</span>' +
+          '<span class="pv-hw-drawer-row-end">' +
+            '<span class="pv-hw-drawer-row-week">' + escapeText(eduWeek) + '</span>' +
+            '<span class="pv-hw-drawer-row-status">' + escapeText(statusLabel) + '</span>' +
+          '</span>';
+        row.addEventListener('click', function () {
+          openedFromList = true;
+          openHwDetail(task, true);
+        });
+        drawerList.appendChild(row);
+      });
+      refreshFloatingTooltips();
+    }
+
+    function updateListSummary() {
+      var s = countHwSummary(getTasks());
+      var elDone = $('pvHwSumDone');
+      var elActive = $('pvHwSumActive');
+      var elOverdue = $('pvHwSumOverdue');
+      var elCount = $('pvHwListDrCount');
+      var elSub = $('pvHwListDrSub');
+      if (elDone) elDone.textContent = String(s.done);
+      if (elActive) elActive.textContent = String(s.active);
+      if (elOverdue) elOverdue.textContent = String(s.overdue);
+      var overdueWrap = $('pvHwSumOverdueWrap');
+      if (overdueWrap) overdueWrap.classList.toggle('is-has-overdue', s.overdue > 0);
+      updateHwCardSummary();
+      if (elCount) elCount.textContent = s.total + ' ödev';
+      if (elSub) elSub.textContent = s.done + ' tamamlandı';
+    }
+
+    function openHwList() {
+      buildListRows();
+      updateListSummary();
+      setDrawerOpen(detailDrawer, detailPanel, false);
+      setDrawerOpen(listDrawer, listPanel, true);
+    }
+
+    function hwSummaryCorrectDesc(correct, wrong, blank, total, started) {
+      if (!started) return 'Öğrenciniz bu ödeve henüz başlamadığı için doğru cevap kaydı bulunmamaktadır.';
+      if (!total) return 'Bu ödevde sayılabilir soru bulunmamaktadır.';
+      if (correct === total) return 'Öğrenciniz bu ödevdeki ' + total + ' sorunun tamamını doğru yanıtlamıştır.';
+      if (!correct) return 'Öğrenciniz bu ödevde henüz doğru cevap vermemiştir.';
+      return 'Öğrenciniz bu ödevdeki ' + total + ' sorudan ' + correct + ' tanesini doğru yanıtlamıştır.';
+    }
+
+    function hwSummaryWrongDesc(wrong, total, started) {
+      if (!started) return 'Öğrenciniz bu ödeve henüz başlamadığı için yanlış cevap kaydı bulunmamaktadır.';
+      if (!wrong) return 'Öğrenciniz bu ödevde yanlış cevap vermemiştir.';
+      return 'Öğrenciniz bu ödevde ' + wrong + ' soruyu yanlış yanıtlamıştır.';
+    }
+
+    function hwSummaryBlankDesc(blank, total, started) {
+      if (!started) return 'Öğrenciniz bu ödeve henüz başlamadığı için boş bırakılan soru kaydı bulunmamaktadır.';
+      if (!blank) return 'Öğrenciniz bu ödevde boş bırakılan soru bırakmamıştır.';
+      return 'Öğrenciniz bu ödevde ' + blank + ' soruyu henüz yanıtlamamış veya boş bırakmıştır.';
+    }
+
+    function hwSummaryXpDesc(earned, max, started) {
+      if (!started) return 'Öğrenciniz bu ödeve henüz başlamadığı için XP kazanamamıştır.';
+      if (!max) return 'Bu ödev için XP hesaplaması henüz oluşturulmamıştır.';
+      if (!earned) return 'Öğrenciniz bu ödevden henüz XP kazanmamıştır.';
+      if (earned >= max) return 'Öğrenciniz bu ödevden en yüksek ' + max + ' XP\'nin tamamını kazanmıştır.';
+      return 'Öğrenciniz bu ödevden toplam ' + max + ' XP\'nin ' + earned + ' tanesini kazanmıştır.';
+    }
+
+    function openHwDetail(task, fromList) {
+      if (!task) return;
+      openedFromList = !!fromList;
+      if (hwDrBack) hwDrBack.hidden = !openedFromList;
+
+      var subject = task.getAttribute('data-subject') || 'mat';
+      detailDrawer.setAttribute('data-subject', subject);
+
+      var hwType = resolveHwFormat(task);
+      var typeBadgeEl = $('pvHwDrTypeBadge');
+      var formatHintEl = $('pvHwDrFormatHint');
+      if (typeBadgeEl) {
+        typeBadgeEl.hidden = false;
+        typeBadgeEl.className = 'pv-hw-drawer-type-badge is-' + hwType;
+        typeBadgeEl.textContent = hwType === 'kid' ? 'KİD' : 'RUD';
+        typeBadgeEl.title = hwType === 'kid' ? HW_KID_TIP : HW_RUD_TIP;
+      }
+      if (formatHintEl) {
+        formatHintEl.hidden = false;
+        formatHintEl.className = 'pv-hw-drawer-format-hint is-' + hwType;
+        formatHintEl.textContent = hwType === 'kid' ? HW_KID_DESC : HW_RUD_DESC;
+      }
+
+      var nameEl = $('pvHwDrName');
+      if (nameEl) nameEl.textContent = (task.getAttribute('data-name') || 'Ödev').toUpperCase();
+      var titleEl = $('pvHwDrTitle');
+      if (titleEl) titleEl.textContent = task.getAttribute('data-topic-short') || task.getAttribute('data-topic') || '—';
+
+      var assignedEl = $('pvHwDrAssigned');
+      if (assignedEl) assignedEl.textContent = task.getAttribute('data-assigned') || '—';
+      var dueEl = $('pvHwDrDue');
+      if (dueEl) dueEl.textContent = task.getAttribute('data-due-date') || task.getAttribute('data-due') || '—';
+      var dueSubEl = $('pvHwDrDueSub');
+      if (dueSubEl) dueSubEl.textContent = task.getAttribute('data-due-sub') || '';
+      var weekEl = $('pvHwDrWeek');
+      if (weekEl) weekEl.textContent = task.getAttribute('data-edu-week') || getCurrentEduWeekLabel();
+
+      var correctEl = $('pvHwDrCorrect');
+      var wrongEl = $('pvHwDrWrong');
+      var blankEl = $('pvHwDrBlank');
+      var xpEl = $('pvHwDrXp');
+      var correctDescEl = $('pvHwDrCorrectDesc');
+      var wrongDescEl = $('pvHwDrWrongDesc');
+      var blankDescEl = $('pvHwDrBlankDesc');
+      var xpDescEl = $('pvHwDrXpDesc');
+      var rowCorrect = $('pvHwDrRowCorrect');
+      var rowWrong = $('pvHwDrRowWrong');
+      var rowBlank = $('pvHwDrRowBlank');
+      var rowXp = $('pvHwDrRowXp');
+
+      var correct = parseInt(task.getAttribute('data-correct') || '0', 10);
+      var wrong = parseInt(task.getAttribute('data-wrong') || '0', 10);
+      var blank = parseInt(task.getAttribute('data-blank') || '0', 10);
+      var done = parseInt(task.getAttribute('data-done') || '0', 10);
+      var total = parseInt(task.getAttribute('data-total') || '0', 10);
+      var xpInfo = getHwXpFromTask(task);
+      var started = done > 0 || correct > 0 || wrong > 0;
+
+      if (correctEl) correctEl.innerHTML = started ? hwFractHtml(correct, total) : '—';
+      if (wrongEl) wrongEl.innerHTML = started ? hwFractHtml(wrong, total) : '—';
+      if (blankEl) blankEl.innerHTML = started ? hwFractHtml(blank, total) : '—';
+      if (xpEl) xpEl.innerHTML = started ? hwFractHtml(xpInfo.earned, xpInfo.max) : '—';
+
+      if (correctDescEl) correctDescEl.textContent = hwSummaryCorrectDesc(correct, wrong, blank, total, started);
+      if (wrongDescEl) wrongDescEl.textContent = hwSummaryWrongDesc(wrong, total, started);
+      if (blankDescEl) blankDescEl.textContent = hwSummaryBlankDesc(blank, total, started);
+      if (xpDescEl) xpDescEl.textContent = hwSummaryXpDesc(xpInfo.earned, xpInfo.max, started);
+
+      if (rowCorrect) rowCorrect.classList.toggle('is-muted', !started);
+      if (rowWrong) rowWrong.classList.toggle('is-muted', !started);
+      if (rowBlank) rowBlank.classList.toggle('is-muted', !started);
+      if (rowXp) rowXp.classList.toggle('is-muted', !started);
+
+      var status = task.getAttribute('data-status') || 'not-started';
+      var statusEl = $('pvHwDrStatus');
+      if (statusEl) {
+        statusEl.textContent = STATUS_LABELS[status] || status;
+        statusEl.className = 'pv-hw-drawer-status is-' + status;
+      }
+
+      var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      var progEl = $('pvHwDrProgress');
+      if (progEl) progEl.textContent = done + ' / ' + total + ' soru';
+      var barEl = $('pvHwDrProgressBar');
+      if (barEl) barEl.style.width = pct + '%';
+
+      var noteEl = $('pvHwDrFooterNote');
+      if (noteEl) {
+        if (status === 'done') noteEl.textContent = 'Bu ödev tamamlandı. Doğru, yanlış ve boş sayıları yukarıda görüntüleniyor.';
+        else if (status === 'overdue') noteEl.textContent = 'Bu ödevin teslim tarihi geçti. Öğrencinizle birlikte tamamlama planı yapmanız önerilir.';
+        else noteEl.textContent = 'Öğrencinizin ödev ilerlemesini buradan takip edebilirsiniz.';
+      }
+
+      setDrawerOpen(listDrawer, listPanel, false);
+      setDrawerOpen(detailDrawer, detailPanel, true);
+    }
+
+    if (hwTitleBtn) hwTitleBtn.addEventListener('click', openHwList);
+    updateListSummary();
+
+    hwSections.addEventListener('click', function (e) {
+      var task = e.target.closest('.pv-hw-task');
+      if (task) openHwDetail(task, false);
+    });
+
+    if (hwDrBack) {
+      hwDrBack.addEventListener('click', function () {
+        setDrawerOpen(detailDrawer, detailPanel, false);
+        openHwList();
+      });
+    }
+
+    listDrawer.querySelectorAll('[data-hw-list-close]').forEach(function (el) {
+      el.addEventListener('click', function () { setDrawerOpen(listDrawer, listPanel, false); });
+    });
+    detailDrawer.querySelectorAll('[data-hw-detail-close]').forEach(function (el) {
+      el.addEventListener('click', closeAllHwDrawers);
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      if (detailDrawer.classList.contains('is-open')) closeAllHwDrawers();
+      else if (listDrawer.classList.contains('is-open')) setDrawerOpen(listDrawer, listPanel, false);
+    });
+  }
+
+  /* ---------------- Haftalık Performans — 9 ders / hafta + filtre ---------------- */
+  var ABS_LESSON_TIP = 'Öğrencinizin bu dersteki katılım ve performans detaylarını görmek için tıklayın.';
+  var ABS_PENDING_TIP = 'Bu ders henüz gerçekleşmedi. Öğrencinizin katılım ve performans verileri ders tamamlandıktan sonra burada görünecektir.';
+  var ABS_KID_DESC = 'Kavram İnşa Dersi (KİD) — öğrenciler kavramı sınıf içi tartışma ve etkinliklerle birlikte inşa eder.';
+  var ABS_RUD_DESC = 'Rehberli Uygulama Dersi (RUD) — öğretmen rehberliğinde adım adım soru çözümü ve uygulama yapılır.';
+
+  var PV_ABS_DAY_NAMES = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+  var PV_ABS_DAY_SHORT = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+
+  var selectedAbsEduWeek = 24;
+  var absFilterStatus = 'all';
+
+  /* performans.html — SUBJECT_STATS_BY_RANGE.week ile uyumlu haftalık canlı ders verisi */
+  var PV_ABS_WEEK_IDS = {
+    22: ['a1', 'a2', 'a3', 'a4', 'a5'],
+    23: ['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7']
+  };
+
+  var PV_ABS_LESSONS = [
+    { id: 'a1',  subject: 'mat', lessonType: 'regular', day: 0, dayName: 'Pazartesi', date: '15', month: 'Haz', name: 'Matematik',       teacher: 'Ali Demir',     topic: 'Köklü Sayılar',           time: '09:00', durationLabel: '60 dk', status: 'attended', correct: 11, total: 14, handRaises: 2, boardRaises: 1, xp: 38, durationMin: 58 },
+    { id: 'a2',  subject: 'fen', lessonType: 'regular', day: 0, dayName: 'Pazartesi', date: '15', month: 'Haz', name: 'Fen Bilimleri',   teacher: 'Zeynep Yıldız', topic: 'Madde ve Özellikleri',    time: '11:00', durationLabel: '60 dk', status: 'attended', correct: 10, total: 12, handRaises: 2, boardRaises: 0, xp: 28, durationMin: 55 },
+    { id: 'a3',  subject: 'trk', lessonType: 'regular', day: 0, dayName: 'Pazartesi', date: '15', month: 'Haz', name: 'Türkçe',           teacher: 'Mehmet Kaya',   topic: 'Paragraf Anlamı',         time: '14:00', durationLabel: '60 dk', status: 'attended', correct: 9,  total: 10, handRaises: 3, boardRaises: 0, xp: 22, durationMin: 57 },
+    { id: 'a4',  subject: 'mat', lessonType: 'kid',     day: 1, dayName: 'Salı',      date: '16', month: 'Haz', name: 'Matematik',       teacher: 'Ali Demir',     topic: 'Köklü Sayılar',           time: '09:00', durationLabel: '45 dk', status: 'attended', correct: 12, total: 14, handRaises: 3, boardRaises: 0, xp: 35, durationMin: 43 },
+    { id: 'a5',  subject: 'fen', lessonType: 'regular', day: 1, dayName: 'Salı',      date: '16', month: 'Haz', name: 'Fen Bilimleri',   teacher: 'Zeynep Yıldız', topic: 'Kuvvet ve Hareket',       time: '11:00', durationLabel: '60 dk', status: 'attended', correct: 9,  total: 11, handRaises: 2, boardRaises: 1, xp: 26, durationMin: 56 },
+    { id: 'a6',  subject: 'trk', lessonType: 'regular', day: 1, dayName: 'Salı',      date: '16', month: 'Haz', name: 'Türkçe',           teacher: 'Mehmet Kaya',   topic: 'Cümlede Anlam',           time: '14:00', durationLabel: '60 dk', status: 'attended', correct: 9,  total: 10, handRaises: 3, boardRaises: 0, xp: 22, durationMin: 58 },
+    { id: 'a7',  subject: 'ing', lessonType: 'regular', day: 1, dayName: 'Salı',      date: '16', month: 'Haz', name: 'İngilizce',        teacher: 'Emre Çelik',    topic: 'Tenses',                  time: '16:00', durationLabel: '60 dk', status: 'attended', correct: 10, total: 12, handRaises: 3, boardRaises: 1, xp: 26, durationMin: 59 },
+    { id: 'a8',  subject: 'mat', lessonType: 'regular', day: 2, dayName: 'Çarşamba',  date: '17', month: 'Haz', name: 'Matematik',       teacher: 'Ali Demir',     topic: 'Cebirsel İfadeler',       time: '09:00', durationLabel: '60 dk', status: 'attended', correct: 9,  total: 12, handRaises: 2, boardRaises: 1, xp: 22, durationMin: 57 },
+    { id: 'a9',  subject: 'fen', lessonType: 'rud',     day: 2, dayName: 'Çarşamba',  date: '17', month: 'Haz', name: 'Fen Bilimleri',   teacher: 'Zeynep Yıldız', topic: 'Elektrik',                time: '11:00', durationLabel: '45 dk', status: 'absent',   correct: 0,  total: 10, handRaises: 0, boardRaises: 0, xp: 0,  durationMin: 0 },
+    { id: 'a10', subject: 'trk', lessonType: 'regular', day: 2, dayName: 'Çarşamba',  date: '17', month: 'Haz', name: 'Türkçe',           teacher: 'Mehmet Kaya',   topic: 'Yazım Kuralları',         time: '14:00', durationLabel: '60 dk', status: 'attended', correct: 9,  total: 10, handRaises: 3, boardRaises: 0, xp: 22, durationMin: 56 },
+    { id: 'a11', subject: 'sos', lessonType: 'regular', day: 2, dayName: 'Çarşamba',  date: '17', month: 'Haz', name: 'Sosyal Bilgiler',  teacher: 'Selin Aydın',  topic: 'Türkiye Coğrafyası',      time: '16:00', durationLabel: '60 dk', status: 'absent',   correct: 0,  total: 10, handRaises: 0, boardRaises: 0, xp: 0,  durationMin: 0 },
+    { id: 'a12', subject: 'ing', lessonType: 'regular', day: 3, dayName: 'Perşembe',  date: '18', month: 'Haz', name: 'İngilizce',        teacher: 'Emre Çelik',    topic: 'Phrasal Verbs',           time: '09:00', durationLabel: '60 dk', status: 'attended', correct: 10, total: 12, handRaises: 4, boardRaises: 0, xp: 27, durationMin: 58 },
+    { id: 'a13', subject: 'din', lessonType: 'regular', day: 3, dayName: 'Perşembe',  date: '18', month: 'Haz', name: 'Din Kültürü',     teacher: 'Ayşe Korkmaz',  topic: 'İbadetler',               time: '11:00', durationLabel: '45 dk', status: 'attended', correct: 13, total: 15, handRaises: 3, boardRaises: 0, xp: 40, durationMin: 44 },
+    { id: 'a14', subject: 'sos', lessonType: 'regular', day: 3, dayName: 'Perşembe',  date: '18', month: 'Haz', name: 'Sosyal Bilgiler',  teacher: 'Selin Aydın',  topic: 'Atatürk İlkeleri',        time: '14:00', durationLabel: '60 dk', status: 'attended', correct: 12, total: 14, handRaises: 2, boardRaises: 0, xp: 38, durationMin: 55 },
+    { id: 'a15', subject: 'mat', lessonType: 'regular', day: 3, dayName: 'Perşembe',  date: '18', month: 'Haz', name: 'Matematik',       teacher: 'Ali Demir',     topic: 'Trigonometri',            time: '16:00', durationLabel: '60 dk', status: 'absent',   correct: 0,  total: 12, handRaises: 0, boardRaises: 0, xp: 0,  durationMin: 0 },
+    { id: 'a16', subject: 'ing', lessonType: 'regular', day: 4, dayName: 'Cuma',      date: '19', month: 'Haz', name: 'İngilizce',        teacher: 'Emre Çelik',    topic: 'Vocabulary',              time: '09:00', durationLabel: '60 dk', status: 'attended', correct: 10, total: 11, handRaises: 3, boardRaises: 0, xp: 26, durationMin: 59 },
+    { id: 'a17', subject: 'trk', lessonType: 'regular', day: 4, dayName: 'Cuma',      date: '19', month: 'Haz', name: 'Türkçe',           teacher: 'Mehmet Kaya',   topic: 'Sözcükte Anlam',          time: '11:00', durationLabel: '60 dk', status: 'attended', correct: 9,  total: 10, handRaises: 3, boardRaises: 0, xp: 22, durationMin: 57 },
+    { id: 'a18', subject: 'fen', lessonType: 'regular', day: 4, dayName: 'Cuma',      date: '19', month: 'Haz', name: 'Fen Bilimleri',   teacher: 'Zeynep Yıldız', topic: 'Elektrik',                time: '14:00', durationLabel: '60 dk', status: 'attended', correct: 9,  total: 11, handRaises: 1, boardRaises: 0, xp: 28, durationMin: 54 },
+    { id: 'a19', subject: 'din', lessonType: 'regular', day: 4, dayName: 'Cuma',      date: '19', month: 'Haz', name: 'Din Kültürü',     teacher: 'Ayşe Korkmaz',  topic: 'Peygamberimizin Hayatı',  time: '16:00', durationLabel: '45 dk', status: 'attended', correct: 11, total: 13, handRaises: 2, boardRaises: 0, xp: 32, durationMin: 43 },
+    { id: 'a20', subject: 'ing', lessonType: 'regular', day: 5, dayName: 'Cumartesi', date: '20', month: 'Haz', name: 'İngilizce',        teacher: 'Emre Çelik',    topic: 'Reading Comp.',           time: '10:00', durationLabel: '60 dk', status: 'attended', correct: 10, total: 12, handRaises: 2, boardRaises: 1, xp: 26, durationMin: 58 },
+    { id: 'a21', subject: 'sos', lessonType: 'rud',     day: 5, dayName: 'Cumartesi', date: '20', month: 'Haz', name: 'Sosyal Bilgiler',  teacher: 'Selin Aydın',  topic: 'Bölgeler',                time: '13:00', durationLabel: '45 dk', status: 'attended', correct: 10, total: 12, handRaises: 2, boardRaises: 0, xp: 30, durationMin: 44 },
+    { id: 'a22', subject: 'din', lessonType: 'regular', day: 5, dayName: 'Cumartesi', date: '20', month: 'Haz', name: 'Din Kültürü',     teacher: 'Ayşe Korkmaz',  topic: 'Ahlaki Değerler',         time: '15:00', durationLabel: '45 dk', status: 'absent',   correct: 0,  total: 8,  handRaises: 0, boardRaises: 0, xp: 0,  durationMin: 0 },
+    { id: 'a23', subject: 'sos', lessonType: 'regular', day: 6, dayName: 'Pazar',     date: '21', month: 'Haz', name: 'Sosyal Bilgiler',  teacher: 'Selin Aydın',  topic: 'Bölgeler',                time: '11:00', durationLabel: '60 dk', status: 'absent',   correct: 0,  total: 10, handRaises: 0, boardRaises: 0, xp: 0,  durationMin: 0 },
+    { id: 'a24', subject: 'din', lessonType: 'kid',     day: 6, dayName: 'Pazar',     date: '21', month: 'Haz', name: 'Din Kültürü',     teacher: 'Ayşe Korkmaz',  topic: 'Kur\'an-ı Kerim',         time: '15:00', durationLabel: '45 dk', status: 'absent',   correct: 0,  total: 8,  handRaises: 0, boardRaises: 0, xp: 0,  durationMin: 0 }
+  ];
+
+  PV_ABS_LESSONS.forEach(function (l, i) {
+    if (l.lessonType === 'kid' || l.lessonType === 'rud') {
+      l.lessonFormat = l.lessonType;
+    } else {
+      l.lessonFormat = i % 2 === 0 ? 'rud' : 'kid';
+    }
+  });
+
+  function absLessonBoardRaises(lesson) {
+    return lesson.boardRaises || 0;
+  }
+
+  function absLessonParticipationCount(lesson) {
+    return (lesson.handRaises || 0) + absLessonBoardRaises(lesson);
+  }
+
+  function getActiveAbsLessons() {
+    var ids = PV_ABS_WEEK_IDS[selectedAbsEduWeek];
+    if (ids) {
+      return PV_ABS_LESSONS.filter(function (l) { return ids.indexOf(l.id) >= 0; });
+    }
+    if (selectedAbsEduWeek === 24) return PV_ABS_LESSONS.slice();
+    return [];
+  }
+
+  function getFilteredAbsLessons() {
+    return getActiveAbsLessons().filter(function (l) {
+      if (absFilterStatus === 'attended' && l.status !== 'attended') return false;
+      if (absFilterStatus === 'absent' && l.status !== 'absent') return false;
+      return true;
+    }).sort(function (a, b) {
+      if (a.day !== b.day) return a.day - b.day;
+      return (a.time || '').localeCompare(b.time || '');
+    });
+  }
+
+  function absLessonFormat(lesson) {
+    if (!lesson) return 'rud';
+    if (lesson.lessonFormat === 'kid' || lesson.lessonFormat === 'rud') return lesson.lessonFormat;
+    if (lesson.lessonType === 'kid' || lesson.lessonType === 'rud') return lesson.lessonType;
+    return 'rud';
+  }
+
+  function absLessonTypeBadge(lesson) {
+    var fmt = absLessonFormat(lesson);
+    return '<span class="pv-abs-item-type is-' + fmt + '">' + (fmt === 'kid' ? 'KİD' : 'RUD') + '</span>';
+  }
+
+  function buildAbsLessonCard(lesson) {
+    var isPending = lesson.status === 'pending';
+    var attended = lesson.status === 'attended';
+    var fmt = absLessonFormat(lesson);
+    var el = document.createElement(isPending ? 'div' : 'button');
+    if (!isPending) el.type = 'button';
+    el.className = 'pv-abs-item ' + (isPending ? 'is-pending' : attended ? 'is-attended' : 'is-absent');
+    el.setAttribute('data-subject', lesson.subject);
+    el.setAttribute('data-day', String(lesson.day));
+    if (isPending) {
+      el.setAttribute('data-tip', ABS_PENDING_TIP);
+      el.setAttribute('aria-label', lesson.name + ' — ' + lesson.dayName + ' — Tamamlanmamış');
+    } else {
+      el.setAttribute('data-lesson-id', lesson.id);
+      el.setAttribute('data-tip', ABS_LESSON_TIP);
+      el.setAttribute('aria-label', lesson.name + ' — ' + lesson.dayName + ' — ' + (fmt === 'kid' ? 'KİD' : 'RUD') + ' — ' + (attended ? 'Katıldı' : 'Katılmadı'));
+    }
+    var chipLabel = isPending ? 'Tamamlanmamış' : (attended ? 'Katıldı' : 'Katılmadı');
+    el.setAttribute('data-lesson-format', fmt);
+    el.innerHTML =
+      '<span class="pv-abs-item-subject">' + escapeText(lesson.name) + '</span>' +
+      '<span class="pv-abs-item-topic">' + escapeText(lesson.topic || '') + '</span>' +
+      '<span class="pv-abs-item-time">' + escapeText(lesson.time) + '</span>' +
+      '<div class="pv-abs-item-foot">' +
+        absLessonTypeBadge(lesson) +
+        '<span class="pv-abs-item-chip">' + chipLabel + '</span>' +
+      '</div>';
+    return el;
+  }
+
+  function buildAbsDayCarousel(dayIdx, dayLessons) {
+    var dayName = PV_ABS_DAY_NAMES[dayIdx];
+    var carousel = document.createElement('div');
+    carousel.className = 'pv-abs-day-carousel' + (dayLessons.length > 1 ? ' has-multiple' : '');
+
+    var prevBtn = document.createElement('button');
+    prevBtn.type = 'button';
+    prevBtn.className = 'pv-abs-nav-btn pv-abs-nav-prev';
+    prevBtn.setAttribute('aria-label', dayName + ' — önceki ders');
+    prevBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+
+    var viewport = document.createElement('div');
+    viewport.className = 'pv-abs-day-viewport';
+
+    var list = document.createElement('div');
+    list.className = 'pv-abs-day-list';
+    dayLessons.forEach(function (lesson) {
+      list.appendChild(buildAbsLessonCard(lesson));
+    });
+
+    var nextBtn = document.createElement('button');
+    nextBtn.type = 'button';
+    nextBtn.className = 'pv-abs-nav-btn pv-abs-nav-next';
+    nextBtn.setAttribute('aria-label', dayName + ' — sonraki ders');
+    nextBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+
+    viewport.appendChild(list);
+    carousel.appendChild(prevBtn);
+    carousel.appendChild(viewport);
+    carousel.appendChild(nextBtn);
+    return carousel;
+  }
+
+  function buildAbsDayColumn(dayIdx, lessons) {
+    var dayLessons = lessons.filter(function (l) { return l.day === dayIdx; });
+    var group = document.createElement('div');
+    group.className = 'pv-abs-day-group';
+    group.setAttribute('data-day', String(dayIdx));
+
+    var hd = document.createElement('span');
+    hd.className = 'pv-abs-day-col-hd';
+    hd.textContent = PV_ABS_DAY_NAMES[dayIdx];
+    group.appendChild(hd);
+
+    if (!dayLessons.length) {
+      var cards = document.createElement('div');
+      cards.className = 'pv-abs-day-cards';
+      var emptyDay = document.createElement('span');
+      emptyDay.className = 'pv-abs-day-empty';
+      emptyDay.textContent = '—';
+      cards.appendChild(emptyDay);
+      group.appendChild(cards);
+    } else {
+      group.appendChild(buildAbsDayCarousel(dayIdx, dayLessons));
+    }
+    return group;
+  }
+
+  function getAbsLessonById(id) {
+    for (var i = 0; i < PV_ABS_LESSONS.length; i++) {
+      if (PV_ABS_LESSONS[i].id === id) return PV_ABS_LESSONS[i];
+    }
+    return null;
+  }
+
+  function renderAbsLessons() {
+    var list = $('pvAbsList');
+    var emptyEl = $('pvAbsFilterEmpty');
+    if (!list) return;
+    list.innerHTML = '';
+
+    var lessons = getFilteredAbsLessons();
+
+    if (!lessons.length && absFilterStatus !== 'all') {
+      if (emptyEl) {
+        emptyEl.hidden = false;
+        emptyEl.classList.add('is-visible');
+      }
+      updateAbsSummary();
+      return;
+    }
+    if (emptyEl) {
+      emptyEl.hidden = true;
+      emptyEl.classList.remove('is-visible');
+    }
+
+    var rowTop = document.createElement('div');
+    rowTop.className = 'pv-abs-week-row is-top';
+    [0, 1, 2, 3].forEach(function (dayIdx) {
+      rowTop.appendChild(buildAbsDayColumn(dayIdx, lessons));
+    });
+    var rowBottom = document.createElement('div');
+    rowBottom.className = 'pv-abs-week-row is-bottom';
+    [4, 5, 6].forEach(function (dayIdx) {
+      rowBottom.appendChild(buildAbsDayColumn(dayIdx, lessons));
+    });
+    list.appendChild(rowTop);
+    list.appendChild(rowBottom);
+
+    updateAbsSummary();
+    initAbsDayCarousels();
+    refreshFloatingTooltips();
+  }
+
+  function initAbsDayCarousels() {
+    var ABS_LIST_GAP = 6;
+    var ABS_CARD_PEEK = 0.86;
+
+    Array.prototype.forEach.call(document.querySelectorAll('.pv-abs-day-carousel'), function (carousel) {
+      var list = carousel.querySelector('.pv-abs-day-list');
+      var prev = carousel.querySelector('.pv-abs-nav-prev');
+      var next = carousel.querySelector('.pv-abs-nav-next');
+      if (!list || !prev || !next) return;
+
+      function syncWidths() {
+        var viewport = carousel.querySelector('.pv-abs-day-viewport');
+        if (!viewport) return;
+        var cards = list.querySelectorAll('.pv-abs-item');
+        var hasMore = cards.length > 1;
+        carousel.classList.toggle('has-multiple', hasMore);
+        var peekRatio = hasMore ? ABS_CARD_PEEK : 1;
+        var w = Math.floor(viewport.clientWidth * peekRatio);
+        w = Math.max(w, 72);
+        Array.prototype.forEach.call(cards, function (card) {
+          card.style.flex = '0 0 ' + w + 'px';
+          card.style.width = w + 'px';
+        });
+        if (!hasMore) list.scrollLeft = 0;
+        update();
+      }
+
+      function step() {
+        var card = list.querySelector('.pv-abs-item');
+        return card ? Math.round(card.getBoundingClientRect().width) + ABS_LIST_GAP : 100;
+      }
+
+      function update() {
+        var max = list.scrollWidth - list.clientWidth - 1;
+        prev.disabled = list.scrollLeft <= 0;
+        next.disabled = list.scrollLeft >= max;
+        carousel.classList.toggle('can-scroll-left', list.scrollLeft > 0);
+        carousel.classList.toggle('can-scroll-right', list.scrollLeft < max);
+      }
+
+      prev.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        list.scrollBy({ left: -step(), behavior: 'smooth' });
+      });
+      next.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        list.scrollBy({ left: step(), behavior: 'smooth' });
+      });
+      list.addEventListener('scroll', update);
+      window.addEventListener('resize', syncWidths);
+      syncWidths();
+    });
+  }
+
+  function updateAbsSummary() {
+    var attendedEl = $('pvAbsSumAttended');
+    var absentEl = $('pvAbsSumAbsent');
+    var participationEl = $('pvAbsSumParticipation');
+    var correctEl = $('pvAbsSumCorrect');
+    var noteTextEl = $('pvAbsSummaryNoteText');
+    var attended = 0, absent = 0, participation = 0, correctTotal = 0;
+    getActiveAbsLessons().forEach(function (l) {
+      if (l.status === 'attended') {
+        attended++;
+        participation += absLessonParticipationCount(l);
+        correctTotal += (l.correct || 0);
+      } else if (l.status === 'absent') {
+        absent++;
+      }
+    });
+    if (attendedEl) attendedEl.textContent = String(attended);
+    if (absentEl) absentEl.textContent = String(absent);
+    if (participationEl) participationEl.textContent = String(participation);
+    if (correctEl) correctEl.textContent = String(correctTotal);
+    if (noteTextEl) {
+      noteTextEl.innerHTML = 'Bu bölümde gördüğünüz katılım ve performans verileri, seçtiğiniz <strong>' + escapeText(formatHwEduWeek(selectedAbsEduWeek)) + '</strong> (' + escapeText(formatHwWeekRange(selectedAbsEduWeek)) + ') tarihleri arasındaki derslere aittir.';
+    }
+  }
+
+  function countAbsLessonsForWeek(week) {
+    var ids = PV_ABS_WEEK_IDS[week];
+    if (ids) return ids.length;
+    if (week === 24) return PV_ABS_LESSONS.length;
+    return 0;
+  }
+
+  function updateAbsWeekLabel() {
+    var eyebrow = $('pvAbsWeekEyebrow');
+    var range = $('pvAbsWeekRange');
+    var prev = $('pvAbsWeekPrev');
+    var next = $('pvAbsWeekNext');
+    if (eyebrow) eyebrow.textContent = formatHwEduWeek(selectedAbsEduWeek);
+    if (range) range.textContent = formatHwWeekRange(selectedAbsEduWeek);
+    if (prev) prev.disabled = selectedAbsEduWeek <= MIN_EDU_WEEK;
+    if (next) next.disabled = selectedAbsEduWeek >= MAX_EDU_WEEK;
+  }
+
+  function renderAbsWeekPicker() {
+    var list = $('pvAbsWeekPickerList');
+    if (!list) return;
+    var html = '';
+    for (var w = MIN_EDU_WEEK; w <= MAX_EDU_WEEK; w++) {
+      var activeCls = w === selectedAbsEduWeek ? ' is-active' : '';
+      var count = countAbsLessonsForWeek(w);
+      var countLabel = count ? count + ' ders' : 'Ders yok';
+      html += '<button type="button" class="pv-hw-edu-picker-item' + activeCls + '" data-week="' + w + '">'
+        + '<strong>' + formatHwEduWeek(w) + '</strong>'
+        + '<span>' + formatHwWeekRange(w) + ' · ' + countLabel + '</span>'
+        + '</button>';
+    }
+    list.innerHTML = html;
+  }
+
+  function closeAbsWeekPicker() {
+    var picker = $('pvAbsWeekPicker');
+    var btn = $('pvAbsWeekCalBtn');
+    if (picker) picker.hidden = true;
+    if (btn) {
+      btn.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function openAbsWeekPicker() {
+    renderAbsWeekPicker();
+    var picker = $('pvAbsWeekPicker');
+    var btn = $('pvAbsWeekCalBtn');
+    if (picker) picker.hidden = false;
+    if (btn) {
+      btn.classList.add('is-open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  function selectAbsEduWeek(weekNum) {
+    var w = parseInt(weekNum, 10);
+    if (!w || w < MIN_EDU_WEEK || w > MAX_EDU_WEEK || w === selectedAbsEduWeek) return;
+    selectedAbsEduWeek = w;
+    closeAbsWeekPicker();
+    updateAbsWeekLabel();
+    renderAbsLessons();
+  }
+
+  function shiftAbsEduWeek(delta) {
+    var next = selectedAbsEduWeek + delta;
+    if (next < MIN_EDU_WEEK || next > MAX_EDU_WEEK) return;
+    selectAbsEduWeek(next);
+  }
+
+  function initAbsEduWeekNav() {
+    var nav = $('pvAbsEduNav');
+    if (!nav || nav.getAttribute('data-abs-week-ready')) return;
+    nav.setAttribute('data-abs-week-ready', '1');
+    selectedAbsEduWeek = 24;
+    updateAbsWeekLabel();
+
+    var prev = $('pvAbsWeekPrev');
+    var next = $('pvAbsWeekNext');
+    var calBtn = $('pvAbsWeekCalBtn');
+    var picker = $('pvAbsWeekPicker');
+    var pickerList = $('pvAbsWeekPickerList');
+
+    if (prev) prev.addEventListener('click', function (e) { e.stopPropagation(); shiftAbsEduWeek(-1); });
+    if (next) next.addEventListener('click', function (e) { e.stopPropagation(); shiftAbsEduWeek(1); });
+    if (calBtn) {
+      calBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var p = $('pvAbsWeekPicker');
+        if (!p) return;
+        if (p.hidden) openAbsWeekPicker();
+        else closeAbsWeekPicker();
+      });
+    }
+    if (pickerList) {
+      pickerList.addEventListener('click', function (e) {
+        var item = e.target.closest('[data-week]');
+        if (!item) return;
+        selectAbsEduWeek(item.getAttribute('data-week'));
+      });
+    }
+    document.addEventListener('click', function (e) {
+      if (!picker || picker.hidden) return;
+      if (nav.contains(e.target)) return;
+      closeAbsWeekPicker();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeAbsWeekPicker();
+    });
+  }
+
+  function initAbsFilters() {
+    var wrap = $('pvAbsFilters');
+    if (!wrap || wrap.getAttribute('data-abs-filters-ready')) return;
+    wrap.setAttribute('data-abs-filters-ready', '1');
+
+    wrap.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-abs-filter]');
+      if (!btn || !wrap.contains(btn)) return;
+      var filter = btn.getAttribute('data-abs-filter') || 'all';
+      if (filter === absFilterStatus) return;
+
+      wrap.querySelectorAll('[data-abs-filter]').forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      absFilterStatus = filter;
+      renderAbsLessons();
+    });
+  }
+
+  function initAbsLessonDrawer() {
+    var drawer = $('pvAbsLessonDrawer');
+    var list = $('pvAbsList');
+    if (!drawer || !list) return;
+
+    var panel = drawer.querySelector('.pv-sem-drawer-panel');
+    var drIco = $('pvAbsDrIco');
+    var drTitle = $('pvAbsDrTitle');
+    var drDate = $('pvAbsDrDate');
+    var drTime = $('pvAbsDrTime');
+    var drStatus = $('pvAbsDrStatus');
+    var drTypeBadge = $('pvAbsDrTypeBadge');
+    var drFormatHint = $('pvAbsDrFormatHint');
+    var drCorrect = $('pvAbsDrCorrect');
+    var drXp = $('pvAbsDrXp');
+    var drHands = $('pvAbsDrHands');
+    var drBoard = $('pvAbsDrBoard');
+    var drParticipation = $('pvAbsDrParticipation');
+    var drDuration = $('pvAbsDrDuration');
+    var drCorrectDesc = $('pvAbsDrCorrectDesc');
+    var drXpDesc = $('pvAbsDrXpDesc');
+    var drHandsDesc = $('pvAbsDrHandsDesc');
+    var drBoardDesc = $('pvAbsDrBoardDesc');
+    var drParticipationDesc = $('pvAbsDrParticipationDesc');
+    var drDurationDesc = $('pvAbsDrDurationDesc');
+    var drRowCorrect = $('pvAbsDrRowCorrect');
+    var drRowXp = $('pvAbsDrRowXp');
+    var drRowHands = $('pvAbsDrRowHands');
+    var drRowBoard = $('pvAbsDrRowBoard');
+    var drRowParticipation = $('pvAbsDrRowParticipation');
+    var drRowDuration = $('pvAbsDrRowDuration');
+    var drNote = $('pvAbsDrNote');
+    var drReplayAlert = $('pvAbsDrReplayAlert');
+    var drReplayText = $('pvAbsDrReplayText');
+    var drReplayBtn = $('pvAbsDrReplayBtn');
+
+    function absReplayLessonLabel(lesson) {
+      var label = lesson.name || 'ders';
+      if (lesson.topic) label += ' · ' + lesson.topic;
+      return label;
+    }
+
+    function absReplayAlertMessage(lesson) {
+      var label = absReplayLessonLabel(lesson);
+      return 'Öğrenciniz <strong>' + escapeText(lesson.dayName) + '</strong> günü gerçekleşen <strong>' + escapeText(label) + '</strong> canlı dersine katılamamıştır. Konu eksiği oluşmaması için öğrencinizin bu dersin <strong>tekrar videosunu izlemesini</strong> önemle tavsiye ederiz.';
+    }
+
+    function absPerfCorrectDesc(lesson, attended) {
+      var correct = lesson.correct || 0;
+      var total = lesson.total || 0;
+      if (!attended) {
+        return 'Öğrenciniz bu derse katılmadığı için soru yanıtlama verisi kaydedilmemiştir.';
+      }
+      if (total === 0) {
+        return 'Bu derste öğrencinize yöneltilen soru bulunmamaktadır.';
+      }
+      if (correct === total) {
+        return 'Öğrenciniz bu derste yöneltilen ' + total + ' sorunun tamamını doğru yanıtlamıştır.';
+      }
+      if (correct === 0) {
+        return 'Öğrenciniz bu derste yöneltilen ' + total + ' soruya henüz doğru yanıt verememiştir.';
+      }
+      return 'Öğrenciniz bu derste yöneltilen ' + total + ' sorudan ' + correct + ' tanesini doğru yanıtlamıştır.';
+    }
+
+    function absPerfHandsDesc(lesson, attended) {
+      var hands = lesson.handRaises || 0;
+      if (!attended) {
+        return 'Öğrenciniz bu derse katılmadığı için parmak kaldırma verisi kaydedilmemiştir.';
+      }
+      if (hands === 0) {
+        return 'Öğrenciniz bu derste söz almak için parmak kaldırmamıştır.';
+      }
+      if (hands === 1) {
+        return 'Öğrenciniz bu derste söz almak için 1 kez parmak kaldırmıştır.';
+      }
+      return 'Öğrenciniz bu derste söz almak için ' + hands + ' kez parmak kaldırmıştır.';
+    }
+
+    function absPerfXpDesc(lesson, attended) {
+      var xp = lesson.xp || 0;
+      if (!attended) {
+        return 'Öğrenciniz bu derse katılmadığı için XP kazanamamıştır.';
+      }
+      if (xp === 0) {
+        return 'Öğrenciniz bu dersten henüz XP kazanmamıştır.';
+      }
+      return 'Öğrenciniz bu dersten ' + xp + ' XP kazanmıştır. XP; doğru cevaplar, parmak kaldırma ve tahtaya kalkma gibi aktif katılımlarla elde edilir.';
+    }
+
+    function absPerfBoardDesc(lesson, attended) {
+      var board = absLessonBoardRaises(lesson);
+      if (!attended) {
+        return 'Öğrenciniz bu derse katılmadığı için tahtaya kalkma verisi kaydedilmemiştir.';
+      }
+      if (board === 0) {
+        return 'Öğrenciniz bu derste tahtaya kalkmamıştır.';
+      }
+      if (board === 1) {
+        return 'Öğrenciniz bu derste tahtaya 1 kez kalkarak soru çözmüştür.';
+      }
+      return 'Öğrenciniz bu derste tahtaya ' + board + ' kez kalkarak soru çözmüştür.';
+    }
+
+    function absPerfParticipationDesc(lesson, attended) {
+      var hands = lesson.handRaises || 0;
+      var board = absLessonBoardRaises(lesson);
+      var total = absLessonParticipationCount(lesson);
+      if (!attended) {
+        return 'Öğrenciniz bu derse katılmadığı için derse katılma verisi kaydedilmemiştir.';
+      }
+      if (total === 0) {
+        return 'Öğrenciniz bu derste parmak kaldırma veya tahtaya kalkma yoluyla aktif katılım göstermemiştir.';
+      }
+      if (hands > 0 && board > 0) {
+        return 'Öğrenciniz bu derste toplam ' + total + ' kez derse katılmıştır (' + hands + ' parmak kaldırma + ' + board + ' tahtaya kalkma).';
+      }
+      if (hands > 0) {
+        return 'Öğrenciniz bu derste toplam ' + total + ' kez derse katılmıştır (' + hands + ' parmak kaldırma).';
+      }
+      return 'Öğrenciniz bu derste toplam ' + total + ' kez derse katılmıştır (' + board + ' tahtaya kalkma).';
+    }
+
+    function absPerfDurationDesc(lesson, attended) {
+      var min = lesson.durationMin || 0;
+      if (!attended) {
+        return 'Öğrenciniz bu derse katılmadığı için derste geçirilen süre kaydedilmemiştir.';
+      }
+      if (min === 0) {
+        return 'Öğrenciniz bu derse kısa süreli katılmış; süre verisi henüz işlenmemiş olabilir.';
+      }
+      if (min === 1) {
+        return 'Öğrenciniz bu derste yaklaşık 1 dakika aktif olarak kalmıştır.';
+      }
+      return 'Öğrenciniz bu derste toplam ' + min + ' dakika aktif olarak kalmıştır.';
+    }
+
+    function setDrawerOpen(open) {
+      drawer.classList.toggle('is-open', open);
+      drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+      if (open && panel) panel.focus();
+    }
+
+    function openLessonDrawer(lesson) {
+      if (!lesson) return;
+      var attended = lesson.status === 'attended';
+
+      if (drIco) {
+        var absIcons = { mat: '📐', fen: '⚛️', trk: '📖', sos: '🌍', ing: '🔤', din: '🕌' };
+        drIco.textContent = absIcons[lesson.subject] || '📚';
+      }
+      if (drTitle) drTitle.textContent = lesson.topic ? lesson.name + ' · ' + lesson.topic : lesson.name;
+      if (drDate) drDate.textContent = lesson.dayName + ', ' + lesson.date + ' ' + lesson.month;
+      if (drTime) drTime.textContent = lesson.time + ' · ' + lesson.durationLabel;
+
+      var fmt = absLessonFormat(lesson);
+      if (drTypeBadge) {
+        drTypeBadge.hidden = false;
+        drTypeBadge.className = 'pv-hw-drawer-type-badge is-' + fmt;
+        drTypeBadge.textContent = fmt === 'kid' ? 'KİD' : 'RUD';
+      }
+      if (drFormatHint) {
+        drFormatHint.hidden = false;
+        drFormatHint.className = 'pv-abs-drawer-format-hint is-' + fmt;
+        drFormatHint.textContent = fmt === 'kid' ? ABS_KID_DESC : ABS_RUD_DESC;
+      }
+
+      if (drStatus) {
+        drStatus.textContent = attended ? 'Katıldı' : 'Katılmadı';
+        drStatus.className = 'pv-abs-drawer-status ' + (attended ? 'is-attended' : 'is-absent');
+      }
+
+      if (drCorrect) {
+        drCorrect.innerHTML = attended
+          ? escapeText(String(lesson.correct)) + ' <sub>/ ' + escapeText(String(lesson.total)) + '</sub>'
+          : '—';
+      }
+      if (drXp) drXp.textContent = attended ? String(lesson.xp || 0) + ' XP' : '—';
+      if (drHands) drHands.textContent = attended ? String(lesson.handRaises || 0) : '—';
+      if (drBoard) drBoard.textContent = attended ? String(absLessonBoardRaises(lesson)) : '—';
+      if (drParticipation) drParticipation.textContent = attended ? String(absLessonParticipationCount(lesson)) : '—';
+      if (drDuration) drDuration.textContent = attended ? (lesson.durationMin + ' dk') : '—';
+
+      if (drCorrectDesc) drCorrectDesc.textContent = absPerfCorrectDesc(lesson, attended);
+      if (drXpDesc) drXpDesc.textContent = absPerfXpDesc(lesson, attended);
+      if (drHandsDesc) drHandsDesc.textContent = absPerfHandsDesc(lesson, attended);
+      if (drBoardDesc) drBoardDesc.textContent = absPerfBoardDesc(lesson, attended);
+      if (drParticipationDesc) drParticipationDesc.textContent = absPerfParticipationDesc(lesson, attended);
+      if (drDurationDesc) drDurationDesc.textContent = absPerfDurationDesc(lesson, attended);
+
+      if (drRowCorrect) drRowCorrect.classList.toggle('is-muted', !attended);
+      if (drRowXp) drRowXp.classList.toggle('is-muted', !attended);
+      if (drRowHands) drRowHands.classList.toggle('is-muted', !attended);
+      if (drRowBoard) drRowBoard.classList.toggle('is-muted', !attended);
+      if (drRowParticipation) drRowParticipation.classList.toggle('is-muted', !attended);
+      if (drRowDuration) drRowDuration.classList.toggle('is-muted', !attended);
+
+      if (drReplayAlert) drReplayAlert.hidden = attended;
+      if (drReplayText) {
+        drReplayText.innerHTML = attended ? '' : absReplayAlertMessage(lesson);
+      }
+      if (drReplayBtn) {
+        drReplayBtn.setAttribute('aria-label', lesson.name + ' dersi tekrar videosunu izlet');
+      }
+
+      if (drNote) {
+        drNote.textContent = attended
+          ? 'Yukarıdaki veriler, öğrencinizin bu canlı dersteki katılım ve performans özetini yansıtmaktadır.'
+          : 'Tekrar videosu izlendikten sonra öğrencinizin konuya hakimiyetini birlikte değerlendirmenizi öneririz.';
+      }
+
+      setDrawerOpen(true);
+    }
+
+    window.VeliPerfDrawer = {
+      open: function (lessonId) {
+        var lesson = getAbsLessonById(lessonId);
+        if (!lesson) return false;
+        selectedAbsEduWeek = 24;
+        updateAbsWeekLabel();
+        renderAbsLessons();
+        openLessonDrawer(lesson);
+        return true;
+      }
+    };
+
+    list.addEventListener('click', function (e) {
+      var btn = e.target.closest('.pv-abs-item[data-lesson-id]');
+      if (!btn || btn.classList.contains('is-pending')) return;
+      openLessonDrawer(getAbsLessonById(btn.getAttribute('data-lesson-id')));
+    });
+
+    drawer.querySelectorAll('[data-abs-lesson-close]').forEach(function (el) {
+      el.addEventListener('click', function () { setDrawerOpen(false); });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && drawer.classList.contains('is-open')) setDrawerOpen(false);
+    });
+  }
+
+  function init() {
+    VeliParent.init({
+      onStudentChange: function () { updateHwCardSummary(); }
+    });
+    renderHwSections();
+    initHwFilters();
+    initHwEduWeekNav();
+    renderAbsLessons();
+    initAbsEduWeekNav();
+    initAbsFilters();
+    initAbsLessonDrawer();
+    initFloatingTooltips();
+    initHwDrawers();
+
+    var deepLessonId = null;
+    try {
+      deepLessonId = new URLSearchParams(window.location.search).get('lesson');
+    } catch (err) { /* ignore */ }
+    if (deepLessonId && window.VeliPerfDrawer) {
+      var pendingLessonId = deepLessonId;
+      setTimeout(function () {
+        if (window.VeliPerfDrawer) window.VeliPerfDrawer.open(pendingLessonId);
+        try {
+          if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+        } catch (err2) { /* ignore */ }
+      }, 60);
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

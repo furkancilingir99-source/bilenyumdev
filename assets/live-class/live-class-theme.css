@@ -1,0 +1,107 @@
+/* LiveClass — Unified design tokens (teacher + student) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Montserrat:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+
+:root {
+  /* Surfaces */
+  --lc-class-background: #070B1F;
+  --lc-class-surface: #10162F;
+  --lc-class-surface-soft: #171E3B;
+  --lc-class-surface-raised: #20284A;
+  --lc-class-border: rgba(255, 255, 255, 0.10);
+  --lc-class-border-strong: rgba(255, 255, 255, 0.18);
+  --lc-class-glass: rgba(16, 22, 47, 0.85);
+
+  /* Text */
+  --lc-class-text-primary: #F8FAFC;
+  --lc-class-text-secondary: #AAB2D5;
+  --lc-class-text-muted: #6F789B;
+
+  /* Brand */
+  --lc-class-primary: #FF2DAA;
+  --lc-class-primary-soft: rgba(255, 45, 170, 0.16);
+  --lc-class-secondary: #3B82FF;
+  --lc-class-secondary-soft: rgba(59, 130, 255, 0.16);
+
+  /* Semantic */
+  --lc-class-success: #22C55E;
+  --lc-class-warning: #FACC15;
+  --lc-class-danger: #EF4444;
+  --lc-class-info: #38BDF8;
+
+  /* Feature */
+  --lc-class-xp: #A855F7;
+  --lc-class-whiteboard: #3B82FF;
+  --lc-class-quiz: #FACC15;
+  --lc-class-chat: #AAB2D5;
+  --lc-class-raised-hand: #FACC15;
+
+  /* Radii */
+  --lc-class-radius-xs: 6px;
+  --lc-class-radius-sm: 10px;
+  --lc-class-radius-md: 14px;
+  --lc-class-radius-lg: 18px;
+  --lc-class-radius-xl: 24px;
+  --lc-class-radius-pill: 999px;
+
+  /* Layout */
+  --lc-class-top-h: 72px;
+  --lc-class-bottom-h: 80px;
+  --lc-class-right-w: clamp(280px, 28vw, 360px);
+
+  /* Typography */
+  --lc-class-font-live: 'Poppins', 'Montserrat', 'Inter', system-ui, sans-serif;
+  --lc-class-font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --lc-class-display: 'Montserrat', sans-serif;
+  --lc-class-mono: 'JetBrains Mono', monospace;
+
+  /* Motion */
+  --lc-class-motion-fast: 120ms;
+  --lc-class-motion-normal: 180ms;
+  --lc-class-motion-slow: 260ms;
+  --lc-class-motion-panel: 240ms;
+  --lc-class-motion-toast: 220ms;
+
+  /* Elevation */
+  --lc-class-shadow-panel: 0 12px 40px rgba(0, 0, 0, 0.28);
+  --lc-class-shadow-floating: 0 18px 60px rgba(0, 0, 0, 0.36);
+  --lc-class-glow-primary: 0 0 24px rgba(255, 45, 170, 0.32);
+  --lc-class-glow-secondary: 0 0 24px rgba(59, 130, 255, 0.30);
+
+  /* Legacy aliases — teacher */
+  --tlc-bg: var(--lc-class-background);
+  --tlc-panel: var(--lc-class-surface);
+  --tlc-panel-soft: var(--lc-class-surface-soft);
+  --tlc-neon: var(--lc-class-primary);
+  --tlc-blue: var(--lc-class-secondary);
+  --tlc-success: var(--lc-class-success);
+  --tlc-warning: var(--lc-class-warning);
+  --tlc-danger: var(--lc-class-danger);
+  --tlc-text: var(--lc-class-text-primary);
+  --tlc-muted: var(--lc-class-text-secondary);
+  --tlc-border: var(--lc-class-border);
+  --tlc-glass: var(--lc-class-glass);
+  --tlc-top-h: var(--lc-class-top-h);
+  --tlc-bottom-h: var(--lc-class-bottom-h);
+  --tlc-right-w: var(--lc-class-right-w);
+
+  /* Legacy aliases — student */
+  --lc-bg: var(--lc-class-background);
+  --lc-surface: var(--lc-class-surface);
+  --lc-surface-soft: var(--lc-class-surface-soft);
+  --lc-border: var(--lc-class-border);
+  --lc-accent: var(--lc-class-primary);
+  --lc-accent-glow: rgba(255, 45, 170, 0.45);
+  --lc-blue: var(--lc-class-secondary);
+  --lc-success: var(--lc-class-success);
+  --lc-warning: var(--lc-class-warning);
+  --lc-danger: var(--lc-class-danger);
+  --lc-text: var(--lc-class-text-primary);
+  --lc-text-2: var(--lc-class-text-secondary);
+  --lc-glass: var(--lc-class-glass);
+  --lc-font: var(--lc-class-font);
+  --lc-display: var(--lc-class-display);
+  --lc-mono: var(--lc-class-mono);
+  --lc-top: var(--lc-class-top-h);
+  --lc-bar: var(--lc-class-bottom-h);
+  --lc-sidebar: var(--lc-class-right-w);
+}

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Performansım · Bilenyum</title>
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-d3-mega.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
+<link rel="stylesheet" href="assets/dashboard-polish.css">
+<link rel="stylesheet" href="assets/teacher-dashboard.css">
+<script src="assets/dashboard-switcher.js" defer></script>
+<script src="assets/teacher-shell.js" defer></script>
+<script src="assets/shell.js" defer></script>
+</head>
+<body data-teacher-active="performans">
+
+<div class="scene" aria-hidden="true">
+  <div class="scene-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
+<header class="hud" data-teacher-hud></header>
+
+<main class="stage thw-stage">
+  <div class="stage-nav" data-teacher-nav></div>
+
+  <div class="thw-main-col tp-main-col">
+    <section class="tp-date-range-bar" aria-label="Performans ve tarih aralığı">
+      <div class="tp-date-range-head">
+        <h1 class="thw-page-title">Performansım</h1>
+        <p class="thw-page-subtitle">Canlı derslerinizde girdiğiniz ders sayısı, sorduğunuz sorular ve tahtaya kaldırdığınız öğrencilerin özeti.</p>
+        <p class="tp-date-range-summary" id="tpDateRangeSummary">—</p>
+      </div>
+      <div class="tp-date-range-fields">
+        <div class="tp-date-field-wrap">
+          <span class="tp-date-field-label">Başlangıç</span>
+          <div id="tpDateStartHost" class="tp-date-picker-host"></div>
+        </div>
+        <span class="tp-date-range-sep" aria-hidden="true">—</span>
+        <div class="tp-date-field-wrap">
+          <span class="tp-date-field-label">Bitiş</span>
+          <div id="tpDateEndHost" class="tp-date-picker-host"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="tp-grid" id="tpPerfGrid" aria-label="Performans özeti"></div>
+  </div>
+</main>
+
+<script src="assets/teacher-date-picker.js"></script>
+<script src="assets/teacher-performance-mock.js"></script>
+<script src="assets/teacher-performance.js"></script>
+</body>
+</html>

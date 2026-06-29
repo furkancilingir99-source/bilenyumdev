@@ -1,0 +1,1331 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bilenyum — Eğitim Setleri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/trial-modal.css">
+<link rel="stylesheet" href="assets/robot-fab.css">
+<style>
+  /* ---------- Page-specific extras ---------- */
+  .btn-soft {
+    background: rgba(62,58,142,0.06);
+    color: var(--p-deep);
+    border-color: rgba(62,58,142,0.18);
+    box-shadow: none;
+  }
+  .btn-soft:hover {
+    background: rgba(62,58,142,0.12);
+    border-color: rgba(62,58,142,0.34);
+    color: var(--p-deep);
+  }
+  #askYumi svg { width: 22px; height: 22px; }
+  .hero-accent { background: linear-gradient(120deg, var(--p-brand) 0%, var(--p-brand-deep) 50%, var(--p-purple) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  /* page-specific tweak: h2.title margin and sec-lead margin (subtle override of canonical) */
+  h2.title { margin-bottom: 14px; }
+  .sec-lead { margin-bottom: 32px; }
+  /* breadcrumb padding override for hero placement */
+  .breadcrumb { padding: 22px 32px 0; }
+
+  /* ---------- Pricing section ---------- */
+  .sec-pricing { background: var(--bg-3); }
+  .sec-pricing .sec-inner { padding-top: 56px; padding-bottom: 64px; }
+
+  .pricing-tabs {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 6px; padding: 6px;
+    background: white;
+    border: 1px solid rgba(40,38,90,0.10);
+    border-radius: 14px;
+    box-shadow: 0 6px 20px -10px rgba(40,38,90,0.18);
+    margin: 28px 0 36px;
+  }
+  .pricing-tab {
+    padding: 14px 14px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    font-family: inherit; font-size: 14px; font-weight: 600;
+    color: var(--ink-dark-1);
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.18s ease, color 0.18s ease;
+  }
+  .pricing-tab:hover:not(.active) { background: rgba(62,58,142,0.06); color: var(--ink-dark-0); }
+  .pricing-tab.active { background: var(--p-purple); color: white; box-shadow: 0 6px 18px -6px rgba(62,58,142,0.45); }
+
+  .pricing-wrap { position: relative; }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding: 16px 0 0;
+  }
+
+  /* Price card (light theme) */
+  .price-card {
+    padding: 0;
+    border-radius: var(--r-l);
+    background: white;
+    color: var(--ink-dark-0);
+    border: 1px solid rgba(40,38,90,0.10);
+    display: flex; flex-direction: column;
+    min-height: 580px;
+    box-shadow: 0 18px 40px -28px rgba(40,38,90,0.25), 0 4px 14px -8px rgba(40,38,90,0.10);
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+  .price-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(62,58,142,0.30);
+    box-shadow: 0 28px 60px -28px rgba(62,58,142,0.30), 0 8px 24px -8px rgba(40,38,90,0.12);
+  }
+  .price-card[data-href] { cursor: pointer; }
+  .price-card-popular {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: linear-gradient(135deg, var(--p-sun), #ffb84a);
+    color: #2a1c00;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+    box-shadow: 0 8px 18px -6px rgba(255,184,74,0.55), 0 2px 4px rgba(0,0,0,0.10);
+    z-index: 3;
+    pointer-events: none;
+  }
+  .price-card-image {
+    height: 120px;
+    border: none; border-bottom: 1px dashed rgba(40,38,90,0.14);
+    background: linear-gradient(135deg, rgba(62,58,142,0.10), rgba(74,214,255,0.08));
+    color: rgba(40,38,90,0.40);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .price-card-body { padding: 28px 32px 32px; display: flex; flex-direction: column; gap: 18px; flex: 1; }
+  .price-card .title, .price-card h3 {
+    font-size: 22px; line-height: 1.25; font-weight: 700;
+    margin: 0 0 8px; color: var(--ink-dark-0);
+    letter-spacing: -0.005em;
+  }
+  .price-features { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+  .price-features li { font-size: 14px; display: flex; gap: 10px; align-items: flex-start; line-height: 1.5; color: var(--ink-dark-1); }
+  .price-features li strong { color: var(--ink-dark-0); }
+  .price-features li::before {
+    content: "✓"; color: #3e3a8e; font-weight: 700; flex-shrink: 0;
+    width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+    background: rgba(62,58,142,0.10); border-radius: 50%; font-size: 12px;
+    margin-top: 1px;
+  }
+  .price-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .price-amount { display: flex; align-items: baseline; gap: 6px; }
+  .price-amount .num {
+    font-size: 30px; font-weight: 800; letter-spacing: -0.02em;
+    background: linear-gradient(120deg, #28265a, #3e3a8e);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .price-amount .per { font-size: 13px; color: var(--ink-dark-2); }
+  .price-meta { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--ink-dark-1); align-items: flex-end; text-align: right; }
+  .price-meta strong { color: var(--ink-dark-0); font-weight: 700; }
+  .price-installment { display: inline-flex; align-items: center; gap: 6px; color: #3e3a8e; font-weight: 600; }
+  .price-installment svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .price-users { display: flex; align-items: center; gap: 10px; padding-top: 14px; margin-top: 4px; border-top: 1px solid rgba(40,38,90,0.10); }
+  .price-users .av-stack { display: flex; }
+  .price-users .av { width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; margin-left: -8px; }
+  .price-users .av:first-child { margin-left: 0; }
+  .price-users .av:nth-child(1) { background: linear-gradient(135deg, var(--p-purple), var(--p-aqua)); }
+  .price-users .av:nth-child(2) { background: linear-gradient(135deg, var(--p-pink), var(--p-sun)); }
+  .price-users .av:nth-child(3) { background: linear-gradient(135deg, var(--p-aqua), var(--p-green)); }
+  .price-users span { font-size: 12px; color: var(--ink-dark-2); }
+  .price-users strong { color: var(--ink-dark-0); font-weight: 700; }
+  .price-actions { display: flex; gap: 8px; margin-top: auto; }
+  .price-actions .btn { flex: 1; padding: 0 12px; min-width: 0; }
+
+  /* ---------- HERO (matched to ornek-videolar) ---------- */
+  .pkg-hero {
+    background: linear-gradient(180deg, #fcfaff 0%, #f4eeff 100%);
+    color: var(--ink-dark-0);
+    position: relative; z-index: 2; overflow: visible;
+  }
+  .pkg-hero-inner {
+    max-width: var(--maxw); margin: 0 auto;
+    padding: 8px 32px 0;
+    display: grid; grid-template-columns: 1.05fr 1fr;
+    gap: 32px; align-items: center;
+  }
+  .pkg-hero-text h1 {
+    font-size: 44px; font-weight: 800;
+    line-height: 1.08; margin: 0 0 12px;
+    letter-spacing: -0.02em;
+    color: var(--ink-dark-0);
+    text-wrap: balance;
+  }
+  .pkg-hero-text .lead {
+    font-size: 17px; color: var(--ink-dark-1);
+    line-height: 1.55; margin: 0 0 18px;
+    max-width: 480px;
+  }
+  .pkg-hero-meta {
+    display: flex; gap: 22px; flex-wrap: wrap;
+  }
+  .pkg-hero-meta-item {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--ink-dark-1);
+    font-weight: 500;
+  }
+  .pkg-hero-meta-item svg {
+    width: 18px; height: 18px;
+    color: var(--p-purple);
+    flex-shrink: 0;
+  }
+
+  /* Stacked package card mockups (örnek-videolar dimensions) */
+  .pkg-stack {
+    position: relative;
+    aspect-ratio: 16/9;
+    min-height: 150px;
+  }
+  .hp-card {
+    position: absolute;
+    background: white;
+    border-radius: 18px;
+    border: 1px solid rgba(40,38,90,0.10);
+    box-shadow: 0 22px 44px -20px rgba(40,38,90,0.40), 0 6px 16px -6px rgba(40,38,90,0.18);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .hp-card-bg-1 {
+    width: 60%; aspect-ratio: 16/10;
+    top: 4%; right: -6%;
+    transform: rotate(8deg);
+    opacity: 0.88;
+  }
+  .hp-card-bg-2 {
+    width: 56%; aspect-ratio: 16/10;
+    bottom: 6%; left: -8%;
+    transform: rotate(-6deg);
+    opacity: 0.88;
+  }
+  .hp-card-main {
+    width: 80%; aspect-ratio: 16/10;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    border-radius: 22px;
+    box-shadow: 0 40px 80px -25px rgba(40,38,90,0.50), 0 14px 28px -10px rgba(229,4,123,0.30), 0 0 0 1px rgba(40,38,90,0.06);
+    border: 2px solid white;
+    z-index: 2;
+  }
+  /* Image header area at top of each card (like main page price-card-image) */
+  .hp-card-image {
+    height: 44%;
+    border-bottom: 1px dashed rgba(40,38,90,0.14);
+    background: linear-gradient(135deg, rgba(62,58,142,0.14), rgba(74,214,255,0.10));
+    color: rgba(40,38,90,0.45);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .hp-card-main .hp-card-image {
+    background: linear-gradient(135deg, rgba(229,4,123,0.16), rgba(62,58,142,0.10));
+    color: rgba(40,38,90,0.55);
+    font-size: 11px;
+    height: 38%;
+    position: relative;
+  }
+  .hp-card-main .hp-card-image .hp-badge {
+    position: absolute;
+    top: 10px; right: 10px;
+    align-self: auto;
+  }
+  .hp-card-body {
+    padding: 12px 14px;
+    flex: 1;
+    display: flex; flex-direction: column;
+    gap: 5px;
+    min-height: 0;
+  }
+  .hp-card-main .hp-card-body { padding: 14px 18px 16px; gap: 6px; }
+  .hp-grade {
+    display: inline-block;
+    padding: 3px 9px; border-radius: 999px;
+    background: rgba(62,58,142,0.10);
+    color: var(--p-purple);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    align-self: flex-start;
+  }
+  .hp-card-main .hp-grade { font-size: 10px; padding: 4px 10px; }
+  .hp-badge {
+    display: inline-block;
+    padding: 4px 10px; border-radius: 999px;
+    background: var(--p-brand);
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px; font-weight: 800;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    align-self: flex-start;
+    box-shadow: 0 6px 14px -4px rgba(229,4,123,0.50);
+  }
+  .hp-title {
+    font-size: 14px; font-weight: 800;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin: 0;
+  }
+  .hp-card-main .hp-title { font-size: 16px; }
+  .hp-features {
+    list-style: none; padding: 0; margin: 4px 0 0;
+    display: flex; flex-direction: column; gap: 4px;
+    font-size: 11px; color: var(--ink-dark-1);
+    line-height: 1.35;
+  }
+  .hp-features li { display: flex; align-items: flex-start; gap: 6px; }
+  .hp-features li::before {
+    content: "✓"; color: var(--p-purple); font-weight: 800;
+    flex-shrink: 0; font-size: 10px;
+  }
+  .hp-price-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: auto; padding-top: 8px;
+    border-top: 1px solid rgba(40,38,90,0.08);
+  }
+  .hp-price {
+    font-size: 17px; font-weight: 800;
+    background: linear-gradient(120deg, #28265a, #3e3a8e);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+  }
+  .hp-price span { font-size: 10.5px; color: var(--ink-dark-2); font-weight: 500; -webkit-text-fill-color: var(--ink-dark-2); }
+  .hp-card-main .hp-price { font-size: 19px; }
+  .hp-cta {
+    font-size: 11.5px; font-weight: 700;
+    color: var(--p-brand);
+    display: inline-flex; align-items: center; gap: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: gap 0.18s ease, color 0.18s ease;
+  }
+  .hp-cta:hover {
+    color: #a01a5e;
+    gap: 8px;
+  }
+
+  /* ---------- Light Space Divider ---------- */
+  .space-divider-light {
+    position: relative;
+    height: 140px;
+    margin-top: -30px;
+    background: linear-gradient(180deg, #f4eeff 0%, #ebe2ff 100%);
+    overflow: hidden;
+    z-index: 1;
+  }
+  .space-wave-light {
+    position: absolute; bottom: -1px; left: 0; right: 0;
+    width: 100%; height: 100%;
+    display: block; z-index: 3;
+  }
+  .geo-circle-light { position: absolute; width: 60px; height: 60px; top: 28%; left: 42%; border: 1.5px solid rgba(62,58,142,0.45); border-radius: 50%; z-index: 2; transform: rotate(-18deg) scaleY(0.4); }
+  .geo-dot-light { position: absolute; border-radius: 50%; z-index: 2; }
+  .geo-dot-light.d1 { width: 10px; height: 10px; top: 32%; left: 14%; background: var(--p-purple); }
+  .geo-dot-light.d2 { width: 6px; height: 6px; top: 20%; right: 24%; background: var(--p-aqua); }
+  .geo-line-light { position: absolute; width: 90px; height: 1px; top: 42%; right: 8%; background: linear-gradient(to right, transparent, rgba(62,58,142,0.6), transparent); transform: rotate(-14deg); z-index: 2; }
+  .geo-tri-light { position: absolute; width: 0; height: 0; top: 16%; left: 68%; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 12px solid rgba(255,122,184,0.65); transform: rotate(18deg); filter: drop-shadow(0 0 8px rgba(255,122,184,0.45)); z-index: 2; }
+
+  /* ---------- Common features (3-col card grid) ---------- */
+  .sec-features { background: var(--bg-3); padding: 0 0 80px; }
+  .sec-features .sec-inner { padding-top: 56px; padding-bottom: 0; }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin-top: 40px;
+  }
+  .feature-card {
+    background: white;
+    border: 1px solid rgba(40,38,90,0.08);
+    border-radius: 18px;
+    padding: 26px 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .feature-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(62,58,142,0.20);
+    box-shadow: 0 18px 40px -16px rgba(62,58,142,0.25);
+  }
+  .feature-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(160deg, var(--p-purple-mid), var(--p-deep));
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 20px -8px rgba(62,58,142,0.40);
+  }
+  .feature-card:nth-child(2) .feature-icon { background: linear-gradient(160deg, var(--p-brand-light), var(--p-brand)); box-shadow: 0 10px 20px -8px rgba(229,4,123,0.40); }
+  .feature-card:nth-child(3) .feature-icon { background: linear-gradient(160deg, var(--p-aqua), #1a7ba8); box-shadow: 0 10px 20px -8px rgba(74,214,255,0.45); }
+  .feature-card:nth-child(4) .feature-icon { background: linear-gradient(160deg, var(--p-green), #2a8a5a); box-shadow: 0 10px 20px -8px rgba(109,212,158,0.45); }
+  .feature-card:nth-child(5) .feature-icon { background: linear-gradient(160deg, var(--p-sun), #b87814); box-shadow: 0 10px 20px -8px rgba(255,181,71,0.45); }
+  .feature-card:nth-child(6) .feature-icon { background: linear-gradient(160deg, var(--p-pink), #c43f8e); box-shadow: 0 10px 20px -8px rgba(255,122,184,0.45); }
+  .feature-icon svg { width: 22px; height: 22px; }
+  .feature-card h3 {
+    font-size: 17px; font-weight: 700;
+    color: var(--ink-dark-0);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .feature-card p {
+    font-size: 14px; color: var(--ink-dark-1);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ---------- How it works (clear step layout) ---------- */
+  .sec-how {
+    background:
+      radial-gradient(circle at 18% 0%, rgba(229,4,123,0.18), transparent 42%),
+      radial-gradient(circle at 88% 100%, rgba(74,214,255,0.16), transparent 45%),
+      linear-gradient(160deg, var(--p-purple-mid) 0%, var(--p-deep) 100%);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .sec-how::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .sec-how .sec-inner { position: relative; z-index: 1; padding-top: 72px; padding-bottom: 88px; }
+  .sec-how .title { color: white; }
+  .sec-how .sec-lead { color: rgba(255,255,255,0.78); }
+  .sec-how .hero-accent {
+    background: none;
+    -webkit-background-clip: initial; background-clip: initial;
+    -webkit-text-fill-color: initial;
+    color: var(--p-aqua);
+  }
+  .how-steps {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-top: 48px;
+    position: relative;
+  }
+  /* Connecting line through circle centers (visible on dark bg) */
+  .how-steps::before {
+    content: ""; position: absolute;
+    top: 44px; left: 12%; right: 12%;
+    height: 3px;
+    background: repeating-linear-gradient(90deg, rgba(255,255,255,0.34) 0 10px, transparent 10px 18px);
+    z-index: 0;
+  }
+  .how-step {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 18px;
+    text-align: center;
+  }
+  .how-step-circle {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800; font-size: 22px;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.20);
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.28), transparent 55%),
+      linear-gradient(160deg, var(--p-purple-mid), var(--p-deep));
+    box-shadow:
+      0 18px 40px -10px rgba(62,58,142,0.65),
+      0 0 0 6px rgba(62,58,142,0.22),
+      inset 0 2px 0 rgba(255,255,255,0.18);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+  }
+  .how-step:hover .how-step-circle {
+    transform: scale(1.06) translateY(-2px);
+    box-shadow:
+      0 24px 50px -10px rgba(62,58,142,0.85),
+      0 0 0 8px rgba(62,58,142,0.30),
+      inset 0 2px 0 rgba(255,255,255,0.22);
+  }
+  .how-step:nth-child(2) .how-step-circle {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.32), transparent 55%),
+      linear-gradient(160deg, var(--p-aqua), #1a7ba8);
+    box-shadow: 0 18px 40px -10px rgba(74,214,255,0.55), 0 0 0 6px rgba(74,214,255,0.24), inset 0 2px 0 rgba(255,255,255,0.22);
+  }
+  .how-step:nth-child(2):hover .how-step-circle {
+    box-shadow: 0 24px 50px -10px rgba(74,214,255,0.75), 0 0 0 8px rgba(74,214,255,0.36), inset 0 2px 0 rgba(255,255,255,0.26);
+  }
+  .how-step:nth-child(3) .how-step-circle {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.30), transparent 55%),
+      linear-gradient(160deg, var(--p-brand-light), var(--p-brand));
+    box-shadow: 0 18px 40px -10px rgba(229,4,123,0.60), 0 0 0 6px rgba(229,4,123,0.24), inset 0 2px 0 rgba(255,255,255,0.20);
+  }
+  .how-step:nth-child(3):hover .how-step-circle {
+    box-shadow: 0 24px 50px -10px rgba(229,4,123,0.80), 0 0 0 8px rgba(229,4,123,0.36), inset 0 2px 0 rgba(255,255,255,0.24);
+  }
+  .how-step:nth-child(4) .how-step-circle {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.34), transparent 55%),
+      linear-gradient(160deg, var(--p-sun), #b87814);
+    box-shadow: 0 18px 40px -10px rgba(255,181,71,0.60), 0 0 0 6px rgba(255,181,71,0.26), inset 0 2px 0 rgba(255,255,255,0.24);
+  }
+  .how-step:nth-child(4):hover .how-step-circle {
+    box-shadow: 0 24px 50px -10px rgba(255,181,71,0.80), 0 0 0 8px rgba(255,181,71,0.38), inset 0 2px 0 rgba(255,255,255,0.28);
+  }
+
+  .how-step-card {
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 18px;
+    padding: 22px 20px 20px;
+    box-shadow: 0 12px 30px -18px rgba(0,0,0,0.45);
+    transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
+  }
+  .how-step:hover .how-step-card {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.28);
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.55);
+  }
+  .how-step-card h3 {
+    font-size: 15.5px; font-weight: 700;
+    color: white;
+    margin: 0 0 8px;
+    letter-spacing: -0.005em;
+  }
+  .how-step-card p {
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.6; margin: 0;
+  }
+
+  /* ---------- FAQ (split: questions left, answer right) ---------- */
+  .sec-faq { background: var(--bg-3); padding: 0 0 80px; }
+  .faq-wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 32px; }
+  .faq-split {
+    display: grid;
+    grid-template-columns: 1fr 1.25fr;
+    gap: 28px;
+    margin-top: 40px;
+    align-items: start;
+  }
+  .faq-questions {
+    display: flex; flex-direction: column;
+    gap: 10px;
+  }
+  .faq-q-btn {
+    width: 100%;
+    background: white;
+    border: 1px solid rgba(40,38,90,0.10);
+    border-radius: 14px;
+    padding: 16px 18px;
+    text-align: left;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 14px;
+    font-size: 14.5px; font-weight: 600;
+    color: var(--ink-dark-0);
+    font-family: inherit;
+    transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease, color 0.22s ease;
+  }
+  .faq-q-btn:hover { border-color: rgba(62,58,142,0.25); transform: translateX(2px); }
+  .faq-q-btn.active {
+    background: linear-gradient(160deg, var(--p-purple-mid), var(--p-deep));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 14px 28px -12px rgba(62,58,142,0.45);
+    transform: translateX(2px);
+  }
+  .faq-q-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    color: var(--p-purple);
+    background: rgba(62,58,142,0.10);
+    padding: 5px 8px;
+    border-radius: 7px;
+    flex-shrink: 0;
+    letter-spacing: 0.04em;
+    transition: background 0.22s ease, color 0.22s ease;
+  }
+  .faq-q-btn.active .faq-q-num { background: rgba(255,255,255,0.22); color: white; }
+  .faq-q-text { flex: 1; line-height: 1.4; }
+  .faq-q-arrow {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transform: translateX(-4px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+  }
+  .faq-q-arrow svg { width: 14px; height: 14px; }
+  .faq-q-btn.active .faq-q-arrow { opacity: 1; transform: translateX(0); }
+  .faq-answer-panel {
+    background: white;
+    border: 1px solid rgba(40,38,90,0.08);
+    border-radius: 18px;
+    padding: 32px 32px 28px;
+    min-height: 260px;
+    position: sticky; top: 100px;
+  }
+  .faq-answer { display: none; }
+  .faq-answer.active { display: block; animation: faqFadeIn 0.32s ease; }
+  @keyframes faqFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .faq-answer-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    color: var(--p-purple);
+    background: rgba(62,58,142,0.10);
+    padding: 5px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .faq-answer h3 {
+    font-size: 22px; font-weight: 700;
+    color: var(--ink-dark-0);
+    margin: 0 0 14px;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+  .faq-answer p {
+    font-size: 15px;
+    color: var(--ink-dark-1);
+    line-height: 1.7;
+    margin: 0;
+  }
+  .faq-all {
+    display: flex; justify-content: center;
+    margin-top: 36px;
+  }
+
+  /* ---------- Help CTA ---------- */
+  .sec-help { background: var(--bg-3); padding: 0 32px 96px; }
+  .help-strip {
+    background:
+      radial-gradient(600px 300px at 80% 50%, rgba(229,4,123,0.30), transparent 60%),
+      radial-gradient(700px 400px at 10% 50%, rgba(168,164,240,0.18), transparent 60%),
+      linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    border-radius: 28px;
+    padding: 48px 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 32px;
+    max-width: var(--maxw); margin: 0 auto;
+    color: white;
+    flex-wrap: wrap;
+    box-shadow: 0 30px 80px -30px rgba(40,38,90,0.50);
+  }
+  .help-text { flex: 1; min-width: 240px; }
+  .help-title {
+    font-size: 28px; font-weight: 800;
+    line-height: 1.15; letter-spacing: -0.015em;
+    margin: 0 0 8px;
+  }
+  .help-sub { font-size: 15.5px; opacity: 0.86; max-width: 460px; line-height: 1.5; margin: 0; }
+  .help-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .help-strip .btn-ghost {
+    background: rgba(255,255,255,0.10);
+    color: white; border-color: rgba(255,255,255,0.22);
+    backdrop-filter: blur(4px);
+  }
+  .help-strip .btn-ghost:hover { background: rgba(255,255,255,0.18); }
+
+  /* Robot FAB & chatbot styles loaded from assets/robot-fab.css */
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1080px) {
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    .how-steps { grid-template-columns: repeat(2, 1fr); }
+    .how-steps::before { display: none; }
+    .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 980px) {
+    h2.title { font-size: 28px; }
+    .sec-inner { padding: 64px 24px; }
+    .pricing-tabs { grid-template-columns: repeat(2, 1fr); }
+    .pricing-tab { font-size: 13px; padding: 11px 8px; }
+    .help-strip { padding: 36px 28px; }
+    .help-title { font-size: 22px; }
+    .pkg-hero-inner { grid-template-columns: 1fr; gap: 32px; padding: 28px 24px 24px; }
+    .pkg-hero-text h1 { font-size: 36px; }
+    .pkg-stack { aspect-ratio: 16/9; }
+    .faq-split { grid-template-columns: 1fr; gap: 20px; }
+    .faq-answer-panel { position: static; min-height: auto; }
+  }
+  @media (max-width: 760px) {
+    .pricing-grid { grid-template-columns: 1fr; }
+    .how-steps { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-contact">
+      <a href="https://wa.me/905551234567" class="wa-link" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.9L4 20l4.2-1.1A7.93 7.93 0 0 0 12.05 20h.01a7.95 7.95 0 0 0 5.55-13.68z"/></svg>
+        <span>+90 555 123 45 67</span>
+      </a>
+      <a href="tel:+908501234567">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 0 0-1.02.24l-2.2 2.2a15.07 15.07 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 4c0-.55-.45-1-1-1H4a1 1 0 0 0-1 1 17 17 0 0 0 17 17c.55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+        <span class="topbar-phone-text">0850 123 45 67</span>
+      </a>
+      <a href="mailto:info@bilenyum.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <span class="topbar-mail-text">info@bilenyum.com</span>
+      </a>
+    </div>
+    <div class="topbar-social">
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.39A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.73 1.46 1.39 2.13a5.88 5.88 0 0 0 2.13 1.39c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.39 5.88 5.88 0 0 0 1.39-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.39-2.13A5.88 5.88 0 0 0 19.86.63C19.1.33 18.22.13 16.95.07 15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/></svg></a>
+      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.13C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.52A3.02 3.02 0 0 0 .5 6.2C0 8.07 0 12 0 12s0 3.93.5 5.8a3.02 3.02 0 0 0 2.12 2.13c1.88.52 9.38.52 9.38.52s7.5 0 9.38-.52a3.02 3.02 0 0 0 2.12-2.13C24 15.93 24 12 24 12s0-3.93-.5-5.8zM9.6 15.6V8.4L15.84 12 9.6 15.6z"/></svg></a>
+      <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.66H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.26 2.37 4.26 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html"><img src="assets/bilenyum-logo.svg" alt="Bilenyum" class="logo-img" /></a>
+    <div class="nav-links">
+      <a href="egitim-setleri.html" class="active">Eğitim Setleri</a>
+      <a href="ornek-videolar.html">Örnek Videolar</a>
+      <a href="kadromuz.html">Ekibimiz</a>
+      <a href="neden-biz.html">Neden Biz?</a>
+      <a href="iletisim.html">İletişim</a>
+    </div>
+    <div class="nav-cta">
+      <a href="giris.html" class="btn btn-secondary btn-sm">Giriş Yap</a>
+      <button class="btn btn-primary btn-sm" data-trial-open type="button">Ücretsiz Deneme Dersi</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO (with breadcrumb inside, shared background) -->
+<section class="pkg-hero">
+  <div class="breadcrumb">
+    <a href="index.html">Anasayfa</a>
+    <span class="sep">›</span>
+    <span class="current">Eğitim Setleri</span>
+  </div>
+  <div class="pkg-hero-inner">
+    <div class="pkg-hero-text">
+      <h1><span class="hero-accent">Eğitimde Şeffaflık Dönemi:</span>Bilenyum ile Tanışın</h1>
+      <p class="lead">Veli sunumu ve ücretsiz deneme dersiyle Bilenyum'u tanıyın. Öğrenciniz için en uygun sete 12 taksit fırsatıyla ulaşarak dijital eğitime kesintisiz başlayın.</p>
+      <div class="pkg-hero-meta">
+        <span class="pkg-hero-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Ücretsiz Canlı Deneme
+        </span>
+        <span class="pkg-hero-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          12 Taksitle Ödeme Kolaylığı
+        </span>
+        <span class="pkg-hero-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11V5l-8-3z"/></svg>
+          Birebir Rehberlik
+        </span>
+      </div>
+    </div>
+    <div class="pkg-stack" aria-hidden="true">
+      <div class="hp-card hp-card-bg-1">
+        <div class="hp-card-image">[Eğitim seti görseli]</div>
+        <div class="hp-card-body">
+          <span class="hp-grade">5. Sınıf</span>
+          <div class="hp-title">Tüm Dersler Eğitim Seti</div>
+          <div class="hp-price-row">
+            <div class="hp-price">₺ 1.290<span> /ay</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="hp-card hp-card-bg-2">
+        <div class="hp-card-image">[Eğitim seti görseli]</div>
+        <div class="hp-card-body">
+          <span class="hp-grade">7. Sınıf</span>
+          <div class="hp-title">Tüm Dersler Eğitim Seti</div>
+          <div class="hp-price-row">
+            <div class="hp-price">₺ 1.690<span> /ay</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="hp-card hp-card-main">
+        <div class="hp-card-image">
+          <span class="hp-badge">EN POPÜLER</span>
+          [Eğitim seti görseli]
+        </div>
+        <div class="hp-card-body">
+          <span class="hp-grade">8. Sınıf · LGS</span>
+          <div class="hp-title">LGS Hızlandırma</div>
+          <ul class="hp-features">
+            <li>Sınava yakın yoğun LGS tekrar ve pekiştirme</li>
+            <li>Branş bazlı mini deneme · eksik kapanışı</li>
+          </ul>
+          <div class="hp-price-row">
+            <div class="hp-price">₺ 1.490<span> /ay</span></div>
+            <a href="paket-detay.html?paket=lgs-hizlandirma" class="hp-cta">İncele →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIGHT DIVIDER -->
+<div class="space-divider-light">
+  <div class="geo-circle-light"></div>
+  <div class="geo-dot-light d1"></div>
+  <div class="geo-dot-light d2"></div>
+  <div class="geo-line-light"></div>
+  <div class="geo-tri-light"></div>
+  <svg class="space-wave-light" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,120 C320,160 640,90 960,140 C1180,175 1320,115 1440,150 L1440,200 L0,200 Z" fill="rgba(62,58,142,0.10)"/>
+    <path d="M0,150 C260,195 540,115 820,165 C1080,210 1300,140 1440,175 L1440,200 L0,200 Z" fill="rgba(62,58,142,0.20)"/>
+    <path d="M0,175 C200,215 460,145 720,178 C960,208 1180,148 1440,178 L1440,200 L0,200 Z" fill="#f3f2ff"/>
+  </svg>
+</div>
+
+<!-- PRICING -->
+<section class="sec sec-pricing">
+  <div class="sec-inner">
+    <h2 class="title">Sınıfına Özel Eğitim Setleri</h2>
+    <p class="sec-lead">5. sınıftan LGS'ye, her sınıf için ihtiyacına özel eğitim setleri Bilenyum'da. Detaylı incele.</p>
+
+    <div class="pricing-tabs" role="tablist">
+      <button class="pricing-tab active" data-grade="8" type="button">8. Sınıf (LGS) Setleri</button>
+      <button class="pricing-tab" data-grade="7" type="button">7. Sınıf Setleri</button>
+      <button class="pricing-tab" data-grade="6" type="button">6. Sınıf Setleri</button>
+      <button class="pricing-tab" data-grade="5" type="button">5. Sınıf Setleri</button>
+    </div>
+
+    <div class="pricing-wrap">
+      <div class="pricing-grid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="sec sec-how">
+  <div class="sec-inner">
+    <h2 class="title"> Bilenyum'a  <span class="hero-accent">Katılım</span>  Yolculuğu</h2>
+    <p class="sec-lead">Eğitim Seti seçiminden ilk canlı dersine kadar tüm süreç sade, hızlı ve şeffaf. Bilenyum ailesine katılırken izleyeceğin adımlar burada.</p>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-step-circle">01</div>
+        <div class="how-step-card">
+          <h3>Tanışma</h3>
+          <p>Ücretsiz deneme dersine ve veli sunumuna katıl; Bilenyum'u yakından tanı.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-circle">02</div>
+        <div class="how-step-card">
+          <h3>Eğitim Seti Seçimi</h3>
+          <p>Öğrencinin sınıfına ve hedeflerine en uygun eğitim setini belirle, 12 taksit avantajıyla satın al.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-circle">03</div>
+        <div class="how-step-card">
+          <h3>Akademik Eşleştirme</h3>
+          <p>Klanın, ders programın, öğretmenlerin ve seviyen sistem tarafından belirlenir.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-circle">04</div>
+        <div class="how-step-card">
+          <h3>Canlı Derslere Başla</h3>
+          <p>Bilenyum ailesine katıl, Kontrol Merkezi üzerinden canlı derslerine kesintisiz başla.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMON FEATURES (3-col card grid) -->
+<section class="sec sec-features">
+  <div class="sec-inner">
+    <h2 class="title">Eğitim Setleri Farklı, Kalite Aynı</h2>
+    <p class="sec-lead">Bilenyum'da her öğrenci, aynı kaliteli eğitime erişir. Eğitim setleri sadece içerdiği ders kapsamında farklılaşır.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg>
+        </div>
+        <h3>Butik Canlı Sınıflar</h3>
+        <p>Maksimum 12 kişilik interaktif sınıflarda, her öğrencinin aktif katıldığı oyunlaştırma temelli bir ders deneyimi sunuyoruz.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+        </div>
+        <h3>Uzman Branş Öğretmenleri</h3>
+        <p>Alanında uzman kadromuzla, Maarif Müfredatı’na tam uyumlu ve akademik odaklı bir eğitim veriyoruz.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM5 8V6h14v2z"/></svg>
+        </div>
+        <h3>Ders Kayıt Arşivi</h3>
+        <p>Tüm dersleri kaydederek öğrencilerimize diledikleri zaman sınırsız tekrar izleme ve pekiştirme imkanı sağlıyoruz.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+        </div>
+        <h3>Öğrenci ve Veli Kontrol Merkezi: </h3>
+        <p>Akademik gelişimi ve görevleri dijital panellerden anlık takip ediyoruz.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11V5l-8-3z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <h3>Ücretsiz Canlı Deneme:</h3>
+        <p>Canlı ders atmosferimizi ve eğitim kalitemizi ücretsiz deneme dersine katılarak bizzat deneyimleyebilirsiniz.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        </div>
+        <h3>12 Ay Taksit Avantajı:</h3>
+        <p>Nitelikli eğitime erişimi kolaylaştıran 12 aya varan taksit seçenekleri sunuyoruz.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec sec-faq" id="sss">
+  <div class="faq-wrap">
+    <h2 class="title">Sıkça Sorulanlar</h2>
+    <p class="sec-lead">Eğitim setleri, ödeme ve platform hakkında merak ettikleriniz.</p>
+
+    <div class="faq-split">
+      <div class="faq-questions">
+        <button class="faq-q-btn active" data-faq="0" type="button">
+          <span class="faq-q-num">01</span>
+          <span class="faq-q-text">Aylık mı yoksa toplu mu ödenir?</span>
+          <span class="faq-q-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+        </button>
+        <button class="faq-q-btn" data-faq="1" type="button">
+          <span class="faq-q-num">02</span>
+          <span class="faq-q-text"> Eğitim setimi sonradan değiştirebilir miyim?</span>
+          <span class="faq-q-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+        </button>
+        <button class="faq-q-btn" data-faq="2" type="button">
+          <span class="faq-q-num">03</span>
+          <span class="faq-q-text">İlk dersim ücretsiz mi? Kart bilgisi gerekiyor mu?</span>
+          <span class="faq-q-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+        </button>
+        <button class="faq-q-btn" data-faq="3" type="button">
+          <span class="faq-q-num">04</span>
+          <span class="faq-q-text">Kaçırdığım dersi nasıl telafi edebilirim?</span>
+          <span class="faq-q-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+        </button>
+        <button class="faq-q-btn" data-faq="4" type="button">
+          <span class="faq-q-num">05</span>
+          <span class="faq-q-text">Birden fazla çocuk için indirim var mı?</span>
+          <span class="faq-q-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+        </button>
+        <button class="faq-q-btn" data-faq="5" type="button">
+          <span class="faq-q-num">06</span>
+          <span class="faq-q-text">Canlı derslere hangi cihazlardan katılabilirim?</span>
+          <span class="faq-q-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+        </button>
+      </div>
+
+      <div class="faq-answer-panel">
+        <div class="faq-answer active" data-faq="0">
+          <h3>Aylık mı yoksa toplu mu ödenir?</h3>
+          <p>Tüm eğitim setlerimizde hem aylık ödeme hem de 12 taksitli toplu ödeme imkânı sunuyoruz. Toplu ödemelerde %10'a varan indirim kazanırsınız.</p>
+        </div>
+        <div class="faq-answer" data-faq="1">
+          <h3>Eğitim setimi sonradan değiştirebilir miyim?</h3>
+          <p>Evet, eğitim yılı içinde setinizi öğrencinin ihtiyaçlarına göre yükseltebilirsiniz. Talebinizi Veli Kontrol Merkezi üzerinden iletmeniz yeterli.</p>
+        </div>
+        <div class="faq-answer" data-faq="2">
+          <h3>İlk dersim ücretsiz mi? Kart bilgisi gerekiyor mu?</h3>
+          <p>Ücretsiz canlı deneme dersimize katılmak için herhangi bir kart bilgisi veya ön ödeme gerekmez. Yalnızca kayıt formunu doldurmanız yeterli.</p>
+        </div>
+        <div class="faq-answer" data-faq="3">
+          <h3>Kaçırdığım dersi nasıl telafi edebilirim?</h3>
+          <p>Kaçırdığınız tüm canlı derslerin video kayıtlarına Öğrenci Kontrol Merkezi üzerinden sınırsız erişebilirsiniz.
+            Konu eksikleri için branş öğretmeninizle anlık mesajlaşma kanalı her zaman açık.</p>
+        </div>
+        <div class="faq-answer" data-faq="4">
+          <h3>Birden fazla çocuk için indirim var mı?</h3>
+          <p>Evet, kardeş indirimimiz mevcut. İki ve üzeri kayıtlarda aileye özel indirim oranlarımız için bizimle iletişime geçebilirsiniz.</p>
+        </div>
+        <div class="faq-answer" data-faq="5">
+          <h3>Canlı derslere hangi cihazlardan katılabilirim?</h3>
+          <p>Bilgisayarda tarayıcıdan, tablet ve telefonda ise mobil uygulamalar ile  kesintisiz katılım sağlayabilirsiniz. </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-all">
+      <a href="#" class="btn btn-soft">Tüm Soruları Gör →</a>
+    </div>
+  </div>
+</section>
+
+<!-- HELP CTA -->
+<section class="sec sec-help">
+  <div class="help-strip">
+    <div class="help-text">
+      <h3 class="help-title">Hangi eğitim seti sana uygun?</h3>
+      <p class="help-sub">Yumi, sınıfına ve hedeflerine göre sana en uygun eğitim setini önerir. Daha kişisel bir görüşme istersen uzman eğitim danışmanımız da sana destek olabilir.</p>
+    </div>
+    <div class="help-actions">
+      <button class="btn btn-primary" id="askYumi" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <line x1="12" y1="3" x2="12" y2="5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="12" cy="2.3" r="1" fill="currentColor"/>
+          <rect x="4.5" y="5.5" width="15" height="13.5" rx="4.5" fill="currentColor"/>
+          <circle cx="9" cy="11.5" r="1.3" fill="#28265a"/>
+          <circle cx="15" cy="11.5" r="1.3" fill="#28265a"/>
+          <rect x="9.8" y="15" width="4.4" height="1.2" rx="0.6" fill="#28265a"/>
+        </svg>
+        Yumi'ye Sor
+      </button>
+      <a href="tel:+908501234567" class="btn btn-ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 18v-7a9 9 0 0 1 18 0v7"/>
+          <path d="M21 19a2 2 0 0 1-2 2h-2v-7h4v5z"/>
+          <path d="M3 19a2 2 0 0 0 2 2h2v-7H3v5z"/>
+        </svg>
+        Uzmanla Görüş
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="site-footer"></footer>
+
+<!-- ROBOT FAB + CHATBOT -->
+<button class="robot-fab" id="robotFab" aria-label="Yumi · Bilenyum Asistanı" type="button">
+  <svg class="robot-svg" viewBox="0 0 64 64" aria-hidden="true">
+    <line class="robot-antenna" x1="32" y1="6" x2="32" y2="14"/>
+    <circle class="robot-antenna-bulb" cx="32" cy="5" r="3"/>
+    <rect class="robot-head" x="10" y="14" width="44" height="38" rx="14"/>
+    <circle class="robot-eye" cx="22" cy="30" r="4"/>
+    <circle class="robot-eye" cx="42" cy="30" r="4"/>
+    <circle class="robot-cheek" cx="16" cy="38" r="2.2"/>
+    <circle class="robot-cheek" cx="48" cy="38" r="2.2"/>
+    <rect class="robot-mouth" x="24" y="40" width="16" height="3.5" rx="1.75"/>
+  </svg>
+</button>
+
+<div class="chatbot" id="chatbot" role="dialog" aria-labelledby="chatbotName" aria-hidden="true">
+  <div class="chatbot-header">
+    <div class="chatbot-avatar" aria-hidden="true">
+      <svg viewBox="0 0 64 64">
+        <line x1="32" y1="8" x2="32" y2="14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="32" cy="6" r="2.5" fill="currentColor"/>
+        <rect x="12" y="14" width="40" height="36" rx="12" fill="currentColor"/>
+        <circle cx="24" cy="30" r="3.5" fill="white"/>
+        <circle cx="40" cy="30" r="3.5" fill="white"/>
+        <rect x="26" y="40" width="12" height="3" rx="1.5" fill="white"/>
+      </svg>
+    </div>
+    <div class="chatbot-title">
+      <div class="chatbot-name" id="chatbotName">Yumi</div>
+      <div class="chatbot-status">Çevrimiçi</div>
+    </div>
+    <button class="chatbot-close" id="chatbotClose" aria-label="Kapat" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="chatbot-body" id="chatbotBody">
+    <div class="chat-msg bot"><div class="chat-bubble">Merhaba! Sınıfını ve hedefini söyle, sana uygun eğitim setini önereyim.</div></div>
+    <div class="chat-actions">
+      <button class="chat-action" type="button">5. Sınıf</button>
+      <button class="chat-action" type="button">6. Sınıf</button>
+      <button class="chat-action" type="button">7. Sınıf</button>
+      <button class="chat-action" type="button">8. Sınıf (LGS)</button>
+    </div>
+  </div>
+  <form class="chatbot-input" id="chatbotForm" autocomplete="off">
+    <input type="text" placeholder="Sorunu yaz…" aria-label="Mesajınız" />
+    <button type="submit" aria-label="Gönder">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </form>
+</div>
+
+<script>
+  // ---------- Pricing data + render ----------
+  const PRICING_DATA = {
+    '8': [
+      { name: 'LGS Hızlandırma', price: '1.490', total: '17.880', users: '320', features: ['Sınava yakın dönem, yoğun LGS tekrar ve pekiştirme', 'Günlük canlı ya da kayıttan izlenebilir akış ve ödev blokları', 'Branş bazlı mini deneme ve eksik kapanış önerileri', 'Veli Kontrol Merkezi\'nde haftalık özet ve uyarılar'] },
+      { name: 'LGS Tüm Dersler Eğitim Seti', price: '1.890', total: '22.680', users: '1.450', popular: true, features: ['LGS kapsamındaki tüm derslerde canlı ders erişimi', 'Dijital içerik ve kayıt arşivi', 'Veli Bilgilendirme Kontrol Merkezi ve rapor sistemleri', 'Telafi ve katılım takibi'] },
+      { name: 'LGS Sayısal Eğitim Seti', price: '1.290', total: '15.480', users: '680', features: ['Matematik, Fen Bilimleri ve Sayısal odaklı içerikler', 'Konu + soru tipi bazlı deneme ve analiz', 'Hedeflenen net ve sıralama için çalışma önerileri', 'Öğretmen geri bildirimi ve veli özeti'] },
+      { name: 'LGS Sözel Eğitim Seti', price: '1.190', total: '14.280', users: '450', features: ['Türkçe, T.C. İnkılap, Din ve İngilizce odaklı program', 'Okuma anlama ve paragraf çalışma parkurları', 'Yazılı / Sözel sınavlara uygun kaynaklar', 'Düzenli performans raporu'] },
+      { name: 'Bire Bir Özel Ders Eğitim Seti', price: '3.490', total: '41.880', users: '220', features: ['Bire bir özel ders saatleri ve esnek planlama', 'Öğrenciye özel içerik ve ödev takibi', 'Veli ile düzenli görüşme özeti', 'Öncelikli akademik destek hattı'] }
+    ],
+    '7': [
+      { name: 'Tüm Dersler Eğitim Seti', price: '1.690', total: '20.280', users: '1.250', popular: true, features: ['Sınıf müfredatına uygun tüm derslerde canlı ders', 'Kayıtlı içerik ve tekrar imkanı', 'Veli Kontrol Merkezi ve dönem raporu', 'Telafi ve devamsızlık bildirimi'] },
+      { name: 'Sayısal Eğitim Seti', price: '1.190', total: '14.280', users: '540', features: ['Matematik ve Fen Bilimleri ağırlıklı program', 'Konu testleri ve gelişim grafiği', 'Deneme sonuçlarıyla eksik kazanım uyarısı', 'Öğretmen geri bildirimi'] },
+      { name: 'Sözel Eğitim Seti', price: '1.090', total: '13.080', users: '380', features: ['Türkçe ve sosyal alan dersleri ile dil gelişimi', 'Paragraf ve yazılı hazırlık içerikleri', 'Okuma alışkanlığı ve kelime çalışmaları', 'Veliye düzenli gelişim özeti'] },
+      { name: 'Bire Bir Özel Ders Eğitim Seti', price: '2.990', total: '35.880', users: '180', features: ['Tek öğrenciye özel ders saatleri', 'Kişisel eksik analizi ve ödev planı', 'Veli bilgilendirme görüşmeleri', 'Öncelikli destek'] }
+    ],
+    '6': [
+      { name: 'Tüm Dersler Eğitim Seti', price: '1.490', total: '17.880', users: '1.100', popular: true, features: ['6. Sınıf müfredatında tüm dersler', 'Etkileşimli canlı dersler ve arşiv', 'Veli Kontrol Merkezi ve başarı takibi', 'Telafi imkânı'] },
+      { name: 'Sayısal Eğitim Seti', price: '1.050', total: '12.600', users: '460', features: ['Matematik ve Fen için ek sorular ve tekrar setleri', 'Mini denemeler ve grafiksel ilerleme', 'Kavram pekiştirme videoları', 'Öğretmen yorumları'] },
+      { name: 'Sözel Eğitim Seti', price: '950', total: '11.400', users: '320', features: ['Türkçe ve Sosyal Bilgiler odaklı içerik', 'Okuma ve yazma çalışmaları', 'Proje ve ödev desteği', 'Gelişim raporu'] },
+      { name: 'Bire Bir Özel Ders Eğitim Seti', price: '2.690', total: '32.280', users: '150', features: ['Bire bir ders ile kişiselleştirilmiş tempo', 'Eksik konu kapatma ve ödev kontrolü', 'Veliye düzenli geri bildirim', 'Esnek saat planı'] }
+    ],
+    '5': [
+      { name: 'Tüm Dersler Eğitim Seti', price: '1.290', total: '15.480', users: '920', popular: true, features: ['5. Sınıf müfredatında tüm dersler', 'Etkileşimli canlı dersler ve arşiv', 'Veli Kontrol Merkezi ve başarı takibi', 'Telafi imkânı'] },
+      { name: 'Sayısal Eğitim Seti', price: '890', total: '10.680', users: '380', features: ['Matematik ve Fen Bilimleri ek soru ve tekrar setleri', 'Mini denemeler ve grafiksel ilerleme', 'Kavram pekiştirme videoları', 'Öğretmen yorumları'] },
+      { name: 'Sözel Eğitim Seti', price: '790', total: '9.480', users: '240', features: ['Türkçe ve Sosyal Bilgiler odaklı içerik', 'Okuma ve yazma çalışmaları', 'Proje ve ödev desteği', 'Gelişim raporu'] },
+      { name: 'Bire Bir Özel Ders Eğitim Seti', price: '2.290', total: '27.480', users: '120', features: ['Bire bir ders ile kişiselleştirilmiş tempo', 'Eksik konu kapatma ve ödev kontrolü', 'Veliye düzenli geri bildirim', 'Esnek saat planı'] }
+    ]
+  };
+
+  function trSlugify(s) {
+    return s.toLowerCase()
+      .replace(/ı/g, 'i').replace(/ş/g, 's').replace(/ğ/g, 'g')
+      .replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ç/g, 'c')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+  function renderPricingCards(grade) {
+    const grid = document.querySelector('.pricing-grid');
+    if (!grid) return;
+    const cards = PRICING_DATA[grade] || [];
+    grid.innerHTML = cards.map(c => {
+      const slug = trSlugify(c.name);
+      const detailUrl = `paket-detay.html?paket=${slug}`;
+      return `
+      <div class="price-card${c.popular ? ' is-popular' : ''}" data-href="${detailUrl}">
+        ${c.popular ? '<span class="price-card-popular">POPÜLER</span>' : ''}
+        <div class="price-card-image">[Eğitim seti görseli]</div>
+        <div class="price-card-body">
+          <h3 class="title">${c.name}</h3>
+          <ul class="price-features">
+            ${c.features.map(f => `<li>${f}</li>`).join('')}
+          </ul>
+          <div class="price-row">
+            <div class="price-amount"><span class="num">₺ ${c.price}</span><span class="per">/ ay</span></div>
+            <div class="price-meta">
+              <span>Toplam <strong>₺ ${c.total}</strong></span>
+              <span class="price-installment">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                12 taksit imkanı
+              </span>
+            </div>
+          </div>
+          <div class="price-users">
+            <div class="av-stack"><div class="av"></div><div class="av"></div><div class="av"></div></div>
+            <span><strong>${c.users}</strong> öğrenci kullanıyor</span>
+          </div>
+          <div class="price-actions">
+            <a href="${detailUrl}" class="btn btn-ghost btn-sm">İncele</a>
+            <a href="checkout.html?paket=${slug}" class="btn btn-primary btn-sm">Satın Al</a>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    grid.scrollLeft = 0;
+  }
+
+  // Pricing tabs → grid render
+  (function() {
+    const grid = document.querySelector('.pricing-grid');
+    if (!grid) return;
+    const tabs = document.querySelectorAll('.pricing-tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.toggle('active', t === tab));
+        renderPricingCards(tab.dataset.grade);
+      });
+    });
+    const activeTab = document.querySelector('.pricing-tab.active');
+    if (activeTab) renderPricingCards(activeTab.dataset.grade);
+  })();
+
+  // Make entire pricing card clickable → paket-detay
+  document.addEventListener('click', (e) => {
+    const card = e.target.closest('.price-card[data-href]');
+    if (!card) return;
+    if (e.target.closest('a, button')) return;
+    window.location.href = card.dataset.href;
+  });
+
+  // FAQ tab-switch (questions left, active answer right)
+  (function() {
+    const buttons = document.querySelectorAll('.faq-q-btn');
+    const answers = document.querySelectorAll('.faq-answer');
+    if (!buttons.length || !answers.length) return;
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.faq;
+        buttons.forEach(b => b.classList.toggle('active', b.dataset.faq === id));
+        answers.forEach(a => a.classList.toggle('active', a.dataset.faq === id));
+      });
+    });
+  })();
+
+</script>
+
+<!-- ============ TRIAL MODAL (Ücretsiz Deneme Dersi) ============ -->
+<!-- CSS: assets/trial-modal.css -->
+
+<div class="trial-modal" id="trialModal" aria-hidden="true">
+  <div class="trial-modal-overlay" data-trial-close></div>
+  <div class="trial-modal-card" role="dialog" aria-modal="true" aria-labelledby="trialModalTitle">
+    <!-- Visual header banner (placeholder) -->
+    <div class="trial-modal-image" aria-hidden="true">[Banner Görseli]</div>
+    <button class="trial-modal-close" data-trial-close aria-label="Kapat" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="trial-modal-body">
+      <div class="trial-modal-head">
+        <span class="trial-modal-eyebrow">Ücretsiz Deneme Dersi</span>
+        <h2 class="trial-modal-title" id="trialModalTitle">Hadi tanışalım</h2>
+        <p class="trial-modal-sub">Çocuğunun seviyesi ve hedefine en uygun deneme dersini birlikte planlayalım.</p>
+      </div>
+      <!-- Step 1: Öğrenci -->
+      <form class="trial-step-form active" id="trialStep1" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-s-name">Öğrenci adı</label>
+            <input type="text" id="trial-s-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-s-surname">Öğrenci soyadı</label>
+            <input type="text" id="trial-s-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-grade">Sınıf seviyesi</label>
+          <select id="trial-s-grade" required>
+            <option value="" disabled selected>Sınıf seç</option>
+            <option value="5">5. Sınıf</option>
+            <option value="6">6. Sınıf</option>
+            <option value="7">7. Sınıf</option>
+            <option value="8">8. Sınıf (LGS)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-subject">Deneme dersi istenen alan</label>
+          <select id="trial-s-subject" required>
+            <option value="" disabled selected>Alan seç</option>
+            <option value="mat">Matematik</option>
+            <option value="fen">Fen Bilimleri</option>
+            <option value="trk">Türkçe</option>
+            <option value="ing">İngilizce</option>
+            <option value="sos">Sosyal Bilgiler</option>
+            <option value="all">Genel (tüm dersler)</option>
+          </select>
+        </div>
+        <div class="trial-actions">
+          <button type="submit" class="btn-modal btn-modal-primary">
+            İleri
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </form>
+      <!-- Step 2: Veli -->
+      <form class="trial-step-form" id="trialStep2" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-p-name">Veli adı</label>
+            <input type="text" id="trial-p-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-p-surname">Veli soyadı</label>
+            <input type="text" id="trial-p-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-p-email">E-posta</label>
+          <input type="email" id="trial-p-email" required placeholder="ornek@email.com" autocomplete="email" data-rule="email" maxlength="120" />
+        </div>
+        <div class="form-field">
+          <label for="trial-p-phone">Telefon</label>
+          <input type="tel" id="trial-p-phone" required placeholder="+90 5XX XXX XX XX" inputmode="numeric" autocomplete="tel" maxlength="17" data-rule="phone-tr" />
+        </div>
+        <div class="trial-actions">
+          <button type="button" class="btn-modal btn-modal-ghost" id="trialBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Geri
+          </button>
+          <button type="submit" class="btn-modal btn-modal-primary">
+            Talebi Gönder
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      </form>
+      <!-- Success -->
+      <div class="trial-success" id="trialSuccess">
+        <div class="trial-success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>Talebin alındı!</h3>
+        <p>1 iş günü içinde belirttiğin telefon numarasından sana ulaşacağız. Tanışmak için sabırsızlanıyoruz!</p>
+        <button type="button" class="btn-modal" data-trial-close>Tamam</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TRIAL MODAL END ============ -->
+
+<script>
+  // Yumi chatbot — sayfa-özel cevap kuralları
+  window.BilenyumChatbot = {
+    replies: function (text) {
+      text = text.toLowerCase();
+      if (text.includes('5'))                                   return '5. sınıf için 3 eğitim seti var: Temel (₺349), Standart (₺549), Yörünge (₺890). En çok tercih edilen Yörünge — 4 ana branş ve aylık birebir görüşme içerir.';
+      if (text.includes('6'))                                   return '6. sınıf için 4 eğitim seti var: Temel (₺399), Standart (₺649), Yörünge (₺990), Süperstar (₺1.490). Yörünge en popüleri.';
+      if (text.includes('7'))                                   return '7. sınıf için 5 eğitim seti var: Temel (₺449) → Süperstar (₺1.890). 8. sınıfa hazırlık için Yörünge veya Premium öneririm.';
+      if (text.includes('8') || text.includes('lgs'))           return '8. Sınıf LGS için 6 eğitim seti var: Temel (₺549) → Birebir Pro (₺3.490). LGS hedefiyse Süperstar veya Galaxy ideal.';
+      if (text.includes('telafi'))                              return 'Telafi hakkı: Hızlı Başlangıç ayda 1, Yörünge ayda 2, Süperstar+ sınırsız. Tüm dersler kayıt altında.';
+      if (text.includes('iade') || text.includes('iptal'))      return 'İlk 14 gün koşulsuz para iadesi. Sonrası kalan ay sayısı kadar pro-rata iade.';
+      if (text.includes('merhaba') || text.includes('selam'))   return 'Merhaba! Sınıfını söyle, eğitim seti önerisi yapayım.';
+      return 'Sorunu aldım. Detaylı bir yanıt vereceğim.';
+    }
+  };
+</script>
+<script src="assets/dom.js"></script>
+<script src="assets/robot-fab.js"></script>
+<script>
+  // Sayfa-özel: "Yumi'ye Sor" CTA chatbot'u açar
+  (function () {
+    var btn = document.getElementById('askYumi');
+    if (btn && window.BilenyumChatbot && window.BilenyumChatbot.open) {
+      btn.addEventListener('click', window.BilenyumChatbot.open);
+    }
+  })();
+</script>
+<script src="assets/trial-modal.js"></script>
+<script src="assets/input-rules.js"></script>
+<script src="assets/footer.js"></script>
+</body>
+</html>

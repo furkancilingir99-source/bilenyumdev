@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Dikkat Testi · Bilenyum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/assessment.css">
+<link rel="stylesheet" href="assets/assessment-light.css">
+</head>
+<body>
+
+<div class="asm-exam-page asm-attention-page" id="asmAttentionExam">
+  <header class="asm-exam-topbar">
+    <h1 class="asm-exam-topbar-title">🎯 Dikkat Testi</h1>
+    <div class="asm-attention-stats">
+      <span class="asm-attention-stat" data-asm-timer>00:00</span>
+      <span class="asm-attention-stat">İşaret: <strong data-asm-marked>0 / 3</strong></span>
+      <span class="asm-attention-stat">Hedef: <strong>3 C</strong></span>
+    </div>
+  </header>
+  <main class="asm-exam-main asm-attention-main">
+    <div class="asm-attention-intro">
+      <p class="asm-question-num">200 harf · 3 gizli C</p>
+      <h2 class="asm-question-text">Aşağıdaki harfler arasında <strong>3 adet C</strong> harfi gizlenmiştir. Bulduğun harfleri işaretle; işareti kaldırmak için tekrar tıkla.</h2>
+      <div class="asm-attention-legend">
+        <span class="asm-attention-legend-item"><kbd>B</kbd> dikkat harfi</span>
+        <span class="asm-attention-legend-item"><kbd class="is-c">C</kbd> aranan harf</span>
+        <span class="asm-attention-legend-item"><span class="asm-letter is-marked-demo">B</span> işaretli</span>
+      </div>
+    </div>
+    <div class="asm-letter-grid-wrap">
+      <div class="asm-letter-grid" id="asmLetterGrid" role="grid" aria-label="Harf ızgarası"></div>
+    </div>
+    <div class="asm-attention-toolbar">
+      <button type="button" class="asm-btn asm-btn-ghost" data-asm-clear-marks>Tüm İşaretleri Kaldır</button>
+      <button type="button" class="asm-btn asm-btn-primary" data-asm-finish-attention>Testi Bitir ve Sonucu Gör</button>
+    </div>
+  </main>
+</div>
+
+<script src="assets/assessment-scoring.js"></script>
+<script src="assets/exam-header.js"></script>
+<script src="assets/exam-student-bar.js"></script>
+<script src="assets/assessment-results.js"></script>
+<script src="assets/exam-cross-break.js"></script>
+<script src="assets/assessment.js"></script>
+</body>
+</html>

@@ -1,0 +1,1622 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bilenyum - Örnek Ders Videoları</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/trial-modal.css">
+<link rel="stylesheet" href="assets/robot-fab.css">
+<style>
+  body { background: #fafaff; }
+
+  /* page-specific eyebrow variant */
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--p-purple-light); margin: 0 0 16px; display: inline-flex; align-items: center; gap: 10px; }
+  .eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--p-purple-light); }
+
+  /* ---------- HERO (light bg, slider layout) ---------- */
+  .sec-videos-hero {
+    background: linear-gradient(180deg, #fcfaff 0%, #f4eeff 100%);
+    color: var(--ink-dark-0);
+    position: relative;
+    z-index: 2;
+    overflow: visible;
+  }
+  .sec-videos-hero .sec-inner { padding-top: 8px; padding-bottom: 0; }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 32px; align-items: center; }
+
+  h1.title { font-size: 44px; line-height: 1.08; margin: 0 0 12px; font-weight: 800; letter-spacing: -0.02em; text-wrap: balance; color: var(--ink-dark-0); }
+  .hero-title-accent { background: linear-gradient(120deg, var(--p-brand) 0%, var(--p-brand-deep) 50%, var(--p-purple) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .lead { font-size: 17px; color: var(--ink-dark-1); max-width: 480px; line-height: 1.55; margin: 0; }
+
+  /* Stacked video cards illustration */
+  .hero-video-illus {
+    position: relative;
+    aspect-ratio: 16/9;
+    min-height: 150px;
+  }
+  .hv-card {
+    position: absolute;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 22px 44px -20px rgba(40,38,90,0.40), 0 6px 16px -6px rgba(40,38,90,0.18);
+    border: 1px solid rgba(40,38,90,0.10);
+  }
+  .hv-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .hv-card-bg-1 {
+    width: 60%; aspect-ratio: 16/10;
+    top: 4%; right: -6%;
+    transform: rotate(8deg);
+    opacity: 0.88;
+  }
+  .hv-card-bg-2 {
+    width: 56%; aspect-ratio: 16/10;
+    bottom: 6%; left: -8%;
+    transform: rotate(-6deg);
+    opacity: 0.88;
+  }
+  .hv-card-main {
+    width: 80%; aspect-ratio: 16/10;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    border-radius: 22px;
+    box-shadow: 0 40px 80px -25px rgba(40,38,90,0.50), 0 14px 28px -10px rgba(229,4,123,0.30), 0 0 0 1px rgba(40,38,90,0.06);
+    border: 2px solid white;
+    isolation: isolate;
+  }
+  .hv-card-main::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.78));
+    z-index: 1;
+  }
+  .hv-play {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 72px; height: 72px; border-radius: 50%;
+    background: rgba(255,255,255,0.96); border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 12px 28px rgba(40,38,90,0.40), 0 0 0 12px rgba(255,255,255,0.20);
+    color: var(--p-brand); z-index: 2;
+  }
+  .hv-play svg { width: 26px; height: 26px; margin-left: 4px; }
+  .hv-info-block {
+    position: absolute; bottom: 20px; left: 20px; right: 20px;
+    color: white; z-index: 3;
+  }
+  .hv-branch-tag {
+    display: inline-block; padding: 4px 10px; border-radius: 999px;
+    background: rgba(229,4,123,0.90); color: white;
+    font-size: 10.5px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+  .hv-info-block .hv-title { font-size: 18px; font-weight: 700; margin-bottom: 3px; line-height: 1.25; }
+  .hv-info-block .hv-meta { font-size: 12.5px; opacity: 0.85; }
+  .hv-duration {
+    position: absolute; top: 14px; right: 14px;
+    background: rgba(0,0,0,0.72); color: white;
+    padding: 4px 10px; border-radius: 6px;
+    font-size: 11.5px; font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    z-index: 2;
+  }
+
+  /* ---------- Light Space Divider (pkg-detay style) ---------- */
+  .space-divider-light {
+    position: relative;
+    height: 140px;
+    margin-top: -30px;
+    background: linear-gradient(180deg, #f4eeff 0%, #ebe2ff 100%);
+    overflow: hidden;
+    z-index: 1;
+  }
+  .space-wave-light {
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    width: 100%; height: 100%;
+    display: block;
+    z-index: 3;
+  }
+  .geo-circle-light {
+    position: absolute;
+    width: 60px; height: 60px;
+    top: 28%; left: 42%;
+    border: 1.5px solid rgba(62,58,142,0.45);
+    border-radius: 50%;
+    z-index: 2;
+    transform: rotate(-18deg) scaleY(0.4);
+  }
+  .geo-dot-light { position: absolute; border-radius: 50%; z-index: 2; }
+  .geo-dot-light.d1 {
+    width: 10px; height: 10px;
+    top: 32%; left: 14%;
+    background: var(--p-purple);
+  }
+  .geo-dot-light.d2 {
+    width: 6px; height: 6px;
+    top: 20%; right: 24%;
+    background: var(--p-aqua);
+  }
+  .geo-line-light {
+    position: absolute;
+    width: 90px; height: 1px;
+    top: 42%; right: 8%;
+    background: linear-gradient(to right, transparent, rgba(62,58,142,0.6), transparent);
+    transform: rotate(-14deg);
+    z-index: 2;
+  }
+  .geo-tri-light {
+    position: absolute;
+    width: 0; height: 0;
+    top: 16%; left: 68%;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 12px solid rgba(255,122,184,0.65);
+    transform: rotate(18deg);
+    filter: drop-shadow(0 0 8px rgba(255,122,184,0.45));
+    z-index: 2;
+  }
+
+  /* ---------- VIDEOS section ---------- */
+  .sec-videos { background: var(--bg-3); color: var(--ink-dark-0); padding-bottom: 32px; }
+  .sec-videos .sec-inner { padding-top: 64px; padding-bottom: 32px; }
+  h2.title { font-size: 38px; line-height: 1.1; margin: 0 0 12px; font-weight: 800; letter-spacing: -0.015em; text-wrap: balance; max-width: 800px; color: var(--ink-dark-0); }
+  .sec-lead { font-size: 16px; color: var(--ink-dark-1); margin: 0; max-width: 640px; line-height: 1.55; }
+  .sec-videos .lead { color: var(--ink-dark-1); margin-bottom: 36px; }
+
+  /* Filter bar (branch + class pills) */
+  .filter-bar {
+    background: white;
+    border: 1px solid rgba(40,38,90,0.10);
+    border-radius: 20px;
+    padding: 18px 22px;
+    display: flex; flex-direction: column; gap: 14px;
+    box-shadow: 0 12px 32px -16px rgba(40,38,90,0.20);
+  }
+  .filter-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .filter-label { font-size: 11px; font-weight: 700; color: var(--ink-dark-2); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.10em; text-transform: uppercase; flex-shrink: 0; min-width: 64px; }
+  .filter-options { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-pill {
+    padding: 8px 16px; border-radius: 999px;
+    border: 1px solid rgba(40,38,90,0.14); background: white;
+    color: var(--ink-dark-1);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .filter-pill:hover { border-color: rgba(62,58,142,0.30); color: var(--p-purple); transform: translateY(-1px); }
+  .filter-pill.active { background: var(--p-purple); border-color: var(--p-purple); color: white; box-shadow: 0 6px 14px -4px rgba(62,58,142,0.50); }
+  .filter-result-count { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--ink-dark-2); margin-top: 16px; letter-spacing: 0.06em; }
+  .filter-result-count strong { color: var(--p-purple); font-weight: 700; }
+
+  /* Empty state */
+  .no-videos {
+    padding: 60px 24px; text-align: center;
+    color: var(--ink-dark-2);
+    background: white; border-radius: 16px;
+    border: 1.5px dashed rgba(40,38,90,0.18);
+    margin-top: 32px; display: none;
+  }
+  .no-videos.show { display: block; }
+  .no-videos svg { width: 48px; height: 48px; color: var(--p-purple-light); margin-bottom: 10px; }
+  .no-videos h3 { font-size: 18px; color: var(--ink-dark-0); margin: 4px 0 6px; }
+  .no-videos p { font-size: 14px; margin: 0; }
+
+  /* Class tabs */
+  .class-tabs {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 6px; padding: 6px;
+    background: white;
+    border: 1px solid rgba(40,38,90,0.10);
+    border-radius: 14px;
+    box-shadow: 0 6px 20px -10px rgba(40,38,90,0.18);
+    margin: 24px 0 36px;
+  }
+  .class-tab {
+    padding: 14px 14px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    font-family: inherit; font-size: 14px; font-weight: 600;
+    color: var(--ink-dark-1);
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.18s ease, color 0.18s ease;
+  }
+  .class-tab:hover:not(.active) {
+    background: rgba(62,58,142,0.06);
+    color: var(--ink-dark-0);
+  }
+  .class-tab.active {
+    background: var(--p-purple);
+    color: white;
+    box-shadow: 0 6px 18px -6px rgba(62,58,142,0.45);
+  }
+
+  /* Class panels: transparent layout wrapper (cards sit directly on section bg) */
+  .class-panels { position: relative; }
+
+  .class-panel { display: none; }
+  .class-panel.active {
+    display: block;
+    animation: panelIn 0.32s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; gap: 16px; flex-wrap: wrap;
+  }
+  .panel-header-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 15px; font-weight: 700;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.01em;
+  }
+  .panel-header-badge {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: 13px;
+  }
+  .class-panel[data-class="5"] .panel-header-badge { background: linear-gradient(160deg, var(--p-purple-mid), var(--p-deep)); }
+  .class-panel[data-class="6"] .panel-header-badge { background: linear-gradient(160deg, var(--p-aqua), #1a7ba8); }
+  .class-panel[data-class="7"] .panel-header-badge { background: linear-gradient(160deg, var(--p-brand-light), var(--p-brand)); }
+  .class-panel[data-class="8"] .panel-header-badge { background: linear-gradient(160deg, var(--p-sun), #b87814); }
+  .panel-header-meta {
+    font-size: 12px; color: var(--ink-dark-2);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .panel-header-meta strong { color: var(--p-purple); font-weight: 700; }
+
+  /* Video sections */
+  .video-section { margin-top: 48px; }
+  .video-section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
+  .video-section-title { display: flex; align-items: center; gap: 14px; font-size: 22px; font-weight: 800; color: var(--ink-dark-0); letter-spacing: -0.01em; }
+  .video-section-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 18px; letter-spacing: -0.02em; }
+  .video-section[data-class="5"] .video-section-icon { background: linear-gradient(160deg, var(--p-purple-mid), var(--p-deep)); box-shadow: 0 8px 20px -8px rgba(62,58,142,0.50); }
+  .video-section[data-class="6"] .video-section-icon { background: linear-gradient(160deg, var(--p-aqua), #1a7ba8); box-shadow: 0 8px 20px -8px rgba(74,214,255,0.45); }
+  .video-section[data-class="7"] .video-section-icon { background: linear-gradient(160deg, var(--p-brand-light), var(--p-brand)); box-shadow: 0 8px 20px -8px rgba(229,4,123,0.50); }
+  .video-section[data-class="8"] .video-section-icon { background: linear-gradient(160deg, var(--p-sun), #b87814); box-shadow: 0 8px 20px -8px rgba(255,181,71,0.50); }
+  .video-section-count { font-size: 13px; color: var(--ink-dark-2); font-weight: 500; margin-left: 6px; }
+  .video-section-link { color: var(--p-purple); font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .video-section-link:hover { color: var(--p-deep); }
+
+  .video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+
+  .video-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(40,38,90,0.08);
+    box-shadow: 0 10px 28px -18px rgba(40,38,90,0.22);
+    cursor: pointer;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    display: flex; flex-direction: column;
+  }
+  .video-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(62,58,142,0.22);
+    box-shadow: 0 22px 48px -18px rgba(62,58,142,0.32), 0 6px 18px -10px rgba(40,38,90,0.18);
+  }
+  .video-thumb { position: relative; aspect-ratio: 16/10; overflow: hidden; background: rgba(62,58,142,0.06); }
+  .video-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+  .video-card:hover .video-thumb img { transform: scale(1.05); }
+  .video-thumb-play {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.92);
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba(255,255,255,0.96);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--p-brand);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.30);
+    opacity: 0;
+    transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .video-card:hover .video-thumb-play { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .video-thumb-play svg { width: 22px; height: 22px; margin-left: 2px; }
+  .video-duration {
+    position: absolute; bottom: 10px; right: 10px;
+    background: rgba(0,0,0,0.78); color: white;
+    font-size: 12.5px; font-weight: 600;
+    padding: 4px 10px; border-radius: 7px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .video-branch {
+    position: absolute; top: 10px; left: 10px;
+    color: white;
+    font-size: 11px; font-weight: 700;
+    padding: 5px 12px; border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.06em;
+    backdrop-filter: blur(4px);
+    text-transform: uppercase;
+  }
+  .video-branch.matematik { background: rgba(62,58,142,0.90); }
+  .video-branch.turkce { background: rgba(229,4,123,0.90); }
+  .video-branch.fen { background: rgba(26,123,168,0.90); }
+  .video-branch.sosyal { background: rgba(42,138,90,0.90); }
+  .video-branch.ingilizce { background: rgba(184,120,20,0.90); }
+  .video-info { padding: 18px 20px 20px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .video-title {
+    font-size: 16px; font-weight: 700;
+    color: var(--ink-dark-0);
+    line-height: 1.3;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 42px;
+  }
+  .video-subtitle {
+    font-size: 13px;
+    color: var(--ink-dark-2);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+  .video-meta { display: flex; align-items: center; gap: 10px; margin-top: auto; }
+  .video-teacher-avatar { width: 26px; height: 26px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 1px solid rgba(40,38,90,0.10); }
+  .video-teacher-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .video-teacher-name { font-size: 13.5px; color: var(--ink-dark-1); font-weight: 500; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .video-views { font-size: 12px; color: var(--ink-dark-2); display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; }
+  .video-views svg { width: 14px; height: 14px; }
+
+  /* Empty state */
+  .no-videos {
+    padding: 80px 24px;
+    text-align: center;
+    color: var(--ink-dark-2);
+    background: white;
+    border-radius: 20px;
+    border: 1.5px dashed rgba(40,38,90,0.18);
+    margin-top: 48px;
+    display: none;
+  }
+  .no-videos.show { display: block; }
+  .no-videos svg { width: 56px; height: 56px; color: var(--p-purple-light); margin-bottom: 12px; }
+  .no-videos h3 { font-size: 18px; color: var(--ink-dark-0); margin: 4px 0 6px; }
+  .no-videos p { font-size: 14px; margin: 0; }
+
+  /* ---------- Video Modal (vertical: big video on top + info + teacher comment) ---------- */
+  .video-modal {
+    position: fixed; inset: 0;
+    z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  .video-modal[hidden] { display: none; }
+  .video-modal.open { opacity: 1; visibility: visible; }
+  .vm-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(13,12,37,0.80);
+    backdrop-filter: blur(14px);
+  }
+  .vm-content {
+    position: relative;
+    background: white;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 920px;
+    max-height: 92vh;
+    overflow: hidden;
+    box-shadow: 0 40px 80px -20px rgba(0,0,0,0.55);
+    transform: scale(0.96);
+    transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+    display: flex; flex-direction: column;
+  }
+  .video-modal.open .vm-content { transform: scale(1); }
+  .vm-close {
+    position: absolute; top: 16px; right: 16px; z-index: 5;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(13,12,37,0.55);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.18);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    transition: background 0.18s ease, transform 0.18s ease;
+  }
+  .vm-close:hover { background: rgba(13,12,37,0.78); transform: scale(1.06); }
+  .vm-close svg { width: 18px; height: 18px; }
+
+  /* Big video on top */
+  .vm-video {
+    position: relative;
+    background: var(--bg-0);
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .vm-video img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .vm-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, transparent 30%);
+  }
+  .vm-play {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 96px; height: 96px; border-radius: 50%;
+    background: rgba(255,255,255,0.96);
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--p-brand);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.50), 0 0 0 14px rgba(255,255,255,0.20);
+    z-index: 2;
+    transition: transform 0.2s ease;
+  }
+  .vm-play:hover { transform: translate(-50%, -50%) scale(1.06); }
+  .vm-play svg { width: 36px; height: 36px; margin-left: 5px; }
+  .vm-duration {
+    position: absolute; top: 16px; left: 16px;
+    background: rgba(0,0,0,0.72); color: white;
+    padding: 6px 12px; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Body below video */
+  .vm-body {
+    padding: 22px 28px 26px;
+    overflow-y: auto;
+    display: flex; flex-direction: column;
+    gap: 14px;
+  }
+  .vm-body::-webkit-scrollbar { width: 6px; }
+  .vm-body::-webkit-scrollbar-thumb { background: rgba(40,38,90,0.16); border-radius: 999px; }
+  .vm-header-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; flex-wrap: wrap;
+  }
+  .vm-meta-tags {
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap;
+  }
+  .vm-branch {
+    display: inline-block;
+    padding: 5px 12px; border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: white;
+  }
+  .vm-branch.matematik { background: var(--p-purple); }
+  .vm-branch.turkce { background: var(--p-brand); }
+  .vm-branch.fen { background: #1a7ba8; }
+  .vm-branch.sosyal { background: #2a8a5a; }
+  .vm-branch.ingilizce { background: #b87814; }
+  .vm-class-meta {
+    font-size: 12px; color: var(--ink-dark-2);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* Action buttons */
+  .vm-actions {
+    display: flex; gap: 6px;
+  }
+  .vm-action {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(40,38,90,0.14);
+    background: white;
+    color: var(--ink-dark-1);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  }
+  .vm-action:hover {
+    background: rgba(62,58,142,0.06);
+    border-color: rgba(62,58,142,0.30);
+    color: var(--p-purple);
+    transform: translateY(-1px);
+  }
+  .vm-action svg { width: 16px; height: 16px; }
+  .vm-action.vm-like.active {
+    background: rgba(229,4,123,0.10);
+    border-color: rgba(229,4,123,0.38);
+    color: var(--p-brand);
+  }
+  .vm-action.vm-like.active svg { fill: var(--p-brand); }
+  .vm-action.vm-save.active {
+    background: rgba(62,58,142,0.10);
+    border-color: rgba(62,58,142,0.38);
+    color: var(--p-purple);
+  }
+  .vm-action.vm-save.active svg { fill: var(--p-purple); }
+
+  .vm-title {
+    font-size: 22px; font-weight: 800;
+    color: var(--ink-dark-0);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .vm-subtitle {
+    font-size: 14.5px;
+    color: var(--ink-dark-1);
+    line-height: 1.55;
+    margin: 0 0 4px;
+  }
+
+  /* Teacher comment block */
+  .vm-teacher {
+    padding: 18px 20px 18px;
+    background: linear-gradient(180deg, rgba(62,58,142,0.06), rgba(62,58,142,0.02));
+    border: 1px solid rgba(62,58,142,0.12);
+    border-radius: 18px;
+  }
+  .vm-teacher-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 12px;
+  }
+  .vm-teacher-avatar {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid white;
+    box-shadow: 0 6px 14px -4px rgba(62,58,142,0.30);
+    flex-shrink: 0;
+  }
+  .vm-teacher-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .vm-teacher-name {
+    font-size: 15px; font-weight: 700;
+    color: var(--ink-dark-0);
+    line-height: 1.2;
+    margin-bottom: 3px;
+  }
+  .vm-teacher-meta {
+    font-size: 12.5px;
+    color: var(--ink-dark-2);
+    font-weight: 500;
+  }
+  .vm-teacher-comment {
+    font-size: 14px;
+    color: var(--ink-dark-1);
+    line-height: 1.55;
+    margin: 0;
+    padding-left: 14px;
+    border-left: 3px solid var(--p-purple);
+    font-style: italic;
+  }
+  .vm-teacher-comment::before {
+    content: "“";
+    color: var(--p-purple);
+    font-weight: 800;
+    font-style: normal;
+    margin-right: 2px;
+  }
+  .vm-teacher-comment::after {
+    content: "”";
+    color: var(--p-purple);
+    font-weight: 800;
+    font-style: normal;
+    margin-left: 2px;
+  }
+
+  /* Share toast */
+  .vm-toast {
+    position: fixed;
+    bottom: 28px; left: 50%; transform: translateX(-50%) translateY(12px);
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: var(--p-deep);
+    color: white;
+    font-size: 13.5px; font-weight: 600;
+    box-shadow: 0 16px 36px -8px rgba(0,0,0,0.45);
+    z-index: 250;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.22,0.61,0.36,1), visibility 0.22s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .vm-toast.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+  .vm-toast svg { width: 16px; height: 16px; color: var(--p-green); }
+
+  @media (max-width: 760px) {
+    .video-modal { padding: 0; align-items: flex-end; }
+    .vm-content { max-height: 96vh; border-radius: 20px 20px 0 0; }
+    .vm-body { padding: 20px 22px 22px; }
+    .vm-title { font-size: 18px; }
+    .vm-play { width: 72px; height: 72px; }
+    .vm-play svg { width: 28px; height: 28px; }
+    .vm-actions { gap: 4px; }
+    .vm-action { padding: 7px 12px; font-size: 12px; }
+    .vm-action span { display: none; }
+  }
+
+  /* ---------- Stats banner ---------- */
+  .sec-stats { background: var(--bg-3); padding: 20px 0 60px; }
+  .stats-row {
+    max-width: var(--maxw); margin: 0 auto;
+    padding: 32px;
+    background: white;
+    border: 1px solid rgba(40,38,90,0.08);
+    border-radius: 24px;
+    box-shadow: 0 16px 40px -20px rgba(40,38,90,0.20);
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+  }
+  .stat-cell { text-align: center; padding: 12px 8px; border-right: 1px solid rgba(40,38,90,0.08); }
+  .stat-cell:last-child { border-right: none; }
+  .stat-cell .num {
+    font-size: 36px; font-weight: 800;
+    background: linear-gradient(120deg, var(--p-purple), var(--p-brand));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1; letter-spacing: -0.02em;
+  }
+  .stat-cell .lbl { font-size: 12px; color: var(--ink-dark-2); margin-top: 8px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* ---------- CTA strip ---------- */
+  .sec-videos-cta { background: var(--bg-3); padding: 0 32px 96px; }
+  .cta-strip {
+    background:
+      radial-gradient(600px 300px at 80% 50%, rgba(229,4,123,0.30), transparent 60%),
+      radial-gradient(700px 400px at 10% 50%, rgba(168,164,240,0.18), transparent 60%),
+      linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    border-radius: 28px;
+    padding: 56px 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 32px;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    color: white;
+    flex-wrap: wrap;
+    box-shadow: 0 30px 80px -30px rgba(40,38,90,0.50);
+  }
+  .cta-strip-text { flex: 1; min-width: 240px; }
+  .cta-strip-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-purple-light); margin-bottom: 12px; }
+  .cta-strip-title { font-size: 30px; font-weight: 800; line-height: 1.15; letter-spacing: -0.015em; margin: 0 0 8px; }
+  .cta-strip-sub { font-size: 16px; opacity: 0.85; max-width: 480px; line-height: 1.5; }
+  .cta-strip-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .cta-strip .btn-ghost { background: rgba(255,255,255,0.10); color: white; border-color: rgba(255,255,255,0.22); backdrop-filter: blur(4px); }
+  .cta-strip .btn-ghost:hover { background: rgba(255,255,255,0.18); }
+
+  /* Robot FAB & chatbot styles loaded from assets/robot-fab.css */
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1080px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .stat-cell { border-right: none; border-bottom: 1px solid rgba(40,38,90,0.08); padding: 16px 8px; }
+    .stat-cell:nth-child(3), .stat-cell:nth-child(4) { border-bottom: none; }
+  }
+  @media (max-width: 980px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 32px; }
+    h1.title { font-size: 36px; }
+    h2.title { font-size: 28px; }
+    .video-grid { grid-template-columns: repeat(2, 1fr); }
+    .cta-strip { padding: 40px 32px; }
+    .cta-strip-title { font-size: 24px; }
+    .sec-inner { padding: 64px 24px; }
+    .sec-videos-hero .sec-inner { padding-top: 32px; padding-bottom: 24px; }
+    .class-panels { padding: 22px 18px; }
+  }
+  @media (max-width: 760px) {
+    .video-grid { grid-template-columns: 1fr; }
+    h1.title { font-size: 30px; }
+    .filter-row { align-items: flex-start; }
+    .filter-label { width: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-contact">
+      <a href="https://wa.me/905551234567" class="wa-link" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.9L4 20l4.2-1.1A7.93 7.93 0 0 0 12.05 20h.01a7.95 7.95 0 0 0 5.55-13.68z"/></svg>
+        <span>+90 555 123 45 67</span>
+      </a>
+      <a href="tel:+908501234567">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 0 0-1.02.24l-2.2 2.2a15.07 15.07 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 4c0-.55-.45-1-1-1H4a1 1 0 0 0-1 1 17 17 0 0 0 17 17c.55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+        <span class="topbar-phone-text">0850 123 45 67</span>
+      </a>
+      <a href="mailto:info@bilenyum.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <span class="topbar-mail-text">info@bilenyum.com</span>
+      </a>
+    </div>
+    <div class="topbar-social">
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.39A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.73 1.46 1.39 2.13a5.88 5.88 0 0 0 2.13 1.39c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.39 5.88 5.88 0 0 0 1.39-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.39-2.13A5.88 5.88 0 0 0 19.86.63C19.1.33 18.22.13 16.95.07 15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/></svg></a>
+      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.13C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.52A3.02 3.02 0 0 0 .5 6.2C0 8.07 0 12 0 12s0 3.93.5 5.8a3.02 3.02 0 0 0 2.12 2.13c1.88.52 9.38.52 9.38.52s7.5 0 9.38-.52a3.02 3.02 0 0 0 2.12-2.13C24 15.93 24 12 24 12s0-3.93-.5-5.8zM9.6 15.6V8.4L15.84 12 9.6 15.6z"/></svg></a>
+      <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.66H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.26 2.37 4.26 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html"><img src="assets/bilenyum-logo.svg" alt="Bilenyum" class="logo-img" /></a>
+    <div class="nav-links">
+      <a href="egitim-setleri.html">Eğitim Setleri</a>
+      <a href="ornek-videolar.html" class="active">Örnek Videolar</a>
+      <a href="kadromuz.html">Ekibimiz</a>
+      <a href="neden-biz.html">Neden Biz?</a>
+      <a href="iletisim.html">İletişim</a>
+    </div>
+    <div class="nav-cta">
+      <a href="giris.html" class="btn btn-secondary btn-sm">Giriş Yap</a>
+      <button class="btn btn-primary btn-sm" data-trial-open type="button">Ücretsiz Deneme Dersi</button>
+    </div>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="index.html">Anasayfa</a>
+  <span class="sep">›</span>
+  <span class="current">Örnek Videolar</span>
+</div>
+
+<!-- HERO (light bg, slider layout) -->
+<section class="sec sec-videos-hero">
+  <div class="sec-inner">
+    <div class="hero-grid">
+      <div>
+        <h1 class="title"><span class="hero-title-accent">10.000+</span><br>Canlı İşlenen Konu</h1>
+        <p class="lead">
+          Bilenyum öğretmenlerinin gerçek canlı derslerinden örnekler. Ders kalitesini, anlatım tarzını ve öğretmen kadromuzu kayıt olmadan keşfedin.
+        </p>
+      </div>
+
+      <div class="hero-video-illus" aria-hidden="true">
+        <div class="hv-card hv-card-bg-1">
+          <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=600&q=80" alt="" />
+        </div>
+        <div class="hv-card hv-card-bg-2">
+          <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=600&q=80" alt="" />
+        </div>
+        <div class="hv-card hv-card-main">
+          <img src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=900&q=80" alt="" />
+          <span class="hv-duration">12:42</span>
+          <button class="hv-play" type="button" aria-label="Oynat">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg>
+          </button>
+          <div class="hv-info-block">
+            <div class="hv-branch-tag">Türkçe · 8. Sınıf</div>
+            <div class="hv-title">Sözcük Yapısı ve Kökleri</div>
+            <div class="hv-meta">Murat Yılmaz · LGS Hazırlık</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIGHT DIVIDER -->
+<div class="space-divider-light">
+  <div class="geo-circle-light"></div>
+  <div class="geo-dot-light d1"></div>
+  <div class="geo-dot-light d2"></div>
+  <div class="geo-line-light"></div>
+  <div class="geo-tri-light"></div>
+  <svg class="space-wave-light" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,120 C320,160 640,90 960,140 C1180,175 1320,115 1440,150 L1440,200 L0,200 Z" fill="rgba(62,58,142,0.10)"/>
+    <path d="M0,150 C260,195 540,115 820,165 C1080,210 1300,140 1440,175 L1440,200 L0,200 Z" fill="rgba(62,58,142,0.20)"/>
+    <path d="M0,175 C200,215 460,145 720,178 C960,208 1180,148 1440,178 L1440,200 L0,200 Z" fill="#f3f2ff"/>
+  </svg>
+</div>
+
+<!-- VIDEOS -->
+<section class="sec sec-videos">
+  <div class="sec-inner">
+    <h2 class="title">Sınıfını Seç, İzlemeye Başla</h2>
+    <p class="sec-lead"> 5. sınıftan 8. sınıfa kadar, Tüm branşlarda Bilenyum öğretmenlerinin canlı derslerinden örnek videoları keşfet.</p>
+
+    <!-- CLASS TABS -->
+    <div class="class-tabs" role="tablist">
+      <button class="class-tab active" data-class="8" type="button" role="tab">8. Sınıf (LGS)</button>
+      <button class="class-tab" data-class="7" type="button" role="tab">7. Sınıf</button>
+      <button class="class-tab" data-class="6" type="button" role="tab">6. Sınıf</button>
+      <button class="class-tab" data-class="5" type="button" role="tab">5. Sınıf</button>
+    </div>
+
+    <!-- CLASS PANELS -->
+    <div class="class-panels class-8" id="classPanels">
+    <div class="class-panel" data-class="5" role="tabpanel">
+      <div class="video-grid">
+        <div class="video-card" data-branch="matematik">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch matematik">Matematik</span>
+            <span class="video-duration">14:22</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">Kesirler ve Karşılaştırma Yöntemleri</div>
+            <div class="video-subtitle">Tam, basit ve bileşik kesirler · büyüklük karşılaştırması</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=23" alt="" /></div>
+              <span class="video-teacher-name">Elif Yıldırım</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 8.4K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="turkce">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch turkce">Türkçe</span>
+            <span class="video-duration">12:44</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">Sözcük Türleri ve Konu Anlatımı Detayı</div>
+            <div class="video-subtitle">İsim, sıfat, zamir ve fiil ayrımı örneklerle</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=11" alt="" /></div>
+              <span class="video-teacher-name">Murat Yılmaz</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 9.2K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="fen">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch fen">Fen</span>
+            <span class="video-duration">13:20</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">Madde, Değişim ve Maddenin Hâlleri</div>
+            <div class="video-subtitle">Fiziksel ve kimyasal değişim, gözlem örnekleri</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=47" alt="" /></div>
+              <span class="video-teacher-name">Selin Aksoy</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 5.6K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="sosyal">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch sosyal">Sosyal</span>
+            <span class="video-duration">12:30</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">Türkiye'nin Matematiksel ve Özel Konumu</div>
+            <div class="video-subtitle">Türkiye'nin matematiksel ve özel konumu</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=14" alt="" /></div>
+              <span class="video-teacher-name">Ahmet Şahin</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 4.2K</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="class-panel" data-class="6" role="tabpanel">
+      <div class="video-grid">
+        <div class="video-card" data-branch="matematik">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch matematik">Matematik</span>
+            <span class="video-duration">11:48</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">Yüzde, Oran ve Hesaplama Uygulamaları</div>
+            <div class="video-subtitle">Oran, orantı ve günlük yüzde uygulamaları</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=23" alt="" /></div>
+              <span class="video-teacher-name">Elif Yıldırım</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 6.1K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="turkce">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch turkce">Türkçe</span>
+            <span class="video-duration">09:55</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">Sözcük Yapısı, Kök ve Ek Bilgisi</div>
+            <div class="video-subtitle">Kök, gövde ve ek ayrımı · pratik analiz</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=11" alt="" /></div>
+              <span class="video-teacher-name">Murat Yılmaz</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 7.8K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="fen">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1581093588401-fbb62a02f120?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch fen">Fen</span>
+            <span class="video-duration">11:08</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">Kuvvet, Hareket ve Sürtünme Kuvveti</div>
+            <div class="video-subtitle">Kuvvet türleri ve hareket çeşitleri</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=47" alt="" /></div>
+              <span class="video-teacher-name">Selin Aksoy</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 7.0K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="sosyal">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1597600159211-d6c104f408d1?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch sosyal">Sosyal</span>
+            <span class="video-duration">14:05</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">Türkiye'nin Yer Şekilleri ve Coğrafyası</div>
+            <div class="video-subtitle">Dağlar, ovalar, platolar ve etkileri</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=14" alt="" /></div>
+              <span class="video-teacher-name">Ahmet Şahin</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 5.8K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="ingilizce">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch ingilizce">İngilizce</span>
+            <span class="video-duration">12:40</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">Free Time and Daily Activities</div>
+            <div class="video-subtitle">Hobby vocabulary and present simple usage</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=49" alt="" /></div>
+              <span class="video-teacher-name">Aylin Öz</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 4.9K</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="class-panel" data-class="7" role="tabpanel">
+      <div class="video-grid">
+        <div class="video-card" data-branch="matematik">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch matematik">Matematik</span>
+            <span class="video-duration">16:35</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">Doğrusal Denklemlerin Çözüm Adımları</div>
+            <div class="video-subtitle">Tek bilinmeyenli denklem kurma ve çözme</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=33" alt="" /></div>
+              <span class="video-teacher-name">Kerem Demir</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 12.3K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="turkce">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch turkce">Türkçe</span>
+            <span class="video-duration">14:12</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">Cümle Anlamı ve Anlatım Bozukluğu</div>
+            <div class="video-subtitle">Eş anlamlılık ve mantıksal hatalar</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=44" alt="" /></div>
+              <span class="video-teacher-name">Zehra Aydın</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 11.4K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="fen">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch fen">Fen</span>
+            <span class="video-duration">15:45</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">Hücre, Bölünme ve Kalıtım Mekanizması</div>
+            <div class="video-subtitle">Mitoz, mayoz ve genetik temeller</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=12" alt="" /></div>
+              <span class="video-teacher-name">Burak Çelik</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 13.6K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="sosyal">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1461360228754-6e81c478b882?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch sosyal">Sosyal</span>
+            <span class="video-duration">16:20</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">İlk Çağ Uygarlıkları ve Mezopotamya</div>
+            <div class="video-subtitle">Mezopotamya, Mısır ve Anadolu uygarlıkları</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=22" alt="" /></div>
+              <span class="video-teacher-name">Deniz Kaya</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 9.7K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="ingilizce">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch ingilizce">İngilizce</span>
+            <span class="video-duration">14:22</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">Communication and Speaking Skills</div>
+            <div class="video-subtitle">Daily conversations and dialogue practice</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=15" alt="" /></div>
+              <span class="video-teacher-name">Onur Yıldız</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 8.1K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="matematik">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1596495577886-d920f1fb7238?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch matematik">Matematik</span>
+            <span class="video-duration">13:48</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">Eşitlik ve Denklem Kurma Yöntemleri</div>
+            <div class="video-subtitle">Problem analizi ve denklem yazma adımları</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=33" alt="" /></div>
+              <span class="video-teacher-name">Kerem Demir</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 9.8K</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="class-panel active" data-class="8" role="tabpanel">
+      <div class="video-grid">
+        <div class="video-card" data-branch="matematik">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1596496050755-c923e73e42e1?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch matematik">Matematik</span>
+            <span class="video-duration">22:15</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">LGS Geometri Soru Çözümleri ve Pratik</div>
+            <div class="video-subtitle">Üçgenler, dörtgenler ve dönüşüm geometrisi</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=33" alt="" /></div>
+              <span class="video-teacher-name">Kerem Demir</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 24.7K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="turkce">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch turkce">Türkçe</span>
+            <span class="video-duration">19:30</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">LGS Paragraf Soru Çözümleri ve Stratejiler</div>
+            <div class="video-subtitle">Anlam, yapı ve çıkarım soruları</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=44" alt="" /></div>
+              <span class="video-teacher-name">Zehra Aydın</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 28.1K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="fen">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1554475901-4538ddfbccc2?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch fen">Fen</span>
+            <span class="video-duration">18:22</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">LGS Genetik, DNA ve Kalıtım Konuları</div>
+            <div class="video-subtitle">Çekinik baskın gen ve mutasyon konuları</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=12" alt="" /></div>
+              <span class="video-teacher-name">Burak Çelik</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 19.5K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="sosyal">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch sosyal">Sosyal</span>
+            <span class="video-duration">21:40</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">LGS T.C. İnkılap Tarihi ve Atatürkçülük</div>
+            <div class="video-subtitle">Kurtuluş Savaşı ve cumhuriyet dönemi</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=22" alt="" /></div>
+              <span class="video-teacher-name">Deniz Kaya</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 17.2K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="ingilizce">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch ingilizce">İngilizce</span>
+            <span class="video-duration">17:08</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">LGS Tourism &amp; Cultural Heritage</div>
+            <div class="video-subtitle">UNESCO sites and travel vocabulary</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=15" alt="" /></div>
+              <span class="video-teacher-name">Onur Yıldız</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 14.5K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="matematik">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1453733190371-0a9bedd82893?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch matematik">Matematik</span>
+            <span class="video-duration">24:50</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">LGS Üçgenler ve Açı Bağıntıları</div>
+            <div class="video-subtitle">İç açı, dış açı ve özel üçgenlerde örnekler</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=33" alt="" /></div>
+              <span class="video-teacher-name">Kerem Demir</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 21.4K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="turkce">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch turkce">Türkçe</span>
+            <span class="video-duration">18:14</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">LGS Sözcükte Anlam ve Deyimler</div>
+            <div class="video-subtitle">Eş anlam, zıt anlam, deyim ve atasözü</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=44" alt="" /></div>
+              <span class="video-teacher-name">Zehra Aydın</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 16.9K</span>
+            </div>
+          </div>
+        </div>
+        <div class="video-card" data-branch="fen">
+          <div class="video-thumb">
+            <img src="https://images.unsplash.com/photo-1628595351029-c2bf17511435?auto=format&fit=crop&w=600&q=80" alt="" />
+            <span class="video-branch fen">Fen</span>
+            <span class="video-duration">20:35</span>
+            <span class="video-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg></span>
+          </div>
+          <div class="video-info">
+            <div class="video-title">LGS Basınç ve Kaldırma Kuvveti</div>
+            <div class="video-subtitle">Sıvı, gaz basıncı ve Arşimet ilkesi</div>
+            <div class="video-meta">
+              <div class="video-teacher-avatar"><img src="https://i.pravatar.cc/100?img=12" alt="" /></div>
+              <span class="video-teacher-name">Burak Çelik</span>
+              <span class="video-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 18.7K</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div><!-- /.class-panels -->
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="sec sec-stats">
+  <div class="stats-row">
+    <div class="stat-cell">
+      <div class="num">10.000+</div>
+      <div class="lbl">Canlı İşlenen Konu</div>
+    </div>
+    <div class="stat-cell">
+      <div class="num">2.500</div>
+      <div class="lbl">Saat Arşiv</div>
+    </div>
+    <div class="stat-cell">
+      <div class="num">35.000</div>
+      <div class="lbl">Aktif Öğrenci</div>
+    </div>
+    <div class="stat-cell">
+      <div class="num">4.9★</div>
+      <div class="lbl">Veli Memnuniyeti</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA STRIP -->
+<section class="sec sec-videos-cta">
+  <div class="cta-strip">
+    <div class="cta-strip-text">
+      <h3 class="cta-strip-title">Bu örnekler yalnızca başlangıç. Bilenyum'da 1.000+ canlı ders tekrarı seni bekliyor.</h3>
+      <p class="cta-strip-sub">Bilenyum'a katıl, canlı derslerin parçası ol; binlerce canlı ders tekrarı ve yardımcı kaynak hep yanında.</p>
+    </div>
+    <div class="cta-strip-actions">
+      <a href="index.html#pricing" class="btn btn-primary">Eğitim Setlerini İncele</a>
+      <a href="#" class="btn btn-ghost" data-trial-open>Ücretsiz Deneme Dersi</a>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO MODAL -->
+<div class="video-modal" id="videoModal" hidden role="dialog" aria-labelledby="vmTitle" aria-modal="true">
+  <div class="vm-backdrop" id="vmBackdrop"></div>
+  <div class="vm-content">
+    <button class="vm-close" id="vmClose" type="button" aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <!-- Big video -->
+    <div class="vm-video">
+      <img class="vm-thumb" src="" alt="" />
+      <div class="vm-overlay"></div>
+      <span class="vm-duration"></span>
+      <button class="vm-play" type="button" aria-label="Oynat">
+        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg>
+      </button>
+    </div>
+
+    <!-- Body: title, actions, teacher comment -->
+    <div class="vm-body">
+      <div class="vm-header-row">
+        <div class="vm-meta-tags">
+          <span class="vm-branch"></span>
+          <span class="vm-class-meta"></span>
+        </div>
+        <div class="vm-actions">
+          <button class="vm-action vm-like" type="button" aria-label="Beğen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span>Beğen</span>
+          </button>
+          <button class="vm-action vm-save" type="button" aria-label="Kaydet">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <span>Kaydet</span>
+          </button>
+          <button class="vm-action vm-share" type="button" aria-label="Paylaş">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <span>Paylaş</span>
+          </button>
+        </div>
+      </div>
+      <h3 class="vm-title" id="vmTitle"></h3>
+      <p class="vm-subtitle"></p>
+
+      <!-- Teacher comment -->
+      <div class="vm-teacher">
+        <div class="vm-teacher-header">
+          <div class="vm-teacher-avatar"><img src="" alt="" /></div>
+          <div>
+            <div class="vm-teacher-name"></div>
+            <div class="vm-teacher-meta"></div>
+          </div>
+        </div>
+        <p class="vm-teacher-comment"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast for share confirmation -->
+<div class="vm-toast" id="vmToast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="vmToastText">Bağlantı kopyalandı</span>
+</div>
+
+<!-- FOOTER -->
+<footer id="site-footer"></footer>
+
+<!-- ROBOT FAB + CHATBOT -->
+<button class="robot-fab" id="robotFab" aria-label="Yumi · Bilenyum Asistanı" type="button">
+  <svg class="robot-svg" viewBox="0 0 64 64" aria-hidden="true">
+    <line class="robot-antenna" x1="32" y1="6" x2="32" y2="14"/>
+    <circle class="robot-antenna-bulb" cx="32" cy="5" r="3"/>
+    <rect class="robot-head" x="10" y="14" width="44" height="38" rx="14"/>
+    <circle class="robot-eye" cx="22" cy="30" r="4"/>
+    <circle class="robot-eye" cx="42" cy="30" r="4"/>
+    <circle class="robot-cheek" cx="16" cy="38" r="2.2"/>
+    <circle class="robot-cheek" cx="48" cy="38" r="2.2"/>
+    <rect class="robot-mouth" x="24" y="40" width="16" height="3.5" rx="1.75"/>
+  </svg>
+</button>
+
+<div class="chatbot" id="chatbot" role="dialog" aria-labelledby="chatbotName" aria-hidden="true">
+  <div class="chatbot-header">
+    <div class="chatbot-avatar" aria-hidden="true">
+      <svg viewBox="0 0 64 64">
+        <line x1="32" y1="8" x2="32" y2="14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="32" cy="6" r="2.5" fill="currentColor"/>
+        <rect x="12" y="14" width="40" height="36" rx="12" fill="currentColor"/>
+        <circle cx="24" cy="30" r="3.5" fill="white"/>
+        <circle cx="40" cy="30" r="3.5" fill="white"/>
+        <rect x="26" y="40" width="12" height="3" rx="1.5" fill="white"/>
+      </svg>
+    </div>
+    <div class="chatbot-title">
+      <div class="chatbot-name" id="chatbotName">Yumi</div>
+      <div class="chatbot-status">Çevrimiçi</div>
+    </div>
+    <button class="chatbot-close" id="chatbotClose" aria-label="Kapat" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="chatbot-body" id="chatbotBody">
+    <div class="chat-msg bot"><div class="chat-bubble">Merhaba! Hangi videoyu arıyorsun?</div></div>
+    <div class="chat-msg bot"><div class="chat-bubble">Aşağıdan hızlı bir konu seçebilir veya direkt sorunu yazabilirsin.</div></div>
+    <div class="chat-actions">
+      <button class="chat-action" type="button">5. Sınıf videoları</button>
+      <button class="chat-action" type="button">LGS hazırlık</button>
+      <button class="chat-action" type="button">Matematik soru çöz</button>
+      <button class="chat-action" type="button">Eğitim Setleri</button>
+    </div>
+  </div>
+  <form class="chatbot-input" id="chatbotForm" autocomplete="off">
+    <input type="text" placeholder="Sorunu yaz…" aria-label="Mesajınız" />
+    <button type="submit" aria-label="Gönder">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </form>
+</div>
+
+<script>
+  // Video modal: open on card click, show teacher bio
+  (function() {
+    const modal = document.getElementById('videoModal');
+    if (!modal) return;
+    const closeBtn = document.getElementById('vmClose');
+    const backdrop = document.getElementById('vmBackdrop');
+
+    const TEACHER_BIOS = {
+      'Elif Yıldırım': '10 yıllık matematik öğretmenliği deneyimi. 5/6/7. sınıf konularında uzmanlaşmış, görsel anlatım yaklaşımıyla tanınan ekibimizden.',
+      'Murat Yılmaz': '15 yıllık Türkçe öğretmeni. Konu anlatımında sade dil, dil bilgisinde örnekli yaklaşım. 6-7. sınıf programlarında deneyimli.',
+      'Selin Aksoy': '12 yıllık Fen Bilimleri öğretmeni. Deneysel öğrenme ve günlük hayat örnekleriyle konuları somutlaştırıyor.',
+      'Ahmet Şahin': '14 yıllık Sosyal Bilgiler öğretmeni. Coğrafya ve tarih anlatımında harita destekli, etkileşimli sunumlar hazırlıyor.',
+      'Aylin Öz': '8 yıllık İngilizce öğretmeni. Konuşma ve dinleme odaklı eğitim, oyun temelli sınıf içi aktiviteler.',
+      'Kerem Demir': '20 yıllık LGS Matematik koçu. Soru çözüm teknikleri ve hız kazandırma stratejileri konusunda uzman.',
+      'Zehra Aydın': '16 yıllık LGS Türkçe koçu. Paragraf, sözel mantık ve anlatım bozukluğu konularında binlerce öğrenciye rehberlik etmiş.',
+      'Burak Çelik': '13 yıllık Fen ve LGS Fen koçu. Genetik, DNA ve fizik konularını ezbersiz mantık üzerine kurarak anlatıyor.',
+      'Deniz Kaya': '18 yıllık Sosyal Bilgiler ve İnkılap Tarihi öğretmeni. LGS\'de yüksek başarı oranıyla tanınan deneyimli kadro.',
+      'Onur Yıldız': '11 yıllık İngilizce öğretmeni. LGS hazırlık ve genel İngilizce programlarında etkili soru çözüm teknikleri.'
+    };
+    const BRANCH_LABELS = { matematik: 'Matematik', turkce: 'Türkçe', fen: 'Fen Bilimleri', sosyal: 'Sosyal Bilgiler', ingilizce: 'İngilizce' };
+    const BRANCH_TEACHER_LABELS = { matematik: 'Matematik Öğretmeni', turkce: 'Türkçe Öğretmeni', fen: 'Fen Bilimleri Öğretmeni', sosyal: 'Sosyal Bilgiler Öğretmeni', ingilizce: 'İngilizce Öğretmeni' };
+
+    function openModal(card) {
+      const branch = card.dataset.branch;
+      const title = card.querySelector('.video-title')?.textContent.trim() || '';
+      const subtitle = card.querySelector('.video-subtitle')?.textContent.trim() || '';
+      const duration = card.querySelector('.video-duration')?.textContent.trim() || '';
+      const thumbUrl = card.querySelector('.video-thumb img')?.getAttribute('src') || '';
+      const teacherName = card.querySelector('.video-teacher-name')?.textContent.trim() || '';
+      const teacherAvatar = card.querySelector('.video-teacher-avatar img')?.getAttribute('src') || '';
+      const cls = card.closest('.class-panel')?.dataset.class || '';
+
+      modal.querySelector('.vm-thumb').src = thumbUrl;
+      modal.querySelector('.vm-thumb').alt = title;
+      modal.querySelector('.vm-duration').textContent = duration;
+
+      const branchEl = modal.querySelector('.vm-branch');
+      branchEl.textContent = BRANCH_LABELS[branch] || branch;
+      branchEl.className = 'vm-branch ' + branch;
+
+      modal.querySelector('.vm-title').textContent = title;
+      modal.querySelector('.vm-subtitle').textContent = subtitle;
+      modal.querySelector('.vm-teacher-avatar img').src = teacherAvatar;
+      modal.querySelector('.vm-teacher-avatar img').alt = teacherName;
+      modal.querySelector('.vm-teacher-name').textContent = teacherName;
+      modal.querySelector('.vm-teacher-meta').textContent = (BRANCH_TEACHER_LABELS[branch] || '') + (cls ? ' · ' + cls + '. Sınıf' + (cls === '8' ? ' (LGS)' : '') : '');
+      modal.querySelector('.vm-teacher-bio').textContent = TEACHER_BIOS[teacherName] || 'Branşında uzman Bilenyum öğretmeni.';
+
+      modal.removeAttribute('hidden');
+      requestAnimationFrame(() => modal.classList.add('open'));
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+      setTimeout(() => modal.setAttribute('hidden', ''), 300);
+    }
+
+    document.querySelectorAll('.video-card').forEach(card => {
+      card.addEventListener('click', () => openModal(card));
+    });
+    closeBtn && closeBtn.addEventListener('click', closeModal);
+    backdrop && backdrop.addEventListener('click', closeModal);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+    });
+  })();
+
+  // Class tabs → panels (with active class color swap on container)
+  (function() {
+    const tabs = document.querySelectorAll('.class-tab');
+    const panels = document.querySelectorAll('.class-panel');
+    const container = document.getElementById('classPanels');
+    if (!tabs.length) return;
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const cls = tab.dataset.class;
+        tabs.forEach(t => t.classList.toggle('active', t === tab));
+        panels.forEach(p => p.classList.toggle('active', p.dataset.class === cls));
+        if (container) {
+          container.classList.remove('class-5', 'class-6', 'class-7', 'class-8');
+          container.classList.add('class-' + cls);
+        }
+      });
+    });
+  })();
+
+</script>
+
+<!-- ============ TRIAL MODAL (Ücretsiz Deneme Dersi) ============ -->
+<!-- CSS: assets/trial-modal.css -->
+
+<div class="trial-modal" id="trialModal" aria-hidden="true">
+  <div class="trial-modal-overlay" data-trial-close></div>
+  <div class="trial-modal-card" role="dialog" aria-modal="true" aria-labelledby="trialModalTitle">
+    <!-- Visual header banner (placeholder) -->
+    <div class="trial-modal-image" aria-hidden="true">[Banner Görseli]</div>
+    <button class="trial-modal-close" data-trial-close aria-label="Kapat" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="trial-modal-body">
+      <div class="trial-modal-head">
+        <span class="trial-modal-eyebrow">Ücretsiz Deneme Dersi</span>
+        <h2 class="trial-modal-title" id="trialModalTitle">Hadi tanışalım</h2>
+        <p class="trial-modal-sub">Çocuğunun seviyesi ve hedefine en uygun deneme dersini birlikte planlayalım.</p>
+      </div>
+      <!-- Step 1: Öğrenci -->
+      <form class="trial-step-form active" id="trialStep1" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-s-name">Öğrenci adı</label>
+            <input type="text" id="trial-s-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-s-surname">Öğrenci soyadı</label>
+            <input type="text" id="trial-s-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-grade">Sınıf seviyesi</label>
+          <select id="trial-s-grade" required>
+            <option value="" disabled selected>Sınıf seç</option>
+            <option value="5">5. Sınıf</option>
+            <option value="6">6. Sınıf</option>
+            <option value="7">7. Sınıf</option>
+            <option value="8">8. Sınıf (LGS)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-subject">Deneme dersi istenen alan</label>
+          <select id="trial-s-subject" required>
+            <option value="" disabled selected>Alan seç</option>
+            <option value="mat">Matematik</option>
+            <option value="fen">Fen Bilimleri</option>
+            <option value="trk">Türkçe</option>
+            <option value="ing">İngilizce</option>
+            <option value="sos">Sosyal Bilgiler</option>
+            <option value="all">Genel (tüm dersler)</option>
+          </select>
+        </div>
+        <div class="trial-actions">
+          <button type="submit" class="btn-modal btn-modal-primary">
+            İleri
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </form>
+      <!-- Step 2: Veli -->
+      <form class="trial-step-form" id="trialStep2" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-p-name">Veli adı</label>
+            <input type="text" id="trial-p-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-p-surname">Veli soyadı</label>
+            <input type="text" id="trial-p-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-p-email">E-posta</label>
+          <input type="email" id="trial-p-email" required placeholder="ornek@email.com" autocomplete="email" data-rule="email" maxlength="120" />
+        </div>
+        <div class="form-field">
+          <label for="trial-p-phone">Telefon</label>
+          <input type="tel" id="trial-p-phone" required placeholder="+90 5XX XXX XX XX" inputmode="numeric" autocomplete="tel" maxlength="17" data-rule="phone-tr" />
+        </div>
+        <div class="trial-actions">
+          <button type="button" class="btn-modal btn-modal-ghost" id="trialBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Geri
+          </button>
+          <button type="submit" class="btn-modal btn-modal-primary">
+            Talebi Gönder
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      </form>
+      <!-- Success -->
+      <div class="trial-success" id="trialSuccess">
+        <div class="trial-success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>Talebin alındı!</h3>
+        <p>1 iş günü içinde belirttiğin telefon numarasından sana ulaşacağız. Tanışmak için sabırsızlanıyoruz!</p>
+        <button type="button" class="btn-modal" data-trial-close>Tamam</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TRIAL MODAL END ============ -->
+
+<script>
+  // Yumi chatbot — sayfa-özel cevap kuralları
+  window.BilenyumChatbot = {
+    replies: function (text) {
+      text = text.toLowerCase();
+      if (text.includes('5') || text.includes('5.'))         return '5. Sınıf videolarını filtrelemek için yukarıdaki "5. Sınıf" pill\'ine tıklayabilirsin.';
+      if (text.includes('lgs') || text.includes('8'))        return '8. Sınıf (LGS) videolarına yukarıdan filtreleyerek ulaşabilirsin. Hangi branş ilgini çekiyor?';
+      if (text.includes('matematik'))                        return 'Matematik bölümünde Kesirler, Yüzdeler, Denklemler ve LGS Geometri videoları var. Filtreden Matematik\'i seç.';
+      if (text.includes('paket') || text.includes('üye'))    return 'Eğitim Setlerimiz ₺349/ay\'dan başlıyor. Sınırsız erişim için index.html#pricing\'i ziyaret et.';
+      if (text.includes('merhaba') || text.includes('selam')) return 'Merhaba! Aradığın konuyu söyleyebilir veya filtrelerle keşfedebilirsin.';
+      return null;
+    }
+  };
+</script>
+<script src="assets/dom.js"></script>
+<script src="assets/robot-fab.js"></script>
+<script src="assets/trial-modal.js"></script>
+<script src="assets/input-rules.js"></script>
+<script src="assets/footer.js"></script>
+</body>
+</html>

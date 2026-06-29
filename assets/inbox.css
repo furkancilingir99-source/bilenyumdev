@@ -1,0 +1,619 @@
+/* ============================================================
+ * Bilenyum — Paylaşılan Inbox + Chat Drawer sistemi
+ *
+ * Tüm dashboard sayfaları bunu yükler:
+ *   <link rel="stylesheet" href="assets/inbox.css">
+ *   <script src="assets/inbox.js"></script>
+ *
+ * Topbar'da `data-inbox-open="msg"` veya `data-inbox-open="notif"`
+ * attribute'una sahip butonlara tıklayınca ilgili drawer açılır.
+ * inbox.js sayfa yüklendiğinde drawer HTML'lerini otomatik enjekte eder.
+ * ============================================================ */
+
+/* ============================================================
+ * Inbox Drawer (bildirimler + mesajlar)
+ * ============================================================ */
+.sn-inbox-drawer {
+  position: fixed; inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+.sn-inbox-drawer.is-open { pointer-events: auto; }
+.sn-inbox-overlay {
+  position: absolute; inset: 0;
+  background: rgba(8, 4, 28, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.30s ease;
+}
+.sn-inbox-drawer.is-open .sn-inbox-overlay { opacity: 1; }
+.sn-inbox-panel {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 560px;
+  max-width: 95vw;
+  background: linear-gradient(180deg, rgba(14, 10, 48, 0.97), rgba(10, 6, 36, 0.97));
+  border-left: 1px solid rgba(168,164,240,0.20);
+  box-shadow: -22px 0 60px -16px rgba(0,0,0,0.65);
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.sn-inbox-drawer.is-open .sn-inbox-panel { transform: translateX(0); }
+.sn-inbox-close {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.78);
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  z-index: 2;
+}
+.sn-inbox-close svg { width: 14px; height: 14px; }
+.sn-inbox-close:hover { background: rgba(255,255,255,0.14); color: white; border-color: rgba(255,255,255,0.28); }
+
+.sn-inbox-head {
+  padding: 22px 28px 18px;
+  display: flex; flex-direction: column; gap: 14px;
+  border-bottom: 1px solid rgba(168,164,240,0.14);
+}
+.sn-inbox-title {
+  margin: 0;
+  font-size: 22px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.02em;
+  padding-right: 40px;
+}
+.sn-inbox-toolbar {
+  padding: 14px 28px;
+  display: flex; align-items: center; justify-content: flex-start;
+  gap: 12px;
+  border-bottom: 1px solid rgba(168,164,240,0.10);
+}
+.sn-inbox-mark {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.80);
+  font-size: 11.5px; font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.sn-inbox-mark:hover { background: rgba(255,255,255,0.10); color: white; }
+.sn-inbox-mark svg { width: 12px; height: 12px; }
+
+.sn-inbox-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 22px 28px;
+}
+.sn-inbox-body::-webkit-scrollbar { width: 8px; }
+.sn-inbox-body::-webkit-scrollbar-thumb { background: rgba(168,164,240,0.20); border-radius: 4px; }
+
+.sn-inbox-group-label {
+  font-size: 11px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.58);
+  padding: 18px 8px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.sn-inbox-group-label > span:first-child { flex: 1; min-width: 0; }
+/* İlk gruptaki mark-all butonu — küçük inline versiyon */
+.sn-inbox-group-label .sn-inbox-mark {
+  padding: 4px 10px;
+  font-size: 10.5px;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 700;
+}
+.sn-inbox-list { display: flex; flex-direction: column; gap: 8px; }
+
+.sn-inbox-item {
+  display: flex; align-items: flex-start;
+  gap: 14px;
+  padding: 15px 16px;
+  border-radius: 14px;
+  background: rgba(16, 14, 42, 0.55);
+  border: 1px solid rgba(168,164,240,0.10);
+  position: relative;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+.sn-inbox-item:hover { background: rgba(28, 25, 65, 0.75); border-color: rgba(168,164,240,0.22); }
+.sn-inbox-item.is-unread {
+  background:
+    linear-gradient(135deg, rgba(74, 214, 255, 0.09) 0%, rgba(28, 143, 181, 0.05) 100%),
+    rgba(22, 30, 58, 0.72);
+  border-color: rgba(74, 214, 255, 0.28);
+  box-shadow:
+    0 6px 16px -10px rgba(74, 214, 255, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.sn-inbox-item.is-unread:hover {
+  background:
+    linear-gradient(135deg, rgba(74, 214, 255, 0.14) 0%, rgba(28, 143, 181, 0.08) 100%),
+    rgba(28, 38, 70, 0.80);
+  border-color: rgba(74, 214, 255, 0.42);
+}
+.sn-inbox-item.is-unread .pop-name { color: white; }
+.sn-inbox-item:not(.is-unread) .pop-name { color: rgba(255,255,255,0.88); }
+.sn-inbox-item:not(.is-unread) .pop-preview { color: rgba(255,255,255,0.72); }
+/* Yeni mesaj/bildirim — küçük aqua dot (badge yerine minimal) */
+.sn-inbox-new-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--p-aqua, #3e3a8e);
+  margin-right: 6px;
+  vertical-align: middle;
+  flex-shrink: 0;
+  animation: snInboxDotPulse 2s ease-in-out infinite;
+}
+@keyframes snInboxDotPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.85; }
+}
+.sn-inbox-item .pop-avatar,
+.sn-inbox-item .pop-icon {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  color: white;
+  overflow: hidden;
+}
+.sn-inbox-item .pop-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
+}
+/* Bilenyum app icon sistem mesajlarında — açık background üstünde marka rengi */
+.sn-inbox-item.is-system .pop-avatar {
+  background: #fff !important;
+  box-shadow: inset 0 0 0 1px rgba(168,164,240,0.25), 0 2px 8px -3px rgba(229,4,123,0.30);
+}
+.sn-inbox-item .pop-avatar .sn-inbox-bilenyum-logo {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  border-radius: 0;
+  display: block;
+}
+.sn-inbox-item .pop-icon svg { width: 20px; height: 20px; stroke: currentColor; }
+.sn-inbox-item .pop-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.sn-inbox-item .pop-name {
+  font-size: 14.5px; font-weight: 800;
+  color: white;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+.sn-inbox-item .pop-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.sn-inbox-item .pop-time {
+  font-size: 11.5px; font-weight: 600;
+  color: rgba(255,255,255,0.62);
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.35;
+  padding-top: 1px;
+}
+.sn-inbox-item .pop-preview {
+  font-size: 14px; line-height: 1.55;
+  color: rgba(255,255,255,0.84);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sn-inbox-item.is-unread .pop-preview { color: rgba(255,255,255,0.94); }
+.sn-inbox-item .pop-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.sn-inbox-item .pop-actions .pop-btn {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 13px;
+  border-radius: 8px;
+  font-size: 12px; font-weight: 800;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  font-family: inherit;
+}
+.sn-inbox-item .pop-actions .pop-btn svg { width: 11px; height: 11px; }
+.sn-inbox-item .pop-actions .pop-btn.is-primary {
+  background: linear-gradient(135deg, var(--p-brand, #e6087b), var(--p-brand-deep, #b8035f));
+  color: white;
+  box-shadow: 0 4px 12px -3px rgba(229,4,123,0.55);
+}
+.sn-inbox-item .pop-actions .pop-btn.is-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 14px -3px rgba(229,4,123,0.70); }
+.sn-inbox-item .pop-actions .pop-btn.is-ghost {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.85);
+  border-color: rgba(255,255,255,0.14);
+}
+.sn-inbox-item .pop-actions .pop-btn.is-ghost:hover { background: rgba(255,255,255,0.12); color: white; }
+.sn-inbox-item .pop-actions .pop-btn.is-live {
+  background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy));
+  color: white;
+  box-shadow: 0 4px 12px -3px rgba(62, 58, 142,0.55);
+}
+.sn-inbox-item .pop-actions .pop-btn.is-live:hover { transform: translateY(-1px); box-shadow: 0 6px 14px -3px rgba(62, 58, 142,0.70); }
+/* Hatırlatıcı eklenmiş state (toggle aktif) */
+.sn-inbox-item .pop-actions .pop-btn.is-set {
+  background: rgba(109, 212, 158, 0.16);
+  color: #8de3b3;
+  border-color: rgba(109, 212, 158, 0.45);
+  box-shadow: none;
+}
+.sn-inbox-item .pop-actions .pop-btn.is-set:hover {
+  background: rgba(109, 212, 158, 0.24);
+  border-color: rgba(109, 212, 158, 0.60);
+  transform: translateY(-1px);
+}
+
+.pop-avatar--aqua   { background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy)); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
+.pop-avatar--purple { background: linear-gradient(135deg, var(--p-purple-mid, #6964c4), var(--p-purple, #3e3a8e)); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
+.pop-avatar--gold   { background: linear-gradient(135deg, #ffd84a, #d6970a); color: #2a1d05; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18); }
+.pop-avatar--brand  { background: linear-gradient(135deg, var(--brand-rose), var(--brand-magenta)); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
+.pop-avatar--green  { background: linear-gradient(135deg, #8de3b3, #3da66e); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
+.pop-icon--exam  { background: linear-gradient(135deg, rgba(255,109,198,0.22), rgba(229,4,123,0.18)); color: #ff7ab8; box-shadow: inset 0 0 0 1px rgba(229,4,123,0.32); }
+.pop-icon--rank  { background: linear-gradient(135deg, rgba(255,216,74,0.22), rgba(214,151,10,0.15)); color: #ffd84a; box-shadow: inset 0 0 0 1px rgba(255,216,74,0.30); }
+.pop-icon--clan  { background: linear-gradient(135deg, rgba(168,164,240,0.22), rgba(105,100,196,0.18)); color: #c0bcff; box-shadow: inset 0 0 0 1px rgba(168,164,240,0.32); }
+.pop-icon--live  { background: linear-gradient(135deg, var(--brand-purple-18), var(--brand-purple-06)); color: var(--brand-purple); box-shadow: inset 0 0 0 1px var(--brand-purple-28); }
+.pop-icon--sys   { background: linear-gradient(135deg, rgba(109,212,158,0.22), rgba(61,166,110,0.18)); color: #8de3b3; box-shadow: inset 0 0 0 1px rgba(109,212,158,0.32); }
+
+.sn-inbox-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: rgba(255,255,255,0.65);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Öğretmenler şeridi */
+.sn-msg-teachers {
+  padding: 14px 22px 12px;
+  border-bottom: 1px solid rgba(168,164,240,0.08);
+  position: relative;
+}
+.sn-msg-teachers-label {
+  font-size: 11px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.58);
+  padding-bottom: 10px;
+}
+/* Carousel: yatay scroll-snap, scrollbar gizli, sağ tarafta fade ipucu */
+.sn-msg-teachers-list {
+  display: flex; gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scroll-snap-type: x proximity;
+  scroll-behavior: smooth;
+  scroll-padding-inline: 4px;
+  -webkit-overflow-scrolling: touch;
+  /* Scrollbar tamamen gizli */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.sn-msg-teachers-list::-webkit-scrollbar { display: none; width: 0; height: 0; }
+/* Sağ tarafta "daha fazla" fade ipucu */
+.sn-msg-teachers::after {
+  content: '';
+  position: absolute;
+  top: 38px; bottom: 18px; right: 0;
+  width: 40px;
+  background: linear-gradient(90deg, transparent 0%, rgba(14,10,48,0.85) 100%);
+  pointer-events: none;
+  border-radius: 0 0 0 0;
+}
+.sn-msg-teacher { scroll-snap-align: start; }
+.sn-msg-teacher {
+  flex: 0 0 auto;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 8px;
+  width: 84px;
+  padding: 8px 4px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  text-align: center;
+  font-family: inherit;
+}
+.sn-msg-teacher:hover { background: rgba(255,255,255,0.05); transform: translateY(-2px); }
+.sn-msg-teacher-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14.5px; font-weight: 800;
+  color: white;
+  letter-spacing: 0.02em;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10), 0 4px 10px -3px rgba(0,0,0,0.40);
+  overflow: hidden;
+}
+.sn-msg-teacher-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+/* Mesaj ikonu avatardan dışarı taşabilsin */
+.sn-msg-teacher-avatar { overflow: visible; }
+/* Fotoğraf overflow için ek wrapper */
+.sn-msg-teacher-avatar > img {
+  position: absolute; top: 0; left: 0;
+}
+.sn-msg-teacher-avatar.is-purple { background: linear-gradient(135deg, var(--p-purple-mid, #6964c4), var(--p-purple, #3e3a8e)); }
+.sn-msg-teacher-avatar.is-gold   { background: linear-gradient(135deg, #ffd84a, #d6970a); color: #2a1d05; }
+.sn-msg-teacher-avatar.is-brand  { background: linear-gradient(135deg, var(--brand-rose), var(--brand-magenta)); }
+.sn-msg-teacher-avatar.is-aqua   { background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy)); }
+/* Online dot kaldırıldı — yerine mesaj ikonu (her zaman görünür) */
+/* Avatarın içine, sağ alt köşeye konumlandırılır — overflow clipping olmaz */
+.sn-msg-teacher-msg-icon {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy));
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 2.5px solid #14102e;
+  color: white;
+  box-shadow: 0 2px 8px rgba(62, 58, 142,0.55);
+  z-index: 5;
+  pointer-events: none;
+}
+.sn-msg-teacher-msg-icon svg {
+  width: 11px; height: 11px;
+  stroke: currentColor;
+  display: block;
+}
+/* Ad üstte, soyad altta — her zaman 2 satır */
+.sn-msg-teacher-name {
+  font-size: 12.5px; font-weight: 800;
+  color: white;
+  line-height: 1.3;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.sn-msg-teacher-firstname,
+.sn-msg-teacher-lastname {
+  display: block;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sn-msg-teacher-title {
+  font-size: 11px;
+  color: rgba(255,255,255,0.68);
+  line-height: 1.25;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Sistem mesajları — tıklanamaz */
+.sn-inbox-item.is-system { cursor: default; }
+.sn-inbox-item.is-system:hover {
+  background: rgba(16, 14, 42, 0.55);
+  border-color: rgba(168,164,240,0.10);
+  transform: none;
+}
+.sn-inbox-item.is-system.is-unread:hover {
+  background:
+    linear-gradient(135deg, rgba(74, 214, 255, 0.09) 0%, rgba(28, 143, 181, 0.05) 100%),
+    rgba(22, 30, 58, 0.72);
+  border-color: rgba(74, 214, 255, 0.28);
+}
+
+/* ============================================================
+ * Chat Drawer (WhatsApp-style)
+ * ============================================================ */
+.sn-chat-drawer {
+  position: fixed; inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+}
+.sn-chat-drawer.is-open { pointer-events: auto; }
+.sn-chat-overlay {
+  position: absolute; inset: 0;
+  background: rgba(8, 4, 28, 0.60);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.30s ease;
+}
+.sn-chat-drawer.is-open .sn-chat-overlay { opacity: 1; }
+.sn-chat-panel {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 520px; max-width: 95vw;
+  background: linear-gradient(180deg, rgba(14, 10, 48, 0.98), rgba(10, 6, 36, 0.98));
+  border-left: 1px solid rgba(168,164,240,0.20);
+  box-shadow: -22px 0 60px -16px rgba(0,0,0,0.70);
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.sn-chat-drawer.is-open .sn-chat-panel { transform: translateX(0); }
+.sn-chat-head {
+  padding: 16px 22px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid rgba(168,164,240,0.14);
+  flex-shrink: 0;
+}
+.sn-chat-back {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.85);
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sn-chat-back svg { width: 14px; height: 14px; }
+.sn-chat-back:hover { background: rgba(255,255,255,0.14); color: white; }
+.sn-chat-head-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13.5px; font-weight: 800;
+  color: white;
+  letter-spacing: 0.02em;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10), 0 4px 10px -3px rgba(0,0,0,0.40);
+  overflow: hidden;
+}
+.sn-chat-head-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
+}
+.sn-chat-head-avatar.is-purple { background: linear-gradient(135deg, var(--p-purple-mid, #6964c4), var(--p-purple, #3e3a8e)); }
+.sn-chat-head-avatar.is-gold   { background: linear-gradient(135deg, #ffd84a, #d6970a); color: #2a1d05; }
+.sn-chat-head-avatar.is-brand  { background: linear-gradient(135deg, var(--brand-rose), var(--brand-magenta)); }
+.sn-chat-head-avatar.is-aqua   { background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy)); }
+.sn-chat-head-id { flex: 1; min-width: 0; }
+.sn-chat-head-name {
+  display: block;
+  font-size: 15.5px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  margin-bottom: 3px;
+}
+.sn-chat-head-status {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600;
+  color: rgba(255,255,255,0.68);
+}
+.sn-chat-head-status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.30);
+}
+.sn-chat-head-status.is-online .sn-chat-head-status-dot {
+  background: #6dd49e;
+}
+/* Offline iken dot'u tamamen gizle (sadece title gözüksün) */
+.sn-chat-head-status:not(.is-online) .sn-chat-head-status-dot {
+  display: none;
+}
+.sn-chat-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 22px 14px;
+  display: flex; flex-direction: column;
+  gap: 10px;
+}
+.sn-chat-body::-webkit-scrollbar { width: 6px; }
+.sn-chat-body::-webkit-scrollbar-thumb { background: rgba(168,164,240,0.20); border-radius: 3px; }
+.sn-chat-bubble {
+  max-width: 84%;
+  padding: 11px 15px 9px;
+  border-radius: 16px;
+  font-size: 14.5px; line-height: 1.55;
+  position: relative;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  animation: snChatPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+@keyframes snChatPop {
+  from { opacity: 0; transform: translateY(6px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.sn-chat-bubble-time {
+  display: block;
+  font-size: 10.5px; font-weight: 600;
+  margin-top: 5px;
+  opacity: 0.78;
+  font-family: 'JetBrains Mono', monospace;
+  text-align: right;
+}
+.sn-chat-bubble.from-teacher {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.98);
+  border-bottom-left-radius: 5px;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.sn-chat-bubble.from-me {
+  align-self: flex-end;
+  background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy));
+  color: white;
+  border-bottom-right-radius: 5px;
+  box-shadow: 0 6px 14px -8px rgba(62, 58, 142,0.40);
+}
+.sn-chat-bubble.from-me .sn-chat-bubble-time { opacity: 0.88; }
+.sn-chat-empty {
+  align-self: center;
+  margin: 40px auto;
+  text-align: center;
+  color: rgba(255,255,255,0.65);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.sn-chat-input {
+  display: flex; gap: 10px;
+  padding: 14px 22px 18px;
+  border-top: 1px solid rgba(168,164,240,0.14);
+  flex-shrink: 0;
+  background: rgba(8, 6, 28, 0.35);
+}
+.sn-chat-field {
+  flex: 1;
+  padding: 13px 18px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(168,164,240,0.24);
+  border-radius: 999px;
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.sn-chat-field:focus { border-color: rgba(74, 214, 255, 0.45); background: rgba(255,255,255,0.10); }
+.sn-chat-field::placeholder { color: rgba(255,255,255,0.48); }
+.sn-chat-send {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy));
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 6px 14px -4px rgba(62, 58, 142,0.50);
+}
+.sn-chat-send:hover { transform: translateY(-1px); box-shadow: 0 8px 18px -4px rgba(62, 58, 142,0.65); }
+.sn-chat-send svg { width: 18px; height: 18px; }
+
+@media (max-width: 640px) {
+  .sn-inbox-panel { width: 100vw; max-width: 100vw; }
+  .sn-chat-panel { width: 100vw; max-width: 100vw; }
+  .sn-inbox-head, .sn-inbox-toolbar { padding-left: 18px; padding-right: 18px; }
+  .sn-inbox-body { padding-left: 14px; padding-right: 14px; }
+}

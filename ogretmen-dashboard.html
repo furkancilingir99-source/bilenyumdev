@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Öğretmen Merkez · Bilenyum</title>
+<meta name="description" content="Bilenyum — Öğretmen kontrol merkezi: günlük ders akışı ve haftalık program." />
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-d3-mega.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
+<link rel="stylesheet" href="assets/dashboard-polish.css">
+<link rel="stylesheet" href="assets/teacher-dashboard.css">
+<script src="assets/dashboard-switcher.js" defer></script>
+<script src="assets/teacher-shell.js" defer></script>
+<script src="assets/shell.js" defer></script>
+</head>
+<body data-teacher-active="dashboard">
+
+<div class="scene" aria-hidden="true">
+  <div class="scene-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
+<header class="hud" data-teacher-hud></header>
+
+<main class="stage td-teacher-stage">
+  <div class="stage-nav" data-teacher-nav></div>
+
+  <!-- Bugünün Akışı — dashboard.html section[1] ile aynı yapı -->
+  <section class="d3-card d3-card-mega" id="tdTodaySection" aria-label="Bugünün Akışı">
+    <div class="d3-mega-top">
+      <div class="d3-mega-head">
+        <span class="d3-head-title">Bugünün Akışı</span>
+        <span class="d3-mega-head-date" id="tdTodayDate">—</span>
+      </div>
+      <div class="d3-mega-left">
+        <div id="tdTodayLoading" class="td-state">
+          <div class="td-skeleton"><div class="td-skeleton-bar"></div><div class="td-skeleton-bar"></div></div>
+          Bugünün dersleri yükleniyor...
+        </div>
+        <p id="tdTodayError" class="td-state is-error" hidden>Bugünün ders akışı yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>
+        <p id="tdTodayEmpty" class="td-state" hidden>Bugün planlanmış dersiniz bulunmuyor.</p>
+        <div id="tdTodayHero" hidden></div>
+      </div>
+    </div>
+    <div class="d3-mega-right">
+      <div class="d3-timeline" id="tdTodayTimeline" hidden></div>
+      <div class="d3-program-footer">
+        <a href="ogretmen-klanlar.html" class="d3-program-allbtn">
+          Tüm Klanları Görüntüle
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Haftalık Ders Programı -->
+  <section class="d3-card td-week-card td-col-week" id="tdWeekSection" aria-label="Haftalık Ders Programı">
+    <div class="d3-head td-week-head">
+      <span class="d3-head-title">Haftalık Ders Programı</span>
+      <div class="td-week-head-right">
+        <div class="td-week-filter-bar" id="tdWeekFilterBar" hidden>
+          <div class="td-week-filter-row">
+            <div class="td-week-filter-field">
+              <label class="td-week-filter-label" for="tdWeekStatusSelect">Ders durumu</label>
+              <div class="td-week-select-wrap">
+                <select id="tdWeekStatusSelect" class="td-week-select" aria-label="Ders durumu filtresi">
+                  <option value="all">Tümü</option>
+                  <option value="completed">Tamamlanan</option>
+                  <option value="upcoming">Gelecek</option>
+                </select>
+                <span class="td-week-select-chevron" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </div>
+            </div>
+            <div class="td-week-filter-field">
+              <label class="td-week-filter-label" for="tdWeekTypeSelect">Ders türü</label>
+              <div class="td-week-select-wrap">
+                <select id="tdWeekTypeSelect" class="td-week-select" aria-label="Ders türü filtresi">
+                  <option value="all">Tümü</option>
+                  <option value="one_to_one">Birebir Ders</option>
+                  <option value="kid">KİD</option>
+                  <option value="rud">RUD</option>
+                  <option value="free_trial">Ücretsiz Deneme</option>
+                </select>
+                <span class="td-week-select-chevron" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="td-week-edu-nav" id="tdWeekEduNav">
+        <button type="button" class="td-week-edu-btn is-prev" id="tdWeekPrev" aria-label="Önceki eğitim haftası">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="td-week-edu-center">
+          <div class="td-week-edu-label">
+            <span class="td-week-edu-eyebrow" id="tdWeekEyebrow">4. Eğitim Haftası</span>
+            <strong class="td-week-edu-range" id="tdWeekRange">—</strong>
+          </div>
+          <button type="button" class="td-week-edu-cal-btn" id="tdWeekCalBtn" aria-label="Eğitim haftası seç" aria-expanded="false" aria-controls="tdWeekPicker">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </button>
+        </div>
+        <button type="button" class="td-week-edu-btn is-next" id="tdWeekNext" aria-label="Sonraki eğitim haftası">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="td-week-edu-picker" id="tdWeekPicker" hidden role="dialog" aria-label="Eğitim haftası seç">
+          <div class="td-week-edu-picker-head">Eğitim Haftası Seç</div>
+          <div class="td-week-edu-picker-list" id="tdWeekPickerList"></div>
+        </div>
+        </div>
+      </div>
+    </div>
+    <div class="td-week-body">
+      <div id="tdWeekLoading" class="td-state">
+        <div class="td-skeleton"><div class="td-skeleton-bar"></div><div class="td-skeleton-bar"></div><div class="td-skeleton-bar"></div></div>
+        Haftalık ders programı yükleniyor...
+      </div>
+      <p id="tdWeekError" class="td-state is-error" hidden>Ders programı yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>
+      <p id="tdWeekEmpty" class="td-state" hidden>Bu hafta için planlanmış ders bulunmuyor.</p>
+      <p id="tdWeekFilterEmpty" class="td-state" hidden>Bu filtreye uygun ders bulunmuyor.</p>
+      <div class="td-week-summary" id="tdWeekSummary" hidden></div>
+      <div class="td-wcal-wrap" id="tdWeekCalendar" hidden>
+        <div class="td-wcal-grid" id="tdWeekCalGrid"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Ders Detay Drawer — öğrenci dashboard lessonDrawer ile aynı yapı -->
+<div class="d3-drawer" id="tdLessonDrawer" data-subject="mat" aria-hidden="true">
+  <div class="d3-drawer-overlay" id="tdLessonDrawerOverlay" data-lesson-close></div>
+  <aside class="d3-drawer-panel" role="dialog" aria-label="Ders detayı">
+    <button type="button" class="d3-drawer-close" id="tdLessonDrawerClose" data-lesson-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="d3-drawer-head">
+      <span class="d3-drawer-icon" id="tdLessonIcon" aria-hidden="true">📐</span>
+      <div class="d3-drawer-meta">
+        <div class="td-drawer-head-line">
+          <span class="d3-drawer-eyebrow" id="tdLessonSubject">MATEMATİK</span>
+          <span class="td-lesson-type-badge is-klan" id="tdLessonTypeBadge">Klan Dersi</span>
+        </div>
+        <h2 class="d3-drawer-title" id="tdLessonTopic">Konu Adı</h2>
+        <p class="td-lesson-format-hint is-klan" id="tdLessonFormatHint">—</p>
+        <div class="d3-drawer-due">
+          <span class="d3-drawer-due-label">Tarih & Saat:</span>
+          <span class="d3-drawer-due-value">
+            <strong id="tdLessonDateText">—</strong>
+            <span class="d3-drawer-due-sub" id="tdLessonTimeText">—</span>
+          </span>
+        </div>
+        <span class="d3-drawer-edu-week" id="tdLessonEduWeek">
+          <span id="tdLessonEduWeekText">—</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="d3-drawer-section">
+      <span class="d3-drawer-label">Ders İçeriği</span>
+      <div class="d3-drawer-quote">
+        <p class="d3-drawer-quote-text" id="tdLessonDesc">—</p>
+        <div class="d3-drawer-kazanim" id="tdLessonKazanimRow" hidden>
+          <span class="d3-drawer-kazanim-tag">Ders Konusu</span>
+          <span class="d3-drawer-kazanim-text" id="tdLessonKazanim">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="d3-drawer-section" id="tdLessonClassSection" hidden>
+      <span class="d3-drawer-label">Sınıf Detayları</span>
+      <div class="d3-drawer-quote td-lesson-class-quote">
+        <div class="td-lesson-class-grid">
+          <div class="td-lesson-class-item">
+            <span class="td-lesson-class-label">Sınıf Seviyesi</span>
+            <strong class="td-lesson-class-val" id="tdLessonClassGrade">—</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d3-drawer-section" id="tdLessonTrialSection" hidden>
+      <span class="d3-drawer-label">Sınıf Dersi</span>
+      <div class="d3-drawer-quote">
+        <div class="d3-drawer-quote-header">
+          <span class="td-drawer-bm td-drawer-bm--trial" id="tdLessonTrialAvatar" aria-hidden="true"></span>
+          <div class="d3-drawer-quote-meta">
+            <span class="d3-drawer-quote-name">Ücretsiz Deneme Dersi</span>
+            <span class="d3-drawer-quote-role" id="tdLessonTrialGrade">—</span>
+          </div>
+        </div>
+        <div class="d3-drawer-kazanim">
+          <span class="d3-drawer-kazanim-tag">Anlatılacak Konu</span>
+          <span class="d3-drawer-kazanim-text" id="tdLessonTrialTopic">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="d3-drawer-section" id="tdLessonClanSection" hidden>
+      <span class="d3-drawer-label">Klan</span>
+      <div class="d3-drawer-quote">
+        <div class="d3-drawer-quote-header">
+          <img class="d3-drawer-quote-avatar" id="tdLessonClanAvatarImg" alt="" hidden />
+          <span class="td-drawer-bm td-drawer-bm--clan" id="tdLessonClanAvatar" aria-hidden="true" hidden></span>
+          <div class="d3-drawer-quote-meta">
+            <span class="d3-drawer-quote-name" id="tdLessonClanName">—</span>
+            <span class="d3-drawer-quote-role" id="tdLessonClanMeta">—</span>
+          </div>
+          <div class="d3-drawer-quote-actions">
+            <a href="#" class="d3-drawer-quote-action" id="tdLessonClanLink" title="Klan detayına git" aria-label="Klan detayına git" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d3-drawer-section" id="tdLessonStudentSection" hidden>
+      <span class="d3-drawer-label">Öğrenci</span>
+      <div class="d3-drawer-quote">
+        <div class="d3-drawer-quote-header">
+          <span class="td-drawer-bm td-drawer-bm--student" id="tdLessonStudentAvatar" aria-hidden="true"></span>
+          <div class="d3-drawer-quote-meta">
+            <span class="d3-drawer-quote-name" id="tdLessonStudentName">—</span>
+            <span class="d3-drawer-quote-role" id="tdLessonStudentMeta">—</span>
+          </div>
+          <div class="d3-drawer-quote-actions">
+            <a href="#" class="d3-drawer-quote-action" id="tdLessonStudentLink" title="Öğrenci detayına git" aria-label="Öğrenci detayına git" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d3-drawer-footer">
+      <button type="button" class="d3-drawer-cta is-waiting" id="tdLessonCta" disabled>
+        <span class="cta-label" id="tdLessonCtaLabel">Canlı Dersin Başlamasına kalan süre</span>
+        <span class="cta-time" id="tdLessonCtaTime">00:00:00</span>
+      </button>
+    </div>
+  </aside>
+</div>
+
+<script src="assets/teacher-avatars.js"></script>
+<script src="assets/teacher-dashboard-mock.js"></script>
+<script src="assets/teacher-dashboard.js"></script>
+</body>
+</html>

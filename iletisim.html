@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>İletişim — Bilenyum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/trial-modal.css">
+<link rel="stylesheet" href="assets/robot-fab.css">
+<style>
+  /* ---------- Hero ---------- */
+  .contact-hero {
+    background: linear-gradient(180deg, #fcfaff 0%, #f4eeff 100%);
+    position: relative; z-index: 2;
+  }
+  .contact-hero-inner {
+    max-width: var(--maxw); margin: 0 auto;
+    padding: 16px 32px 48px;
+    text-align: center;
+  }
+  .contact-hero h1 {
+    font-size: 44px; font-weight: 800;
+    line-height: 1.08; margin: 0 0 12px;
+    letter-spacing: -0.02em;
+    color: var(--ink-dark-0);
+    text-wrap: balance;
+  }
+  .contact-hero .lead {
+    font-size: 17px; color: var(--ink-dark-1);
+    line-height: 1.55; margin: 0 auto;
+    max-width: 580px;
+  }
+
+  /* ---------- Priority Channels (3 big prominent cards) ---------- */
+  .sec-channels {
+    background: var(--bg-3);
+    padding-top: 64px; padding-bottom: 24px;
+    margin-top: -32px; /* lift above hero bottom */
+    position: relative; z-index: 3;
+  }
+  .channels-wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 32px; }
+  .channels-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .channel-card {
+    background: white;
+    border: 1px solid rgba(40,38,90,0.08);
+    border-radius: 22px;
+    padding: 28px 28px 26px;
+    box-shadow: 0 18px 44px -22px rgba(40,38,90,0.22), 0 4px 14px -8px rgba(40,38,90,0.10);
+    cursor: pointer;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    display: flex; flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .channel-card::before {
+    content: ""; position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    z-index: 1;
+  }
+  .channel-card.whatsapp::before { background: linear-gradient(90deg, #25D366, #128C7E); }
+  .channel-card.call::before { background: linear-gradient(90deg, var(--p-purple-mid), var(--p-deep)); }
+  .channel-card.mobile::before { background: linear-gradient(90deg, var(--p-brand-light), var(--p-brand)); }
+  .channel-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(62,58,142,0.20);
+    box-shadow: 0 28px 60px -22px rgba(62,58,142,0.30), 0 8px 24px -8px rgba(40,38,90,0.16);
+  }
+  .channel-icon {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    margin-bottom: 18px;
+    box-shadow: 0 12px 24px -8px rgba(40,38,90,0.30);
+  }
+  .channel-card.whatsapp .channel-icon { background: linear-gradient(160deg, #25D366, #128C7E); box-shadow: 0 12px 24px -8px rgba(37,211,102,0.55); }
+  .channel-card.call .channel-icon { background: linear-gradient(160deg, var(--p-purple-mid), var(--p-deep)); box-shadow: 0 12px 24px -8px rgba(62,58,142,0.55); }
+  .channel-card.mobile .channel-icon { background: linear-gradient(160deg, var(--p-brand-light), var(--p-brand)); box-shadow: 0 12px 24px -8px rgba(229,4,123,0.55); }
+  .channel-icon svg { width: 26px; height: 26px; }
+  .channel-card h3 {
+    font-size: 18px; font-weight: 800;
+    color: var(--ink-dark-0);
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .channel-meta {
+    font-size: 12.5px; color: var(--ink-dark-2);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.04em;
+    margin: 0 0 18px;
+  }
+  .channel-value {
+    font-size: 22px; font-weight: 800;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+    font-feature-settings: "tnum";
+  }
+  .channel-card.whatsapp .channel-value { color: #128C7E; }
+  .channel-card.call .channel-value { color: var(--p-deep); }
+  .channel-card.mobile .channel-value { color: var(--p-brand); }
+  .channel-cta {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 14px; font-weight: 700;
+    color: white;
+    margin-top: auto;
+    align-self: stretch;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+  }
+  .channel-cta svg { width: 16px; height: 16px; }
+  .channel-card:hover .channel-cta { transform: translateY(-1px); filter: brightness(1.05); }
+  .channel-card.whatsapp .channel-cta {
+    background: linear-gradient(160deg, #25D366, #128C7E);
+    box-shadow: 0 10px 24px -8px rgba(37,211,102,0.55), inset 0 1px 0 rgba(255,255,255,0.20);
+  }
+  .channel-card.call .channel-cta {
+    background: linear-gradient(160deg, var(--p-purple-mid), var(--p-deep));
+    box-shadow: 0 10px 24px -8px rgba(62,58,142,0.55), inset 0 1px 0 rgba(255,255,255,0.16);
+  }
+  .channel-card.mobile .channel-cta {
+    background: linear-gradient(160deg, var(--p-brand-light), var(--p-brand));
+    box-shadow: 0 10px 24px -8px rgba(229,4,123,0.55), inset 0 1px 0 rgba(255,255,255,0.20);
+  }
+
+  /* ---------- Unified Form + Map component ---------- */
+  .sec-form-map {
+    background: var(--bg-3);
+    padding-top: 24px; padding-bottom: 64px;
+  }
+  .form-map-wrap {
+    max-width: var(--maxw); margin: 0 auto;
+    padding: 0 32px;
+  }
+  .panel-card {
+    background: white;
+    border: 1px solid rgba(40,38,90,0.08);
+    border-radius: 22px;
+    box-shadow: 0 18px 44px -22px rgba(40,38,90,0.20);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+  }
+  .panel-card h3 {
+    font-size: 20px; font-weight: 800;
+    color: var(--ink-dark-0);
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .panel-card .panel-sub {
+    font-size: 13.5px; color: var(--ink-dark-1);
+    margin: 0 0 20px; line-height: 1.5;
+  }
+  .unified-form-side {
+    padding: 30px 32px 30px;
+    border-right: 1px solid rgba(40,38,90,0.08);
+  }
+  .unified-map-side {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, rgba(62,58,142,0.03), transparent);
+  }
+  .unified-map-frame {
+    position: relative;
+    flex: 1;
+    min-height: 280px;
+    background: rgba(62,58,142,0.06);
+    border-bottom: 1px solid rgba(40,38,90,0.08);
+  }
+  .unified-map-frame iframe {
+    width: 100%; height: 100%;
+    border: none; display: block;
+    filter: hue-rotate(-12deg);
+  }
+  .unified-map-info {
+    padding: 22px 26px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .unified-map-info .map-header-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .unified-map-info h3 { margin: 0; }
+  .unified-map-info .map-info-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 13px;
+    color: var(--ink-dark-1);
+    line-height: 1.45;
+  }
+  .unified-map-info .map-info-row svg {
+    width: 18px; height: 18px;
+    color: var(--p-purple);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .unified-map-info .map-info-row strong { color: var(--ink-dark-0); display: block; margin-bottom: 2px; font-weight: 700; }
+
+  /* Form */
+  .contact-form { display: flex; flex-direction: column; gap: 14px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-field { display: flex; flex-direction: column; gap: 6px; }
+  .form-field label {
+    font-size: 12px; font-weight: 700;
+    color: var(--ink-dark-2);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(40,38,90,0.14);
+    background: rgba(40,38,90,0.03);
+    color: var(--ink-dark-0);
+    font-family: inherit;
+    font-size: 14.5px;
+    outline: none;
+    transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+  }
+  .form-field textarea {
+    min-height: 220px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  .form-field-message { flex: 1; }
+  .form-field-message textarea { height: 100%; min-height: 150px; }
+  .form-field select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23797ea6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-size: 18px; padding-right: 40px; }
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus {
+    border-color: var(--p-purple);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(62,58,142,0.10);
+  }
+  .form-field input::placeholder,
+  .form-field textarea::placeholder { color: var(--ink-dark-2); }
+  .form-kvkk {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 12.5px; color: var(--ink-dark-1);
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+  .form-kvkk input[type="checkbox"] {
+    width: 18px; height: 18px;
+    margin-top: 1px;
+    accent-color: var(--p-purple);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .form-kvkk a { color: var(--p-purple); font-weight: 600; text-decoration: underline; text-decoration-color: rgba(62,58,142,0.30); text-underline-offset: 3px; }
+  .form-kvkk a:hover { text-decoration-color: var(--p-purple); }
+  .form-submit { margin-top: 8px; }
+
+  /* Map */
+  .map-card { padding: 0; overflow: hidden; }
+  .map-header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid rgba(40,38,90,0.08);
+  }
+  .map-header h3 { margin: 0 0 6px; font-size: 22px; font-weight: 800; color: var(--ink-dark-0); letter-spacing: -0.01em; }
+  .map-header p { margin: 0; font-size: 14px; color: var(--ink-dark-1); line-height: 1.5; }
+  .map-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: rgba(62,58,142,0.06);
+  }
+  .map-frame iframe {
+    width: 100%; height: 100%;
+    border: none; display: block;
+    filter: hue-rotate(-12deg);
+  }
+  .map-info {
+    padding: 22px 28px 24px;
+    border-top: 1px solid rgba(40,38,90,0.08);
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .map-info-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 13.5px;
+    color: var(--ink-dark-1);
+    line-height: 1.45;
+  }
+  .map-info-row svg {
+    width: 18px; height: 18px;
+    color: var(--p-purple);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .map-info-row strong { color: var(--ink-dark-0); display: block; margin-bottom: 2px; font-weight: 700; }
+
+  /* ---------- Kurumsal Şeffaflık (light theme, modern flat info layout) ---------- */
+  .sec-corporate {
+    background: var(--bg-3);
+    padding: 72px 0 96px;
+    position: relative;
+  }
+  .corporate-wrap {
+    max-width: var(--maxw); margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+  }
+  /* Header: ikon + başlık yan yana */
+  .corp-header {
+    display: flex; align-items: center;
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+  .corp-icon {
+    flex-shrink: 0;
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at 28% 22%, rgba(255,255,255,1), transparent 55%),
+      linear-gradient(135deg, #ffffff 0%, #f5f4fc 100%);
+    box-shadow:
+      0 16px 32px -10px rgba(229,4,123,0.28),
+      0 8px 18px -8px rgba(40,38,90,0.16),
+      0 0 0 1px rgba(40,38,90,0.06);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .corp-icon-mark { width: 60%; height: 70%; display: block; }
+  .corp-title {
+    font-size: 28px; font-weight: 800;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.015em;
+    margin: 0;
+    line-height: 1.15;
+  }
+  /* Beyaz kart zemini içine alınan bilgi gridi */
+  .corp-card {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.06);
+    border-radius: 22px;
+    padding: 36px 36px 38px;
+    box-shadow:
+      0 18px 44px -22px rgba(40,38,90,0.22),
+      0 4px 14px -8px rgba(40,38,90,0.10);
+  }
+  .corp-info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px 28px;
+  }
+  .corp-info {
+    display: flex; flex-direction: column;
+    gap: 8px;
+  }
+  .corp-info-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px; font-weight: 700;
+    color: var(--p-brand);
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+  }
+  .corp-info-value {
+    font-size: 15.5px;
+    color: var(--ink-dark-0);
+    line-height: 1.5;
+    margin: 0;
+    font-weight: 500;
+  }
+  .corp-info-value a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(40,38,90,0.18);
+    transition: color 0.18s ease, border-color 0.18s ease;
+  }
+  .corp-info-value a:hover {
+    color: var(--p-brand);
+    border-bottom-color: var(--p-brand);
+  }
+
+  /* Robot FAB & chatbot styles loaded from assets/robot-fab.css */
+
+  /* ---------- Toast (form sent confirmation) ---------- */
+  .toast {
+    position: fixed;
+    bottom: 28px; left: 50%; transform: translateX(-50%) translateY(12px);
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: var(--p-deep);
+    color: white;
+    font-size: 13.5px; font-weight: 600;
+    box-shadow: 0 16px 36px -8px rgba(0,0,0,0.45);
+    z-index: 250;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.22,0.61,0.36,1), visibility 0.22s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+  .toast svg { width: 16px; height: 16px; color: var(--p-green); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1080px) {
+    .channels-grid { grid-template-columns: 1fr; }
+    .corp-info-grid { grid-template-columns: repeat(3, 1fr); gap: 32px 24px; }
+  }
+  @media (max-width: 980px) {
+    .panel-card { grid-template-columns: 1fr; }
+    .unified-form-side { border-right: none; border-bottom: 1px solid rgba(40,38,90,0.08); padding: 24px 24px 26px; }
+    .contact-hero h1 { font-size: 36px; }
+    h2.title { font-size: 26px; }
+    .corp-info-grid { grid-template-columns: repeat(2, 1fr); }
+    .sec-inner { padding: 56px 24px; }
+    .channels-wrap, .form-map-wrap, .corporate-wrap { padding: 0 24px; }
+  }
+  @media (max-width: 760px) {
+    .form-row { grid-template-columns: 1fr; }
+    .channel-value { font-size: 19px; }
+    .corp-info-grid { grid-template-columns: 1fr; }
+    .corp-header { gap: 14px; margin-bottom: 22px; }
+    .corp-icon { width: 52px; height: 52px; border-radius: 14px; }
+    .corp-title { font-size: 22px; }
+    .corp-card { padding: 24px 22px 26px; border-radius: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-contact">
+      <a href="https://wa.me/905551234567" class="wa-link" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.9L4 20l4.2-1.1A7.93 7.93 0 0 0 12.05 20h.01a7.95 7.95 0 0 0 5.55-13.68z"/></svg>
+        <span>+90 555 123 45 67</span>
+      </a>
+      <a href="tel:+908501234567">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 0 0-1.02.24l-2.2 2.2a15.07 15.07 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 4c0-.55-.45-1-1-1H4a1 1 0 0 0-1 1 17 17 0 0 0 17 17c.55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+        <span class="topbar-phone-text">0850 123 45 67</span>
+      </a>
+      <a href="mailto:info@bilenyum.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <span class="topbar-mail-text">info@bilenyum.com</span>
+      </a>
+    </div>
+    <div class="topbar-social">
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.39A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.73 1.46 1.39 2.13a5.88 5.88 0 0 0 2.13 1.39c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.39 5.88 5.88 0 0 0 1.39-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.39-2.13A5.88 5.88 0 0 0 19.86.63C19.1.33 18.22.13 16.95.07 15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/></svg></a>
+      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.13C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.52A3.02 3.02 0 0 0 .5 6.2C0 8.07 0 12 0 12s0 3.93.5 5.8a3.02 3.02 0 0 0 2.12 2.13c1.88.52 9.38.52 9.38.52s7.5 0 9.38-.52a3.02 3.02 0 0 0 2.12-2.13C24 15.93 24 12 24 12s0-3.93-.5-5.8zM9.6 15.6V8.4L15.84 12 9.6 15.6z"/></svg></a>
+      <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.66H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.26 2.37 4.26 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html"><img src="assets/bilenyum-logo.svg" alt="Bilenyum" class="logo-img" /></a>
+    <div class="nav-links">
+      <a href="egitim-setleri.html">Eğitim Setleri</a>
+      <a href="ornek-videolar.html">Örnek Videolar</a>
+      <a href="kadromuz.html">Ekibimiz</a>
+      <a href="neden-biz.html">Neden Biz?</a>
+      <a href="iletisim.html" class="active">İletişim</a>
+    </div>
+    <div class="nav-cta">
+      <a href="giris.html" class="btn btn-secondary btn-sm">Giriş Yap</a>
+      <button class="btn btn-primary btn-sm" data-trial-open type="button">Ücretsiz Deneme Dersi</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO (breadcrumb merged into hero bg) -->
+<section class="contact-hero">
+  <div class="breadcrumb">
+    <a href="index.html">Anasayfa</a>
+    <span class="sep">›</span>
+    <span class="current">İletişim</span>
+  </div>
+  <div class="contact-hero-inner">
+    <h1>Bize Ulaş</h1>
+    <p class="lead">Soruların, önerilerin veya destek ihtiyaçların için bize istediğin yoldan ulaşabilirsin.</p>
+  </div>
+</section>
+
+<!-- PRIORITY CHANNELS -->
+<section class="sec-channels">
+  <div class="channels-wrap">
+    <div class="channels-grid">
+      <a href="https://wa.me/905551234567" target="_blank" rel="noopener" class="channel-card whatsapp">
+        <div class="channel-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.9L4 20l4.2-1.1A7.93 7.93 0 0 0 12.05 20h.01a7.95 7.95 0 0 0 5.55-13.68zM12.06 18.5h-.01a6.59 6.59 0 0 1-3.36-.92l-.24-.14-2.5.65.67-2.43-.16-.25a6.6 6.6 0 1 1 12.24-3.46 6.6 6.6 0 0 1-6.64 6.55zm3.62-4.94c-.2-.1-1.18-.58-1.36-.65-.18-.07-.31-.1-.44.1-.13.2-.51.65-.62.78-.11.13-.23.15-.43.05-.2-.1-.84-.31-1.6-.99-.59-.53-1-1.18-1.11-1.38-.11-.2-.01-.31.09-.41.09-.09.2-.23.3-.35.1-.12.13-.2.2-.33.07-.13.03-.25-.02-.35-.05-.1-.44-1.06-.6-1.46-.16-.38-.32-.33-.44-.34-.11 0-.24-.02-.37-.02-.13 0-.34.05-.51.25-.18.2-.67.65-.67 1.59 0 .94.69 1.85.78 1.97.1.12 1.36 2.07 3.29 2.91.46.2.82.32 1.1.41.46.15.88.13 1.21.08.37-.06 1.18-.48 1.34-.95.17-.47.17-.87.12-.95-.05-.08-.18-.13-.38-.23z"/></svg>
+        </div>
+        <h3>WhatsApp Hattı</h3>
+        <p class="channel-meta">Sınıf saatleri içinde anlık yanıt</p>
+        <div class="channel-value">+90 555 123 45 67</div>
+        <span class="channel-cta">Sohbete başla
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
+      <a href="tel:+908501234567" class="channel-card call">
+        <div class="channel-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <h3>Çağrı Merkezi</h3>
+        <p class="channel-meta">Pazartesi - Cuma · 09:00 - 18:00</p>
+        <div class="channel-value">0850 123 45 67</div>
+        <span class="channel-cta">Hemen ara
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
+      <a href="tel:+905321234567" class="channel-card mobile">
+        <div class="channel-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        </div>
+        <h3>Mobil İletişim</h3>
+        <p class="channel-meta">Acil durumlar için 7/24 ulaşılabilir</p>
+        <div class="channel-value">+90 532 123 45 67</div>
+        <span class="channel-cta">Ara
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- UNIFIED FORM + MAP -->
+<section class="sec-form-map">
+  <div class="form-map-wrap">
+    <div class="panel-card">
+      <!-- FORM SIDE -->
+      <div class="unified-form-side">
+        <h3>İletişim Formu</h3>
+        <p class="panel-sub">Detaylı sorularınızı buradan iletebilirsiniz. 1 iş günü içinde dönüş yapıyoruz.</p>
+        <form class="contact-form" id="contactForm" autocomplete="off">
+          <div class="form-field">
+            <label for="cf-subject">Konu</label>
+            <select id="cf-subject" name="subject" required>
+              <option value="" disabled selected>Mesajınız hangi konuda?</option>
+              <option value="istek">İstek</option>
+              <option value="oneri">Öneri</option>
+              <option value="sikayet">Şikayet</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="cf-firstname">Ad</label>
+              <input type="text" id="cf-firstname" required placeholder="Adınız" autocomplete="given-name" data-rule="name" maxlength="40" />
+            </div>
+            <div class="form-field">
+              <label for="cf-lastname">Soyad</label>
+              <input type="text" id="cf-lastname" required placeholder="Soyadınız" autocomplete="family-name" data-rule="name" maxlength="40" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="cf-email">E-posta</label>
+              <input type="email" id="cf-email" required placeholder="ornek@email.com" autocomplete="email" data-rule="email" maxlength="120" />
+            </div>
+            <div class="form-field">
+              <label for="cf-phone">Telefon</label>
+              <input type="tel" id="cf-phone" placeholder="+90 5XX XXX XX XX" autocomplete="tel" inputmode="numeric" maxlength="17" data-rule="phone-tr" />
+            </div>
+          </div>
+          <div class="form-field form-field-message">
+            <label for="cf-message">Mesajınız</label>
+            <textarea id="cf-message" required placeholder="Mesajınızı buraya yazın..."></textarea>
+          </div>
+          <label class="form-kvkk">
+            <input type="checkbox" required />
+            <span>Kişisel verilerimin <a href="#">KVKK Aydınlatma Metni</a> kapsamında işlenmesini kabul ediyorum.</span>
+          </label>
+          <button type="submit" class="btn btn-primary form-submit">
+            Mesajı Gönder
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;flex-shrink:0;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- MAP SIDE -->
+      <div class="unified-map-side">
+        <div class="unified-map-frame">
+          <iframe
+            src="https://www.openstreetmap.org/export/embed.html?bbox=29.0080%2C41.0840%2C29.0470%2C41.1000&amp;layer=mapnik&amp;marker=41.0922%2C29.0275"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Bilenyum Ofis Haritası">
+          </iframe>
+        </div>
+        <div class="unified-map-info">
+          <div class="map-header-row">
+            <h3>Ofis Konumumuz</h3>
+          </div>
+          <div class="map-info-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div>
+              <strong>Adres</strong>
+              Maslak Mah. Eğitim Plaza No:24 K:8<br/>Sarıyer / İstanbul, 34485
+            </div>
+          </div>
+          <div class="map-info-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <div>
+              <strong>Çalışma Saatleri</strong>
+              Pazartesi - Cuma: 09:00 - 18:00<br/>
+              Cumartesi: 10:00 - 16:00
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KURUMSAL İLETİŞİM -->
+<section class="sec-corporate">
+  <div class="corporate-wrap">
+    <div class="corp-header">
+      <div class="corp-icon" aria-hidden="true">
+        <img class="corp-icon-mark" src="assets/bilenyum-amblem.svg" alt="" />
+      </div>
+      <h2 class="corp-title">Kurumsal Şeffaflık</h2>
+    </div>
+
+    <div class="corp-card">
+      <div class="corp-info-grid">
+        <div class="corp-info">
+          <span class="corp-info-label">Tescilli Marka Adı</span>
+          <p class="corp-info-value">BİLENYUM</p>
+        </div>
+        <div class="corp-info">
+          <span class="corp-info-label">Ticaret Ünvanı / İşletme Adı</span>
+          <p class="corp-info-value">Bilenyum Eğitim Teknolojileri A.Ş.</p>
+        </div>
+        <div class="corp-info">
+          <span class="corp-info-label">Mersis Numarası</span>
+          <p class="corp-info-value">0123456789000001</p>
+        </div>
+        <div class="corp-info">
+          <span class="corp-info-label">Ticaret Sicil No</span>
+          <p class="corp-info-value">123456-5 (İstanbul Ticaret Odası)</p>
+        </div>
+        <div class="corp-info">
+          <span class="corp-info-label">Vergi Dairesi / No</span>
+          <p class="corp-info-value">Maslak V.D. / 123 456 7890</p>
+        </div>
+        <div class="corp-info">
+          <span class="corp-info-label">Kurumsal E-posta</span>
+          <p class="corp-info-value"><a href="mailto:info@bilenyum.com">info@bilenyum.com</a></p>
+        </div>
+        <div class="corp-info">
+          <span class="corp-info-label">Kayıtlı E-posta (KEP)</span>
+          <p class="corp-info-value"><a href="mailto:bilenyum@hs01.kep.tr">bilenyum@hs01.kep.tr</a></p>
+        </div>
+        <div class="corp-info">
+          <span class="corp-info-label">Merkez Adres</span>
+          <p class="corp-info-value">Esentepe Mah. Büyükdere Cad. No:199 Şişli / İstanbul</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="site-footer"></footer>
+
+<!-- ROBOT FAB + CHATBOT -->
+<button class="robot-fab" id="robotFab" aria-label="Yumi · Bilenyum Asistanı" type="button">
+  <svg class="robot-svg" viewBox="0 0 64 64" aria-hidden="true">
+    <line class="robot-antenna" x1="32" y1="6" x2="32" y2="14"/>
+    <circle class="robot-antenna-bulb" cx="32" cy="5" r="3"/>
+    <rect class="robot-head" x="10" y="14" width="44" height="38" rx="14"/>
+    <circle class="robot-eye" cx="22" cy="30" r="4"/>
+    <circle class="robot-eye" cx="42" cy="30" r="4"/>
+    <circle class="robot-cheek" cx="16" cy="38" r="2.2"/>
+    <circle class="robot-cheek" cx="48" cy="38" r="2.2"/>
+    <rect class="robot-mouth" x="24" y="40" width="16" height="3.5" rx="1.75"/>
+  </svg>
+</button>
+
+<div class="chatbot" id="chatbot" role="dialog" aria-labelledby="chatbotName" aria-hidden="true">
+  <div class="chatbot-header">
+    <div class="chatbot-avatar" aria-hidden="true">
+      <svg viewBox="0 0 64 64">
+        <line x1="32" y1="8" x2="32" y2="14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="32" cy="6" r="2.5" fill="currentColor"/>
+        <rect x="12" y="14" width="40" height="36" rx="12" fill="currentColor"/>
+        <circle cx="24" cy="30" r="3.5" fill="white"/>
+        <circle cx="40" cy="30" r="3.5" fill="white"/>
+        <rect x="26" y="40" width="12" height="3" rx="1.5" fill="white"/>
+      </svg>
+    </div>
+    <div class="chatbot-title">
+      <div class="chatbot-name" id="chatbotName">Yumi</div>
+      <div class="chatbot-status">Çevrimiçi</div>
+    </div>
+    <button class="chatbot-close" id="chatbotClose" aria-label="Kapat" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="chatbot-body" id="chatbotBody">
+    <div class="chat-msg bot"><div class="chat-bubble">Merhaba! Hangi konuda yardım edebilirim?</div></div>
+    <div class="chat-actions">
+      <button class="chat-action" type="button">Adres</button>
+      <button class="chat-action" type="button">Çalışma saatleri</button>
+      <button class="chat-action" type="button">Kurumsal iletişim</button>
+    </div>
+  </div>
+  <form class="chatbot-input" id="chatbotForm" autocomplete="off">
+    <input type="text" placeholder="Sorunu yaz…" aria-label="Mesajınız" />
+    <button type="submit" aria-label="Gönder">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </form>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toastText">Mesajın iletildi, en kısa sürede dönüş yapacağız.</span>
+</div>
+
+<script>
+  // Contact form (UI-only submit with toast)
+  (function() {
+    const form = document.getElementById('contactForm');
+    const toast = document.getElementById('toast');
+    if (!form || !toast) return;
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+      form.reset();
+    });
+  })();
+
+</script>
+
+<!-- ============ TRIAL MODAL (Ücretsiz Deneme Dersi) ============ -->
+<!-- CSS: assets/trial-modal.css -->
+
+<div class="trial-modal" id="trialModal" aria-hidden="true">
+  <div class="trial-modal-overlay" data-trial-close></div>
+  <div class="trial-modal-card" role="dialog" aria-modal="true" aria-labelledby="trialModalTitle">
+    <!-- Visual header banner (placeholder) -->
+    <div class="trial-modal-image" aria-hidden="true">[Banner Görseli]</div>
+    <button class="trial-modal-close" data-trial-close aria-label="Kapat" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="trial-modal-body">
+      <div class="trial-modal-head">
+        <span class="trial-modal-eyebrow">Ücretsiz Deneme Dersi</span>
+        <h2 class="trial-modal-title" id="trialModalTitle">Hadi tanışalım</h2>
+        <p class="trial-modal-sub">Çocuğunun seviyesi ve hedefine en uygun deneme dersini birlikte planlayalım.</p>
+      </div>
+      <!-- Step 1: Öğrenci -->
+      <form class="trial-step-form active" id="trialStep1" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-s-name">Öğrenci adı</label>
+            <input type="text" id="trial-s-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-s-surname">Öğrenci soyadı</label>
+            <input type="text" id="trial-s-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-grade">Sınıf seviyesi</label>
+          <select id="trial-s-grade" required>
+            <option value="" disabled selected>Sınıf seç</option>
+            <option value="5">5. Sınıf</option>
+            <option value="6">6. Sınıf</option>
+            <option value="7">7. Sınıf</option>
+            <option value="8">8. Sınıf (LGS)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-subject">Deneme dersi istenen alan</label>
+          <select id="trial-s-subject" required>
+            <option value="" disabled selected>Alan seç</option>
+            <option value="mat">Matematik</option>
+            <option value="fen">Fen Bilimleri</option>
+            <option value="trk">Türkçe</option>
+            <option value="ing">İngilizce</option>
+            <option value="sos">Sosyal Bilgiler</option>
+            <option value="all">Genel (tüm dersler)</option>
+          </select>
+        </div>
+        <div class="trial-actions">
+          <button type="submit" class="btn-modal btn-modal-primary">
+            İleri
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </form>
+      <!-- Step 2: Veli -->
+      <form class="trial-step-form" id="trialStep2" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-p-name">Veli adı</label>
+            <input type="text" id="trial-p-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-p-surname">Veli soyadı</label>
+            <input type="text" id="trial-p-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-p-email">E-posta</label>
+          <input type="email" id="trial-p-email" required placeholder="ornek@email.com" autocomplete="email" data-rule="email" maxlength="120" />
+        </div>
+        <div class="form-field">
+          <label for="trial-p-phone">Telefon</label>
+          <input type="tel" id="trial-p-phone" required placeholder="+90 5XX XXX XX XX" inputmode="numeric" autocomplete="tel" maxlength="17" data-rule="phone-tr" />
+        </div>
+        <div class="trial-actions">
+          <button type="button" class="btn-modal btn-modal-ghost" id="trialBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Geri
+          </button>
+          <button type="submit" class="btn-modal btn-modal-primary">
+            Talebi Gönder
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      </form>
+      <!-- Success -->
+      <div class="trial-success" id="trialSuccess">
+        <div class="trial-success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>Talebin alındı!</h3>
+        <p>1 iş günü içinde belirttiğin telefon numarasından sana ulaşacağız. Tanışmak için sabırsızlanıyoruz!</p>
+        <button type="button" class="btn-modal" data-trial-close>Tamam</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TRIAL MODAL END ============ -->
+
+<script>
+  // Yumi chatbot — sayfa-özel cevap kuralları
+  window.BilenyumChatbot = {
+    replies: function (text) {
+      text = text.toLowerCase();
+      if (text.includes('adres'))                                                          return 'Maslak Mah. Eğitim Plaza No:24 K:8, Sarıyer / İstanbul. Yukarıdaki haritadan konum ayrıntılarına bakabilirsin.';
+      if (text.includes('çalış') || text.includes('saat'))                                 return 'Pazartesi - Cuma 09:00 - 18:00, Cumartesi 10:00 - 16:00 arası açığız. Acil durumlar için mobil hattımız 7/24 ulaşılabilir.';
+      if (text.includes('kurumsal') || text.includes('iletişim') || text.includes('partner')) return 'Kurumsal iş birlikleri için partnership@bilenyum.com adresine yazabilirsin. Aşağıdaki kurumsal iletişim bölümünde diğer birimlerin e-postaları da var.';
+      if (text.includes('whatsapp') || text.includes('wp'))                                return 'WhatsApp hattımız +90 555 123 45 67. Sınıf saatleri içinde anlık yanıt veriyoruz.';
+      if (text.includes('telefon') || text.includes('ara'))                                return 'Çağrı merkezi: 0850 123 45 67 (Pzt-Cuma 09:00-18:00). Mobil: +90 532 123 45 67 (7/24).';
+      if (text.includes('merhaba') || text.includes('selam'))                              return 'Merhaba! Adres, çalışma saatleri veya kurumsal iletişim hakkında sorularını yanıtlamak için buradayım.';
+      return 'Sorunu aldım, en kısa sürede dönüş yapacağız.';
+    }
+  };
+</script>
+<script src="assets/dom.js"></script>
+<script src="assets/robot-fab.js"></script>
+<script src="assets/trial-modal.js"></script>
+<script src="assets/input-rules.js"></script>
+<script src="assets/footer.js"></script>
+</body>
+</html>

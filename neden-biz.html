@@ -1,0 +1,1079 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Neden Bilenyum? — Bilime Dayalı, Çocuğa Göre Eğilmiş Öğrenme</title>
+<meta name="description" content="Bilenyum'un eğitim metodolojisi, vizyonu, misyonu, kullandığı bilimsel öğrenme yöntemleri ve teknolojik altyapısı." />
+<link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%233e3a8e'/%3E%3Ctext x='50' y='65' text-anchor='middle' font-family='Inter,system-ui,sans-serif' font-size='62' font-weight='900' fill='white' letter-spacing='-3'%3Eb%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/trial-modal.css">
+<style>
+  /* ============ HERO (centered, classroom bg image) ============ */
+  .why-hero {
+    background: #f7f3ff;
+    position: relative;
+    z-index: 2;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  /* Background layer: faded classroom photo + white veil + brand glows */
+  .why-hero-bg {
+    position: absolute; inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .why-hero-bg-img {
+    position: absolute; inset: 0;
+    background-image: url("https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=2000&q=80");
+    background-size: cover;
+    background-position: center 40%;
+    filter: grayscale(0.15) saturate(1.08) blur(1px);
+    opacity: 0.48;
+  }
+  .why-hero-bg-veil {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(247,243,255,0.82) 55%, #ffffff 92%, #ffffff 100%);
+  }
+  .why-hero-bg-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  .why-hero-bg-glow.g1 {
+    top: -80px; right: -60px;
+    width: 380px; height: 380px;
+    background: radial-gradient(circle, rgba(229,4,123,0.40), transparent 70%);
+  }
+  .why-hero-bg-glow.g2 {
+    bottom: -100px; left: -80px;
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, rgba(74,214,255,0.32), transparent 70%);
+  }
+
+  /* Content stays above the bg layer */
+  .why-hero .breadcrumb { position: relative; z-index: 2; }
+  .why-hero-inner {
+    position: relative; z-index: 2;
+    max-width: 860px; margin: 0 auto;
+    padding: 32px 32px 64px;
+    text-align: center;
+    display: flex; flex-direction: column;
+    align-items: center;
+  }
+  .why-hero .section-eyebrow { margin-bottom: 16px; }
+  .why-hero h1 {
+    font-size: 52px; font-weight: 800;
+    line-height: 1.08; margin: 0 0 20px;
+    letter-spacing: -0.022em;
+    color: var(--ink-dark-0);
+    text-wrap: balance;
+    max-width: 800px;
+  }
+  .hero-accent {
+    background: linear-gradient(120deg, var(--p-brand) 0%, var(--p-brand-deep) 50%, var(--p-purple) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .why-hero .lead {
+    font-size: 18px; color: var(--ink-dark-1);
+    line-height: 1.6; margin: 0 0 44px;
+    max-width: 640px;
+  }
+
+  /* Modern stat cards: glassmorphism + gradient values, no harsh borders */
+  .why-hero-stats {
+    display: grid;
+    /* Eşit 4 sütun — viewport'a sığar, başlıklar nowrap ile tek satır kalır */
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+  }
+  .whs-cell {
+    position: relative;
+    background: rgba(255,255,255,0.62);
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,0.85);
+    border-radius: 20px;
+    padding: 16px 14px 18px;
+    min-width: 0;
+    text-align: left;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.9) inset,
+      0 18px 40px -22px rgba(40,38,90,0.28),
+      0 2px 6px -2px rgba(40,38,90,0.06);
+    transition: transform 0.22s cubic-bezier(0.22, 0.61, 0.36, 1),
+                box-shadow 0.22s ease,
+                background 0.22s ease;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    gap: 14px;
+  }
+  .whs-cell:hover {
+    transform: translateY(-4px);
+    background: rgba(255,255,255,0.78);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.95) inset,
+      0 28px 56px -22px rgba(40,38,90,0.36),
+      0 4px 10px -2px rgba(40,38,90,0.08);
+  }
+  .whs-cell[data-tone="purple"] { --accent: var(--p-purple); --accent-grad: linear-gradient(135deg, #3e3a8e, #6964c4); }
+  .whs-cell[data-tone="brand"]  { --accent: var(--p-brand);  --accent-grad: linear-gradient(135deg, #e5047b, #ff3a9a); }
+  .whs-cell[data-tone="aqua"]   { --accent: var(--p-aqua);   --accent-grad: linear-gradient(135deg, #1c8fb5, #4ad6ff); }
+  .whs-cell[data-tone="green"]  { --accent: var(--p-green);  --accent-grad: linear-gradient(135deg, #2a8a5a, #6dd49e); }
+
+  /* Top row: small icon + tiny dot pulse (modern accent) */
+  .whs-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 12px;
+    background: var(--accent-grad);
+    color: white;
+    position: relative;
+    box-shadow: 0 8px 18px -8px var(--accent);
+  }
+  .whs-icon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255,255,255,0.30), transparent 50%);
+    pointer-events: none;
+  }
+  .whs-icon svg { width: 18px; height: 18px; position: relative; z-index: 1; }
+
+  /* Value: big, gradient text fill */
+  .whs-val {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 21px; font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.2;     /* descenderlar (ğ, ş, vs) kesilmesin */
+    padding-bottom: 2px;  /* gradient-clip alt kenarı için pay */
+    white-space: nowrap;
+    background: var(--accent-grad);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    display: inline-flex; align-items: baseline; gap: 2px;
+  }
+  .whs-val .whs-unit {
+    font-size: 18px; font-weight: 800;
+    letter-spacing: -0.01em;
+    -webkit-text-fill-color: inherit;
+  }
+
+  /* Label: clean, balanced */
+  .whs-lbl {
+    font-size: 13px; font-weight: 600;
+    color: var(--ink-dark-1);
+    line-height: 1.45;
+    margin-top: -2px;
+  }
+
+  /* ---------- Light Space Divider (hero → vizyon arası) ---------- */
+  /* Bg is solid white to merge seamlessly with hero's white veil end &
+     vm-sec's white start — no visible color seam. Larger negative margin
+     ensures sub-pixel rendering gap between hero & divider disappears. */
+  .space-divider-light {
+    position: relative;
+    height: 140px;
+    margin-top: -1px;          /* hairline overlap kills the 1px seam */
+    background: #ffffff;
+    overflow: hidden;
+    z-index: 3;                /* sit above hero so its white bg wins on the seam */
+  }
+  .space-wave-light {
+    position: absolute; bottom: -1px; left: 0; right: 0;
+    width: 100%; height: 100%;
+    display: block; z-index: 3;
+  }
+  .geo-circle-light { position: absolute; width: 60px; height: 60px; top: 28%; left: 42%; border: 1.5px solid rgba(62,58,142,0.45); border-radius: 50%; z-index: 2; transform: rotate(-18deg) scaleY(0.4); }
+  .geo-dot-light { position: absolute; border-radius: 50%; z-index: 2; }
+  .geo-dot-light.d1 { width: 10px; height: 10px; top: 32%; left: 14%; background: var(--p-purple); }
+  .geo-dot-light.d2 { width: 6px; height: 6px; top: 20%; right: 24%; background: var(--p-aqua); }
+  .geo-line-light { position: absolute; width: 90px; height: 1px; top: 42%; right: 8%; background: linear-gradient(to right, transparent, rgba(62,58,142,0.6), transparent); transform: rotate(-14deg); z-index: 2; }
+  .geo-tri-light { position: absolute; width: 0; height: 0; top: 16%; left: 68%; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 12px solid rgba(255,122,184,0.65); transform: rotate(18deg); filter: drop-shadow(0 0 8px rgba(255,122,184,0.45)); z-index: 2; }
+
+  /* ============ VISION + MISSION ============ */
+  .vm-sec { background: white; }
+  .vm-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .vm-card {
+    background: linear-gradient(160deg, #fcfaff 0%, #f4eeff 100%);
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 20px;
+    padding: 32px 32px 36px;
+    position: relative; overflow: hidden;
+  }
+  .vm-card::after {
+    content: ''; position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(62,58,142,0.10), transparent 70%);
+    pointer-events: none;
+  }
+  .vm-card.mission::after { background: radial-gradient(circle, rgba(229,4,123,0.10), transparent 70%); }
+  .vm-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+    box-shadow: 0 12px 28px -10px rgba(62,58,142,0.50);
+  }
+  .vm-card.mission .vm-icon { background: linear-gradient(135deg, var(--p-brand), var(--p-brand-deep)); box-shadow: 0 12px 28px -10px rgba(229,4,123,0.50); }
+  .vm-icon svg { width: 28px; height: 28px; }
+  .vm-card h3 {
+    font-size: 22px; font-weight: 800;
+    margin: 0 0 12px;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.01em;
+  }
+  .vm-card p {
+    font-size: 15px; line-height: 1.65;
+    color: var(--ink-dark-1);
+    margin: 0;
+  }
+  .vm-card p + p { margin-top: 14px; }
+  .vm-card strong { color: var(--ink-dark-0); font-weight: 700; }
+
+  /* ============ METHODS ============ */
+  .methods-sec { background: linear-gradient(180deg, var(--bg-3) 0%, #ece8ff 100%); }
+  .methods-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .method-card {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.06);
+    border-radius: 18px;
+    padding: 24px 24px 26px;
+    transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .method-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px -22px rgba(40,38,90,0.28);
+    border-color: rgba(62,58,142,0.22);
+  }
+  .method-head {
+    display: flex; align-items: flex-start; gap: 14px;
+    margin-bottom: 14px;
+  }
+  .method-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    background: rgba(62,58,142,0.08);
+    color: var(--p-purple);
+  }
+  .method-icon svg { width: 24px; height: 24px; }
+  .method-card[data-color="brand"] .method-icon { background: rgba(229,4,123,0.10); color: var(--p-brand); }
+  .method-card[data-color="aqua"]  .method-icon { background: rgba(74,214,255,0.14); color: #1c8fb5; }
+  .method-card[data-color="green"] .method-icon { background: rgba(109,212,158,0.16); color: #2a8a5a; }
+  .method-card[data-color="sun"]   .method-icon { background: rgba(255,181,71,0.18); color: #b07712; }
+  .method-name {
+    font-size: 17px; font-weight: 800;
+    color: var(--ink-dark-0);
+    margin: 0 0 4px;
+    letter-spacing: -0.005em;
+  }
+  .method-en {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px; font-weight: 600;
+    color: var(--ink-dark-2);
+    letter-spacing: 0.04em;
+  }
+  .method-body {
+    font-size: 14px; line-height: 1.6;
+    color: var(--ink-dark-1);
+    margin: 0 0 14px;
+  }
+  .method-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11.5px; font-weight: 700;
+    color: var(--p-purple);
+    background: rgba(62,58,142,0.08);
+    padding: 5px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+  }
+  .method-tag svg { width: 12px; height: 12px; }
+
+  /* ============ HOW WE TEACH (process) ============ */
+  .how-sec { background: white; }
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 8px;
+  }
+  .how-step {
+    position: relative;
+    padding: 26px 24px 28px;
+    background: linear-gradient(180deg, white 0%, #fcfaff 100%);
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 18px;
+    transition: transform 0.18s ease, box-shadow 0.2s ease;
+  }
+  .how-step:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px -22px rgba(40,38,90,0.28);
+  }
+  .how-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; font-weight: 800;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 18px -8px rgba(62,58,142,0.55);
+  }
+  .how-step:nth-child(2) .how-num { background: linear-gradient(135deg, var(--p-aqua), #1c8fb5); box-shadow: 0 8px 18px -8px rgba(74,214,255,0.55); }
+  .how-step:nth-child(3) .how-num { background: linear-gradient(135deg, var(--p-brand), var(--p-brand-deep)); box-shadow: 0 8px 18px -8px rgba(229,4,123,0.55); }
+  .how-step:nth-child(4) .how-num { background: linear-gradient(135deg, var(--p-green), #2a8a5a); box-shadow: 0 8px 18px -8px rgba(109,212,158,0.55); }
+  .how-step:nth-child(5) .how-num { background: linear-gradient(135deg, var(--p-sun), #b07712); box-shadow: 0 8px 18px -8px rgba(255,181,71,0.55); }
+  .how-step:nth-child(6) .how-num { background: linear-gradient(135deg, var(--p-pink), #aa3070); box-shadow: 0 8px 18px -8px rgba(255,122,184,0.55); }
+  .how-step h3 {
+    font-size: 17px; font-weight: 800;
+    color: var(--ink-dark-0);
+    margin: 0 0 8px;
+    letter-spacing: -0.005em;
+  }
+  .how-step p {
+    font-size: 14px; line-height: 1.6;
+    color: var(--ink-dark-1);
+    margin: 0;
+  }
+
+  /* ============ TECH & INFRA ============ */
+  .tech-sec {
+    background:
+      radial-gradient(900px 380px at 90% 10%, rgba(74,214,255,0.10), transparent 60%),
+      var(--bg-3);
+  }
+  .tech-grid {
+    display: grid; grid-template-columns: 1.1fr 1fr;
+    gap: 24px;
+  }
+  .tech-feature {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 18px;
+    padding: 24px 24px 26px;
+    display: flex; gap: 16px;
+    align-items: flex-start;
+  }
+  .tech-icon {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 24px -10px rgba(62,58,142,0.50);
+  }
+  .tech-icon svg { width: 26px; height: 26px; }
+  .tech-feature[data-tone="aqua"] .tech-icon { background: linear-gradient(135deg, var(--p-aqua), #1c8fb5); box-shadow: 0 10px 24px -10px rgba(74,214,255,0.55); }
+  .tech-feature[data-tone="brand"] .tech-icon { background: linear-gradient(135deg, var(--p-brand), var(--p-brand-deep)); box-shadow: 0 10px 24px -10px rgba(229,4,123,0.55); }
+  .tech-feature[data-tone="green"] .tech-icon { background: linear-gradient(135deg, var(--p-green), #2a8a5a); box-shadow: 0 10px 24px -10px rgba(109,212,158,0.55); }
+  .tech-feature h3 {
+    font-size: 17px; font-weight: 800;
+    color: var(--ink-dark-0);
+    margin: 0 0 6px;
+    letter-spacing: -0.005em;
+  }
+  .tech-feature p {
+    font-size: 14px; line-height: 1.6;
+    color: var(--ink-dark-1);
+    margin: 0;
+  }
+  .tech-side {
+    display: flex; flex-direction: column;
+    gap: 16px;
+  }
+  .tech-quote {
+    background: linear-gradient(160deg, var(--p-deep) 0%, var(--bg-1) 100%);
+    color: white;
+    border-radius: 18px;
+    padding: 28px 28px 30px;
+    position: relative; overflow: hidden;
+  }
+  .tech-quote::before {
+    content: '“';
+    position: absolute; top: 4px; left: 18px;
+    font-family: Georgia, serif;
+    font-size: 110px; line-height: 1;
+    color: rgba(255,255,255,0.10);
+    pointer-events: none;
+  }
+  .tech-quote p {
+    font-size: 16px; line-height: 1.55;
+    margin: 0 0 14px;
+    position: relative;
+  }
+  .tech-quote .author {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px;
+    color: var(--ink-1);
+  }
+  .tech-quote .author-mark {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--p-purple-light), var(--p-purple));
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 13px; color: white;
+  }
+  .tech-quote .author strong { color: white; font-weight: 700; }
+
+  /* ============ OUTCOMES (stats) ============ */
+  .outcomes-sec { background: white; }
+  .outcomes-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .out-card {
+    background: linear-gradient(180deg, #fcfaff 0%, #f4eeff 100%);
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 18px;
+    padding: 26px 22px 28px;
+    text-align: left;
+  }
+  .out-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 36px; font-weight: 800;
+    background: linear-gradient(120deg, var(--p-brand) 0%, var(--p-purple) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .out-label {
+    font-size: 14px; font-weight: 700;
+    color: var(--ink-dark-0);
+    margin-bottom: 6px;
+  }
+  .out-sub {
+    font-size: 12.5px; font-weight: 500;
+    color: var(--ink-dark-2);
+    line-height: 1.5;
+  }
+
+  /* ============ HELP STRIP (egitim-setleri ile aynı UI) ============ */
+  .sec-help { background: white; padding: 0 32px 96px; }
+  .help-strip {
+    background:
+      radial-gradient(600px 300px at 80% 50%, rgba(229,4,123,0.30), transparent 60%),
+      radial-gradient(700px 400px at 10% 50%, rgba(168,164,240,0.18), transparent 60%),
+      linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    border-radius: 28px;
+    padding: 48px 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 32px;
+    max-width: var(--maxw); margin: 0 auto;
+    color: white;
+    flex-wrap: wrap;
+    box-shadow: 0 30px 80px -30px rgba(40,38,90,0.50);
+  }
+  .help-text { flex: 1; min-width: 240px; }
+  .help-title {
+    font-size: 28px; font-weight: 800;
+    line-height: 1.15; letter-spacing: -0.015em;
+    margin: 0 0 8px;
+  }
+  .help-sub { font-size: 15.5px; opacity: 0.86; max-width: 460px; line-height: 1.5; margin: 0; }
+  .help-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .help-strip .btn-ghost {
+    background: rgba(255,255,255,0.10);
+    color: white; border-color: rgba(255,255,255,0.22);
+    backdrop-filter: blur(4px);
+  }
+  .help-strip .btn-ghost:hover { background: rgba(255,255,255,0.18); }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1080px) {
+    .vm-grid, .tech-grid { grid-template-columns: 1fr; }
+    .outcomes-grid { grid-template-columns: repeat(2, 1fr); }
+    .how-grid { grid-template-columns: repeat(2, 1fr); }
+    .why-hero-stats { grid-template-columns: repeat(2, 1fr); max-width: 540px; }
+  }
+  @media (max-width: 980px) {
+    .why-hero-inner { padding: 24px 24px 56px; }
+    .why-hero h1 { font-size: 38px; }
+    .why-hero .lead { font-size: 16px; margin-bottom: 36px; }
+    h2.title { font-size: 28px; }
+    .sec-inner { padding: 64px 24px; }
+    .methods-grid { grid-template-columns: 1fr; }
+    .help-strip { padding: 36px 28px; }
+    .help-title { font-size: 22px; }
+  }
+  @media (max-width: 760px) {
+    .why-hero h1 { font-size: 30px; }
+    .why-hero-stats { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .whs-val { font-size: 20px; }
+    .outcomes-grid { grid-template-columns: 1fr 1fr; }
+    .out-num { font-size: 28px; }
+    .how-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-contact">
+      <a href="https://wa.me/905551234567" class="wa-link" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.9L4 20l4.2-1.1A7.93 7.93 0 0 0 12.05 20h.01a7.95 7.95 0 0 0 5.55-13.68z"/></svg>
+        <span>+90 555 123 45 67</span>
+      </a>
+      <a href="tel:+908501234567">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 0 0-1.02.24l-2.2 2.2a15.07 15.07 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 4c0-.55-.45-1-1-1H4a1 1 0 0 0-1 1 17 17 0 0 0 17 17c.55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+        <span class="topbar-phone-text">0850 123 45 67</span>
+      </a>
+      <a href="mailto:info@bilenyum.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <span class="topbar-mail-text">info@bilenyum.com</span>
+      </a>
+    </div>
+    <div class="topbar-social">
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.39A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.73 1.46 1.39 2.13a5.88 5.88 0 0 0 2.13 1.39c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.39 5.88 5.88 0 0 0 1.39-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.39-2.13A5.88 5.88 0 0 0 19.86.63C19.1.33 18.22.13 16.95.07 15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/></svg></a>
+      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.13C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.52A3.02 3.02 0 0 0 .5 6.2C0 8.07 0 12 0 12s0 3.93.5 5.8a3.02 3.02 0 0 0 2.12 2.13c1.88.52 9.38.52 9.38.52s7.5 0 9.38-.52a3.02 3.02 0 0 0 2.12-2.13C24 15.93 24 12 24 12s0-3.93-.5-5.8zM9.6 15.6V8.4L15.84 12 9.6 15.6z"/></svg></a>
+      <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.66H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.26 2.37 4.26 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html"><img src="assets/bilenyum-logo.svg" alt="Bilenyum" class="logo-img" /></a>
+    <div class="nav-links">
+      <a href="egitim-setleri.html">Eğitim Setleri</a>
+      <a href="ornek-videolar.html">Örnek Videolar</a>
+      <a href="kadromuz.html">Ekibimiz</a>
+      <a href="neden-biz.html" class="active">Neden Biz?</a>
+      <a href="iletisim.html">İletişim</a>
+    </div>
+    <div class="nav-cta">
+      <a href="giris.html" class="btn btn-secondary btn-sm">Giriş Yap</a>
+      <button class="btn btn-primary btn-sm" data-trial-open type="button">Ücretsiz Deneme Dersi</button>
+    </div>
+  </div>
+</header>
+
+<!-- =================== HERO (centered, classroom bg image) =================== -->
+<section class="sec why-hero">
+  <!-- Faded background: students + teachers classroom photo + glow -->
+  <div class="why-hero-bg" aria-hidden="true">
+    <div class="why-hero-bg-img"></div>
+    <div class="why-hero-bg-veil"></div>
+    <div class="why-hero-bg-glow g1"></div>
+  </div>
+
+  <nav class="breadcrumb" aria-label="Sayfa konumu">
+    <a href="index.html">Anasayfa</a>
+    <span class="sep">›</span>
+    <span class="current">Neden Bilenyum?</span>
+  </nav>
+
+  <div class="why-hero-inner">
+    <h1>Bilim ile tasarlanmış, <span class="hero-accent">öğrenci odaklı</span> bir öğrenme deneyimi.</h1>
+    <p class="lead">
+      Bilenyum; modern pedagojiyi, güçlü bir teknolojik altyapıyı ve yenilikçi ölçme-değerlendirme araçlarını tek bir ekosistemde buluşturur. Ezbere değil anlamaya, sadece sınava değil kalıcı başarı alışkanlıklarına odaklanan geleceğin eğitim modelidir.
+    </p>
+
+    <div class="why-hero-stats">
+      <div class="whs-cell" data-tone="purple">
+        <span class="whs-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </span>
+        <div class="whs-val">Özgün</div>
+        <div class="whs-lbl">Özgün eğitim materyalleri, ödevler ve ders sonrası tekrar kaynakları.</div>
+      </div>
+      <div class="whs-cell" data-tone="brand">
+        <span class="whs-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </span>
+        <div class="whs-val">12 Saat</div>
+        <div class="whs-lbl">Tüm dersler paketinde haftalık butik öğrenme deneyimi.</div>
+      </div>
+      <div class="whs-cell" data-tone="aqua">
+        <span class="whs-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </span>
+        <div class="whs-val">%100 Takip</div>
+        <div class="whs-lbl">Psikolojik danışman desteği ve aylık veli seminerleri.</div>
+      </div>
+      <div class="whs-cell" data-tone="green">
+        <span class="whs-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/></svg>
+        </span>
+        <div class="whs-val">Düzenli Sınav</div>
+        <div class="whs-lbl">Deneme sınavları ile başarı takibi ve analitik raporlar.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIGHT DIVIDER -->
+<div class="space-divider-light">
+  <div class="geo-circle-light"></div>
+  <div class="geo-dot-light d1"></div>
+  <div class="geo-dot-light d2"></div>
+  <div class="geo-line-light"></div>
+  <div class="geo-tri-light"></div>
+  <svg class="space-wave-light" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,120 C320,160 640,90 960,140 C1180,175 1320,115 1440,150 L1440,200 L0,200 Z" fill="rgba(62,58,142,0.10)"/>
+    <path d="M0,150 C260,195 540,115 820,165 C1080,210 1300,140 1440,175 L1440,200 L0,200 Z" fill="rgba(62,58,142,0.20)"/>
+    <path d="M0,175 C200,215 460,145 720,178 C960,208 1180,148 1440,178 L1440,200 L0,200 Z" fill="#ffffff"/>
+  </svg>
+</div>
+
+<!-- =================== VISION + MISSION =================== -->
+<section class="sec vm-sec">
+  <div class="sec-inner">
+    <h2 class="title">Pusulamız belli, rotamız çocuğun yörüngesinde.</h2>
+    <p class="sec-lead">Bilenyum'u büyütürken yön kuran iki yıldız: nereye gittiğimiz ve oraya nasıl gideceğimiz.</p>
+
+    <div class="vm-grid">
+      <div class="vm-card vision">
+        <span class="vm-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        </span>
+        <h3>Vizyonumuz</h3>
+        <p>
+          Her çocuğun, <strong>kendi yörüngesinde öğrenmenin</strong> hakkı olduğuna inanıyoruz. Türkiye'nin her köşesindeki çocuğun, postal kodundan bağımsız olarak; bilim odaklı, kişiselleştirilmiş ve insana saygılı bir eğitime erişebileceği bir gelecek inşa ediyoruz.
+        </p>
+        <p>
+          Bilenyum, on yıl içinde Türkçe konuşan her öğrencinin öğrenme yolunda <strong>varsayılan tercihi</strong> olmayı hedefler.
+        </p>
+      </div>
+
+      <div class="vm-card mission">
+        <span class="vm-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-9-9 18-2-8-7-1z"/></svg>
+        </span>
+        <h3>Misyonumuz</h3>
+        <p>
+          <strong>Bilimsel öğrenme yöntemlerini</strong>, deneyimli öğretmenleri ve doğru zamanda devreye giren teknolojiyi tek bir sınıfta birleştirmek. Çocuğun ne öğrendiğini, neyi anladığını ve nerede takıldığını görünür kılmak.
+        </p>
+        <p>
+          Veliye <strong>şeffaflık</strong>, öğretmene <strong>zaman</strong>, öğrenciye <strong>kendine güven</strong> kazandıran bir eğitim ekosistemi sunmak — Bilenyum'un her gün yenilediği taahhüdüdür.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== SCIENTIFIC METHODS =================== -->
+<section class="sec methods-sec">
+  <div class="sec-inner">
+    <h2 class="title">Anlamayı hızlandıran, kalıcılığı garanti eden öğrenme bilimi.</h2>
+    <p class="sec-lead">Bilenyum'un her dersi; eğitim psikolojisi ve bilişsel bilim alanında onlarca yıldır doğrulanmış ilkelerle tasarlanır. Süs değil, sırt çantamızda.</p>
+
+    <div class="methods-grid">
+      <article class="method-card" data-color="default">
+        <div class="method-head">
+          <span class="method-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          </span>
+          <div>
+            <div class="method-name">Aralıklı Tekrar</div>
+            <div class="method-en">Spaced Repetition</div>
+          </div>
+        </div>
+        <p class="method-body">
+          Yeni öğrenilen konu; sistem tarafından doğru aralıklarla yeniden gündeme getirilir. Beynin unutma eğrisine bilinçli müdahale ederek bilgiyi kısa süreli hafızadan uzun süreli hafızaya taşır.
+        </p>
+        <span class="method-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Ebbinghaus / Bahrick araştırmalarına dayanır
+        </span>
+      </article>
+
+      <article class="method-card" data-color="brand">
+        <div class="method-head">
+          <span class="method-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><polyline points="9 13 7 22 12 19 17 22 15 13"/></svg>
+          </span>
+          <div>
+            <div class="method-name">Ustalık Temelli Öğrenme</div>
+            <div class="method-en">Mastery Learning</div>
+          </div>
+        </div>
+        <p class="method-body">
+          Bir konuyu %80 ustalık eşiğine ulaşmadan bir sonrakine geçilmez. Öğrenci kendi hızında ilerler; eksik kalan kavram tekrar çalışılır. Konular üst üste değil, sağlam zemin üzerine konur.
+        </p>
+        <span class="method-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Benjamin Bloom — 2 Sigma Problemi
+        </span>
+      </article>
+
+      <article class="method-card" data-color="aqua">
+        <div class="method-head">
+          <span class="method-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2a7.5 7.5 0 0 0-5 13.16V19a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-3.84A7.5 7.5 0 0 0 9.5 2z"/><path d="M9 22h.01"/><line x1="9" y1="6" x2="9" y2="13"/></svg>
+          </span>
+          <div>
+            <div class="method-name">Bilişsel Yük Yönetimi</div>
+            <div class="method-en">Cognitive Load Theory</div>
+          </div>
+        </div>
+        <p class="method-body">
+          Ders materyali; çalışan belleği aşırı yüklemeyecek şekilde parçalanır. Gereksiz görsel uyaran, dikkat dağıtıcı çoklu kanal kaldırılır. Çocuk konuya odaklanır, kavramı işler.
+        </p>
+        <span class="method-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          John Sweller — bilişsel mimari
+        </span>
+      </article>
+
+      <article class="method-card" data-color="green">
+        <div class="method-head">
+          <span class="method-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </span>
+          <div>
+            <div class="method-name">Aktif Geri Çağırma</div>
+            <div class="method-en">Retrieval Practice</div>
+          </div>
+        </div>
+        <p class="method-body">
+          Pasif okuma yerine; öğrenci bilgiyi hatırlamak zorunda kaldığı kısa sınavlarla pekiştirir. Beyin, bilgiye ulaşma yollarını her seferinde güçlendirir — sınavda hatırlamak değil, uygulamak kolaylaşır.
+        </p>
+        <span class="method-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Roediger &amp; Karpicke meta analizleri
+        </span>
+      </article>
+
+      <article class="method-card" data-color="sun">
+        <div class="method-head">
+          <span class="method-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </span>
+          <div>
+            <div class="method-name">Sokratik Diyalog</div>
+            <div class="method-en">Socratic Questioning</div>
+          </div>
+        </div>
+        <p class="method-body">
+          Öğretmen ve Yumi, doğrudan cevap vermek yerine yönlendirici sorular sorar. Çocuk; düşünme adımlarını kendisi kurar, eleştirel düşünme kası gelişir. "Çözümü ezberleme, çıkar."
+        </p>
+        <span class="method-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Antik felsefenin sınıftaki en güncel hâli
+        </span>
+      </article>
+
+      <article class="method-card" data-color="default">
+        <div class="method-head">
+          <span class="method-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </span>
+          <div>
+            <div class="method-name">Yapay Zeka Destekli Kişiselleştirme</div>
+            <div class="method-en">Adaptive Learning</div>
+          </div>
+        </div>
+        <p class="method-body">
+          Yumi; öğrencinin çözdüğü her soruyu, geçirdiği süreyi ve yaptığı hataları analiz eder. Bir sonraki çalışma adımını çocuğa, sınıf ortalamasına değil; <strong>onun veri profiline</strong> göre önerir.
+        </p>
+        <span class="method-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Item Response Theory (IRT) tabanlı
+        </span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- =================== HOW WE TEACH (process) =================== -->
+<section class="sec how-sec">
+  <div class="sec-inner">
+    <h2 class="title">Çocuğun yolculuğu, altı net adımda kurulur.</h2>
+    <p class="sec-lead">Bilenyum'a katılan her öğrencinin önünde, ezbere değil; akışa dayalı bir yol haritası vardır. Her adımda öğretmen var, Yumi var, veli var.</p>
+
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="how-num">01</div>
+        <h3>Tanıma &amp; Tanı</h3>
+        <p>Kısa bir başlangıç değerlendirmesi ile öğrencinin mevcut seviyesi, güçlü/zayıf konuları ve öğrenme stili çıkarılır.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">02</div>
+        <h3>Kişisel Yol Haritası</h3>
+        <p>Müfredata uygun ama çocuğa özel sıralanmış bir <strong>haftalık plan</strong> oluşturulur. Hedef küçük, ölçülebilir, ulaşılabilir.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">03</div>
+        <h3>Küçük Gruplu Canlı Sınıf</h3>
+        <p>Maksimum <strong>8 öğrencilik</strong> sınıflarda, deneyimli öğretmenle gerçek zamanlı, etkileşimli ders. Soru sormak teşvik edilir.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">04</div>
+        <h3>Yumi ile Birebir Çalışma</h3>
+        <p>Ders sonrası Yumi devreye girer; takılan soruları çözer, kavramı farklı örneklerle açıklar, alıştırma önerir.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">05</div>
+        <h3>Aralıklı Pekiştirme</h3>
+        <p>Sistem, bilgiyi tam zamanında geri getirir. Yarın değil, beynin unutmak üzere olduğu anda. Böylece kalıcılık sağlanır.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">06</div>
+        <h3>Veli Görünürlüğü</h3>
+        <p>Anne-baba; <strong>haftalık özet</strong> ve Veli Kontrol Merkezi üzerinden çocuğun ne yaptığını, neyi anladığını ve nerede zorlandığını net görür.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== TECH & INFRASTRUCTURE =================== -->
+<section class="sec tech-sec">
+  <div class="sec-inner">
+    <h2 class="title">Bilime hizmet eden, dikkat dağıtmayan bir teknoloji.</h2>
+    <p class="sec-lead">Bilenyum'da teknoloji, öğretmenin yerini almak için değil; öğretmenin elini güçlendirmek için var. Her bir bileşen, ölçülebilir bir öğrenme kazanımına bağlıdır.</p>
+
+    <div class="tech-grid">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="tech-feature">
+          <span class="tech-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1.4" fill="currentColor"/></svg>
+          </span>
+          <div>
+            <h3>Yumi · Yapay Zeka Asistanı</h3>
+            <p>Müfredat ve pedagojiye eğitilmiş; çocukla Türkçe diyalog kuran, doğrudan cevap değil yol gösteren özel asistan. Konuşma geçmişi şifrelenir, üçüncü taraflarla paylaşılmaz.</p>
+          </div>
+        </div>
+        <div class="tech-feature" data-tone="aqua">
+          <span class="tech-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </span>
+          <div>
+            <h3>Adaptif Soru Bankası</h3>
+            <p>50.000+ soruluk, MEB müfredatı ve LGS odaklı banka. IRT temelli zorluk modeli sayesinde her öğrenci, kendi seviyesinin <strong>bir basamak üstünden</strong> çalışır.</p>
+          </div>
+        </div>
+        <div class="tech-feature" data-tone="brand">
+          <span class="tech-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </span>
+          <div>
+            <h3>Öğrenme Analitikleri</h3>
+            <p>Her dersin sonunda; öğretmen, veli ve öğrenci için ayrı dashboard. Hangi kazanım sağlandı, hangi konu zayıf — sayılarla, grafiklerle açık.</p>
+          </div>
+        </div>
+        <div class="tech-feature" data-tone="green">
+          <span class="tech-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          </span>
+          <div>
+            <h3>Düşük Gecikmeli Canlı Sınıf</h3>
+            <p>WebRTC tabanlı, kendi sunucularımızda barındırılan video altyapısı. 100ms altı gecikme, ekran paylaşımı, etkileşimli beyaz tahta — kesintisiz akış için.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tech-side">
+        <div class="tech-quote">
+          <p>"Çocuğun nasıl öğrendiğini bilmeden tasarlanan eğitim, en iyi içerikle bile boşa kürek çekmektir. Bilenyum'da önce <strong>bilişsel bilime</strong> baktık, sonra teknoloji yazdık."</p>
+          <div class="author">
+            <span class="author-mark">EÖ</span>
+            <span><strong>Dr. Elif Özdemir</strong> · Bilenyum Pedagoji Direktörü</span>
+          </div>
+        </div>
+
+        <div class="tech-feature" style="background:white; border-color:rgba(20,22,50,0.08);">
+          <span class="tech-icon" style="background:linear-gradient(135deg,#1a1842,#28265a); box-shadow:0 10px 24px -10px rgba(20,22,50,0.55);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 5v6c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11V5l-8-3z"/><polyline points="9 12 11 14 15 10"/></svg>
+          </span>
+          <div>
+            <h3>Veri Güvenliği &amp; KVKK Uyum</h3>
+            <p>Veriler Türkiye'deki sunucularda barındırılır; KVKK ve KOSGEB rehberine tam uyum. Çocuk verisinde minimumcu yaklaşım — sadece <strong>öğrenme için gerekli</strong> veri tutulur.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== OUTCOMES =================== -->
+<section class="sec outcomes-sec">
+  <div class="sec-inner">
+    <h2 class="title">Yöntem işliyor — ailelerden gelen veriler de söylüyor.</h2>
+    <p class="sec-lead">Bilenyum öğrencileri üzerinde son akademik yılda yapılan iç ölçümlemelerden ortaya çıkan sonuçlar.</p>
+
+    <div class="outcomes-grid">
+      <div class="out-card">
+        <div class="out-num">+%38</div>
+        <div class="out-label">Konu kavrama puanı</div>
+        <div class="out-sub">İlk 12 hafta sonunda yapılan ön-test / son-test farkı.</div>
+      </div>
+      <div class="out-card">
+        <div class="out-num">%92</div>
+        <div class="out-label">Veli memnuniyeti</div>
+        <div class="out-sub">Aylık NPS anketlerinin yıllık ortalaması.</div>
+      </div>
+      <div class="out-card">
+        <div class="out-num">2.4×</div>
+        <div class="out-label">Çalışma süresi verimi</div>
+        <div class="out-sub">Aynı sürede çözülen soru ve doğruluk oranı.</div>
+      </div>
+      <div class="out-card">
+        <div class="out-num">%96</div>
+        <div class="out-label">Devamlılık oranı</div>
+        <div class="out-sub">Bilenyum'a başlayan öğrencinin dönem sonuna kadar kalma oranı.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== HELP STRIP CTA =================== -->
+<section class="sec sec-help">
+  <div class="help-strip">
+    <div class="help-text">
+      <h3 class="help-title">Bilenyum'u en iyi yol; bir derste deneyimleyerek tanımaktır.</h3>
+      <p class="help-sub">Ücretsiz deneme dersinde; Yumi'yi tanı, sınıfa gir, ders sonunda raporunu al. Karar sonra.</p>
+    </div>
+    <div class="help-actions">
+      <button class="btn btn-primary" data-trial-open type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Ücretsiz Deneme Dersi
+      </button>
+      <a href="egitim-setleri.html" class="btn btn-ghost">
+        Eğitim Setlerini Gör
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="site-footer"></footer>
+
+<!-- ============ TRIAL MODAL (Ücretsiz Deneme Dersi) ============ -->
+<!-- CSS: assets/trial-modal.css -->
+
+<div class="trial-modal" id="trialModal" aria-hidden="true">
+  <div class="trial-modal-overlay" data-trial-close></div>
+  <div class="trial-modal-card" role="dialog" aria-modal="true" aria-labelledby="trialModalTitle">
+    <div class="trial-modal-image" aria-hidden="true">[Banner Görseli]</div>
+    <button class="trial-modal-close" data-trial-close aria-label="Kapat" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="trial-modal-body">
+      <div class="trial-modal-head">
+        <span class="trial-modal-eyebrow">Ücretsiz Deneme Dersi</span>
+        <h2 class="trial-modal-title" id="trialModalTitle">Hadi tanışalım</h2>
+        <p class="trial-modal-sub">Çocuğunun seviyesi ve hedefine en uygun deneme dersini birlikte planlayalım.</p>
+      </div>
+      <!-- Step 1: Öğrenci -->
+      <form class="trial-step-form active" id="trialStep1" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-s-name">Öğrenci adı</label>
+            <input type="text" id="trial-s-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-s-surname">Öğrenci soyadı</label>
+            <input type="text" id="trial-s-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-grade">Sınıf seviyesi</label>
+          <select id="trial-s-grade" required>
+            <option value="" disabled selected>Sınıf seç</option>
+            <option value="5">5. Sınıf</option>
+            <option value="6">6. Sınıf</option>
+            <option value="7">7. Sınıf</option>
+            <option value="8">8. Sınıf (LGS)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-subject">Deneme dersi istenen alan</label>
+          <select id="trial-s-subject" required>
+            <option value="" disabled selected>Alan seç</option>
+            <option value="mat">Matematik</option>
+            <option value="fen">Fen Bilimleri</option>
+            <option value="trk">Türkçe</option>
+            <option value="ing">İngilizce</option>
+            <option value="sos">Sosyal Bilgiler</option>
+            <option value="all">Genel (tüm dersler)</option>
+          </select>
+        </div>
+        <div class="trial-actions">
+          <button type="submit" class="btn-modal btn-modal-primary">
+            İleri
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </form>
+      <!-- Step 2: Veli -->
+      <form class="trial-step-form" id="trialStep2" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-p-name">Veli adı</label>
+            <input type="text" id="trial-p-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-p-surname">Veli soyadı</label>
+            <input type="text" id="trial-p-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-p-email">E-posta</label>
+          <input type="email" id="trial-p-email" required placeholder="ornek@email.com" autocomplete="email" data-rule="email" maxlength="120" />
+        </div>
+        <div class="form-field">
+          <label for="trial-p-phone">Telefon</label>
+          <input type="tel" id="trial-p-phone" required placeholder="+90 5XX XXX XX XX" inputmode="numeric" autocomplete="tel" maxlength="17" data-rule="phone-tr" />
+        </div>
+        <div class="trial-actions">
+          <button type="button" class="btn-modal btn-modal-ghost" id="trialBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Geri
+          </button>
+          <button type="submit" class="btn-modal btn-modal-primary">
+            Talebi Gönder
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      </form>
+      <!-- Success -->
+      <div class="trial-success" id="trialSuccess">
+        <div class="trial-success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>Talebin alındı!</h3>
+        <p>1 iş günü içinde belirttiğin telefon numarasından sana ulaşacağız. Tanışmak için sabırsızlanıyoruz!</p>
+        <button type="button" class="btn-modal" data-trial-close>Tamam</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TRIAL MODAL END ============ -->
+
+<script src="assets/dom.js"></script>
+<script src="assets/trial-modal.js"></script>
+<script src="assets/input-rules.js"></script>
+
+<script src="assets/footer.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude Code workspace files
+.claude/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Node (if you add a build pipeline later)
+node_modules/
+dist/
+build/

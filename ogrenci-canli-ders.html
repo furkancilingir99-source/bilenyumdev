@@ -1,0 +1,958 @@
+﻿<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Canlı Ders · Bilenyum</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Montserrat:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/live-class/live-class-theme.css">
+<link rel="stylesheet" href="assets/live-class/live-class-shell.css">
+<link rel="stylesheet" href="assets/live-class/live-class-answer-ux.css">
+<link rel="stylesheet" href="assets/live-class.css">
+</head>
+<body class="lc-body lc-class-shell">
+
+<div class="lc-scene" aria-hidden="true">
+  <div class="lc-scene-grid"></div>
+  <div class="lc-orb lc-orb-1"></div>
+  <div class="lc-orb lc-orb-2"></div>
+  <div class="lc-stars"></div>
+</div>
+
+<!-- ========== 6.1 CİHAZ KONTROLÜ (PRE-JOIN) ========== -->
+<section class="lc-screen lc-screen--prejoin is-active" id="lcPreJoin" aria-label="Derse katılım hazırlığı">
+  <div class="tlc-join">
+    <div class="tlc-join-head">
+      <div class="tlc-join-logo" aria-hidden="true">🎓</div>
+      <h1 class="tlc-join-title">Bilenyum Canlı Dersi</h1>
+      <div class="tlc-join-channel">
+        <span id="pjSubject">LGS Matematik</span> — <span id="pjTopic">Denklem Çözme</span>
+        &nbsp;·&nbsp; Öğretmen: <strong id="pjTeacher">Furkan Çilingir</strong>
+        &nbsp;·&nbsp; <span id="pjStudentName">Furkan Çilingir</span>
+      </div>
+    </div>
+
+    <div class="tlc-join-body">
+      <!-- Sol: kamera önizleme -->
+      <div class="tlc-join-preview">
+        <div class="tlc-join-preview-stage" id="pjCamPreview">
+          <div class="tlc-join-cam-off" id="pjCamOff">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            <span>Kameranız kapatıldı</span>
+          </div>
+        </div>
+        <div class="tlc-join-preview-bar">
+          <div class="tlc-ctrl-group" id="pjCamGroup">
+            <button type="button" class="tlc-join-iconbtn" id="pjCamToggleBtn" aria-label="Kamera aç/kapat" aria-pressed="false">
+              <!-- cam-off icon (varsayılan: kapalı) -->
+              <svg id="pjCamIconOff" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              <!-- cam-on icon (gizli başlar) -->
+              <svg id="pjCamIconOn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            </button>
+            <button type="button" class="tlc-pj-caret" id="pjCamCaret" aria-label="Kamera seç" aria-haspopup="true" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="tlc-join-menu tlc-join-menu--up" id="pjCamMenu" hidden role="menu" aria-label="Kamera">
+              <span class="tlc-join-menu-title">Kamera</span>
+              <label class="tlc-join-menu-opt"><input type="radio" name="pjCam" checked><span>FaceTime HD Camera</span></label>
+              <label class="tlc-join-menu-opt"><input type="radio" name="pjCam"><span>Harici Webcam</span></label>
+              <label class="tlc-join-menu-opt"><input type="radio" name="pjCam"><span>OBS Sanal Kamera</span></label>
+              <hr class="tlc-audio-div">
+              <button type="button" class="tlc-join-menu-more">Diğer video ayarları</button>
+            </div>
+          </div>
+          <label class="tlc-join-switch"><input type="checkbox" class="tlc-switch" id="pjCamSwitch" aria-label="Kamerayı aç/kapat"></label>
+          <input type="checkbox" id="pjStartCamOff" checked hidden aria-hidden="true">
+          <div class="tlc-join-bgfilter-wrap" style="position:relative;margin-left:auto;">
+            <button type="button" class="tlc-join-bgfilter" id="pjBgFilterBtn" aria-haspopup="true" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/><path d="M2 17c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/></svg>
+              Arka plan filtreleri
+            </button>
+            <div class="tlc-join-menu tlc-join-menu--up" id="pjBgFilterMenu" hidden role="menu" style="right:0;left:auto;width:220px;">
+              <span class="tlc-join-menu-title">Arka Plan Filtresi</span>
+              <label class="tlc-join-menu-opt"><input type="radio" name="pjBgFilter" checked><span class="lc-bgf-sw lc-bgf-none"></span><span>Hiçbiri</span></label>
+              <label class="tlc-join-menu-opt"><input type="radio" name="pjBgFilter"><span class="lc-bgf-sw lc-bgf-blur"></span><span>Bulanık</span></label>
+              <label class="tlc-join-menu-opt"><input type="radio" name="pjBgFilter"><span class="lc-bgf-sw lc-bgf-mor"></span><span>Bilenyum Mor</span></label>
+              <label class="tlc-join-menu-opt"><input type="radio" name="pjBgFilter"><span class="lc-bgf-sw lc-bgf-lila"></span><span>Lila Işıltı</span></label>
+              <label class="tlc-join-menu-opt"><input type="radio" name="pjBgFilter"><span class="lc-bgf-sw lc-bgf-gece"></span><span>Gece Mavisi</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sağ: ses seçenekleri -->
+      <div class="tlc-join-audio">
+        <label class="tlc-join-acard is-selected" id="pjComputerCard">
+          <span class="tlc-join-radio"><input type="radio" name="pjAudio" value="computer" checked></span>
+          <span class="tlc-join-acard-body">
+            <span class="tlc-join-acard-head">Bilgisayar sesi</span>
+            <span class="tlc-join-arow">
+              <span class="tlc-join-arow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="1" y1="1" x2="23" y2="23"/></svg></span>
+              <button type="button" class="tlc-join-dd" id="pjMicDD" aria-haspopup="true" aria-expanded="false">MacBook Mikrofonu <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+              <input type="checkbox" class="lc-pj-switch" id="pjStartMicOff" checked aria-label="Mikrofonu kapalı başlat">
+              <div class="tlc-join-menu" id="pjMicMenu" hidden role="menu" aria-label="Mikrofon">
+                <span class="tlc-join-menu-title">Mikrofon</span>
+                <label class="tlc-join-menu-opt"><input type="radio" name="pjMic" checked><span>MacBook Mikrofonu</span></label>
+                <label class="tlc-join-menu-opt"><input type="radio" name="pjMic"><span>USB Mikrofon</span></label>
+                <label class="tlc-join-menu-opt"><input type="radio" name="pjMic"><span>AirPods Mikrofon</span></label>
+                <div class="tlc-join-meter-row">
+                  <span class="tlc-join-arow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/></svg></span>
+                  <div class="lc-meter-bar" style="flex:1"><div class="lc-meter-fill" id="pjMicMeter"></div></div>
+                </div>
+                <hr class="tlc-audio-div">
+                <button type="button" class="tlc-join-menu-more">Daha fazla ses ayarı</button>
+              </div>
+            </span>
+            <span class="tlc-join-arow">
+              <span class="tlc-join-arow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg></span>
+              <button type="button" class="tlc-join-dd" id="pjSpkDD" aria-haspopup="true" aria-expanded="false">MacBook Hoparlör <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+              <div class="tlc-join-menu" id="pjSpkMenu" hidden role="menu" aria-label="Hoparlör">
+                <span class="tlc-join-menu-title">Hoparlör</span>
+                <label class="tlc-join-menu-opt"><input type="radio" name="pjSpk" checked><span>MacBook Hoparlör</span></label>
+                <label class="tlc-join-menu-opt"><input type="radio" name="pjSpk"><span>AirPods</span></label>
+                <label class="tlc-join-menu-opt"><input type="radio" name="pjSpk"><span>Harici Hoparlör</span></label>
+                <hr class="tlc-audio-div">
+                <button type="button" class="tlc-join-menu-more">Daha fazla ses ayarı</button>
+              </div>
+            </span>
+            <a class="tlc-join-test" id="pjMicSpkTest">Mikrofonu ve hoparlörü test et</a>
+          </span>
+        </label>
+        <label class="tlc-join-aopt is-disabled"><span class="tlc-join-radio"><input type="radio" name="pjAudio" value="phone" disabled></span><span>Telefon sesi</span></label>
+        <label class="tlc-join-aopt"><span class="tlc-join-radio"><input type="radio" name="pjAudio" value="room"></span><span>Oda sesi</span></label>
+        <label class="tlc-join-aopt"><span class="tlc-join-radio"><input type="radio" name="pjAudio" value="none"></span><span>Ses kullanma</span></label>
+        <div class="lc-device-error" id="pjDeviceError" hidden role="alert"></div>
+      </div>
+    </div>
+
+    <div class="tlc-join-actions">
+      <button type="button" class="lc-btn lc-btn--ghost" id="pjCancel">Geri dön</button>
+      <button type="button" class="lc-btn lc-btn--primary" id="pjJoin">Derse katıl</button>
+    </div>
+    <a class="tlc-join-help" href="#">Yardım mı gerekiyor?</a>
+  </div>
+</section>
+
+<!-- ========== 6.2 BEKLEME ODASI ========== -->
+<section class="lc-screen lc-screen--waiting" id="lcWaiting" hidden aria-label="Bekleme odası">
+  <div class="lc-wait-card">
+    <div class="lc-wait-spinner"></div>
+    <h2 class="lc-wait-title" id="waitTitle">Öğretmenin seni derse almak üzere</h2>
+    <p class="lc-wait-sub" id="waitLessonLabel">LGS Matematik — Denklem Çözme</p>
+    <p class="lc-wait-teacher">Öğretmen: <span id="waitTeacher">Furkan Çilingir</span></p>
+    <p class="lc-wait-time">Planlanan başlangıç: <strong id="waitStartTime">09:00</strong></p>
+    <p class="lc-wait-conn">Bağlantı: <span class="lc-ok" id="waitConn">İyi</span></p>
+    <div class="lc-wait-preview" id="waitPreview">
+      <div class="lc-vid-card lc-vid-card--me is-mini">
+        <div class="lc-vid-avatar">🧑‍🎓</div>
+        <span class="lc-vid-you">Sen</span>
+      </div>
+    </div>
+    <div class="lc-wait-actions">
+      <button type="button" class="lc-btn lc-btn--primary" id="waitAdmit">Öğretmen derse aldı (demo)</button>
+      <button type="button" class="lc-btn lc-btn--ghost" id="waitLeave">Çıkış</button>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 6.3 CANLI DERS ========== -->
+<div class="lc-live lc-class-shell" id="lcLive" hidden>
+
+  <!-- BÖLGE 1: ÜST DERS BARI -->
+  <header class="lc-topbar" id="lcTopbar">
+    <div class="lc-topbar-left" id="lcIdentityMount"></div>
+    <div class="lc-topbar-chips" id="lcStatusChips" aria-label="Ders durumu">
+      <span class="lc-chip is-live">Canlı</span>
+      <div class="lc-student-status-badges" id="lcStudentStatusBadges" aria-label="Durum rozetleri"></div>
+      <button type="button" class="lc-xp-badge" id="lcXpBadge" aria-label="Bugünkü XP">+85 XP</button>
+    </div>
+    <div class="lc-topbar-right">
+      <button type="button" class="lc-icon-btn lc-notif-btn" id="lcNotifBtn" aria-label="Bildirimler">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="lc-notif-badge" id="lcNotifBadge" hidden>0</span>
+      </button>
+      <button type="button" class="lc-icon-btn lc-conn is-good" id="lcConnBtn" aria-label="Bağlantı kalitesi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>
+        <span class="lc-conn-tip" id="lcConnTip">Bağlantı iyi · 42ms · %0 paket kaybı</span>
+      </button>
+      <button type="button" class="lc-icon-btn" id="lcFullscreenBtn" aria-label="Tam ekran"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
+      <button type="button" class="lc-icon-btn" id="lcSettingsBtn" aria-label="Ayarları aç"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+      <button type="button" class="lc-icon-btn" id="lcHelpBtn" aria-label="Yardım iste"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
+      <button type="button" class="lc-icon-btn lc-icon-btn--danger" id="lcLeaveTopBtn" aria-label="Dersten ayrıl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+    </div>
+  </header>
+
+  <div class="lc-student-banner" id="lcStudentBanner" hidden role="status" aria-live="polite"></div>
+  <div class="lc-connection-warning" id="lcConnectionWarning" hidden role="alert"></div>
+  <div class="lc-wb-state-banner" id="lcWbStateBanner" hidden role="status"></div>
+  <div class="lc-quiz-context-hint" id="lcQuizContextHint" hidden role="status"></div>
+
+  <!-- ANA GÖVDE -->
+  <div class="lc-workspace" id="lcWorkspace">
+
+    <!-- BÖLGE 2 + 3: SAHNE + VİDEO -->
+    <div class="lc-stage-col" id="lcStageCol">
+      <section class="lc-main-stage" id="lcMainStage" aria-label="Ana sahne">
+
+        <!-- Konuşmacı görünümü -->
+        <div class="lc-view lc-view--speaker is-active" id="lcViewSpeaker">
+          <div class="lc-speaker-stage" id="lcSpeakerStage"></div>
+        </div>
+
+        <!-- Ekran paylaşımı -->
+        <div class="lc-view lc-view--share" id="lcViewShare" hidden>
+          <div class="lc-share-badge">Öğretmen ekran paylaşıyor</div>
+          <div class="lc-share-frame">
+            <div class="lc-share-mock" id="lcShareMock">
+              <div class="lc-share-slide">
+                <h3>Doğrusal Denklemler</h3>
+                <p>2x + 5 = 15 → x = ?</p>
+                <div class="lc-share-graph"></div>
+              </div>
+            </div>
+            <div class="lc-share-tools">
+              <button type="button" class="lc-share-tool" data-zoom="in" aria-label="Yakınlaştır">+</button>
+              <button type="button" class="lc-share-tool" data-zoom="out" aria-label="Uzaklaştır">−</button>
+              <button type="button" class="lc-share-tool" data-zoom="fit" aria-label="Ekrana sığdır">⤢</button>
+            </div>
+          </div>
+          <div class="lc-float-teacher" id="lcFloatTeacher"></div>
+        </div>
+
+        <!-- Beyaz tahta -->
+        <div class="lc-view lc-view--board" id="lcViewBoard" hidden>
+          <div class="lc-board-permission" id="lcBoardPermission">
+            <span class="lc-board-perm-icon" id="lcBoardPermIcon">🔒</span>
+            <span class="lc-board-perm-text" id="lcBoardPermText">Sadece izleme — yazmak için parmak kaldır.</span>
+          </div>
+          <div class="lc-board-wrap" id="lcBoardWrap">
+            <div class="lc-board-empty" id="lcBoardEmpty">
+              <span>🪐</span>
+              <p>Öğretmenin beyaz tahta paylaşımını bekliyorsun…</p>
+            </div>
+            <div class="lc-board-active" id="lcBoardActive" hidden>
+              <canvas id="lcDrawCanvas" aria-label="Beyaz tahta çizim alanı"></canvas>
+              <div class="lc-cursors" id="lcCursors"></div>
+            </div>
+          </div>
+          <div class="lc-board-tools" id="lcBoardTools">
+            <button type="button" class="lc-btool" data-tool="pointer" aria-label="İşaretçi" title="İşaretçi">↖</button>
+            <button type="button" class="lc-btool is-active" data-tool="pen" aria-label="Kalem" title="Kalem">✎</button>
+            <button type="button" class="lc-btool" data-tool="highlighter" aria-label="Fosforlu kalem" title="Fosforlu kalem">🖍</button>
+            <button type="button" class="lc-btool lc-btool--eraser" data-tool="eraser" aria-label="Silgi" title="Silgi — kendi çizimlerini sil">🧽 Silgi</button>
+            <input type="color" class="lc-board-color" id="lcBoardColor" value="#FF2DAA" aria-label="Renk seç" title="Renk">
+            <select class="lc-board-width" id="lcBoardWidth" aria-label="Kalem kalınlığı" title="Kalınlık">
+              <option value="2">İnce</option>
+              <option value="3" selected>Orta</option>
+              <option value="6">Kalın</option>
+            </select>
+            <button type="button" class="lc-btool" id="lcBoardUndo" aria-label="Geri al" title="Geri al">↩</button>
+            <button type="button" class="lc-btool" id="lcBoardRedo" aria-label="Yinele" title="Yinele">↪</button>
+            <button type="button" class="lc-btool lc-btool--clear" id="lcBoardClearOwn" aria-label="Kendi çizimlerimi temizle" title="Kendi çizimlerimi temizle">🗑</button>
+          </div>
+        </div>
+
+        <!-- Boş durum -->
+        <div class="lc-view lc-view--empty" id="lcViewEmpty" hidden>
+          <div class="lc-empty-state"><span>🪐</span><p>Ders içeriği yükleniyor…</p></div>
+        </div>
+
+        <!-- Altyazı -->
+        <div class="lc-captions" id="lcCaptions" hidden role="region" aria-live="polite">
+          <p id="lcCaptionsText">Furkan Çilingir: Bugün doğrusal denklemleri birlikte çözeceğiz.</p>
+        </div>
+
+        <!-- Tam ekran büyüt/küçült -->
+        <button type="button" class="lc-stage-fs-btn" id="lcStageFsBtn" aria-label="Tam ekran yap" title="Tam ekran">
+          <svg class="lc-fs-ico-max" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          <svg class="lc-fs-ico-min" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        </button>
+      </section>
+
+      <!-- Aktif cevap isteği dock (scroll'suz cevaplama) -->
+      <aside class="lc-answer-dock" id="lcAnswerDock" hidden aria-label="Aktif cevap isteği">
+        <div class="lc-answer-dock-inner">
+          <header class="lc-answer-dock-head">
+            <span class="lc-answer-dock-title" id="lcAnswerDockTitle">Aktif Soru</span>
+            <span class="lc-answer-timer" id="lcAnswerDockTimer" hidden>00:45</span>
+            <button type="button" class="lc-answer-dock-min" id="lcAnswerDockMin" aria-label="Küçült">−</button>
+          </header>
+          <p class="lc-answer-dock-hint" id="lcAnswerDockHint">Ekrandaki soruya göre cevabını seç.</p>
+          <div class="lc-answer-dock-question-wrap" id="lcAnswerDockQuestionWrap">
+            <p class="lc-answer-dock-question" id="lcAnswerDockQuestion" hidden></p>
+            <button type="button" class="lc-answer-dock-expand" id="lcAnswerDockExpand" hidden>Sorunun tamamını gör</button>
+          </div>
+          <div class="lc-answer-dock-body">
+            <div class="lc-answer-opts" id="lcAnswerDockOpts"></div>
+            <div class="lc-answer-open" id="lcAnswerDockOpen" hidden>
+              <textarea id="lcAnswerDockText" aria-label="Cevabını yaz" placeholder="Cevabını yaz…"></textarea>
+            </div>
+          </div>
+          <div class="lc-answer-feedback" id="lcAnswerDockFeedback" hidden></div>
+          <footer class="lc-answer-dock-foot">
+            <span class="lc-answer-selection" id="lcAnswerDockSelection">Bir seçenek seç</span>
+            <button type="button" class="lc-btn lc-btn--primary" id="lcAnswerDockSubmit" disabled>Cevabı Gönder</button>
+          </footer>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- BÖLGE 4: SAĞ PANEL -->
+    <aside class="lc-sidebar" id="lcSidebar" aria-label="Etkileşim paneli">
+      <div class="lc-sidebar-tabs" role="tablist">
+        <button type="button" class="lc-tab is-active" role="tab" data-tab="chat" aria-selected="true" aria-label="Chat panelini aç"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+        <button type="button" class="lc-tab" role="tab" data-tab="people" aria-selected="false" aria-label="Katılımcılar panelini aç"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></button>
+        <button type="button" class="lc-tab" role="tab" data-tab="quiz" aria-selected="false" aria-label="Quiz panelini aç"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#FACC15"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span class="lc-tab-badge" id="lcQuizBadge" hidden></span></button>
+        <button type="button" class="lc-tab" role="tab" data-tab="progress" aria-selected="false" aria-label="İlerlemem panelini aç"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></button>
+      </div>
+
+      <div class="lc-panel is-active" id="lcPanelChat" role="tabpanel">
+        <h2 class="lc-panel-title">Sohbet</h2>
+        <div class="lc-chat-pinned" id="lcChatPinned"></div>
+        <div class="lc-chat-feed" id="lcChatFeed">
+          <p class="lc-panel-empty" id="lcChatEmpty">Henüz mesaj yok. İlk mesajı sen gönderebilirsin.</p>
+        </div>
+        <div class="lc-chat-disabled-notice" id="lcChatDisabledNotice" hidden role="status"></div>
+        <form class="lc-chat-form" id="lcChatForm">
+          <div class="lc-chat-row">
+            <button type="button" class="lc-chat-emoji" id="lcChatEmoji" aria-label="Emoji ekle">😊</button>
+            <input type="text" class="lc-chat-input" id="lcChatInput" placeholder="Mesaj yaz…" maxlength="280" autocomplete="off">
+            <button type="submit" class="lc-chat-send" aria-label="Mesaj gönder">➤</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="lc-panel" id="lcPanelPeople" role="tabpanel" hidden>
+        <h2 class="lc-panel-title">Katılımcılar (<span id="lcPeopleCount">13</span>)</h2>
+        <div class="lc-people-list" id="lcPeopleList"></div>
+      </div>
+
+      <div class="lc-panel" id="lcPanelQuiz" role="tabpanel" hidden>
+        <div class="lc-answer-sticky" id="lcAnswerStickyPanel" hidden aria-hidden="true"></div>
+        <h2 class="lc-panel-title">Ekrandaki Soru</h2>
+        <div class="lc-quiz-box lc-screen-q-box" id="lcScreenQBox" hidden>
+          <div class="lc-quiz-timer" id="lcSqTimer" hidden>⏱ 0:45</div>
+          <h3 class="lc-quiz-q" id="lcSqTitle">Ekrandaki soruyu cevapla</h3>
+          <p class="lc-quiz-q" id="lcSqQuestion" hidden></p>
+          <div id="lcSqMcWrap">
+            <div class="lc-quiz-opts" id="lcSqOpts"></div>
+          </div>
+          <div id="lcSqOpenWrap" hidden>
+            <textarea class="lc-sq-answer" id="lcSqAnswer" rows="3" placeholder="Cevabını buraya yaz..." aria-label="Cevabını yaz"></textarea>
+          </div>
+          <button type="button" class="lc-btn lc-btn--primary lc-quiz-submit" id="lcSqSubmit" disabled>Cevabı Gönder</button>
+          <div class="lc-sq-result" id="lcSqResult" hidden></div>
+        </div>
+      </div>
+
+      <div class="lc-panel" id="lcPanelProgress" role="tabpanel" hidden>
+        <h2 class="lc-panel-title">Benim Ders İlerlemem</h2>
+        <div id="lcProgressBody"></div>
+      </div>
+
+      <div class="lc-panel" id="lcPanelStatus" role="tabpanel" hidden>
+        <h2 class="lc-panel-title">Durumum</h2>
+        <p class="lc-panel-sub">İzin durumlarını görürsün; değiştiremezsin.</p>
+        <div id="lcPermStatusBody"></div>
+      </div>
+
+      <div class="lc-panel" id="lcPanelNotes" role="tabpanel" hidden>
+        <h2 class="lc-panel-title">Kişisel Notlar</h2>
+        <div class="lc-notes-actions">
+          <button type="button" class="lc-notes-btn" id="lcNotesStamp">🕐 Zaman damgası</button>
+          <button type="button" class="lc-notes-btn" id="lcNotesShot">📸 Ekran görüntüsü</button>
+          <button type="button" class="lc-notes-btn" id="lcNotesClear">🗑 Temizle</button>
+          <button type="button" class="lc-notes-btn" id="lcNotesPdf">📄 PDF indir</button>
+        </div>
+        <div class="lc-notes-editor" id="lcNotesEditor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Ders sırasında notlarını buraya yazabilirsin."></div>
+        <span class="lc-notes-save" id="lcNotesSave">Kaydedildi</span>
+      </div>
+
+      <div class="lc-panel" id="lcPanelTranscript" role="tabpanel" hidden>
+        <h2 class="lc-panel-title">Transkript</h2>
+        <div class="lc-transcript-list" id="lcTranscriptList">
+          <p class="lc-panel-empty">Altyazı açıldığında konuşmalar burada listelenir.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- BÖLGE 5: ALT KONTROL BARı -->
+  <footer class="lc-controlbar" id="lcControlbar" aria-label="Ders kontrolleri">
+    <div class="lc-control-group">
+      <!-- Mikrofon grubu (öğretmen tasarımından) -->
+      <div class="tlc-ctrl-group" id="lcMicGroup">
+        <button type="button" class="tlc-ctrl-btn is-stateful" id="lcMicBtn" aria-label="Mikrofonu aç veya kapat" title="Mikrofonu aç/kapat · M"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></span><span>Mikrofon</span></button>
+        <button type="button" class="tlc-ctrl-caret" id="lcAudioMenuBtn" aria-label="Ses ayarları" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>
+        </button>
+        <div class="tlc-audio-menu" id="lcAudioMenu" hidden role="menu" aria-label="Ses ayarları">
+          <div class="tlc-audio-sec">
+            <span class="tlc-audio-title">Hoparlör</span>
+            <label class="tlc-audio-opt"><input type="radio" name="lcSpk"><span>Kulaklıklar (2- JBL Quantum Stream Studio)</span></label>
+            <label class="tlc-audio-opt"><input type="radio" name="lcSpk"><span>Hoparlör (Realtek(R) Audio)</span></label>
+            <label class="tlc-audio-opt"><input type="radio" name="lcSpk" checked><span>Speakers (NVIDIA Broadcast)</span></label>
+            <div class="tlc-audio-slider"><span class="tlc-audio-slider-ico">🔊</span><input type="range" min="0" max="100" value="35" aria-label="Hoparlör seviyesi"></div>
+          </div>
+          <hr class="tlc-audio-div">
+          <div class="tlc-audio-sec">
+            <span class="tlc-audio-title">Mikrofon</span>
+            <label class="tlc-audio-opt"><input type="radio" name="lcMic" checked><span>Mikrofon (2- JBL Quantum Stream Studio)</span></label>
+            <label class="tlc-audio-opt"><input type="radio" name="lcMic"><span>Microphone (Camo)</span></label>
+            <label class="tlc-audio-opt"><input type="radio" name="lcMic"><span>Mikrofon (Realtek(R) Audio)</span></label>
+            <div class="tlc-audio-meter" aria-hidden="true"><span class="tlc-audio-slider-ico">🎙️</span><span class="tlc-audio-bars" id="lcMicLevelBars"><i class="is-on"></i><i class="is-on"></i><i class="is-on"></i><i class="is-on"></i><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+          </div>
+          <hr class="tlc-audio-div">
+          <label class="tlc-audio-row"><span>Gürültü engelleme</span><input type="checkbox" class="tlc-switch" checked></label>
+        </div>
+      </div>
+      <!-- Kamera grubu (öğretmen tasarımından) -->
+      <div class="tlc-ctrl-group" id="lcCamGroup">
+        <button type="button" class="tlc-ctrl-btn is-stateful" id="lcCamBtn" aria-label="Kamerayı aç veya kapat" title="Kamerayı aç/kapat · V"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></span><span>Kamera</span></button>
+        <button type="button" class="tlc-ctrl-caret" id="lcCamMenuBtn" aria-label="Kamera ayarları" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>
+        </button>
+        <div class="tlc-audio-menu" id="lcCamMenu" hidden role="menu" aria-label="Kamera ayarları">
+          <div class="tlc-audio-sec">
+            <span class="tlc-audio-title">Kamera</span>
+            <label class="tlc-audio-opt"><input type="radio" name="lcCamDev" checked><span>FaceTime HD Camera</span></label>
+            <label class="tlc-audio-opt"><input type="radio" name="lcCamDev"><span>Harici Webcam</span></label>
+            <label class="tlc-audio-opt"><input type="radio" name="lcCamDev"><span>OBS Virtual Camera</span></label>
+          </div>
+          <hr class="tlc-audio-div">
+          <div class="tlc-audio-sec">
+            <span class="tlc-audio-title">Arka planlar</span>
+            <div class="tlc-bg-grid" id="lcBgGrid">
+              <button type="button" class="tlc-bg-item is-selected" data-bg="none" data-bg-name="Hiçbiri">
+                <span class="tlc-bg-swatch tlc-bg-none">⊘</span><span class="tlc-bg-name">Hiçbiri</span>
+              </button>
+              <button type="button" class="tlc-bg-item" data-bg="blur" data-bg-name="Bulanık">
+                <span class="tlc-bg-swatch tlc-bg-blur"></span><span class="tlc-bg-name">Bulanık</span>
+              </button>
+              <button type="button" class="tlc-bg-item" data-bg="bilenyum" data-bg-name="Bilenyum Mor" style="--bg-grad:linear-gradient(135deg,#3e3a8e 0%,#e6087b 100%);">
+                <span class="tlc-bg-swatch tlc-bg-img"></span><span class="tlc-bg-name">Bilenyum Mor</span>
+              </button>
+              <button type="button" class="tlc-bg-item" data-bg="lila" data-bg-name="Lila Işıltı" style="--bg-grad:linear-gradient(135deg,#a8a4f0 0%,#6964c4 100%);">
+                <span class="tlc-bg-swatch tlc-bg-img"></span><span class="tlc-bg-name">Lila Işıltı</span>
+              </button>
+              <button type="button" class="tlc-bg-item" data-bg="gece" data-bg-name="Gece Mavisi" style="--bg-grad:linear-gradient(160deg,#28265a 0%,#3e3a8e 100%);">
+                <span class="tlc-bg-swatch tlc-bg-img"></span><span class="tlc-bg-name">Gece Mavisi</span>
+              </button>
+              <button type="button" class="tlc-bg-item" data-bg="neon" data-bg-name="Neon Magenta" style="--bg-grad:linear-gradient(135deg,#e6087b 0%,#ff6ec4 100%);">
+                <span class="tlc-bg-swatch tlc-bg-img"></span><span class="tlc-bg-name">Neon Magenta</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="lc-control-group">
+      <!-- El grubu (buton + caret menü) -->
+      <div class="tlc-ctrl-group" id="lcHandGroup">
+        <button type="button" class="tlc-ctrl-btn" id="lcHandBtn" aria-label="El kaldır" aria-pressed="false" title="Whiteboard'a yazmak için parmak kaldır · H"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span><span class="lc-ctrl-label">El</span></button>
+        <button type="button" class="tlc-ctrl-caret" id="lcHandMenuBtn" aria-label="El seçenekleri" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>
+        </button>
+        <div class="tlc-audio-menu tlc-mini-menu" id="lcHandMenu" hidden role="menu" aria-label="El seçenekleri">
+          <div class="tlc-audio-sec">
+            <span class="tlc-audio-title">Söz / El</span>
+            <button type="button" class="tlc-menu-act" data-hand="raise"><span class="tlc-menu-ico">✋</span>Parmak kaldır</button>
+            <button type="button" class="tlc-menu-act" data-hand="lower"><span class="tlc-menu-ico">🤚</span>Eli indir</button>
+          </div>
+        </div>
+      </div>
+      <!-- Tepki grubu (buton + caret menü) -->
+      <div class="tlc-ctrl-group" id="lcReactGroup">
+        <button type="button" class="tlc-ctrl-btn" id="lcReactBtn" aria-label="Reaksiyon gönder" aria-expanded="false"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></span><span>Tepki</span></button>
+        <button type="button" class="tlc-ctrl-caret" id="lcReactCaretBtn" aria-label="Tepki seç" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>
+        </button>
+        <div class="lc-react-menu" id="lcReactMenu" hidden>
+          <button type="button" data-react="clap" aria-label="Alkış">👏</button>
+          <button type="button" data-react="like" aria-label="Beğendim">👍</button>
+          <button type="button" data-react="heart" aria-label="Kalp">❤️</button>
+          <button type="button" data-react="smile" aria-label="Gülümseme">😊</button>
+          <button type="button" data-react="wow" aria-label="Şaşırdım">😮</button>
+          <button type="button" data-react="confused" aria-label="Anlamadım">😕</button>
+          <button type="button" data-react="slow" aria-label="Yavaşla">🐢</button>
+          <button type="button" data-react="fast" aria-label="Hızlan">⚡</button>
+        </div>
+      </div>
+    </div>
+    <div class="lc-control-group">
+      <button type="button" class="lc-ctrl lc-ctrl--leave" id="lcLeaveBtn" aria-label="Dersten ayrıl"><span class="lc-ctrl-icon"><svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;display:block"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.88 1.11-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.6a.984.984 0 0 1-.29-.7c0-.28.11-.53.29-.71C3.34 9.78 7.46 8 12 8s8.66 1.78 11.71 4.19c.18.18.29.43.29.71 0 .27-.11.52-.29.7l-2.48 2.46c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28a11.27 11.27 0 0 0-2.66-1.85.998.998 0 0 1-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg></span><span class="lc-ctrl-label">Dersten Ayrıl</span></button>
+    </div>
+  </footer>
+</div>
+
+<!-- MODALLAR -->
+<div class="lc-modal" id="lcLeaveModal" hidden role="dialog" aria-labelledby="lcLeaveTitle" aria-modal="true">
+  <div class="lc-modal-backdrop" data-close-modal></div>
+  <div class="lc-modal-card">
+    <h2 class="lc-modal-title" id="lcLeaveTitle">Dersten ayrılmak istiyor musun?</h2>
+    <p class="lc-modal-text">Canlı dersten çıkarsan katılımın sona erer.</p>
+    <div class="lc-modal-actions">
+      <button type="button" class="lc-btn lc-btn--ghost" data-close-modal>İptal</button>
+      <button type="button" class="lc-btn lc-btn--danger" id="lcLeaveConfirm">Dersten ayrıl</button>
+    </div>
+  </div>
+</div>
+
+<div class="lc-modal lc-modal--wide" id="lcSettingsModal" hidden role="dialog" aria-labelledby="lcSettingsTitle" aria-modal="true">
+  <div class="lc-modal-backdrop" data-close-modal></div>
+  <div class="lc-modal-card">
+    <h2 class="lc-modal-title" id="lcSettingsTitle">Ayarlar</h2>
+    <div class="lc-settings-tabs" role="tablist">
+      <button type="button" class="lc-stab is-active" data-stab="audio">Ses</button>
+      <button type="button" class="lc-stab" data-stab="video">Kamera</button>
+      <button type="button" class="lc-stab" data-stab="view">Görünüm</button>
+      <button type="button" class="lc-stab" data-stab="captions">Altyazı</button>
+      <button type="button" class="lc-stab" data-stab="shortcuts">Kısayollar</button>
+      <button type="button" class="lc-stab" data-stab="connection">Bağlantı</button>
+    </div>
+    <div class="lc-spanel is-active" data-spanel="audio">
+      <label class="lc-prejoin-field"><span>Mikrofon</span><select><option>Varsayılan</option></select></label>
+      <label class="lc-prejoin-field"><span>Hoparlör</span><select><option>Varsayılan</option></select></label>
+      <label class="lc-prejoin-check"><input type="checkbox" checked> Gürültü azaltma</label>
+    </div>
+    <div class="lc-spanel" data-spanel="video" hidden>
+      <label class="lc-prejoin-field"><span>Kamera</span><select><option>HD Webcam</option></select></label>
+      <label class="lc-prejoin-check"><input type="checkbox"> Ayna görünümü</label>
+      <label class="lc-prejoin-check"><input type="checkbox"> Arka plan bulanıklaştırma</label>
+    </div>
+    <div class="lc-spanel" data-spanel="view" hidden>
+      <label class="lc-prejoin-check"><input type="radio" name="viewmode" checked> Galeri görünümü</label>
+      <label class="lc-prejoin-check"><input type="radio" name="viewmode"> Konuşmacı görünümü</label>
+      <label class="lc-prejoin-check"><input type="radio" name="viewmode"> Paylaşım görünümü</label>
+    </div>
+    <div class="lc-spanel" data-spanel="captions" hidden>
+      <label class="lc-prejoin-check"><input type="checkbox" id="lcSettingsCaptions"> Altyazıyı göster</label>
+      <label class="lc-prejoin-field"><span>Yazı boyutu</span><select><option>Orta</option><option>Büyük</option></select></label>
+    </div>
+    <div class="lc-spanel" data-spanel="shortcuts" hidden>
+      <ul class="lc-shortcuts"><li><kbd>M</kbd> Mikrofon</li><li><kbd>V</kbd> Kamera</li><li><kbd>H</kbd> El kaldır</li><li><kbd>C</kbd> Chat</li><li><kbd>P</kbd> Katılımcılar</li><li><kbd>N</kbd> Notlar</li><li><kbd>Q</kbd> Quiz</li><li><kbd>F</kbd> Odak modu</li><li><kbd>Space</kbd> Bas-konuş</li></ul>
+    </div>
+    <div class="lc-spanel" data-spanel="connection" hidden>
+      <p>Ping: <strong>24 ms</strong> · Paket kaybı: <strong>0%</strong></p>
+      <p>Ses: <span class="lc-ok">Bağlı</span> · Video: <span class="lc-ok">Bağlı</span></p>
+    </div>
+    <button type="button" class="lc-btn lc-btn--primary lc-modal-close" data-close-modal>Tamam</button>
+  </div>
+</div>
+
+<div class="lc-reconnect" id="lcReconnect" hidden role="alert">
+  <div class="lc-reconnect-card"><div class="lc-wait-spinner"></div><p>Bağlantın koptu. Yeniden bağlanılıyor…</p></div>
+</div>
+
+<div class="lc-reward" id="lcReward" hidden role="alert"><div class="lc-reward-card"><span id="lcRewardBadge">🏅</span><h3>Harika!</h3><p id="lcRewardXp">+25 XP</p></div></div>
+<div class="lc-xp-toast" id="lcXpToast" hidden role="status"></div>
+<div class="lc-badge-popup" id="lcBadgePopup" hidden role="alert"></div>
+<div class="lc-toast" id="lcToast" hidden role="status"></div>
+
+<div class="lc-crisis-modal" id="lcMicRequestModal" hidden role="dialog" aria-labelledby="lcMicRequestTitle">
+  <div class="lc-crisis-modal-card">
+    <h3 id="lcMicRequestTitle">Mikrofon açma isteği</h3>
+    <p>Öğretmenin mikrofonunu açmanı istiyor.</p>
+    <div class="lc-modal-actions">
+      <button type="button" class="lc-btn lc-btn--ghost" id="lcMicDecline">Şimdilik kapalı kalsın</button>
+      <button type="button" class="lc-btn lc-btn--primary" id="lcMicAccept">Mikrofonu aç</button>
+    </div>
+  </div>
+</div>
+<section class="lc-screen lc-screen--break" id="lcBreak" hidden aria-label="Ders arası">
+  <div class="lc-break-card">
+    <span class="lc-break-icon">☕</span>
+    <h2 class="lc-break-title">Ders arası başladı</h2>
+    <p class="lc-break-sub">Birkaç dakika içinde devam edeceğiz.</p>
+    <div class="lc-break-timer" id="lcBreakTimer">05:00</div>
+    <p class="lc-break-hint">Chat açık kalabilir · Mikrofon ve kamera sende</p>
+  </div>
+</section>
+
+<!-- DERS BİTTİ -->
+<section class="lc-screen lc-screen--ended" id="lcEnded" hidden aria-label="Ders sona erdi">
+  <div class="lc-ended-card">
+    <span class="lc-ended-icon">🎓</span>
+    <h2 class="lc-ended-title">Ders sona erdi</h2>
+    <p class="lc-ended-meta">Süre: <strong id="lcEndedDuration">00:00:00</strong> · Katılım: <strong class="lc-ok">Tam</strong></p>
+    <div class="lc-lesson-summary" id="lcLessonSummary"></div>
+    <p class="lc-ended-next">Sonraki ders: <span id="lcNextLesson">LGS Matematik — Oran Orantı · Yarın 09:00</span></p>
+    <div class="lc-ended-actions">
+      <button type="button" class="lc-btn lc-btn--primary" id="lcEndedNotes">Notlarımı indir</button>
+      <button type="button" class="lc-btn lc-btn--ghost" id="lcEndedHome">Ana sayfaya dön</button>
+    </div>
+  </div>
+</section>
+
+<!-- BİLDİRİM MERKEZİ -->
+<div class="lc-notif-panel" id="lcNotifPanel" hidden>
+  <header class="lc-notif-head"><h3>Bildirimler</h3><button type="button" class="lc-notif-clear" id="lcNotifClear">Temizle</button></header>
+  <div class="lc-notif-list" id="lcNotifList"></div>
+</div>
+
+<!-- MOCK CONTROL PANEL -->
+<aside class="lc-mock-panel" id="lcMockPanel" aria-label="Demo kontrolleri">
+  <button type="button" class="lc-mock-toggle" id="lcMockToggle" aria-expanded="true">Demo Kontrolleri</button>
+  <div class="lc-mock-body" id="lcMockBody">
+    <section class="lc-mock-section">
+      <h4>Demo Senaryoları</h4>
+      <div class="lc-mock-btns lc-mock-btns--grid">
+        <button type="button" data-scenario="normal">Normal ders</button>
+        <button type="button" data-scenario="share">Ekran paylaşımı</button>
+        <button type="button" data-scenario="quiz">Quiz</button>
+        <button type="button" data-scenario="weak">Bağlantı zayıf</button>
+        <button type="button" data-scenario="hand">El kaldır</button>
+        <button type="button" data-scenario="whiteboard">Whiteboard yazma</button>
+        <button type="button" data-scenario="ended">Ders bitti</button>
+      </div>
+    </section>
+    <section class="lc-mock-section">
+      <h4>Ders Durumu</h4>
+      <select id="mockSessionStatus" class="lc-mock-select">
+        <option value="prejoin">Pre-join</option>
+        <option value="waiting_room">Bekleme Odası</option>
+        <option value="live" selected>Canlı Ders</option>
+        <option value="break">Ders Arası</option>
+        <option value="ended">Ders Bitti</option>
+        <option value="reconnecting">Yeniden Bağlanıyor</option>
+        <option value="disconnected">Bağlantı Koptu</option>
+      </select>
+    </section>
+    <section class="lc-mock-section">
+      <h4>Görünüm Modu</h4>
+      <select id="mockStageMode" class="lc-mock-select">
+        <option value="speaker">Konuşmacı</option>
+        <option value="gallery">Galeri</option>
+        <option value="screen_share">Ekran Paylaşımı</option>
+        <option value="whiteboard">Beyaz Tahta</option>
+        <option value="quiz">Quiz</option>
+        <option value="empty">Boş</option>
+      </select>
+    </section>
+    <section class="lc-mock-section">
+      <h4>El Kaldırma & Whiteboard</h4>
+      <div class="lc-mock-btns">
+        <button type="button" data-wb="random_hand">Rastgele el kaldırsın</button>
+        <button type="button" data-wb="clear_hands">Tüm el kaldırmaları temizle</button>
+        <button type="button" data-wb="select_me">Furkan'ı seç (el kaldırdıysa)</button>
+        <button type="button" data-wb="select_random">El kaldırandan rastgele seç</button>
+        <button type="button" data-wb="select_not_raised">El kaldırmayanı seç (hata)</button>
+        <button type="button" data-wb="revoke">Yazma iznini kaldır</button>
+        <button type="button" data-wb="mock_draw_selected">Seçili öğrenci mock çizim</button>
+        <button type="button" data-wb="mock_draw_random">El kaldıran mock çizim</button>
+        <button type="button" data-wb="clear_strokes">Tüm öğrenci çizimlerini temizle</button>
+        <button type="button" data-tevent="teacher_closed_whiteboard">Whiteboard kapat</button>
+      </div>
+    </section>
+    <section class="lc-mock-section">
+      <h4>Öğretmen Aksiyonları</h4>
+      <div class="lc-mock-btns">
+        <button type="button" data-tevent="teacher_stopped_screen_share">Paylaşımı durdur</button>
+        <button type="button" data-tevent="teacher_opened_whiteboard">Beyaz tahta</button>
+        <button type="button" data-tevent="teacher_started_quiz">Quiz başlat</button>
+        <button type="button" data-tevent="teacher_started_poll">Anket başlat</button>
+        <button type="button" data-tevent="teacher_muted_all">Herkesi sessize al</button>
+        <button type="button" data-tevent="teacher_muted_you">Mikrofonunu kapat</button>
+        <button type="button" data-tevent="teacher_selected_you">Seni seçti</button>
+        <button type="button" data-tevent="teacher_started_break">Ara ver</button>
+        <button type="button" data-tevent="teacher_ended_class">Dersi bitir</button>
+        <button type="button" data-tevent="teacher_enabled_captions">Altyazı aç</button>
+      </div>
+    </section>
+    <section class="lc-mock-section">
+      <h4>Öğrenci Simülasyonu</h4>
+      <div class="lc-mock-btns">
+        <button type="button" data-sim="random_speak">Rastgele konuşsun</button>
+        <button type="button" data-sim="random_hand">Rastgele el kaldırsın</button>
+        <button type="button" data-sim="random_react">Rastgele reaksiyon</button>
+        <button type="button" data-sim="mute_all">Tüm mic kapalı</button>
+        <button type="button" data-sim="cam_off_some">Bazı kameralar kapalı</button>
+        <button type="button" data-sim="weak_conn">Zayıf bağlantı</button>
+      </div>
+    </section>
+    <section class="lc-mock-section">
+      <h4>Ekrandaki Soru (öğretmen simülasyonu)</h4>
+      <div class="lc-mock-btns">
+        <button type="button" data-sq="mc">Çoktan seçmeli cevap iste</button>
+        <button type="button" data-sq="mc-blank">Boş şıklarla cevap iste</button>
+        <button type="button" data-sq="open">Açık uçlu cevap iste</button>
+        <button type="button" data-sq="close">Cevap isteğini kapat</button>
+      </div>
+    </section>
+    <section class="lc-mock-section">
+      <h4>Bağlantı</h4>
+      <select id="mockConnection" class="lc-mock-select">
+        <option value="excellent">Mükemmel</option>
+        <option value="good" selected>İyi</option>
+        <option value="medium">Orta</option>
+        <option value="poor">Zayıf</option>
+        <option value="critical">Kritik</option>
+        <option value="offline">Offline</option>
+      </select>
+    </section>
+    <section class="lc-mock-section">
+      <h4>Cihaz İzinleri</h4>
+      <label class="lc-mock-check"><input type="checkbox" id="mockCamPerm" checked> Kamera izni</label>
+      <label class="lc-mock-check"><input type="checkbox" id="mockMicPerm" checked> Mikrofon izni</label>
+      <label class="lc-mock-check"><input type="checkbox" id="mockCamDevice"> Kamera bulunamadı</label>
+      <label class="lc-mock-check"><input type="checkbox" id="mockMicDevice"> Mikrofon bulunamadı</label>
+    </section>
+    <section class="lc-mock-section">
+      <label class="lc-mock-check"><input type="checkbox" id="mockRecording"> Kayıt alınıyor</label>
+      <label class="lc-mock-check"><input type="checkbox" id="mockFocus"> Odak modu</label>
+      <label class="lc-mock-check"><input type="checkbox" id="mockCompact"> Kompakt mod</label>
+    </section>
+  </div>
+</aside>
+
+<script src="assets/live-class-mock.js"></script>
+<script src="assets/live-class/live-class-theme.js"></script>
+<script src="assets/live-class/live-class-domain.js"></script>
+<script src="assets/live-class/live-class-events.js"></script>
+<script src="assets/live-class/live-class-store.js"></script>
+<script src="assets/live-class/live-class-ui.js"></script>
+<script src="assets/badges-achievements-seed.js"></script>
+<script src="assets/permissions-seed.js"></script>
+<script src="assets/gamification-events-seed.js"></script>
+<script src="assets/student-insights-seed.js"></script>
+<script src="assets/live-class/live-class-demo-seed.js"></script>
+<script src="assets/live-class/live-class-bridge.js"></script>
+<script src="assets/answer-request.js"></script>
+<script src="assets/answer-feedback.js"></script>
+<script src="assets/live-class/live-class-identity-header.js"></script>
+<script src="assets/live-class/student-active-answer-dock.js"></script>
+<script src="assets/screen-question.js"></script>
+<script src="assets/student-screen-question.js"></script>
+<script src="assets/live-class-whiteboard.js"></script>
+<script src="assets/student-progress.js"></script>
+<script src="assets/student-crisis-ui.js"></script>
+<script src="assets/live-class.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var PJ_MENUS = ['pjCamMenu', 'pjMicMenu', 'pjSpkMenu', 'pjBgFilterMenu'];
+
+  function closeAll(except) {
+    PJ_MENUS.forEach(function (id) {
+      if (id === except) return;
+      var m = document.getElementById(id);
+      if (m) m.hidden = true;
+    });
+    setExpanded('pjCamCaret', except === 'pjCamMenu');
+    setExpanded('pjMicDD', except === 'pjMicMenu');
+    setExpanded('pjSpkDD', except === 'pjSpkMenu');
+    setExpanded('pjBgFilterBtn', except === 'pjBgFilterMenu');
+  }
+
+  function setExpanded(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.setAttribute('aria-expanded', val ? 'true' : 'false');
+  }
+
+  function toggleMenu(menuId, triggerId) {
+    var menu = document.getElementById(menuId);
+    if (!menu) return;
+    var isOpen = !menu.hidden;
+    closeAll(isOpen ? null : menuId);
+    menu.hidden = isOpen;
+    setExpanded(triggerId, !isOpen);
+  }
+
+  // kamera durumu: false = kapalı (başlangıç), true = açık
+  var pjCamOn = false;
+
+  function syncCamUI() {
+    var hiddenSw = document.getElementById('pjStartCamOff');
+    var camSw    = document.getElementById('pjCamSwitch');
+    var overlay  = document.getElementById('pjCamOff');
+    var iconOff  = document.getElementById('pjCamIconOff');
+    var iconOn   = document.getElementById('pjCamIconOn');
+    var btn      = document.getElementById('pjCamToggleBtn');
+    // pjStartCamOff: checked=true → kamera kapalı (live-class.js bunu okur)
+    if (hiddenSw) hiddenSw.checked = !pjCamOn;
+    // görünür switch: checked = kamera açık
+    if (camSw && camSw.checked !== pjCamOn) camSw.checked = pjCamOn;
+    // overlay: kapalıyken görünür, açıkken gizli
+    if (overlay) overlay.style.display = pjCamOn ? 'none' : '';
+    // buton ikonu — SVG'de .hidden property çalışmaz, attribute kullan
+    if (iconOff) { if (pjCamOn) iconOff.setAttribute('hidden',''); else iconOff.removeAttribute('hidden'); } // strikethrough → kapalıyken görünür
+    if (iconOn)  { if (pjCamOn) iconOn.removeAttribute('hidden'); else iconOn.setAttribute('hidden',''); }   // normal ikon → açıkken görünür
+    if (btn) {
+      btn.setAttribute('aria-pressed', pjCamOn ? 'true' : 'false');
+      btn.title = pjCamOn ? 'Kamera açık — kapatmak için tıkla' : 'Kamera kapalı — açmak için tıkla';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Kamera toggle butonu
+    var camBtn = document.getElementById('pjCamToggleBtn');
+    if (camBtn) camBtn.addEventListener('click', function () {
+      pjCamOn = !pjCamOn;
+      syncCamUI();
+    });
+
+    // Aç/kapa switch
+    var camSwitch = document.getElementById('pjCamSwitch');
+    if (camSwitch) camSwitch.addEventListener('change', function () {
+      pjCamOn = camSwitch.checked;
+      syncCamUI();
+    });
+
+    // Kamera caret → pjCamMenu
+    var camCaret = document.getElementById('pjCamCaret');
+    if (camCaret) camCaret.addEventListener('click', function (e) {
+      e.stopPropagation();
+      toggleMenu('pjCamMenu', 'pjCamCaret');
+    });
+
+    // Mikrofon dropdown
+    var micDD = document.getElementById('pjMicDD');
+    if (micDD) micDD.addEventListener('click', function (e) {
+      e.stopPropagation();
+      toggleMenu('pjMicMenu', 'pjMicDD');
+    });
+
+    // Hoparlör dropdown
+    var spkDD = document.getElementById('pjSpkDD');
+    if (spkDD) spkDD.addEventListener('click', function (e) {
+      e.stopPropagation();
+      toggleMenu('pjSpkMenu', 'pjSpkDD');
+    });
+
+    // Arka plan filtreleri
+    var bgBtn = document.getElementById('pjBgFilterBtn');
+    if (bgBtn) bgBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      toggleMenu('pjBgFilterMenu', 'pjBgFilterBtn');
+    });
+
+    // Dışarı tıklanınca kapat
+    document.addEventListener('click', function () { closeAll(null); });
+
+    // Menü içine tıklamak kapatmasın
+    PJ_MENUS.forEach(function (id) {
+      var m = document.getElementById(id);
+      if (m) m.addEventListener('click', function (e) { e.stopPropagation(); });
+    });
+
+    syncCamUI();
+  });
+})();
+
+// Alt bar mic/kamera caret menüleri (öğretmenden taşınan kontroller)
+(function () {
+  'use strict';
+  var MENUS = [['lcAudioMenuBtn', 'lcAudioMenu'], ['lcCamMenuBtn', 'lcCamMenu'], ['lcHandMenuBtn', 'lcHandMenu']];
+  function closeAll(except) {
+    MENUS.forEach(function (pair) {
+      var menu = document.getElementById(pair[1]);
+      var btn = document.getElementById(pair[0]);
+      if (!menu) return;
+      if (pair[1] !== except) { menu.hidden = true; if (btn) btn.setAttribute('aria-expanded', 'false'); }
+    });
+  }
+  // El menüsündeki "Parmak kaldır / Eli indir" seçeneklerini duruma göre etkinleştir
+  function syncHandMenuState() {
+    var handBtn = document.getElementById('lcHandBtn');
+    var raiseItem = document.querySelector('#lcHandMenu [data-hand="raise"]');
+    var lowerItem = document.querySelector('#lcHandMenu [data-hand="lower"]');
+    if (!handBtn) return;
+    var raised = handBtn.classList.contains('is-active');
+    if (raiseItem) raiseItem.disabled = raised;   // zaten kalkıksa tekrar kaldırılamaz
+    if (lowerItem) lowerItem.disabled = !raised;  // kalkık değilse indirilemez
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    MENUS.forEach(function (pair) {
+      var btn = document.getElementById(pair[0]);
+      var menu = document.getElementById(pair[1]);
+      if (!btn || !menu) return;
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = !menu.hidden;
+        closeAll(open ? null : pair[1]);
+        menu.hidden = open;
+        btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+        if (pair[1] === 'lcHandMenu' && !menu.hidden) syncHandMenuState();
+      });
+      menu.addEventListener('click', function (e) { e.stopPropagation(); });
+    });
+    // Arka plan seçimi
+    var grid = document.getElementById('lcBgGrid');
+    if (grid) grid.addEventListener('click', function (e) {
+      var item = e.target.closest('.tlc-bg-item');
+      if (!item) return;
+      grid.querySelectorAll('.tlc-bg-item').forEach(function (b) { b.classList.toggle('is-selected', b === item); });
+    });
+    // El menüsü aksiyonları (parmak kaldır / indir) — mevcut lcHandBtn toggle'ını kullanır
+    var handMenu = document.getElementById('lcHandMenu');
+    var handBtn = document.getElementById('lcHandBtn');
+    if (handMenu && handBtn) handMenu.addEventListener('click', function (e) {
+      var act = e.target.closest('[data-hand]');
+      if (!act) return;
+      var raised = handBtn.classList.contains('is-active');
+      if (act.dataset.hand === 'raise' && !raised) handBtn.click();
+      else if (act.dataset.hand === 'lower' && raised) handBtn.click();
+      closeAll(null);
+    });
+    // Tepki caret'i → mevcut reaksiyon menüsünü aç (lcReactBtn davranışını yeniden kullanır)
+    var reactCaret = document.getElementById('lcReactCaretBtn');
+    var reactBtn = document.getElementById('lcReactBtn');
+    if (reactCaret && reactBtn) reactCaret.addEventListener('click', function (e) {
+      e.stopPropagation();
+      closeAll(null);
+      reactBtn.click();
+    });
+    document.addEventListener('click', function () { closeAll(null); });
+  });
+})();
+
+// Tam ekran büyüt/küçült
+(function () {
+  'use strict';
+  function fsTarget() { return document.getElementById('lcLive') || document.documentElement; }
+  function toggleFs() {
+    try {
+      if (!document.fullscreenElement) {
+        var t = fsTarget();
+        if (t.requestFullscreen) { var p = t.requestFullscreen(); if (p && p.catch) p.catch(function(){}); }
+      } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    } catch (e) {}
+  }
+  function syncIcons() {
+    var on = !!document.fullscreenElement;
+    var max = document.querySelector('.lc-fs-ico-max');
+    var min = document.querySelector('.lc-fs-ico-min');
+    if (max) max.hidden = on;
+    if (min) min.hidden = !on;
+    var sb = document.getElementById('lcStageFsBtn');
+    if (sb) { sb.setAttribute('aria-label', on ? 'Tam ekrandan çık' : 'Tam ekran yap'); sb.title = on ? 'Tam ekrandan çık' : 'Tam ekran'; }
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var sb = document.getElementById('lcStageFsBtn');
+    if (sb) sb.addEventListener('click', toggleFs);
+    document.addEventListener('fullscreenchange', syncIcons);
+    document.addEventListener('webkitfullscreenchange', syncIcons);
+    syncIcons();
+  });
+})();
+
+// İlerleme panelini güvenle render et (yüklemede + sekme açılınca)
+(function () {
+  'use strict';
+  function renderProg() { if (window.StudentProgress && window.StudentProgress.renderProgressPanel) window.StudentProgress.renderProgressPanel(); }
+  document.addEventListener('DOMContentLoaded', function () {
+    renderProg();
+    var tab = document.querySelector('.lc-tab[data-tab="progress"]');
+    if (tab) tab.addEventListener('click', renderProg);
+  });
+})();
+</script>
+</body>
+</html>

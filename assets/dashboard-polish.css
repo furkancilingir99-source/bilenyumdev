@@ -1,0 +1,655 @@
+/* ====================================================================
+ * dashboard-polish.css — v2 el yapımı aydınlık tema (marka uyumu)
+ * dashboard-light.css'ten sonra yüklenir.
+ * ==================================================================== */
+
+/* ---- Tipografi: Poppins her yerde, mono sadece saat/sayı ---- */
+.stage,
+.ov-page,
+.sn-page,
+.tk-page,
+.perf-page,
+.prog-page {
+  font-family: var(--font-sans) !important;
+}
+
+/* ============================================================
+ * MERKEZ — Bugünün Akışı timeline
+ * ============================================================ */
+.d3-timeline .d3-task-xp { display: none !important; }
+
+.d3-timeline {
+  gap: 2px !important;
+}
+
+.d3-tl-item {
+  gap: 8px !important;
+  --tl-subject-color: var(--brand-purple);
+}
+.d3-tl-item[data-subject="mat"] { --tl-subject-color: var(--brand-magenta); }
+.d3-tl-item[data-subject="fen"] { --tl-subject-color: #2ea86a; }
+.d3-tl-item[data-subject="trk"] { --tl-subject-color: var(--brand-purple); }
+.d3-tl-item[data-subject="ing"] { --tl-subject-color: var(--brand-rose); }
+.d3-tl-item[data-subject="sos"] { --tl-subject-color: var(--lilac-deep); }
+.d3-tl-item[data-subject="din"] { --tl-subject-color: var(--brand-purple); }
+.d3-tl-item[data-type="live"]  { --tl-accent: var(--brand-magenta); }
+.d3-tl-item[data-type="solve"] { --tl-accent: var(--brand-rose); }
+.d3-tl-item[data-type="hw"]    { --tl-accent: var(--lilac-deep); }
+
+.d3-tl-rail::before {
+  background: var(--brand-purple-14) !important;
+  width: 2px !important;
+}
+.d3-tl-dot {
+  width: 10px !important;
+  height: 10px !important;
+  background: var(--tl-subject-color) !important;
+  box-shadow: 0 0 0 3px var(--bg-surface), 0 0 0 4px color-mix(in srgb, var(--tl-subject-color) 35%, transparent) !important;
+}
+
+.d3-tl-time {
+  font-family: var(--font-sans) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: var(--brand-purple) !important;
+  min-width: 42px !important;
+}
+
+.d3-tl-card {
+  padding: 7px 10px !important;
+  margin: 2px 0 !important;
+  border-radius: 10px !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-10) !important;
+  border-left: 3px solid var(--tl-subject-color) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.d3-tl-card:hover {
+  background: var(--lilac-50) !important;
+  border-color: color-mix(in srgb, var(--tl-subject-color) 28%, var(--brand-purple-10)) !important;
+  transform: translateX(2px) !important;
+}
+
+.d3-tl-subject {
+  font-family: var(--font-sans) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  color: var(--tl-subject-color) !important;
+}
+.d3-tl-week {
+  font-family: var(--font-sans) !important;
+  font-size: 9px !important;
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.d3-tl-topic {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--brand-navy) !important;
+}
+
+.d3-mega-right {
+  border-top-color: var(--brand-purple-10) !important;
+}
+
+/* ============================================================
+ * PROGRAM — takvim yapısını koru, aydınlık & okunaklı
+ * ============================================================ */
+.prog-page {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--shadow-md) !important;
+  padding: 18px 20px !important;
+}
+
+.prog-eyebrow {
+  font-family: var(--font-sans) !important;
+  color: var(--brand-magenta) !important;
+  letter-spacing: 0.08em !important;
+}
+.prog-title {
+  font-family: var(--font-sans) !important;
+  font-size: 21px !important;
+  font-weight: 700 !important;
+  color: var(--brand-navy) !important;
+}
+.prog-date-label {
+  font-family: var(--font-sans) !important;
+  color: var(--ink-dark-1) !important;
+}
+
+.prog-view-toggle {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.prog-view-btn {
+  font-family: var(--font-sans) !important;
+  color: var(--ink-dark-1) !important;
+}
+.prog-view-btn.is-active {
+  background: linear-gradient(135deg, var(--brand-rose), var(--brand-magenta)) !important;
+  color: #fff !important;
+  box-shadow: var(--shadow-brand) !important;
+}
+
+.prog-month-weekdays > div {
+  font-family: var(--font-sans) !important;
+  color: var(--asm-text-label) !important;
+}
+.prog-month-day {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-08) !important;
+}
+.prog-month-day.is-today {
+  background: var(--brand-magenta-08) !important;
+  border-color: var(--brand-magenta-35) !important;
+}
+.month-day-num {
+  font-family: var(--font-sans) !important;
+  color: var(--brand-navy) !important;
+}
+.prog-month-day.is-today .month-day-num { color: var(--brand-magenta) !important; }
+.prog-month-day.is-other-month .month-day-num { color: var(--ink-dark-2) !important; }
+.month-event {
+  font-family: var(--font-sans) !important;
+  color: var(--brand-navy) !important;
+}
+
+.prog-drawer-panel {
+  background: var(--bg-surface) !important;
+  background-image: none !important;
+  border-left: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.prog-drawer-title,
+.prog-drawer-body,
+.prog-drawer-eyebrow,
+.prog-drawer-text,
+.prog-drawer-label,
+.prog-drawer-teacher-name,
+.prog-drawer-teacher-role,
+.prog-drawer-chip,
+.prog-drawer-game-reward-text strong {
+  font-family: var(--font-sans) !important;
+}
+.prog-drawer-title,
+.prog-drawer-teacher-name,
+.prog-drawer-game-reward-text strong {
+  color: var(--brand-navy) !important;
+}
+.prog-drawer-text,
+.prog-drawer-teacher-role {
+  color: var(--ink-dark-1) !important;
+}
+.prog-drawer-eyebrow,
+.prog-drawer-label {
+  color: var(--brand-purple) !important;
+  font-family: var(--font-mono) !important;
+}
+
+/* ============================================================
+ * ÖDEVLER — stat kartları & bölümler
+ * ============================================================ */
+.ov-hero-pattern,
+.ov-hero-glow { display: none !important; }
+
+.ov-hero {
+  background: linear-gradient(145deg, #fff 0%, var(--lilac-100) 55%, color-mix(in srgb, var(--ov-c, var(--brand-magenta)) 6%, #fff) 100%) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  border-left: 4px solid var(--ov-c, var(--brand-magenta)) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.ov-hero-title,
+.ov-hero-subject,
+.ov-hero-teacher-text strong {
+  color: var(--brand-navy) !important;
+}
+.ov-hero-eyebrow { color: var(--brand-magenta) !important; }
+.ov-hero-desc,
+.ov-hero-teacher-label,
+.ov-hero-countdown-label {
+  color: var(--ink-dark-1) !important;
+}
+
+.ov-stat {
+  padding: 14px 12px !important;
+  gap: 8px !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--shadow-sm) !important;
+  border-top: 3px solid var(--stat-accent, var(--brand-purple)) !important;
+}
+.ov-stat--active { --stat-accent: var(--brand-purple); }
+.ov-stat--done   { --stat-accent: #2ea86a; }
+.ov-stat--xp     { --stat-accent: var(--brand-magenta); }
+.ov-stat--ontime { --stat-accent: var(--brand-rose); }
+
+.ov-stat-icon {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 10px !important;
+  background: color-mix(in srgb, var(--stat-accent) 12%, #fff) !important;
+  color: var(--stat-accent) !important;
+}
+.ov-stat-val {
+  font-family: var(--font-sans) !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: var(--brand-navy) !important;
+}
+.ov-stat-label {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: var(--ink-dark-1) !important;
+}
+
+.ov-section-dot {
+  box-shadow: none !important;
+  background: var(--sc-c, var(--brand-purple)) !important;
+}
+.ov-section-title {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: var(--brand-navy) !important;
+}
+.ov-section-count {
+  display: none !important;
+}
+
+.ov-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  border-left: 3px solid var(--c, var(--brand-purple)) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.ov-card::before { display: none !important; }
+.ov-card:hover {
+  box-shadow: var(--shadow-md) !important;
+  border-color: color-mix(in srgb, var(--c) 30%, var(--brand-purple-14)) !important;
+}
+.ov-card-subject {
+  font-family: var(--font-sans) !important;
+  color: var(--c, var(--brand-purple)) !important;
+}
+.ov-card-title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--brand-navy) !important;
+}
+.ov-card-teacher,
+.ov-card-week {
+  color: var(--ink-dark-1) !important;
+}
+.ov-card-due-chip {
+  font-family: var(--font-sans) !important;
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.ov-card-due-chip.is-urgent {
+  background: rgba(212, 146, 10, 0.10) !important;
+  border-color: rgba(212, 146, 10, 0.30) !important;
+  color: #9a6808 !important;
+}
+.ov-card-due-chip.is-overdue {
+  background: var(--brand-magenta-08) !important;
+  border-color: var(--brand-magenta-35) !important;
+  color: var(--brand-magenta) !important;
+}
+.ov-card-due-chip.is-done {
+  background: rgba(46, 168, 106, 0.10) !important;
+  border-color: rgba(46, 168, 106, 0.30) !important;
+  color: #248f58 !important;
+}
+.ov-card-go {
+  color: var(--brand-purple) !important;
+}
+.ov-card:hover .ov-card-go { color: var(--brand-magenta) !important; }
+.ov-card.is-done {
+  opacity: 0.82 !important;
+  background: var(--lilac-50) !important;
+}
+
+.ov-toolbar {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* ============================================================
+ * DENEME SINAVLARI
+ * ============================================================ */
+.sn-pagehead-title {
+  font-size: 26px !important;
+  font-weight: 700 !important;
+}
+
+.sn-upcoming-join,
+.sn-upcoming-remind {
+  font-family: var(--font-sans) !important;
+}
+
+.sn-filter-chip {
+  font-family: var(--font-sans) !important;
+  border-radius: 999px !important;
+}
+
+.sn-card,
+.sn-row,
+.sn-perf-card,
+.sn-detail-card,
+.sn-key-panel {
+  border-radius: 14px !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.sn-card-title,
+.sn-row-title,
+.sn-upcoming-title {
+  font-weight: 600 !important;
+}
+
+.sn-section-dot { box-shadow: none !important; }
+
+.sn-countdown-unit strong {
+  font-family: var(--font-mono) !important;
+  color: var(--brand-navy) !important;
+}
+
+/* Kareli / dashed desenleri kaldır */
+.sn-upcoming,
+.sn-card,
+.ov-hero,
+.d3-mega-banner,
+.d3-hero-cover-placeholder {
+  background-image: none !important;
+}
+
+/* ============================================================
+ * DERS TEKRARLARI
+ * ============================================================ */
+.tk-pagehead-title {
+  font-size: 26px !important;
+  font-weight: 700 !important;
+}
+
+.tk-card {
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  border-top: 3px solid var(--c, var(--brand-purple)) !important;
+}
+.tk-card-title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--brand-navy) !important;
+}
+.tk-card-meta,
+.tk-card-date,
+.tk-card-subject {
+  font-family: var(--font-sans) !important;
+  color: var(--ink-dark-1) !important;
+}
+.tk-card-subject { color: var(--c, var(--brand-purple)) !important; font-weight: 600 !important; }
+
+.tk-card-thumb {
+  background: linear-gradient(145deg, var(--lilac-100), var(--lilac-200)) !important;
+}
+.tk-card-overlay {
+  background: linear-gradient(180deg, transparent 40%, rgba(40, 38, 90, 0.55)) !important;
+}
+
+/* ============================================================
+ * PERFORMANS — tüm kartlar
+ * ============================================================ */
+.perf-pagehead-title {
+  font-size: 26px !important;
+  font-weight: 700 !important;
+}
+.perf-pagehead-sub { color: var(--ink-dark-1) !important; }
+
+.perf-card,
+.perf-hero,
+.perf-subj-row,
+.perf-hw-stat,
+.perf-att-stat,
+.perf-badge,
+.perf-topic-row {
+  border-radius: 16px !important;
+}
+
+.perf-card-title,
+.perf-hero-num,
+.perf-subj-name,
+.perf-hw-stat-num,
+.perf-att-stat-num,
+.perf-badge-name,
+.perf-topic-name,
+.perf-donut-center strong {
+  font-family: var(--font-sans) !important;
+  color: var(--brand-navy) !important;
+}
+
+.perf-hero-denom,
+.perf-hero-label,
+.perf-hero-sub,
+.perf-subj-meta,
+.perf-hw-stat-text,
+.perf-hw-xp-label,
+.perf-att-stat-label,
+.perf-badge-count,
+.perf-topic-meta,
+.perf-hero-chart-label,
+.perf-donut-center span {
+  font-family: var(--font-sans) !important;
+  color: var(--ink-dark-1) !important;
+}
+
+.perf-hero-eyebrow {
+  font-family: var(--font-sans) !important;
+  color: var(--brand-magenta) !important;
+}
+
+.perf-filter-btn,
+.perf-filter-item {
+  font-family: var(--font-sans) !important;
+}
+
+.perf-subj-row {
+  border: 1px solid var(--brand-purple-10) !important;
+  background: var(--bg-surface) !important;
+}
+.perf-subj-score {
+  font-family: var(--font-sans) !important;
+  color: var(--brand-navy) !important;
+}
+
+.perf-badge {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-10) !important;
+}
+
+.perf-att-cal-day {
+  font-family: var(--font-sans) !important;
+  color: var(--brand-navy) !important;
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-08) !important;
+}
+
+.perf-link-btn {
+  font-family: var(--font-sans) !important;
+  color: var(--brand-purple) !important;
+  background: var(--brand-purple-06) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.perf-link-btn:hover {
+  background: var(--brand-magenta-12) !important;
+  color: var(--brand-magenta) !important;
+}
+
+.perf-topic-row {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-10) !important;
+}
+.perf-topic-row:hover {
+  background: var(--lilac-50) !important;
+}
+
+/* ============================================================
+ * DENEME SINAVLARI — liste satırları & grafikler
+ * ============================================================ */
+.sn-row {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  border-left: 3px solid var(--c, var(--brand-purple)) !important;
+  box-shadow: var(--shadow-sm) !important;
+  backdrop-filter: none !important;
+}
+.sn-row[data-type="genel"] { --c: var(--brand-magenta); }
+.sn-row[data-type="brans"] { --c: var(--brand-purple); }
+.sn-row[data-type="kurum"] { --c: var(--lilac-deep); }
+
+.sn-row-date {
+  background: color-mix(in srgb, var(--c) 8%, #fff) !important;
+  border-color: color-mix(in srgb, var(--c) 25%, var(--brand-purple-14)) !important;
+}
+.sn-row-date-month { color: var(--c) !important; }
+.sn-row-date-day {
+  font-family: var(--font-sans) !important;
+  color: var(--brand-navy) !important;
+}
+.sn-row-date-year {
+  font-family: var(--font-sans) !important;
+  color: var(--ink-dark-2) !important;
+}
+
+.sn-row-eyebrow { font-family: var(--font-sans) !important; }
+.sn-row-title {
+  font-family: var(--font-sans) !important;
+  font-weight: 600 !important;
+  color: var(--brand-navy) !important;
+}
+.sn-row-meta,
+.sn-row-meta-sep {
+  font-family: var(--font-sans) !important;
+  color: var(--ink-dark-1) !important;
+}
+.sn-row-net-eyebrow,
+.sn-row-net-breakdown-text {
+  font-family: var(--font-sans) !important;
+  color: var(--asm-text-label) !important;
+}
+.sn-row-net-value {
+  font-family: var(--font-sans) !important;
+  color: var(--brand-navy) !important;
+}
+
+.sn-row-btn {
+  font-family: var(--font-sans) !important;
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.sn-row-btn-primary {
+  background: linear-gradient(135deg, var(--brand-rose), var(--brand-magenta)) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+.sn-card-sub,
+.sn-upcoming-desc,
+.sn-section-count {
+  font-family: var(--font-sans) !important;
+  color: var(--ink-dark-1) !important;
+}
+
+.sn-chart-card,
+.sn-key-panel,
+.sn-perf-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+
+.sn-key-cell,
+.sn-key-legend-item {
+  font-family: var(--font-sans) !important;
+  color: var(--brand-navy) !important;
+}
+
+.sn-countdown-unit {
+  font-family: var(--font-sans) !important;
+}
+
+/* Tekrarlar — bölüm başlıkları (ov-section paylaşımlı) */
+.tk-page .ov-section-title,
+.tk-page .ov-section-count {
+  font-family: var(--font-sans) !important;
+}
+
+/* Performans — ek kartlar */
+.perf-hw-stat {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-08) !important;
+}
+.perf-hw-xp-num {
+  font-family: var(--font-sans) !important;
+  color: var(--brand-navy) !important;
+}
+.perf-grid > .perf-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* ============================================================
+ * Tamamlayıcı — ödevler, program, tekrarlar
+ * ============================================================ */
+
+.ov-section--week { --sc-c: var(--brand-purple) !important; }
+.ov-section--today { --sc-c: var(--brand-magenta) !important; }
+.ov-section--overdue { --sc-c: var(--brand-rose) !important; }
+.ov-section--done { --sc-c: #2ea86a !important; }
+
+.ov-hero-countdown-val {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-mono) !important;
+}
+.ov-hero-countdown-val.is-urgent { color: var(--brand-magenta) !important; }
+.ov-hero-countdown-val.is-overdue { color: #9a6808 !important; }
+
+.ov-empty-title { color: var(--brand-navy) !important; }
+.ov-empty-sub { color: var(--ink-dark-1) !important; }
+.ov-card-xp { color: #9a6808 !important; font-family: var(--font-mono) !important; }
+.ov-card-score { color: #248f58 !important; font-family: var(--font-mono) !important; }
+
+.ov-card[data-subject="trk"] { --c: var(--brand-purple) !important; }
+.ov-hero[data-subject="trk"] { --ov-c: var(--brand-purple) !important; }
+
+.tk-filter-chip {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.tk-filter-chip:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+.tk-filter-chip.is-active {
+  background: var(--brand-magenta-12) !important;
+  border-color: var(--brand-magenta-35) !important;
+  color: var(--brand-navy) !important;
+}
+
+.tk-card[data-subject="trk"] { --c: var(--brand-purple) !important; }
+.tk-card-overlay { background: linear-gradient(to top, var(--brand-navy-72), transparent) !important; }
+.tk-card-play {
+  background: var(--bg-surface) !important;
+  color: var(--brand-magenta) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}

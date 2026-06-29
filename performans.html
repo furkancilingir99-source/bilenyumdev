@@ -1,0 +1,4090 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Performans · Bilenyum</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/inbox.css">
+<link rel="stylesheet" href="assets/assessment.css">
+<link rel="stylesheet" href="assets/assessment-light.css">
+<script src="assets/dashboard-switcher.js" defer></script>
+<script src="assets/shell.js" defer></script>
+
+<style>
+/* ============================================================
+ * BASE
+ * ============================================================ */
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  background: var(--bg-page);
+  color: white;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  position: relative;
+}
+button, a { font-family: inherit; cursor: pointer; }
+a { text-decoration: none; color: inherit; }
+
+
+
+/* ============================================================
+ * MAIN STAGE — nav rail + scrollable content
+ * ============================================================ */
+.stage {
+  position: relative; z-index: 5;
+  height: calc(100vh - 88px);
+  padding: 16px 28px;
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 16px;
+  overflow: hidden;
+}
+.stage-nav { display: flex; flex-direction: column; min-height: 0; grid-column: 1; }
+
+
+/* ============================================================
+ * PERFORMANS PAGE
+ * ============================================================ */
+.perf-page {
+  grid-column: 2;
+  min-width: 0; min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  padding: 4px 2px 4px;
+  display: flex; flex-direction: column;
+  gap: 14px;
+}
+.perf-page > .perf-pagehead { flex-shrink: 0; }
+.perf-page::-webkit-scrollbar { width: 6px; }
+.perf-page::-webkit-scrollbar-thumb { background: rgba(168,164,240,0.30); border-radius: 3px; }
+.perf-page::-webkit-scrollbar-track { background: transparent; }
+
+.perf-pagehead {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 18px;
+  padding: 4px 4px 2px;
+  flex-wrap: wrap;
+}
+.perf-pagehead-title {
+  margin: 0;
+  font-size: 28px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.025em;
+}
+.perf-pagehead-sub {
+  font-size: 13px; font-weight: 600;
+  color: rgba(255,255,255,0.55);
+}
+
+/* Card base */
+.perf-card {
+  background: rgba(20,18,52,0.85);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(168,164,240,0.18);
+  border-radius: 20px;
+  padding: 20px 22px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.perf-topics-note {
+  margin: -6px 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: rgba(255,255,255,0.48);
+}
+.perf-card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.perf-card-title {
+  margin: 0;
+  font-size: 15px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.01em;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.perf-card-title svg { width: 16px; height: 16px; color: var(--p-aqua); }
+
+/* Time filter chip (per widget) */
+.perf-filter {
+  position: relative;
+}
+.perf-filter-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px;
+  background: rgba(74,214,255,0.10);
+  border: 1px solid rgba(74,214,255,0.28);
+  border-radius: 999px;
+  color: #b6e8ff;
+  font-size: 11.5px; font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.perf-filter-btn > span[data-filter-label] { white-space: nowrap; }
+.perf-filter-btn:hover { background: rgba(74,214,255,0.18); border-color: rgba(74,214,255,0.45); }
+.perf-filter-btn svg { width: 10px; height: 10px; transition: transform 0.18s; }
+.perf-filter.is-open .perf-filter-btn svg { transform: rotate(180deg); }
+.perf-filter-menu {
+  position: absolute;
+  top: calc(100% + 6px); right: 0;
+  min-width: 140px;
+  padding: 6px;
+  background: rgba(20,18,52,0.96);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(168,164,240,0.22);
+  border-radius: 12px;
+  box-shadow: 0 20px 40px -8px rgba(0,0,0,0.55);
+  opacity: 0; visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.18s, transform 0.18s, visibility 0.18s;
+  z-index: 20;
+}
+.perf-filter.is-open .perf-filter-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+.perf-filter-item {
+  display: block; width: 100%;
+  padding: 7px 10px;
+  background: transparent; border: none;
+  color: rgba(255,255,255,0.78);
+  font-size: 12px; font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 7px;
+  font-family: inherit;
+}
+.perf-filter-item:hover { background: rgba(255,255,255,0.06); color: white; }
+.perf-filter-item.is-active { background: rgba(74,214,255,0.14); color: #4ad6ff; }
+
+/* Bu Hafta — stat kartı açıklama tooltip */
+.perf-week-stat[data-tip],
+[data-perf-tip] { cursor: help; }
+.perf-floattip {
+  position: fixed; z-index: 10002;
+  max-width: 280px; padding: 10px 14px; border-radius: 10px;
+  background: var(--brand-navy, #28265a); color: #fff;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
+  font-size: 12px; font-weight: 500;
+  line-height: 1.5; text-align: center; white-space: normal;
+  pointer-events: none;
+  box-shadow: 0 10px 28px rgba(40,38,90,0.22);
+  opacity: 0; transform: translate(-50%, calc(-100% - 8px));
+  transition: opacity 0.16s ease;
+}
+.perf-floattip.is-visible { opacity: 1; }
+.perf-floattip[hidden] { display: none !important; }
+
+/* ============================================================
+ * HERO — Genel Performans (kart olarak grid içinde span-2)
+ * ============================================================ */
+.perf-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 200px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+  padding: 24px 26px;
+  background:
+    radial-gradient(circle at 0% 100%, rgba(74,214,255,0.18), transparent 55%),
+    radial-gradient(circle at 100% 0%, rgba(105,100,196,0.20), transparent 50%),
+    rgba(20,18,52,0.85);
+  border: 1px solid rgba(168,164,240,0.20);
+  border-radius: 20px;
+  min-height: 0;
+}
+.perf-hero-left {
+  display: flex; flex-direction: column;
+  gap: 8px;
+}
+.perf-hero-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 800;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(74,214,255,0.85);
+}
+.perf-hero-score {
+  display: flex; align-items: baseline; gap: 6px;
+}
+.perf-hero-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 64px; font-weight: 800;
+  color: #4ad6ff;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+.perf-hero-denom {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px; font-weight: 700;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: -0.02em;
+}
+.perf-hero-label {
+  font-size: 13px; font-weight: 700;
+  color: rgba(255,255,255,0.75);
+  letter-spacing: -0.005em;
+}
+.perf-hero-trend {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(109,212,158,0.16);
+  color: #8de3b3;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px; font-weight: 800;
+  width: fit-content;
+}
+.perf-hero-trend svg { width: 12px; height: 12px; }
+.perf-hero-trend.is-down {
+  background: rgba(255,109,198,0.16);
+  color: #ff9ec6;
+}
+.perf-hero-sub {
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.5;
+}
+
+.perf-hero-right {
+  display: flex; flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+}
+.perf-hero { overflow: visible; } /* tooltip kart sınırının dışına taşabilsin */
+/* Eksenli grafik kutusu: Y ekseni (sol) + plot + X ekseni (alt) */
+.perf-hero-chartbox {
+  flex: 1;
+  min-height: 150px;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) 16px;
+  column-gap: 8px;
+  row-gap: 4px;
+  overflow: visible;
+}
+.perf-hero-yaxis {
+  grid-column: 1; grid-row: 1;
+  position: relative;
+}
+.perf-hero-yaxis-tick {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; font-weight: 700;
+  color: rgba(255,255,255,0.40);
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+.perf-hero-chart {
+  grid-column: 2; grid-row: 1;
+  position: relative;
+  min-height: 0;
+  overflow: visible;
+}
+/* SVG absolute + preserveAspectRatio="none" — viewBox intrinsic aspect ratio'sunun
+ * CSS layout'a sızıp feedback loop yaratmasını önler. Boyut yalnızca flex parent'tan gelir. */
+.perf-hero-chart-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+  overflow: visible;
+}
+.perf-hero-chart-points {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.perf-hero-pt {
+  position: absolute;
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: rgba(20,18,52,0.95);
+  border: 2px solid var(--pt-color, #4ad6ff);
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+.perf-hero-pt::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+}
+.perf-hero-pt:hover {
+  background: var(--pt-color, #4ad6ff);
+  transform: translate(-50%, -50%) scale(1.20);
+}
+.perf-hero-pt.is-last {
+  width: 13px; height: 13px;
+  background: var(--pt-color, #4ad6ff);
+  border-color: rgba(20,18,52,0.85);
+}
+.perf-hero-pt.is-last::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--pt-color, #4ad6ff);
+  opacity: 0.18;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+}
+/* Tooltip */
+.perf-hero-pt-tip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  background: rgba(20,18,52,0.97);
+  padding: 10px 12px;
+  border-radius: 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  border: 1px solid rgba(168,164,240,0.32);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.55);
+  z-index: 20;
+  display: flex; flex-direction: column;
+  gap: 5px;
+  min-width: 120px;
+}
+.perf-hero-pt-tip-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 800;
+  letter-spacing: 0.10em; text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+.perf-hero-pt-tip-main { display: flex; align-items: baseline; gap: 8px; }
+.perf-hero-pt-tip-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px; font-weight: 900;
+  color: var(--pt-color, #4ad6ff);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.perf-hero-pt-tip-trend {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.perf-hero-pt-tip-trend.is-up { color: #6dd49e; }
+.perf-hero-pt-tip-trend.is-down { color: #ff7aa0; }
+.perf-hero-pt-tip-trend.is-flat { color: rgba(255,255,255,0.45); }
+.perf-hero-pt-tip::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(20,18,52,0.97);
+}
+.perf-hero-pt:hover .perf-hero-pt-tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.perf-hero-pt.is-first .perf-hero-pt-tip { left: 0; transform: translateX(-20%) translateY(6px); }
+.perf-hero-pt.is-first:hover .perf-hero-pt-tip { transform: translateX(-20%) translateY(0); }
+.perf-hero-pt.is-first .perf-hero-pt-tip::after { left: 20%; }
+.perf-hero-pt.is-last .perf-hero-pt-tip { left: auto; right: 0; transform: translateX(20%) translateY(6px); }
+.perf-hero-pt.is-last:hover .perf-hero-pt-tip { transform: translateX(20%) translateY(0); }
+.perf-hero-pt.is-last .perf-hero-pt-tip::after { left: auto; right: 20%; transform: translateX(50%); }
+.perf-hero-chart-labels {
+  grid-column: 2; grid-row: 2;
+  position: relative;
+}
+.perf-hero-chart-label {
+  position: absolute;
+  transform: translateX(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; font-weight: 700;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+/* Milestone noktaları — 36 hafta için yalnız dönüm noktaları görünür */
+.perf-hero-pt.is-milestone {
+  width: 9px; height: 9px;
+}
+
+/* ============================================================
+ * 3-COL GRID
+ * ============================================================ */
+.perf-grid {
+  display: grid;
+  /* 8 kolonlu grid — explicit placements ile her widget'a özel genişlik */
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  /* Row 1 doğal yükseklik (hero/hafta), Row 2 kalan alanı doldurur */
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 16px;
+  /* Tek ekrana sığsın diye grid kalan dikey alanı doldurur */
+  flex: 1 1 auto;
+  min-height: 0;
+  /* Satır içindeki kartlar en kısa içerikten ziyade satırın en uzun kartına stretchelenir */
+  align-items: stretch;
+}
+/* Row 1: Hero (4) + Bu Hafta (3) + 2 mini sıralama kartı dikey (1) */
+.perf-grid > .perf-hero                  { grid-column: 1 / span 4; grid-row: 1; }
+.perf-grid > [data-widget="week"]        { grid-column: 5 / span 3; grid-row: 1; }
+.perf-grid > [data-widget="mini-stats"]  { grid-column: 8 / span 1; grid-row: 1; align-self: stretch; }
+/* Row 2: Ders Bazlı (4) + Konular (2) + Ödev Performansım (2)
+ * Hepsi stretch — yükseklikler eşitlenir, en uzun Ders Bazlı'ya hizalanır. */
+.perf-grid > [data-widget="subjects"]    { grid-column: 1 / span 4; grid-row: 2; min-height: 0; overflow: hidden; }
+.perf-grid > [data-widget="topics"]      { grid-column: 5 / span 2; grid-row: 2; min-height: 0; overflow: hidden; }
+.perf-grid > [data-widget="homework"]    { grid-column: 7 / span 2; grid-row: 2; min-height: 0; overflow: hidden; }
+.perf-grid > .perf-hero,
+.perf-grid > [data-widget="week"],
+.perf-grid > [data-widget="mini-stats"] { min-height: 0; }
+
+/* Row 2 listeleri: kart kalan alanı doldurur, içerik taşarsa kart içinde kayar */
+.perf-grid > [data-widget="subjects"] .perf-subj-list,
+.perf-grid > [data-widget="topics"]  .perf-topic-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.perf-grid > [data-widget="homework"] .perf-hw-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  justify-content: center;
+}
+.perf-subj-list::-webkit-scrollbar,
+.perf-topic-list::-webkit-scrollbar { width: 6px; }
+.perf-subj-list::-webkit-scrollbar-thumb,
+.perf-topic-list::-webkit-scrollbar-thumb { background: rgba(168,164,240,0.30); border-radius: 3px; }
+.perf-subj-list::-webkit-scrollbar-track,
+.perf-topic-list::-webkit-scrollbar-track { background: transparent; }
+
+/* ============================================================
+ * DERS BAZLI PERFORMANS
+ * ============================================================ */
+.perf-subj-list {
+  display: flex; flex-direction: column;
+  gap: 8px;
+}
+.perf-subj-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0,1fr) auto 28px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  font: inherit; color: inherit; text-align: left;
+  width: 100%;
+}
+.perf-subj-row:hover {
+  background: rgba(74,214,255,0.08);
+  border-color: rgba(74,214,255,0.30);
+  transform: translateY(-1px);
+}
+.perf-subj-emoji {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  line-height: 1;
+}
+.perf-subj-chevron {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.40);
+  transition: color 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+.perf-subj-chevron svg { width: 18px; height: 18px; }
+.perf-subj-row:hover .perf-subj-chevron {
+  color: var(--p-aqua);
+  transform: translateX(2px);
+}
+.perf-subj-info {
+  display: flex; flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.perf-subj-name {
+  font-size: 13.5px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.005em;
+}
+.perf-subj-meta {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+}
+.perf-subj-bar {
+  position: relative;
+  width: 100%; height: 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+.perf-subj-bar-fill {
+  position: absolute; inset: 0;
+  width: var(--p, 0%);
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--c-from, #4ad6ff), var(--c-to, #6964c4));
+  box-shadow: 0 0 8px -2px var(--c-from, #4ad6ff);
+  transform-origin: left center;
+}
+.perf-subj-score {
+  text-align: right;
+}
+.perf-subj-score strong {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.02em;
+}
+.perf-subj-score-trend {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700;
+}
+.perf-subj-score-trend.is-up { color: #6dd49e; }
+.perf-subj-score-trend.is-down { color: #ff7eb3; }
+
+/* ============================================================
+ * ÖDEV İSTATİSTİKLERİ — Donut + sayılar
+ * ============================================================ */
+.perf-hw-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  gap: 8px;
+  justify-content: space-between;
+}
+.perf-hw-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  gap: 10px;
+  justify-content: center;
+}
+.perf-donut {
+  position: relative;
+  width: clamp(88px, 14vh, 118px);
+  height: clamp(88px, 14vh, 118px);
+  flex-shrink: 0;
+}
+.perf-donut svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.perf-donut-track { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 12; }
+.perf-donut-seg { fill: none; stroke-width: 12; stroke-linecap: round; transition: stroke-dasharray 0.9s cubic-bezier(0.22, 0.61, 0.36, 1); }
+.perf-donut-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.perf-donut-center strong {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(22px, 3.5vh, 30px); font-weight: 800;
+  color: white;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.perf-donut-center span {
+  margin-top: 3px;
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.perf-hw-stats {
+  display: flex; flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  justify-content: center;
+}
+button.perf-hw-stat {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  width: 100%;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+button.perf-hw-stat:hover {
+  background: rgba(74,214,255,0.08);
+  border-color: rgba(74,214,255,0.28);
+  transform: translateY(-1px);
+}
+button.perf-hw-stat::after {
+  content: '›';
+  margin-left: 4px;
+  font-size: 17px;
+  line-height: 1;
+  color: rgba(255,255,255,0.35);
+  flex-shrink: 0;
+}
+button.perf-hw-stat:hover::after { color: var(--p-aqua, #4ad6ff); }
+.perf-hw-stat-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--c, var(--p-aqua));
+  box-shadow: 0 0 6px var(--c, var(--p-aqua));
+  flex-shrink: 0;
+}
+.perf-hw-stat-text {
+  flex: 1;
+  font-size: 12.5px; font-weight: 700;
+  color: rgba(255,255,255,0.85);
+}
+.perf-hw-stat-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px; font-weight: 800;
+  color: white;
+}
+/* Kazanılan XP — tek satır vurgulu kutu, kartın altına yapışır */
+.perf-hw-xp {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px;
+  flex-shrink: 0;
+  width: 100%;
+  background: linear-gradient(135deg, rgba(255,138,58,0.16), rgba(229,4,123,0.10));
+  border: 1px solid rgba(255,138,58,0.35);
+  border-radius: 12px;
+}
+.perf-hw-xp-icon {
+  font-size: 20px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(255,138,58,0.55));
+  flex-shrink: 0;
+}
+.perf-hw-xp-label {
+  flex: 1;
+  font-size: 12.5px; font-weight: 600;
+  color: rgba(255,255,255,0.78);
+  letter-spacing: 0;
+}
+.perf-hw-xp-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px; font-weight: 700;
+  color: rgba(255,255,255,0.75);
+  flex-shrink: 0;
+}
+.perf-hw-xp-num strong {
+  font-size: 19px; font-weight: 800;
+  color: #ffd84a;
+  letter-spacing: -0.02em;
+  margin-right: 4px;
+}
+
+/* ============================================================
+ * BAŞARIMLAR
+ * ============================================================ */
+.perf-badges {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.perf-badge {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  background: linear-gradient(180deg, rgba(255,216,74,0.06), rgba(229,4,123,0.04));
+  border: 1px solid rgba(255,216,74,0.18);
+  border-radius: 14px;
+  text-align: center;
+}
+.perf-badge.is-locked {
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.05);
+  opacity: 0.45;
+  filter: grayscale(0.7);
+}
+.perf-badge-emoji {
+  font-size: 34px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(229,4,123,0.40));
+}
+.perf-badge-name {
+  font-size: 11px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.005em;
+}
+.perf-badge-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,0.55);
+}
+.perf-badges-foot {
+  margin-top: 12px;
+  display: flex; justify-content: center;
+}
+.perf-link-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid rgba(168,164,240,0.30);
+  border-radius: 999px;
+  color: white;
+  font-size: 12px; font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+.perf-link-btn:hover { background: rgba(168,164,240,0.10); border-color: rgba(168,164,240,0.45); }
+.perf-link-btn svg { width: 12px; height: 12px; }
+
+/* ============================================================
+ * DEVAMSIZLIK
+ * ============================================================ */
+.perf-att-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.perf-att-stat {
+  padding: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  text-align: center;
+}
+.perf-att-stat-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  display: block;
+}
+.perf-att-stat.is-excused .perf-att-stat-num { color: #ffd84a; }
+.perf-att-stat.is-unexcused .perf-att-stat-num { color: #ff7eb3; }
+.perf-att-stat-label {
+  display: block;
+  margin-top: 4px;
+  font-size: 10.5px; font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.perf-att-cal {
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  gap: 4px;
+}
+.perf-att-cal-day {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.perf-att-cal-day.is-present { background: rgba(109,212,158,0.30); border-color: rgba(109,212,158,0.45); }
+.perf-att-cal-day.is-excused { background: rgba(255,216,74,0.30); border-color: rgba(255,216,74,0.45); }
+.perf-att-cal-day.is-unexcused { background: rgba(255,109,198,0.35); border-color: rgba(255,109,198,0.50); }
+.perf-att-cal-day.is-today { box-shadow: 0 0 0 1px var(--p-aqua); }
+.perf-att-legend {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin-top: 10px;
+}
+.perf-att-legend-item {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10.5px; font-weight: 700;
+  color: rgba(255,255,255,0.65);
+}
+.perf-att-legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 2px;
+}
+
+/* ============================================================
+ * SINIF SIRALAMASI
+ * ============================================================ */
+.perf-rank-list {
+  display: flex; flex-direction: column;
+  gap: 6px;
+}
+.perf-rank-row {
+  display: grid;
+  grid-template-columns: 28px 36px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.perf-rank-row.is-me {
+  background: linear-gradient(135deg, rgba(74,214,255,0.10), rgba(105,100,196,0.10));
+  border-color: rgba(74,214,255,0.45);
+}
+.perf-rank-pos {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px; font-weight: 800;
+  color: rgba(255,255,255,0.55);
+}
+.perf-rank-row.is-top-1 .perf-rank-pos { color: #ffd84a; }
+.perf-rank-row.is-top-2 .perf-rank-pos { color: #d8e0f5; }
+.perf-rank-row.is-top-3 .perf-rank-pos { color: #ff8a4a; }
+.perf-rank-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--p-purple-mid), var(--p-purple));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13.5px; font-weight: 800;
+  color: white;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+}
+.perf-rank-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.perf-rank-name {
+  font-size: 13px; font-weight: 700;
+  color: white;
+  letter-spacing: -0.005em;
+}
+.perf-rank-meta {
+  font-size: 10.5px; font-weight: 600;
+  color: rgba(255,255,255,0.55);
+}
+.perf-rank-score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.02em;
+}
+.perf-rank-foot {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(74,214,255,0.08);
+  border: 1px dashed rgba(74,214,255,0.35);
+  border-radius: 12px;
+  font-size: 12px; color: rgba(255,255,255,0.85);
+  text-align: center;
+}
+.perf-rank-foot strong { color: var(--p-aqua, #4ad6ff); }
+
+/* ============================================================
+ * BU HAFTA ÖZET — 4'lü mini kart
+ * ============================================================ */
+.perf-week {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+  flex: 1; /* Parent perf-card flex column — kalan tüm yüksekliği doldur */
+}
+.perf-week-stat {
+  /* İkon solda, num + label sağda dikey stacked */
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+.perf-week-stat::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--bg-from), var(--bg-to));
+  opacity: 0.15;
+  z-index: 0;
+}
+.perf-week-stat > * { position: relative; z-index: 1; }
+.perf-week-stat.is-xp     { --bg-from: #ff8a3a; --bg-to: #d44a00; border: 1px solid rgba(255,138,58,0.40); }
+.perf-week-stat.is-hw     { --bg-from: #6dd49e; --bg-to: #3da66e; border: 1px solid rgba(109,212,158,0.40); }
+.perf-week-stat.is-exam   { --bg-from: #4ad6ff; --bg-to: #1c8fb5; border: 1px solid rgba(74,214,255,0.40); }
+.perf-week-stat.is-attend { --bg-from: #a8a4f0; --bg-to: #6964c4; border: 1px solid rgba(168,164,240,0.40); }
+.perf-week-icon {
+  grid-row: 1 / span 2;
+  font-size: 30px; line-height: 1;
+  align-self: center;
+}
+.perf-week-num {
+  grid-column: 2;
+  align-self: end;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+.perf-week-label {
+  grid-column: 2;
+  align-self: start;
+  margin-top: 2px;
+  font-size: 10.5px; font-weight: 700;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* ============================================================
+ * EN ÇOK ÇALIŞILAN KONULAR
+ * ============================================================ */
+.perf-topic-list {
+  display: flex; flex-direction: column;
+  gap: 8px;
+}
+.perf-topic-row {
+  display: grid;
+  grid-template-columns: 28px 30px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+}
+button.perf-topic-row:hover {
+  background: rgba(74,214,255,0.08);
+  border-color: rgba(74,214,255,0.28);
+  transform: translateY(-1px);
+}
+.perf-drawer-total-note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(74,214,255,0.08);
+  border: 1px solid rgba(74,214,255,0.18);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.72);
+}
+.perf-topic-rank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; font-weight: 700;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+.perf-topic-emoji { font-size: 22px; text-align: center; }
+.perf-topic-name { color: white; font-weight: 700; font-size: 14px; }
+.perf-topic-name small {
+  display: block;
+  font-size: 12px; font-weight: 600;
+  color: rgba(255,255,255,0.50);
+  margin-top: 2px;
+}
+.perf-topic-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13.5px; font-weight: 800;
+  color: var(--p-aqua);
+}
+
+/* ============================================================
+ * MINI STATS — 3 yan yana mini KPI kart
+ * ============================================================ */
+.perf-mini-stats {
+  display: grid;
+  /* 2 satır halinde dikey: tek bir kart kolonunda 2 sıralama
+   * Row 1'deki Bu Hafta'nın yüksekliğine uysunlar diye sığacak şekilde stack. */
+  grid-template-columns: 1fr;
+  grid-auto-rows: 1fr;
+  gap: 12px;
+  min-height: 0;
+}
+.perf-mini-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px;
+  background: rgba(20,18,52,0.85);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(168,164,240,0.18);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.perf-mini-card:hover {
+  border-color: rgba(168,164,240,0.32);
+  transform: translateY(-1px);
+}
+.perf-mini-card-top {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px;
+}
+.perf-mini-card-icon {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  line-height: 1;
+}
+.perf-mini-card-trend {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  letter-spacing: -0.01em;
+}
+.perf-mini-card-trend.is-up {
+  background: rgba(109,212,158,0.14);
+  color: #6dd49e;
+}
+.perf-mini-card-trend.is-down {
+  background: rgba(255,126,179,0.14);
+  color: #ff7eb3;
+}
+.perf-mini-card-trend.is-flat {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.65);
+}
+.perf-mini-card-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.perf-mini-card-value small {
+  font-size: 13px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 700;
+  margin-left: 2px;
+}
+.perf-mini-card-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.60);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* ============================================================
+ * DERS DETAY DRAWER
+ * ============================================================ */
+.perf-drawer {
+  position: fixed; inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+}
+.perf-drawer.is-open { pointer-events: auto; }
+.perf-drawer-overlay {
+  position: absolute; inset: 0;
+  background: rgba(5, 3, 18, 0.60);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+.perf-drawer.is-open .perf-drawer-overlay { opacity: 1; }
+.perf-drawer-panel {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 480px; max-width: 92vw;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(105,100,196,0.28), transparent 55%),
+    radial-gradient(circle at 0% 100%, rgba(74,214,255,0.16), transparent 55%),
+    linear-gradient(170deg, #2a2347 0%, #1a1538 100%);
+  border-left: 1px solid rgba(168,164,240,0.30);
+  box-shadow: -24px 0 60px rgba(0,0,0,0.60);
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.30s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+.perf-drawer.is-open .perf-drawer-panel { transform: translateX(0); }
+.perf-drawer-close {
+  position: absolute;
+  top: 18px; right: 18px;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(20,18,52,0.70);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: white;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0;
+  z-index: 3;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.18s;
+}
+.perf-drawer-close svg { width: 16px; height: 16px; }
+.perf-drawer-close:hover { background: rgba(40,36,80,0.85); }
+
+.perf-drawer-head {
+  padding: 22px 22px 0;
+  display: flex; align-items: center; gap: 14px;
+}
+.perf-drawer-icon {
+  width: 56px; height: 56px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 44px; line-height: 1;
+  filter: drop-shadow(0 5px 10px rgba(0,0,0,0.45));
+  flex-shrink: 0;
+  background: none;
+}
+.perf-drawer-head-info { flex: 1; min-width: 0; padding-right: 40px; }
+.perf-drawer-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 800;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--p-aqua, #4ad6ff);
+  display: block;
+  margin-bottom: 4px;
+}
+.perf-drawer-title {
+  margin: 0;
+  font-size: 22px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.perf-drawer-teacher {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px; font-weight: 700;
+  color: rgba(255,255,255,0.72);
+  letter-spacing: 0.03em;
+}
+
+.perf-drawer-body {
+  flex: 1; min-height: 0;
+  overflow-y: auto;
+  padding: 20px 22px 24px;
+  display: flex; flex-direction: column;
+  gap: 18px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(168,164,240,0.30) transparent;
+}
+.perf-drawer-body::-webkit-scrollbar { width: 5px; }
+.perf-drawer-body::-webkit-scrollbar-thumb { background: rgba(168,164,240,0.30); border-radius: 3px; }
+
+/* Drawer — bölüm etiketi (proje drawer dili) */
+.perf-drawer-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--p-aqua, #4ad6ff);
+}
+.perf-drawer-section {
+  display: flex; flex-direction: column;
+  gap: 10px;
+}
+
+/* Drawer — filtre araç çubuğu */
+.perf-drawer-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Drawer — Genel skor (öne çıkan hero kutu) */
+.perf-drawer-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+.perf-drawer-stat {
+  position: relative;
+  padding: 18px 16px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(74,214,255,0.16), transparent 62%),
+    rgba(255,255,255,0.04);
+  border: 1px solid rgba(168,164,240,0.20);
+  border-radius: 14px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 5px;
+}
+.perf-drawer-stat-num {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 40px; font-weight: 900;
+  color: white;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.perf-drawer-stat-label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 800;
+  color: var(--p-aqua, #4ad6ff);
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+
+/* Drawer — metrik satırları (ikon sol · değer/etiket · açıklama sağ) */
+.perf-drawer-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.perf-drawer-metric {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 116px) minmax(0, 1fr);
+  gap: 11px;
+  align-items: center;
+  padding: 10px 13px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(168,164,240,0.18);
+  border-radius: 12px;
+}
+.perf-drawer-metric-icon {
+  width: 34px; height: 34px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 17px; line-height: 1;
+  border-radius: 10px;
+  background: rgba(74,214,255,0.10);
+  border: 1px solid rgba(74,214,255,0.18);
+  flex-shrink: 0;
+}
+.perf-drawer-metric-main { min-width: 0; }
+.perf-drawer-metric-num {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 19px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+.perf-drawer-metric-num sub {
+  font-size: 0.62em;
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
+  vertical-align: baseline;
+}
+.perf-drawer-metric-label {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px; font-weight: 700;
+  color: rgba(255,255,255,0.78);
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+.perf-drawer-metric-desc {
+  font-size: 11.5px; font-weight: 500;
+  line-height: 1.45;
+  color: rgba(255,255,255,0.55);
+}
+
+.perf-drawer-section {
+  display: flex; flex-direction: column;
+  gap: 10px;
+}
+.perf-drawer-section-title {
+  margin: 0;
+  font-size: 13px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.005em;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.perf-drawer-section-title svg { width: 14px; height: 14px; color: var(--p-aqua); }
+
+/* Konular */
+.perf-topics {
+  display: flex; flex-direction: column;
+  gap: 6px;
+}
+.perf-topic-detail {
+  display: grid;
+  grid-template-columns: 1fr 90px auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+}
+.perf-topic-detail-name {
+  font-size: 13px; font-weight: 700;
+  color: rgba(255,255,255,0.92);
+}
+.perf-topic-detail-name small {
+  display: block;
+  font-size: 10.5px; font-weight: 600;
+  color: rgba(255,255,255,0.45);
+  margin-top: 2px;
+}
+.perf-topic-detail-bar {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+.perf-topic-detail-bar-fill {
+  position: absolute; inset: 0;
+  width: var(--p, 0%);
+  background: linear-gradient(90deg, var(--p-aqua), var(--p-purple-mid));
+  border-radius: inherit;
+}
+.perf-topic-detail-pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; font-weight: 800;
+  color: white;
+  text-align: right;
+  min-width: 36px;
+}
+
+/* Drawer — Son ödevler */
+.perf-drawer-hw {
+  display: flex; flex-direction: column;
+  gap: 6px;
+}
+.perf-drawer-hw-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  font-size: 12.5px;
+}
+.perf-drawer-hw-title { color: rgba(255,255,255,0.92); font-weight: 700; }
+.perf-drawer-hw-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: rgba(255,255,255,0.50);
+}
+.perf-drawer-hw-status {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10.5px; font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.perf-drawer-hw-status.is-done { background: rgba(109,212,158,0.16); color: #8de3b3; }
+.perf-drawer-hw-status.is-late { background: rgba(255,109,198,0.16); color: #ff9ec6; }
+.perf-drawer-hw-status.is-open { background: rgba(255,216,74,0.16); color: #ffd84a; }
+
+/* Ödev drawer — filtre + sekmeler + liste */
+.perf-hw-drawer-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.perf-hw-drawer-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.perf-hw-drawer-tab {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(168,164,240,0.22);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.72);
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.perf-hw-drawer-tab:hover {
+  background: rgba(255,255,255,0.07);
+  color: white;
+}
+.perf-hw-drawer-tab.is-active {
+  background: rgba(74,214,255,0.14);
+  border-color: rgba(74,214,255,0.35);
+  color: #4ad6ff;
+}
+.perf-drawer-hw-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.perf-drawer-hw-item {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+button.perf-drawer-hw-item:hover {
+  background: rgba(74,214,255,0.08);
+  border-color: rgba(74,214,255,0.28);
+  transform: translateY(-1px);
+}
+.perf-drawer-hw-emoji {
+  font-size: 22px;
+  line-height: 1;
+  text-align: center;
+}
+.perf-drawer-hw-info { min-width: 0; }
+.perf-drawer-hw-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.perf-drawer-hw-info .perf-drawer-hw-title {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.92);
+  line-height: 1.3;
+}
+.perf-drawer-hw-info small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.48);
+}
+.perf-drawer-hw-empty {
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.45);
+  border: 1px dashed rgba(168,164,240,0.22);
+  border-radius: 12px;
+}
+
+/* Ödev drawer — liste / detay geçişi */
+.perf-hw-drawer-panel { overflow: hidden; }
+.perf-hw-stack-view {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+.perf-hw-stack-view.is-active { display: flex; }
+
+.perf-hw-detail-back {
+  position: absolute;
+  top: 18px; left: 18px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px 7px 10px;
+  border-radius: 999px;
+  background: rgba(20,18,52,0.70);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.88);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+.perf-hw-detail-back svg { width: 14px; height: 14px; }
+.perf-hw-detail-back:hover {
+  background: rgba(40,36,80,0.85);
+  border-color: rgba(74,214,255,0.35);
+  color: #fff;
+}
+
+.perf-hw-detail-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 58px 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(168,164,240,0.30) transparent;
+}
+.perf-hw-detail-body::-webkit-scrollbar { width: 5px; }
+.perf-hw-detail-body::-webkit-scrollbar-thumb { background: rgba(168,164,240,0.30); border-radius: 3px; }
+
+.perf-hw-detail-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.perf-hw-detail-icon {
+  font-size: 44px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35));
+  flex-shrink: 0;
+}
+.perf-hw-detail-titlebar-text { flex: 1; min-width: 0; padding-right: 36px; }
+.perf-hw-detail-eyebrow-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.perf-hw-type {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  line-height: 1.35;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.perf-hw-type.is-kid {
+  background: rgba(124, 58, 237, 0.22);
+  border: 1px solid rgba(124, 58, 237, 0.38);
+  color: #c4b5fd;
+}
+.perf-hw-type.is-rud {
+  background: rgba(16, 185, 129, 0.20);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #6ee7b7;
+}
+.perf-hw-type[hidden],
+.perf-hw-format-hint[hidden] { display: none !important; }
+.perf-hw-format-hint {
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: rgba(255,255,255,0.72);
+  background: rgba(168, 164, 240, 0.10);
+  border-left: 3px solid rgba(168, 164, 240, 0.45);
+}
+.perf-hw-format-hint.is-kid {
+  border-left-color: rgba(124, 58, 237, 0.55);
+  background: rgba(124, 58, 237, 0.12);
+  color: #ddd6fe;
+}
+.perf-hw-format-hint.is-rud {
+  border-left-color: rgba(16, 185, 129, 0.42);
+  background: rgba(16, 185, 129, 0.10);
+  color: #a7f3d0;
+}
+
+.perf-hw-detail-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  padding-left: 58px;
+  margin-top: -6px;
+}
+.perf-hw-detail-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.78);
+  letter-spacing: 0.02em;
+}
+.perf-hw-detail-chip svg { width: 13px; height: 13px; opacity: 0.85; flex-shrink: 0; }
+
+.perf-hw-detail-text {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.85);
+}
+
+.perf-hw-detail-teacher {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(168,164,240,0.18);
+}
+.perf-hw-detail-teacher img {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(168,164,240,0.30);
+  flex-shrink: 0;
+}
+.perf-hw-detail-teacher-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.perf-hw-detail-teacher-name {
+  font-size: 14px; font-weight: 800;
+  color: white;
+  line-height: 1.2;
+}
+.perf-hw-detail-teacher-role {
+  font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,0.55);
+}
+
+.perf-hw-detail-rewards {
+  display: flex;
+  gap: 8px;
+}
+.perf-hw-detail-reward-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.perf-hw-detail-reward {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(168,164,240,0.16);
+}
+.perf-hw-detail-reward-icon { font-size: 20px; line-height: 1; }
+.perf-hw-detail-reward strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  color: white;
+}
+.perf-hw-detail-reward small {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+
+.perf-hw-detail-sep {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168,164,240,0.28), transparent);
+  margin: 2px 0;
+}
+
+.perf-hw-detail-game {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.perf-hw-detail-game-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(255,216,74,0.9);
+}
+.perf-hw-detail-game-label::before {
+  content: '✦';
+  font-size: 13px;
+}
+
+.perf-hw-detail-footer {
+  flex-shrink: 0;
+  padding: 14px 22px 22px;
+  border-top: 1px solid rgba(168,164,240,0.16);
+  background: rgba(10,8,32,0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.perf-hw-detail-retry-note {
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: rgba(255,255,255,0.55);
+  text-align: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 200, 120, 0.28);
+  background: rgba(255, 180, 80, 0.10);
+  color: rgba(255, 236, 210, 0.92);
+}
+.perf-hw-detail-late-xp-note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 122, 74, 0.32);
+  background: rgba(255, 122, 74, 0.12);
+  color: rgba(255, 220, 200, 0.95);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+}
+.perf-hw-detail-late-xp-note strong { font-weight: 800; }
+.perf-hw-detail-chip.is-status-done { color: #9be5bb; }
+.perf-hw-detail-chip.is-status-active { color: #ffd84a; }
+.perf-hw-detail-chip.is-status-overdue { color: #ffb380; }
+.perf-hw-detail-cta {
+  width: 100%;
+  padding: 15px 18px;
+  border: none;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: white;
+  cursor: pointer;
+  background: linear-gradient(135deg, #e5047b 0%, #a80358 100%);
+  box-shadow: 0 18px 36px -12px rgba(229,4,123,0.55), inset 0 2px 0 rgba(255,255,255,0.22);
+  transition: transform 0.18s, opacity 0.18s, box-shadow 0.18s;
+}
+.perf-hw-detail-cta:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 42px -10px rgba(229,4,123,0.65), inset 0 2px 0 rgba(255,255,255,0.28);
+}
+.perf-hw-detail-cta:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.perf-hw-detail-cta.is-overdue {
+  background: linear-gradient(135deg, #ff7a4a 0%, #c44a1a 100%);
+  box-shadow: 0 18px 36px -12px rgba(255,122,74,0.45), inset 0 2px 0 rgba(255,255,255,0.22);
+}
+.perf-hw-detail-cta.is-completed {
+  background: rgba(109,212,158,0.18);
+  border: 1px solid rgba(109,212,158,0.35);
+  color: #248f58;
+  box-shadow: none;
+}
+.perf-hw-detail-cta.is-retry {
+  background: linear-gradient(135deg, #a8a4f0 0%, #6964c4 100%);
+  box-shadow: 0 12px 28px rgba(105,100,196,0.28);
+}
+.perf-hw-detail-cta.is-continue {
+  background: linear-gradient(135deg, #4ad6ff 0%, #2a8fc4 100%);
+  box-shadow: 0 18px 36px -12px rgba(74,214,255,0.35), inset 0 2px 0 rgba(255,255,255,0.22);
+}
+
+/* ============================================================
+ * Animasyonlar (sayfa yükleme)
+ * ============================================================ */
+@keyframes perfFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.perf-page > * {
+  opacity: 0;
+  animation: perfFadeUp 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+.perf-page > *:nth-child(1) { animation-delay: 0.05s; }
+.perf-page > *:nth-child(2) { animation-delay: 0.12s; }
+.perf-page > *:nth-child(3) { animation-delay: 0.20s; }
+.perf-page > *:nth-child(4) { animation-delay: 0.28s; }
+.perf-page > *:nth-child(5) { animation-delay: 0.36s; }
+@media (prefers-reduced-motion: reduce) {
+  .perf-page > * { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+/* ============================================================
+ * Responsive
+ * ============================================================ */
+/* 1920×1080 — tek ekrana sığdır, iç scroll kartlarda */
+@media (min-width: 1600px) and (min-height: 1000px) {
+  .stage { padding: 12px 24px; }
+  .perf-page { gap: 10px; padding: 2px 2px 2px; }
+  .perf-pagehead { padding: 0 4px; }
+  .perf-pagehead-title { font-size: 24px; }
+  .perf-grid { gap: 12px; }
+  .perf-card { padding: 16px 18px; }
+  .perf-card-head { margin-bottom: 10px; }
+  .perf-hero { padding: 18px 20px; gap: 12px; }
+  .perf-subj-row,
+  button.perf-topic-row { padding: 8px 10px; }
+  .perf-week-stat { padding: 12px 14px; }
+  .perf-mini-card { padding: 14px 16px; }
+}
+@media (max-width: 1200px) {
+  .perf-grid { grid-template-columns: repeat(2, 1fr); }
+  .perf-grid > .span-3 { grid-column: span 2; }
+}
+@media (max-width: 760px) {
+  .stage {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: auto; min-height: calc(100vh - 88px);
+  }
+  .stage-nav { grid-column: 1; }
+  .perf-page { grid-column: 1; padding-right: 0; }
+  .perf-grid { grid-template-columns: 1fr; }
+  .perf-grid > .span-3,
+  .perf-grid > .span-2 { grid-column: span 1; }
+  .perf-hero { grid-template-columns: 1fr; }
+  .hud { flex-wrap: wrap; gap: 12px; height: auto; padding: 12px 16px; }
+}
+
+/* ============================================================
+ * Toast
+ * ============================================================ */
+.sn-toast {
+  position: fixed;
+  bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 20px;
+  background: rgba(20,18,52,0.98);
+  border: 1px solid rgba(109,212,158,0.40);
+  border-radius: 12px;
+  color: white;
+  font-size: 13px; font-weight: 700;
+  box-shadow: 0 14px 32px -10px rgba(0,0,0,0.65);
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.22s, transform 0.22s, visibility 0.22s;
+  z-index: 10500;
+}
+.sn-toast.is-show {
+  opacity: 1; visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+.sn-toast svg { width: 16px; height: 16px; color: #6dd49e; }
+
+</style>
+<link rel="stylesheet" href="assets/dashboard-light.css">
+<link rel="stylesheet" href="assets/dashboard-polish.css">
+<link rel="stylesheet" href="assets/dashboard-sn-perf.css">
+</head>
+<body>
+
+<!-- BACKGROUND SCENE -->
+<div class="scene" aria-hidden="true">
+  <div class="scene-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div id="stars"></div>
+</div>
+
+<!-- HUD TOPBAR -->
+<header class="hud">
+  <a class="hud-brand" href="index.html" aria-label="Bilenyum anasayfa">
+    <img src="assets/bilenyum-logo.svg" alt="Bilenyum" />
+  </a>
+  <div class="hud-stats">
+    <div class="stat-pill xp" title="Toplam XP">
+      <span class="stat-icon">
+        <svg viewBox="0 0 256 256" fill="currentColor"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17Z"/></svg>
+      </span>
+      <span class="stat-value">12.450</span>
+    </div>
+
+    <button type="button" class="stat-icon-btn is-msg" id="msgBtn" aria-label="Mesajlarım" data-inbox-open="msg">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="notif-dot"></span>
+    </button>
+
+    <button type="button" class="stat-icon-btn is-notif" id="notifBtn" aria-label="Bildirimler" data-inbox-open="notif">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-dot"></span>
+    </button>
+
+    <div class="hud-profile">
+      <button type="button" class="hud-player" id="profileBtn" aria-haspopup="true" aria-expanded="false">
+        <span class="player-avatar-wrap" style="--xp-pct: 64%;">
+          <span class="player-avatar-ring"></span>
+          <span class="player-avatar"><span aria-hidden="true">🧒</span></span>
+        </span>
+        <span class="player-text">
+          <span class="player-name">Mira Yılmaz</span>
+          <span class="player-clan">Alfa Klanı</span>
+        </span>
+        <svg class="hud-player-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="hud-menu" id="profileMenu" role="menu">
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profilim
+        </button>
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Ayarlar
+        </button>
+        <div class="hud-menu-divider"></div>
+        <button type="button" class="hud-menu-item is-danger" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Çıkış Yap
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN STAGE -->
+<main class="stage">
+
+  <!-- KOLON 1: Nav rail + Yumi -->
+  <div class="stage-nav">
+    <aside class="nav-rail" aria-label="Ana menü">
+      <a class="nav-item" href="dashboard.html" title="Merkez">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-item-label">Merkez</span>
+      </a>
+      <a class="nav-item" href="program.html" title="Program">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="nav-item-label">Program</span>
+      </a>
+      <a class="nav-item" href="odevler.html" title="Ödevler">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span class="nav-item-label">Ödevler</span>
+      </a>
+      <a class="nav-item" href="tekrarlar.html" title="Ders Tekrarları">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        <span class="nav-item-label">Ders Tekrarları</span>
+      </a>
+      <a class="nav-item" href="sinavlar.html" title="Sonuçlar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 14 11 16 15 12"/></svg>
+        <span class="nav-item-label">Sonuçlar</span>
+      </a>
+      <a class="nav-item is-active" href="performans.html" title="Performans" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span class="nav-item-label">Performans</span>
+      </a>
+    </aside>
+
+    <!-- Yumi — kafa + bildirim popup + chatbot -->
+    <div class="yumi-dock">
+
+      <!-- Bildirim popup -->
+      <div class="yumi-panel yumi-notif" id="yumiNotif" role="dialog" aria-label="Yumi bildirimleri">
+        <div class="yumi-notif-head">
+          <span class="yumi-notif-name">Yumi</span>
+          <button type="button" class="yumi-x" data-yumi-close aria-label="Kapat">✕</button>
+        </div>
+        <p class="yumi-notif-text" id="yumiNotifText"></p>
+        <div class="yumi-notif-foot">
+          <span class="yumi-dots" id="yumiDots"></span>
+          <button type="button" class="yumi-next" id="yumiNext">
+            <span id="yumiNextLabel">İleri</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Chatbot paneli -->
+      <div class="yumi-panel yumi-chat" id="yumiChat" role="dialog" aria-label="Yumi sohbet">
+        <div class="yumi-chat-head">
+          <span class="yumi-chat-ava" aria-hidden="true">🤖</span>
+          <span class="yumi-chat-id">
+            <span class="yumi-chat-name">Yumi</span>
+            <span class="yumi-chat-status">Çevrimiçi · Asistan</span>
+          </span>
+          <button type="button" class="yumi-x" data-yumi-close aria-label="Kapat">✕</button>
+        </div>
+        <div class="yumi-chat-body" id="yumiChatBody"></div>
+        <form class="yumi-chat-input" id="yumiChatForm">
+          <input type="text" class="yumi-chat-field" id="yumiChatField" placeholder="Yumi'ye bir şey sor..." autocomplete="off" />
+          <button type="submit" class="yumi-chat-send" aria-label="Gönder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <button type="button" class="yumi-head" id="yumiHead" aria-label="Yumi">
+        <span aria-hidden="true">🤖</span>
+        <span class="yumi-head-notif" id="yumiNotifBadge">3</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- KOLON 2: Performans içeriği -->
+  <section class="perf-page" id="perfPage">
+
+    <!-- BAŞLIK -->
+    <header class="perf-pagehead">
+      <h1 class="perf-pagehead-title">Performansım</h1>
+    </header>
+
+    <!-- 3-COL GRID — tüm widgetlar (hero dahil) burada -->
+    <div class="perf-grid">
+
+      <!-- Hero: Genel Performans (span-2) -->
+      <article class="perf-hero" id="perfHero" data-perf-tip="Bilenyum başarı endeksin; derslerdeki performansın, ödevlerin, sınavların ve derse katılımın bir araya gelerek hesaplanır. 100'e ne kadar yakınsan o kadar iyisin!">
+        <div class="perf-hero-left">
+          <span class="perf-hero-eyebrow">GENEL PERFORMANS</span>
+          <div class="perf-hero-score">
+            <span class="perf-hero-num" id="perfHeroNum">78</span>
+            <span class="perf-hero-denom">/100</span>
+          </div>
+          <span class="perf-hero-label">Bilenyum başarı endeksin</span>
+          <span class="perf-hero-trend">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 18 12 12 18 18"/><polyline points="6 12 12 6 18 12"/></svg>
+            +4 puan · Bu Ay
+          </span>
+        </div>
+        <div class="perf-hero-right">
+          <div class="perf-hero-chartbox">
+            <div class="perf-hero-yaxis" id="perfHeroYaxis"></div>
+            <div class="perf-hero-chart" id="perfHeroChart">
+              <svg class="perf-hero-chart-svg" viewBox="0 0 320 140" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="perfHeroGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#4ad6ff" stop-opacity="0.30"/>
+                    <stop offset="55%" stop-color="#6964c4" stop-opacity="0.12"/>
+                    <stop offset="100%" stop-color="#6964c4" stop-opacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="perfHeroLineGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#4ad6ff"/>
+                    <stop offset="100%" stop-color="#a8a4f0"/>
+                  </linearGradient>
+                </defs>
+                <g id="perfHeroGrid"></g>
+                <path id="perfHeroArea" d="" fill="url(#perfHeroGrad)"/>
+                <path id="perfHeroLine" d="" stroke="url(#perfHeroLineGrad)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" style="filter:drop-shadow(0 0 4px rgba(74,214,255,0.40));"/>
+              </svg>
+              <div class="perf-hero-chart-points" id="perfHeroPoints"></div>
+            </div>
+            <div class="perf-hero-chart-labels" id="perfHeroLabels">
+              <!-- labels JS ile -->
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Bu Hafta (span-1) -->
+      <div class="perf-card" data-widget="week" data-perf-tip="Seçtiğin eğitim haftasındaki özet performansın. XP, ödev, sınav ve canlı ders katılımını tek bakışta görebilirsin.">
+        <div class="perf-card-head">
+          <h3 class="perf-card-title">Bu Hafta</h3>
+          <div class="perf-filter" data-week-filter id="perfWeekFilter">
+            <button type="button" class="perf-filter-btn" id="perfWeekFilterBtn" aria-haspopup="true" aria-expanded="false">
+              <span data-filter-label id="perfWeekLabel">11. Eğitim Haftası</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="perf-filter-menu" id="perfWeekFilterMenu" role="menu"></div>
+          </div>
+        </div>
+        <div class="perf-week">
+          <div class="perf-week-stat is-xp" data-tip="Seçili eğitim haftasında tamamladığın ders, ödev ve etkinliklerden kazandığın toplam XP.">
+            <span class="perf-week-icon">⚡</span>
+            <span class="perf-week-num" id="perfWeekXp">+1.250</span>
+            <span class="perf-week-label">XP</span>
+          </div>
+          <div class="perf-week-stat is-hw" data-tip="Bu eğitim haftasında tamamladığın ödev sayısı ve toplam ödev sayısı.">
+            <span class="perf-week-icon">📝</span>
+            <span class="perf-week-num" id="perfWeekHw">12/14</span>
+            <span class="perf-week-label">Tamamlanan ödev</span>
+          </div>
+          <div class="perf-week-stat is-exam" data-tip="Bu eğitim haftasında girdiğin deneme sınavından aldığın net.">
+            <span class="perf-week-icon">🎯</span>
+            <span class="perf-week-num" id="perfWeekExam">82.4</span>
+            <span class="perf-week-label">Deneme sınavı neti</span>
+          </div>
+          <div class="perf-week-stat is-attend" data-tip="Bu eğitim haftasında katıldığın canlı ders sayısı ve planlanan toplam canlı ders sayısı.">
+            <span class="perf-week-icon">📹</span>
+            <span class="perf-week-num" id="perfWeekAttend">10/12</span>
+            <span class="perf-week-label">Katıldığım canlı ders sayısı</span>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- 1) Ders Bazlı Performans -->
+      <div class="perf-card" data-widget="subjects" data-perf-tip="Her ders için başarı puanını görürsün. Bir derse tıklayarak o dersteki detaylı istatistiklerine ulaşabilirsin.">
+        <div class="perf-card-head">
+          <h3 class="perf-card-title">Ders Bazlı Performans</h3>
+          <div class="perf-filter" data-filter>
+            <button type="button" class="perf-filter-btn" data-filter-btn>
+              <span data-filter-label>Bu Dönem</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="perf-filter-menu" data-filter-menu>
+              <button type="button" class="perf-filter-item" data-range="week">Bu Hafta</button>
+              <button type="button" class="perf-filter-item" data-range="month">Bu Ay</button>
+              <button type="button" class="perf-filter-item is-active" data-range="term">Bu Dönem</button>
+            </div>
+          </div>
+        </div>
+        <div class="perf-subj-list" id="perfSubjList">
+          <!-- JS ile -->
+        </div>
+      </div>
+
+      <!-- En Çok Çalıştığın Dersler -->
+      <div class="perf-card" data-widget="topics" data-perf-tip="En çok zaman ayırdığın dersler burada listelenir. Bir derse tıklayarak çalışma sürenin nasıl dağıldığını görebilirsin.">
+        <div class="perf-card-head">
+          <h3 class="perf-card-title">En Çok Çalıştığın Dersler</h3>
+          <div class="perf-filter" data-filter>
+            <button type="button" class="perf-filter-btn" data-filter-btn>
+              <span data-filter-label>Bu Ay</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="perf-filter-menu" data-filter-menu>
+              <button type="button" class="perf-filter-item" data-range="week">Bu Hafta</button>
+              <button type="button" class="perf-filter-item is-active" data-range="month">Bu Ay</button>
+              <button type="button" class="perf-filter-item" data-range="term">Bu Dönem</button>
+            </div>
+          </div>
+        </div>
+        <p class="perf-topics-note">Toplam çalışma süresi; canlı derse katılım, ödev çözme ve ders tekrarı izleme sürelerinin toplamıdır.</p>
+        <div class="perf-topic-list" id="perfTopicList">
+          <!-- JS ile -->
+        </div>
+      </div>
+
+      <!-- Ödev Performansım -->
+      <div class="perf-card" data-widget="homework" data-perf-tip="Ödevlerinin tamamlanma durumunu buradan takip edersin. Renkli dilimler tamamlanan, bekleyen ve geciken ödevlerini gösterir.">
+        <div class="perf-card-head">
+          <h3 class="perf-card-title">Ödev Performansım</h3>
+          <div class="perf-filter" data-filter>
+            <button type="button" class="perf-filter-btn" data-filter-btn>
+              <span data-filter-label>Bu Ay</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="perf-filter-menu" data-filter-menu>
+              <button type="button" class="perf-filter-item" data-range="week">Bu Hafta</button>
+              <button type="button" class="perf-filter-item is-active" data-range="month">Bu Ay</button>
+              <button type="button" class="perf-filter-item" data-range="all">Bu Zamana kadar</button>
+            </div>
+          </div>
+        </div>
+        <div class="perf-hw-wrap">
+          <div class="perf-hw-main">
+            <div class="perf-donut" id="perfDonut" data-perf-tip="Daire grafiğindeki her renk farklı bir ödev durumunu temsil eder. Ortadaki sayı toplam ödev sayını gösterir.">
+              <svg viewBox="0 0 110 110">
+                <circle class="perf-donut-track" cx="55" cy="55" r="48"/>
+                <circle class="perf-donut-seg" id="perfDonutDone" cx="55" cy="55" r="48"
+                  stroke="#6dd49e" stroke-dasharray="0 301.6"/>
+                <circle class="perf-donut-seg" id="perfDonutLate" cx="55" cy="55" r="48"
+                  stroke="#ff7eb3" stroke-dasharray="0 301.6"/>
+                <circle class="perf-donut-seg" id="perfDonutOpen" cx="55" cy="55" r="48"
+                  stroke="#ffd84a" stroke-dasharray="0 301.6"/>
+              </svg>
+              <div class="perf-donut-center">
+                <strong id="perfDonutTotal">35</strong>
+                <span>TOPLAM</span>
+              </div>
+            </div>
+            <div class="perf-hw-stats">
+              <button type="button" class="perf-hw-stat" style="--c:#6dd49e" data-hw-open="done" data-perf-tip="Zamanında teslim ettiğin ödevler. Tıklayarak listeyi görebilirsin.">
+                <span class="perf-hw-stat-dot"></span>
+                <span class="perf-hw-stat-text">Tamamlandı</span>
+                <span class="perf-hw-stat-num" id="perfHwDone">24</span>
+              </button>
+              <button type="button" class="perf-hw-stat" style="--c:#ffd84a" data-hw-open="active" data-perf-tip="Henüz teslim etmediğin ama süresi dolmamış ödevler. Tıklayarak listeyi görebilirsin.">
+                <span class="perf-hw-stat-dot"></span>
+                <span class="perf-hw-stat-text">Bekliyor</span>
+                <span class="perf-hw-stat-num" id="perfHwOpen">8</span>
+              </button>
+              <button type="button" class="perf-hw-stat" style="--c:#ff7eb3" data-hw-open="overdue" data-perf-tip="Son teslim tarihi geçmiş ödevler. Bunları en kısa sürede tamamlamaya çalış!">
+                <span class="perf-hw-stat-dot"></span>
+                <span class="perf-hw-stat-text">Geciken</span>
+                <span class="perf-hw-stat-num" id="perfHwLate">3</span>
+              </button>
+            </div>
+          </div>
+          <div class="perf-hw-xp" id="perfHwXpBox" data-perf-tip="Seçili dönemde ödevlerinden kazandığın toplam XP. Ödevlerini tamamladıkça bu sayı artar!">
+            <span class="perf-hw-xp-icon">⚡</span>
+            <span class="perf-hw-xp-label" id="perfHwXpLabel">Bu ay kazandığın</span>
+            <span class="perf-hw-xp-num"><strong id="perfHwXp">2.400</strong> XP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mini Stats — Genel sıralama + Klan içi sıralama -->
+      <div class="perf-mini-stats" data-widget="mini-stats">
+        <div class="perf-mini-card" data-perf-tip="Tüm Bilenyum öğrencileri arasındaki sıralaman. Ne kadar yukarıdaysan o kadar başarılısın!">
+          <div class="perf-mini-card-top">
+            <div class="perf-mini-card-icon">🏆</div>
+            <span class="perf-mini-card-trend is-up">▲ 12</span>
+          </div>
+          <div class="perf-mini-card-value">847.<small>/ 3.420</small></div>
+          <div class="perf-mini-card-label">Genel sıralama</div>
+        </div>
+        <div class="perf-mini-card" data-perf-tip="Kendi klanındaki arkadaşların arasındaki sıralaman. Klan içinde kaçıncı olduğunu buradan takip edebilirsin.">
+          <div class="perf-mini-card-top">
+            <div class="perf-mini-card-icon">🪐</div>
+            <span class="perf-mini-card-trend is-up">▲ 2</span>
+          </div>
+          <div class="perf-mini-card-value">3.<small>/ 32</small></div>
+          <div class="perf-mini-card-label">Klan içi sıralama</div>
+        </div>
+      </div>
+
+
+
+
+
+
+
+
+    </div>
+  </section>
+</main>
+
+<!-- DERS DETAY DRAWER -->
+<div class="perf-drawer" id="perfSubjDrawer" aria-hidden="true">
+  <div class="perf-drawer-overlay" data-perf-close></div>
+  <aside class="perf-drawer-panel" role="dialog" aria-modal="true">
+    <button type="button" class="perf-drawer-close" data-perf-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <header class="perf-drawer-head">
+      <div class="perf-drawer-icon" id="perfDrawerIcon">📐</div>
+      <div class="perf-drawer-head-info">
+        <span class="perf-drawer-eyebrow">DERS DETAYI</span>
+        <h3 class="perf-drawer-title" id="perfDrawerTitle">—</h3>
+        <span class="perf-drawer-teacher" id="perfDrawerTeacher">—</span>
+      </div>
+    </header>
+
+    <div class="perf-drawer-body">
+
+      <div class="perf-drawer-toolbar">
+        <div class="perf-filter" data-subj-drawer-filter id="perfSubjDrawerFilter">
+          <button type="button" class="perf-filter-btn" id="perfSubjDrawerFilterBtn" aria-haspopup="true" aria-expanded="false">
+            <span data-filter-label id="perfSubjDrawerFilterLabel">Bu Dönem</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="perf-filter-menu" id="perfSubjDrawerFilterMenu" role="menu">
+            <button type="button" class="perf-filter-item" data-subj-range="week" role="menuitem">Bu Hafta</button>
+            <button type="button" class="perf-filter-item" data-subj-range="month" role="menuitem">Bu Ay</button>
+            <button type="button" class="perf-filter-item is-active" data-subj-range="term" role="menuitem">Bu Dönem</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="perf-drawer-stats">
+        <div class="perf-drawer-stat">
+          <span class="perf-drawer-stat-num" id="perfDrawerStatOverall">—</span>
+          <span class="perf-drawer-stat-label">Genel Skor</span>
+        </div>
+      </div>
+
+      <p class="perf-drawer-total-note">Seçili dönemdeki ders istatistiklerin. Filtreyi değiştirerek bu hafta, bu ay veya tüm dönem verilerini karşılaştırabilirsin.</p>
+
+      <div class="perf-drawer-section">
+        <span class="perf-drawer-label">Ders İstatistikleri</span>
+        <div class="perf-drawer-metrics" id="perfDrawerMetrics">
+          <!-- JS ile -->
+        </div>
+      </div>
+
+    </div>
+  </aside>
+</div>
+
+<!-- KONU ÇALIŞMA SÜRESİ DRAWER -->
+<div class="perf-drawer" id="perfTopicDrawer" aria-hidden="true">
+  <div class="perf-drawer-overlay" data-topic-close></div>
+  <aside class="perf-drawer-panel" role="dialog" aria-modal="true">
+    <button type="button" class="perf-drawer-close" data-topic-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <header class="perf-drawer-head">
+      <div class="perf-drawer-icon" id="perfTopicDrawerIcon">📐</div>
+      <div class="perf-drawer-head-info">
+        <span class="perf-drawer-eyebrow">ÇALIŞMA SÜRESİ DETAYI</span>
+        <h3 class="perf-drawer-title" id="perfTopicDrawerTitle">—</h3>
+        <span class="perf-drawer-teacher" id="perfTopicDrawerSub">—</span>
+      </div>
+    </header>
+
+    <div class="perf-drawer-body">
+      <div class="perf-drawer-toolbar">
+        <div class="perf-filter" data-topic-drawer-filter id="perfTopicDrawerFilter">
+          <button type="button" class="perf-filter-btn" id="perfTopicDrawerFilterBtn" aria-haspopup="true" aria-expanded="false">
+            <span data-filter-label id="perfTopicDrawerFilterLabel">Bu Ay</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="perf-filter-menu" id="perfTopicDrawerFilterMenu" role="menu">
+            <button type="button" class="perf-filter-item" data-topic-range="week" role="menuitem">Bu Hafta</button>
+            <button type="button" class="perf-filter-item is-active" data-topic-range="month" role="menuitem">Bu Ay</button>
+            <button type="button" class="perf-filter-item" data-topic-range="term" role="menuitem">Bu Dönem</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="perf-drawer-stats">
+        <div class="perf-drawer-stat">
+          <span class="perf-drawer-stat-num" id="perfTopicDrawerTotal">—</span>
+          <span class="perf-drawer-stat-label">Toplam Çalışma Süresi</span>
+        </div>
+      </div>
+
+      <p class="perf-drawer-total-note" id="perfTopicDrawerNote">
+        Bu derste geçirdiğin toplam süre; canlı derse katılım, ödev çözme ve ders tekrarı izleme sürelerinin toplamından oluşur.
+      </p>
+
+      <div class="perf-drawer-section">
+        <span class="perf-drawer-label">Süre Dağılımı</span>
+        <div class="perf-drawer-metrics" id="perfTopicDrawerMetrics">
+          <!-- JS ile -->
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- ÖDEV LİSTESİ DRAWER -->
+<div class="perf-drawer" id="perfHwDrawer" aria-hidden="true">
+  <div class="perf-drawer-overlay" data-hw-close></div>
+  <aside class="perf-drawer-panel perf-hw-drawer-panel" role="dialog" aria-modal="true">
+
+    <!-- Liste görünümü -->
+    <div class="perf-hw-stack-view is-active" id="perfHwListView">
+      <button type="button" class="perf-drawer-close" data-hw-close aria-label="Kapat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <header class="perf-drawer-head">
+        <div class="perf-drawer-icon" id="perfHwDrawerIcon">📝</div>
+        <div class="perf-drawer-head-info">
+          <span class="perf-drawer-eyebrow">ÖDEV PERFORMANSIM</span>
+          <h3 class="perf-drawer-title" id="perfHwDrawerTitle">Ödevlerim</h3>
+          <span class="perf-drawer-teacher" id="perfHwDrawerSub">—</span>
+        </div>
+      </header>
+
+      <div class="perf-drawer-body">
+        <div class="perf-hw-drawer-toolbar">
+          <div class="perf-filter" data-hw-drawer-filter id="perfHwDrawerFilter">
+            <button type="button" class="perf-filter-btn" id="perfHwDrawerFilterBtn" aria-haspopup="true" aria-expanded="false">
+              <span data-filter-label id="perfHwDrawerFilterLabel">Bu Ay</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="perf-filter-menu" id="perfHwDrawerFilterMenu" role="menu">
+              <button type="button" class="perf-filter-item" data-hw-range="week" role="menuitem">Bu Hafta</button>
+              <button type="button" class="perf-filter-item is-active" data-hw-range="month" role="menuitem">Bu Ay</button>
+              <button type="button" class="perf-filter-item" data-hw-range="all" role="menuitem">Bu Zamana kadar</button>
+            </div>
+          </div>
+          <div class="perf-hw-drawer-tabs" id="perfHwDrawerTabs" role="tablist">
+            <button type="button" class="perf-hw-drawer-tab is-active" data-hw-tab="all" role="tab">Tümü</button>
+            <button type="button" class="perf-hw-drawer-tab" data-hw-tab="done" role="tab">Tamamlanan</button>
+            <button type="button" class="perf-hw-drawer-tab" data-hw-tab="active" role="tab">Devam Eden</button>
+            <button type="button" class="perf-hw-drawer-tab" data-hw-tab="overdue" role="tab">Gecikmiş</button>
+          </div>
+        </div>
+
+        <div class="perf-drawer-section" style="margin-top:4px">
+          <div class="perf-drawer-hw-list" id="perfHwDrawerList">
+            <!-- JS ile -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ödev detay görünümü -->
+    <div class="perf-hw-stack-view" id="perfHwDetailView" data-subject="mat">
+      <button type="button" class="perf-hw-detail-back" id="perfHwDetailBack" aria-label="Listeye dön">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Geri
+      </button>
+      <button type="button" class="perf-drawer-close" data-hw-close aria-label="Kapat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <div class="perf-hw-detail-body">
+        <div class="perf-hw-detail-titlebar">
+          <span class="perf-hw-detail-icon" id="perfHwDetailIcon">📐</span>
+          <div class="perf-hw-detail-titlebar-text">
+            <div class="perf-hw-detail-eyebrow-row">
+              <span class="perf-drawer-eyebrow" id="perfHwDetailSubject">MATEMATİK</span>
+              <span class="perf-hw-type is-kid" id="perfHwDetailFormat" hidden>KİD</span>
+            </div>
+            <h3 class="perf-drawer-title" id="perfHwDetailTopic">—</h3>
+            <p class="perf-hw-format-hint is-kid" id="perfHwDetailFormatDesc" hidden>Kavram İnşa Dersi (KİD) ödevi — kavramı pekiştiren inşa odaklı çalışma.</p>
+          </div>
+        </div>
+
+        <div class="perf-hw-detail-chips">
+          <span class="perf-hw-detail-chip" id="perfHwDetailDate">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="perf-hw-detail-chip-text" data-hw-fill="date">—</span>
+          </span>
+          <span class="perf-hw-detail-chip" id="perfHwDetailTime">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>
+            <span class="perf-hw-detail-chip-text" data-hw-fill="time">—</span>
+          </span>
+          <span class="perf-hw-detail-chip" id="perfHwDetailEduWeek" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="perf-hw-detail-chip-text" data-hw-fill="eduWeek">—</span>
+          </span>
+          <span class="perf-hw-detail-chip" id="perfHwDetailScore" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span class="perf-hw-detail-chip-text" data-hw-fill="score">—</span>
+          </span>
+          <span class="perf-hw-detail-chip" id="perfHwDetailStatus" hidden>
+            <span class="perf-hw-detail-chip-text" data-hw-fill="status">—</span>
+          </span>
+        </div>
+
+        <div class="perf-drawer-section">
+          <span class="perf-drawer-label">Ödev Açıklaması</span>
+          <p class="perf-hw-detail-text" id="perfHwDetailDesc" data-hw-fill="desc">—</p>
+        </div>
+
+        <div class="perf-drawer-section">
+          <span class="perf-drawer-label">Eğitmen</span>
+          <div class="perf-hw-detail-teacher">
+            <img id="perfHwDetailAvatar" src="" alt="" />
+            <div class="perf-hw-detail-teacher-info">
+              <span class="perf-hw-detail-teacher-name" id="perfHwDetailTeacher" data-hw-fill="teacher">—</span>
+              <span class="perf-hw-detail-teacher-role" id="perfHwDetailTeacherRole" data-hw-fill="teacherRole">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="perf-hw-detail-sep" aria-hidden="true"></div>
+
+        <div class="perf-hw-detail-game">
+          <h4 class="perf-hw-detail-game-label">Ödüller</h4>
+          <div class="perf-hw-detail-rewards">
+            <div class="perf-hw-detail-reward">
+              <span class="perf-hw-detail-reward-icon">⚡</span>
+              <div class="perf-hw-detail-reward-text">
+                <small>En fazla</small>
+                <strong id="perfHwDetailXp" data-hw-fill="xp">—</strong>
+              </div>
+            </div>
+            <div class="perf-hw-detail-reward">
+              <span class="perf-hw-detail-reward-icon" id="perfHwDetailBadgeIcon">🏆</span>
+              <div class="perf-hw-detail-reward-text">
+                <strong id="perfHwDetailBadge" data-hw-fill="badge">—</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="perf-hw-detail-footer">
+        <p class="perf-hw-detail-late-xp-note" id="perfHwDetailLateXpNote" hidden></p>
+        <p class="perf-hw-detail-retry-note" id="perfHwDetailRetryNote" hidden>
+          Tekrar çözülen ödevlerin başarı puanına etki etmez.
+        </p>
+        <button type="button" class="perf-hw-detail-cta" id="perfHwDetailCta" disabled>Ödevi Yapmaya Başla</button>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- TOAST -->
+<div class="sn-toast" id="snToast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="snToastText">İşlem tamamlandı</span>
+</div>
+
+<!-- ============ SCRIPTS ============ -->
+<script>
+(function () {
+  'use strict';
+
+  // Nav rail active toggle
+  document.querySelectorAll('.nav-item').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.nav-item').forEach(function (x) { x.classList.remove('is-active'); });
+      b.classList.add('is-active');
+    });
+  });
+
+
+
+  // Per-widget filter dropdowns
+  document.querySelectorAll('[data-filter]').forEach(function (wrap) {
+    var btn = wrap.querySelector('[data-filter-btn]');
+    var menu = wrap.querySelector('[data-filter-menu]');
+    var label = wrap.querySelector('[data-filter-label]');
+    if (!btn || !menu) return;
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      // Diğer filtreleri kapat
+      document.querySelectorAll('[data-filter].is-open').forEach(function (x) { if (x !== wrap) x.classList.remove('is-open'); });
+      wrap.classList.toggle('is-open');
+    });
+    menu.querySelectorAll('.perf-filter-item').forEach(function (it) {
+      it.addEventListener('click', function (e) {
+        e.stopPropagation();
+        menu.querySelectorAll('.perf-filter-item').forEach(function (x) { x.classList.remove('is-active'); });
+        it.classList.add('is-active');
+        if (label) label.textContent = it.textContent;
+        wrap.classList.remove('is-open');
+        // Filter değişince widget'ın render fonksiyonunu çağır
+        var range = it.getAttribute('data-range');
+        var card = wrap.closest('[data-widget]');
+        var widget = card && card.getAttribute('data-widget');
+        if (widget === 'subjects')         renderSubjects(range);
+        else if (widget === 'homework')    renderHomework(range);
+        else if (widget === 'topics')      renderTopics(range);
+        else if (widget === 'attendance')  renderAttendance(range);
+      });
+    });
+  });
+  document.addEventListener('click', function () {
+    document.querySelectorAll('[data-filter].is-open').forEach(function (x) { x.classList.remove('is-open'); });
+    document.querySelectorAll('[data-week-filter].is-open').forEach(function (x) { x.classList.remove('is-open'); });
+  });
+
+  // ============================================================
+  // BU HAFTA — eğitim haftası seçici + özet veriler
+  // ============================================================
+  var CURRENT_EDU_WEEK = 11;
+  var WEEK_SUMMARY = {
+    6:  { xp: '+720',   hw: '8/11',  exam: '74.0', attend: '7/10' },
+    7:  { xp: '+840',   hw: '9/12',  exam: '76.5', attend: '8/11' },
+    8:  { xp: '+910',   hw: '10/13', exam: '77.8', attend: '8/12' },
+    9:  { xp: '+980',   hw: '10/12', exam: '78.2', attend: '9/12' },
+    10: { xp: '+1.100', hw: '11/13', exam: '80.0', attend: '9/13' },
+    11: { xp: '+1.250', hw: '12/14', exam: '82.4', attend: '10/12' },
+    12: { xp: '+1.320', hw: '13/15', exam: '84.1', attend: '11/13' }
+  };
+
+  function eduWeekLabel(n) { return n + '. Eğitim Haftası'; }
+
+  function renderWeekSummary(weekNum) {
+    var d = WEEK_SUMMARY[weekNum] || WEEK_SUMMARY[CURRENT_EDU_WEEK];
+    var xpEl = document.getElementById('perfWeekXp');
+    var hwEl = document.getElementById('perfWeekHw');
+    var examEl = document.getElementById('perfWeekExam');
+    var attendEl = document.getElementById('perfWeekAttend');
+    if (xpEl) xpEl.textContent = d.xp;
+    if (hwEl) hwEl.textContent = d.hw;
+    if (examEl) examEl.textContent = d.exam;
+    if (attendEl) attendEl.textContent = d.attend;
+  }
+
+  (function initWeekFilter() {
+    var wrap = document.getElementById('perfWeekFilter');
+    var btn = document.getElementById('perfWeekFilterBtn');
+    var menu = document.getElementById('perfWeekFilterMenu');
+    var label = document.getElementById('perfWeekLabel');
+    if (!wrap || !btn || !menu) return;
+
+    var weeks = Object.keys(WEEK_SUMMARY).map(Number).sort(function (a, b) { return b - a; });
+    menu.innerHTML = weeks.map(function (w) {
+      return '<button type="button" class="perf-filter-item' + (w === CURRENT_EDU_WEEK ? ' is-active' : '') + '" data-week="' + w + '" role="menuitem">' + eduWeekLabel(w) + '</button>';
+    }).join('');
+
+    if (label) label.textContent = eduWeekLabel(CURRENT_EDU_WEEK);
+    renderWeekSummary(CURRENT_EDU_WEEK);
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      document.querySelectorAll('[data-filter].is-open, [data-week-filter].is-open').forEach(function (x) {
+        if (x !== wrap) x.classList.remove('is-open');
+      });
+      var open = wrap.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    menu.addEventListener('click', function (e) {
+      var item = e.target.closest('[data-week]');
+      if (!item) return;
+      e.stopPropagation();
+      var w = parseInt(item.getAttribute('data-week'), 10);
+      menu.querySelectorAll('.perf-filter-item').forEach(function (x) { x.classList.remove('is-active'); });
+      item.classList.add('is-active');
+      if (label) label.textContent = eduWeekLabel(w);
+      renderWeekSummary(w);
+      wrap.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+  })();
+
+  function bindPerfTips() {
+    var tip = document.getElementById('perfFloatTip');
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.id = 'perfFloatTip';
+      tip.className = 'perf-floattip';
+      tip.hidden = true;
+      document.body.appendChild(tip);
+    }
+    document.querySelectorAll('.perf-week-stat[data-tip], [data-perf-tip]').forEach(function (el) {
+      if (el.getAttribute('data-tip-bound')) return;
+      el.setAttribute('data-tip-bound', '1');
+      el.addEventListener('mouseenter', function () {
+        var text = el.getAttribute('data-tip') || el.getAttribute('data-perf-tip');
+        if (!text) return;
+        tip.textContent = text;
+        tip.hidden = false;
+        var r = el.getBoundingClientRect();
+        tip.style.left = (r.left + r.width / 2) + 'px';
+        tip.style.top = r.top + 'px';
+        requestAnimationFrame(function () { tip.classList.add('is-visible'); });
+      });
+      el.addEventListener('mouseleave', function () {
+        tip.classList.remove('is-visible');
+        tip.hidden = true;
+      });
+    });
+  }
+  bindPerfTips();
+
+  // ============================================================
+  // DATA
+  // ============================================================
+  var TODAY = new Date(2026, 5, 9);
+
+  // ---- Ödev verileri ----
+  var HW_SUBJ = {
+    mat: { name: 'Matematik',       emoji: '📐', color: '#ff6dc6' },
+    fen: { name: 'Fen Bilimleri',   emoji: '⚛️', color: '#6dd49e' },
+    trk: { name: 'Türkçe',           emoji: '📖', color: '#4ad6ff' },
+    sos: { name: 'Sosyal Bilgiler', emoji: '🌍', color: '#a8a4f0' },
+    din: { name: 'Din Kültürü',     emoji: '🕌', color: '#5e9be8' },
+    ing: { name: 'İngilizce',        emoji: '🔤', color: '#ffd84a' }
+  };
+
+  var HW_BADGES = {
+    mat: { name: 'Sayı Avcısı',      icon: '🔢' },
+    fen: { name: 'Doğa Gözlemcisi',  icon: '🌿' },
+    trk: { name: 'Cümle Ustası',     icon: '✍️' },
+    sos: { name: 'Tarih Dedektifi',  icon: '🔍' },
+    din: { name: 'Bilge Öğrenci',    icon: '📿' },
+    ing: { name: 'Dil Kâşifi',       icon: '🗺️' }
+  };
+
+  var HW_TEACHERS = {
+    'Ali Demir':     { full: 'Ali Demir',     role: 'Matematik Öğretmeni',       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=faces&q=80' },
+    'Zeynep Yıldız': { full: 'Zeynep Yıldız', role: 'Fen Bilimleri Öğretmeni', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop&crop=faces&q=80' },
+    'Mehmet Kaya':   { full: 'Mehmet Kaya',   role: 'Türkçe Öğretmeni',          avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=faces&q=80' },
+    'Selin Aydın':   { full: 'Selin Aydın',   role: 'Sosyal Bilgiler Öğretmeni', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&crop=faces&q=80' },
+    'Emre Çelik':    { full: 'Emre Çelik',    role: 'İngilizce Öğretmeni',       avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80' },
+    'Ayşe Korkmaz':  { full: 'Ayşe Korkmaz',  role: 'Din Kültürü Öğretmeni',    avatar: 'https://images.unsplash.com/photo-1542178243-bc20204b769f?w=120&h=120&fit=crop&crop=faces&q=80' },
+    'Ömer Aksoy':    { full: 'Ömer Aksoy',    role: 'Din Kültürü Öğretmeni',    avatar: 'https://images.unsplash.com/photo-1542178243-bc20204b769f?w=120&h=120&fit=crop&crop=faces&q=80' }
+  };
+
+  var HW_STATUS_LABEL = {
+    done:    'Tamamlandı',
+    active:  'Devam Eden',
+    overdue: 'Gecikmiş'
+  };
+
+  var HW_STATUS_TIP = {
+    done:    'Bu ödevi zamanında tamamladın. Detayları görmek ve tekrar çözmek için tıkla.',
+    active:  'Bu ödev hâlâ açık. Detayları görmek ve ödeve başlamak için tıkla.',
+    overdue: 'Bu ödevin teslim tarihi geçti. Detayları görmek ve tamamlamak için tıkla.'
+  };
+
+  var HW_ITEMS = [
+    // Bu hafta — aktif
+    { id: 1,  subject: 'mat', topic: 'Trigonometri Çalışma Soruları',     teacher: 'Ali Demir',     status: 'active',  xp: 75, due: '2026-06-14 23:59', hwId: 'mat-koklu', eduWeek: 11,
+      desc: 'Köklü sayılarda toplama, çıkarma, çarpma ve bölme işlemleri. PDF içinde 15 örnek soru var. Önce konu tekrarını yapıp soruları sırayla çözmeni öneririm.' },
+    { id: 2,  subject: 'fen', topic: 'Madde Döngüleri · Etkinlik',        teacher: 'Zeynep Yıldız', status: 'active',  xp: 60, due: '2026-06-13 18:00', hwId: 'fen-dongu', eduWeek: 8, started: true,
+      desc: 'Karbon, su ve azot döngüleri için kavram haritası hazırlayacaksın. Etkinlik dosyasını indirip her döngüyü çevremizdeki örneklerle ilişkilendirmeni bekliyorum 🌱' },
+    { id: 3,  subject: 'ing', topic: 'Friendship Reading · 12 Questions', teacher: 'Emre Çelik',    status: 'active',  xp: 45, due: '2026-06-15 17:00', hwId: 'ing-friendship', eduWeek: 9,
+      desc: 'Friendship ünitesindeki okuma metinlerinden 12 soruluk anlama testini tamamla. Önce sözlüksüz dene; zorlandığın kelimeleri derste birlikte çalışırız.' },
+    // Bu hafta — geciken
+    { id: 4,  subject: 'mat', topic: 'Cebirsel İfadeler · 20 Soru',       teacher: 'Ali Demir',     status: 'overdue', xp: 80, due: '2026-06-07 23:59',
+      desc: 'Cebirsel ifadelerin sadeleştirilmesi ve özdeşlikler üzerinden 20 soru. Hâlâ teslim edebilirsin; bir an önce tamamla.' },
+    { id: 5,  subject: 'sos', topic: 'Atatürk İlkeleri Çalışma Kağıdı',  teacher: 'Selin Aydın',  status: 'overdue', xp: 50, due: '2026-06-06 23:59',
+      desc: 'Atatürk\'ün altı ilkesi için kısa açıklama ve günümüzden örnekler yaz. Tablonun her satırını eksiksiz doldur.' },
+    { id: 6,  subject: 'din', topic: 'İbadetler Ünitesi · 15 Soru',       teacher: 'Ayşe Korkmaz',  status: 'overdue', xp: 65, due: '2026-06-05 23:59',
+      desc: 'İbadetler ünitesindeki temel kavramları pekiştiren 15 soruluk çalışma. Süresi geçmiş olsa da tamamlayıp öğretmene iletebilirsin.' },
+    // Bu hafta — tamamlanan
+    { id: 7,  subject: 'trk', topic: 'Paragraf Anlamı · 8 Soru',          teacher: 'Mehmet Kaya',   status: 'done', xp: 50, due: '2026-06-08 18:00', doneAt: '2026-06-08 14:30', score: 95, hwId: 'trk-paragraf',
+      desc: 'Paragraf anlamı sorularında ana düşünce, yardımcı düşünce ve çıkarım becerilerini ölçen 8 soruluk testi tamamladın.' },
+    { id: 8,  subject: 'fen', topic: 'Basit Makineler Tekrarı',           teacher: 'Zeynep Yıldız', status: 'done', xp: 55, due: '2026-06-07 18:00', doneAt: '2026-06-07 16:00', score: 92, hwId: 'fen-dongu',
+      desc: 'Basit makineler konusunu pekiştirmek için hazırlanan tekrar ödevi. Kaldıraç, makara ve eğik düzlem örneklerini çalıştın.' },
+    { id: 9,  subject: 'mat', topic: 'Olasılığa Giriş · 10 Soru',         teacher: 'Ali Demir',     status: 'done', xp: 65, due: '2026-06-06 23:59', doneAt: '2026-06-06 21:40', score: 78, hwId: 'mat-koklu',
+      desc: 'Temel olasılık kavramları ve örnek sorular. Sonuçları tekrar çözerek konuyu pekiştirebilirsin.' },
+    { id: 10, subject: 'ing', topic: 'Daily Routines Worksheet',          teacher: 'Emre Çelik',    status: 'done', xp: 45, due: '2026-06-05 17:00', doneAt: '2026-06-05 22:00', score: 100, hwId: 'ing-friendship',
+      desc: 'Daily routines unit worksheet — reading and comprehension questions about everyday habits.' },
+    { id: 11, subject: 'trk', topic: 'Cümle Türleri',                     teacher: 'Mehmet Kaya',   status: 'done', xp: 50, due: '2026-06-04 18:00', doneAt: '2026-06-04 15:30', score: 90, hwId: 'trk-paragraf' },
+    // Bu ay — ek ödevler (hafta dışı Haziran)
+    { id: 12, subject: 'fen', topic: 'DNA ve Kalıtım Mini Quiz',          teacher: 'Zeynep Yıldız', status: 'done', xp: 60, due: '2026-06-03 23:59', doneAt: '2026-06-03 20:00', score: 96, hwId: 'fen-dongu' },
+    { id: 13, subject: 'sos', topic: 'Coğrafya · Türkiye İklimi',         teacher: 'Selin Aydın',  status: 'done', xp: 50, due: '2026-06-02 18:00', doneAt: '2026-06-02 14:00', score: 82 },
+    { id: 14, subject: 'mat', topic: 'Geometri Tekrar Soruları',          teacher: 'Ali Demir',     status: 'done', xp: 70, due: '2026-06-01 23:59', doneAt: '2026-06-01 22:10', score: 85, hwId: 'mat-koklu' },
+    { id: 15, subject: 'din', topic: 'Hz. Muhammed (s.a.v.) Dönemi',      teacher: 'Ömer Aksoy',    status: 'done', xp: 40, due: '2026-05-30 23:59', doneAt: '2026-05-30 19:30', score: 91 },
+    { id: 16, subject: 'ing', topic: 'Vocabulary Builder Quiz',           teacher: 'Emre Çelik',    status: 'done', xp: 35, due: '2026-05-29 17:00', doneAt: '2026-05-29 21:00', score: 95, hwId: 'ing-friendship' },
+    { id: 17, subject: 'trk', topic: 'Sözcükte Anlam',                    teacher: 'Mehmet Kaya',   status: 'done', xp: 45, due: '2026-05-28 18:00', doneAt: '2026-05-28 17:00', score: 87, hwId: 'trk-paragraf' },
+    { id: 18, subject: 'din', topic: 'Peygamberimizin Hayatı',            teacher: 'Ayşe Korkmaz',  status: 'done', xp: 55, due: '2026-05-27 23:59', doneAt: '2026-05-27 20:45', score: 88 },
+    { id: 19, subject: 'fen', topic: 'Elektrik Devreleri Ödevi',          teacher: 'Zeynep Yıldız', status: 'done', xp: 55, due: '2026-05-26 18:00', doneAt: '2026-05-26 16:30', score: 94 },
+    { id: 20, subject: 'mat', topic: 'Türev Pratik Test',                 teacher: 'Ali Demir',     status: 'active',  xp: 80, due: '2026-06-18 23:59',
+      desc: 'Türev konusunda uygulama soruları içeren pratik test. Kuralları tekrar edip adım adım çözmeni öneririm.' },
+    { id: 21, subject: 'sos', topic: 'Osmanlı Kültür ve Medeniyeti',      teacher: 'Selin Aydın',  status: 'active',  xp: 50, due: '2026-06-20 18:00',
+      desc: 'Osmanlı kültür ve medeniyetini kapsayan özet çalışması ve kavram soruları. Metinleri dikkatle okuyup not al.' },
+    { id: 22, subject: 'trk', topic: 'Yazım Kuralları Testi',             teacher: 'Mehmet Kaya',   status: 'active',  xp: 45, due: '2026-06-19 18:00', started: true,
+      desc: 'Yazım kuralları ve noktalama üzerine kısa test. Büyük harf, birleşik/ayrı yazım ve kesme işareti sorularını içerir.' },
+    { id: 23, subject: 'ing', topic: 'Phrasal Verbs Practice',            teacher: 'Emre Çelik',    status: 'active',  xp: 40, due: '2026-06-17 17:00',
+      desc: 'Phrasal verbs listesindeki fiilleri cümle içinde kullanarak boşluk doldurma alıştırmalarını tamamla.' },
+    { id: 24, subject: 'din', topic: 'Hac ve Kurban · Kavramlar',         teacher: 'Ömer Aksoy',    status: 'done', xp: 40, due: '2026-05-25 23:59', doneAt: '2026-05-25 19:10', score: 88 },
+    { id: 25, subject: 'din', topic: 'Kur\'an-ı Kerim Okuma',             teacher: 'Ayşe Korkmaz',  status: 'active',  xp: 60, due: '2026-06-16 23:59',
+      desc: 'Seçilen surenin anlamını okuyup telaffuz çalışması yap. Ses kaydını öğretmenine gönderebilirsin.' },
+    { id: 26, subject: 'fen', topic: 'Modern Fizik Quiz',                 teacher: 'Zeynep Yıldız', status: 'active',  xp: 65, due: '2026-06-21 18:00',
+      desc: 'Modern fizik kavramları üzerine kısa quiz. Atom modelleri ve kuantum fiziğine giriş sorularını içerir.' },
+    { id: 27, subject: 'mat', topic: 'İntegral Konu Anlatımı',            teacher: 'Ali Demir',     status: 'overdue', xp: 70, due: '2026-05-24 23:59' },
+    // Bu zamana kadar — Mayıs ve öncesi
+    { id: 28, subject: 'trk', topic: 'Paragraf Test 5',                   teacher: 'Mehmet Kaya',   status: 'done', xp: 50, due: '2026-05-20 18:00', doneAt: '2026-05-20 15:00', score: 86 },
+    { id: 29, subject: 'mat', topic: 'Fonksiyonlar Çalışma Kağıdı',       teacher: 'Ali Demir',     status: 'done', xp: 70, due: '2026-05-18 23:59', doneAt: '2026-05-18 21:30', score: 80 },
+    { id: 30, subject: 'fen', topic: 'Kuvvet ve Hareket Soruları',        teacher: 'Zeynep Yıldız', status: 'done', xp: 55, due: '2026-05-15 18:00', doneAt: '2026-05-15 17:20', score: 91 },
+    { id: 31, subject: 'sos', topic: 'Ekonomi Kavramları',                teacher: 'Selin Aydın',  status: 'done', xp: 45, due: '2026-05-12 18:00', doneAt: '2026-05-12 14:45', score: 79 },
+    { id: 32, subject: 'ing', topic: 'Present Perfect Exercises',         teacher: 'Emre Çelik',    status: 'done', xp: 40, due: '2026-05-10 17:00', doneAt: '2026-05-10 20:15', score: 93 },
+    { id: 33, subject: 'din', topic: 'Ahlaki Değerler Çalışması',         teacher: 'Ayşe Korkmaz',  status: 'done', xp: 55, due: '2026-05-08 23:59', doneAt: '2026-05-08 22:00', score: 84 },
+    { id: 34, subject: 'din', topic: 'İslam Medeniyeti',                  teacher: 'Ömer Aksoy',    status: 'done', xp: 40, due: '2026-05-05 23:59', doneAt: '2026-05-05 18:40', score: 90 },
+    { id: 35, subject: 'mat', topic: 'Polinomlar Test',                   teacher: 'Ali Demir',     status: 'overdue', xp: 75, due: '2026-04-28 23:59' },
+    { id: 36, subject: 'trk', topic: 'Anlatım Bozuklukları',              teacher: 'Mehmet Kaya',   status: 'done', xp: 45, due: '2026-04-22 18:00', doneAt: '2026-04-22 16:50', score: 88 }
+  ];
+
+  var HW_FORMAT_BY_ID = {
+    1: 'kid', 2: 'kid', 3: 'rud', 4: 'rud', 5: 'kid', 6: 'rud', 7: 'kid', 8: 'rud',
+    9: 'rud', 10: 'kid', 11: 'kid', 12: 'kid', 13: 'kid', 14: 'rud', 15: 'kid', 16: 'rud',
+    17: 'kid', 18: 'kid', 19: 'rud', 20: 'rud', 21: 'kid', 22: 'kid', 23: 'rud', 24: 'kid',
+    25: 'kid', 26: 'rud', 27: 'rud', 28: 'kid', 29: 'rud', 30: 'kid', 31: 'kid', 32: 'rud',
+    33: 'kid', 34: 'kid', 35: 'rud', 36: 'kid'
+  };
+
+  function resolveHwFormat(h) {
+    if (!h) return 'kid';
+    if (h.homeworkType === 'kid' || h.homeworkType === 'rud') return h.homeworkType;
+    return HW_FORMAT_BY_ID[h.id] === 'rud' ? 'rud' : 'kid';
+  }
+  function hwTypeLabel(fmt) {
+    return fmt === 'rud' ? 'RUD' : 'KİD';
+  }
+  function hwTypeDesc(fmt) {
+    if (fmt === 'rud') {
+      return 'Rehberli Uygulama Dersi (RUD) ödevi — rehberli soru çözümü ve uygulama çalışması.';
+    }
+    return 'Kavram İnşa Dersi (KİD) ödevi — kavramı pekiştiren inşa odaklı çalışma.';
+  }
+  function hwTypeBadgeHtml(h, cls) {
+    var fmt = resolveHwFormat(h);
+    cls = cls || 'perf-hw-type';
+    return '<span class="' + cls + ' is-' + fmt + '">' + hwTypeLabel(fmt) + '</span>';
+  }
+
+  function parseHwDate(str) {
+    if (!str) return null;
+    var p = str.split(' ')[0].split('-');
+    return new Date(+p[0], +p[1] - 1, +p[2]);
+  }
+
+  function hwItemDate(item) {
+    if (item.status === 'done' && item.doneAt) return parseHwDate(item.doneAt);
+    return parseHwDate(item.due);
+  }
+
+  function inHwRange(item, range) {
+    if (range === 'all') return true;
+    var due = parseHwDate(item.due);
+    if (item.status === 'done') {
+      var d = parseHwDate(item.doneAt || item.due);
+      if (!d) return false;
+      if (range === 'week') {
+        var weekAgo = new Date(TODAY);
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        weekAgo.setHours(0, 0, 0, 0);
+        return d >= weekAgo && d <= TODAY;
+      }
+      return d.getMonth() === TODAY.getMonth() && d.getFullYear() === TODAY.getFullYear();
+    }
+    if (!due) return false;
+    if (range === 'week') {
+      var ws = new Date(TODAY);
+      ws.setDate(ws.getDate() - 7);
+      ws.setHours(0, 0, 0, 0);
+      var we = new Date(TODAY);
+      we.setDate(we.getDate() + 7);
+      return due >= ws && due <= we;
+    }
+    return due.getMonth() === TODAY.getMonth() && due.getFullYear() === TODAY.getFullYear();
+  }
+
+  function getHwSummary(range) {
+    var items = HW_ITEMS.filter(function (h) { return inHwRange(h, range); });
+    var done = items.filter(function (h) { return h.status === 'done'; }).length;
+    var open = items.filter(function (h) { return h.status === 'active'; }).length;
+    var late = items.filter(function (h) { return h.status === 'overdue'; }).length;
+    var xp = items.filter(function (h) { return h.status === 'done'; })
+      .reduce(function (s, h) { return s + h.xp; }, 0);
+    var label = range === 'week' ? 'Bu hafta kazandığın'
+      : range === 'month' ? 'Bu ay kazandığın'
+      : 'Bu zamana kadar kazandığın';
+    return { done: done, open: open, late: late, total: items.length, xp: xp, label: label };
+  }
+
+  function formatHwDate(str) {
+    var d = parseHwDate(str);
+    if (!d) return '—';
+    var months = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+    return d.getDate() + ' ' + months[d.getMonth()];
+  }
+
+  function hwStatusClass(status) {
+    if (status === 'done') return 'is-done';
+    if (status === 'overdue') return 'is-late';
+    return 'is-open';
+  }
+
+  // En Çok Çalıştığın Dersler — range'e göre ders listesi (süre = canlı + ödev + tekrar)
+  var SUBJECTS_STUDY_DATA = {
+    week: [
+      { id:'mat', emoji:'📐', name:'Matematik',       teacher:'Ali Demir',     time:'2s 18dk', live:'58dk',  homework:'42dk',  review:'38dk' },
+      { id:'fen', emoji:'⚛️', name:'Fen Bilimleri',   teacher:'Zeynep Yıldız', time:'1s 54dk', live:'44dk',  homework:'36dk',  review:'34dk' },
+      { id:'trk', emoji:'📖', name:'Türkçe',           teacher:'Mehmet Kaya',   time:'1s 22dk', live:'32dk',  homework:'28dk',  review:'22dk' },
+      { id:'sos', emoji:'🌍', name:'Sosyal Bilgiler',  teacher:'Selin Aydın',  time:'48dk',    live:'18dk',  homework:'16dk',  review:'14dk' },
+      { id:'ing', emoji:'🔤', name:'İngilizce',        teacher:'Emre Çelik',    time:'36dk',    live:'12dk',  homework:'14dk',  review:'10dk' },
+      { id:'din', emoji:'🕌', name:'Din Kültürü',     teacher:'Ayşe Korkmaz',  time:'32dk',    live:'10dk',  homework:'12dk',  review:'10dk' }
+    ],
+    month: [
+      { id:'mat', emoji:'📐', name:'Matematik',       teacher:'Ali Demir',     time:'8s 24dk', live:'3s 10dk', homework:'2s 48dk', review:'2s 26dk' },
+      { id:'fen', emoji:'⚛️', name:'Fen Bilimleri',   teacher:'Zeynep Yıldız', time:'6s 12dk', live:'2s 18dk', homework:'1s 54dk', review:'2s 00dk' },
+      { id:'trk', emoji:'📖', name:'Türkçe',           teacher:'Mehmet Kaya',   time:'5s 48dk', live:'2s 02dk', homework:'1s 46dk', review:'2s 00dk' },
+      { id:'sos', emoji:'🌍', name:'Sosyal Bilgiler',  teacher:'Selin Aydın',  time:'4s 36dk', live:'1s 38dk', homework:'1s 28dk', review:'1s 30dk' },
+      { id:'ing', emoji:'🔤', name:'İngilizce',        teacher:'Emre Çelik',    time:'3s 18dk', live:'1s 06dk', homework:'1s 02dk', review:'1s 10dk' },
+      { id:'din', emoji:'🕌', name:'Din Kültürü',     teacher:'Ayşe Korkmaz',  time:'2s 48dk', live:'58dk',    homework:'52dk',    review:'58dk' }
+    ],
+    term: [
+      { id:'mat', emoji:'📐', name:'Matematik',       teacher:'Ali Demir',     time:'24s 12dk', live:'9s 20dk', homework:'7s 32dk', review:'7s 20dk' },
+      { id:'fen', emoji:'⚛️', name:'Fen Bilimleri',   teacher:'Zeynep Yıldız', time:'18s 36dk', live:'7s 04dk', homework:'5s 48dk', review:'5s 44dk' },
+      { id:'trk', emoji:'📖', name:'Türkçe',           teacher:'Mehmet Kaya',   time:'16s 50dk', live:'6s 18dk', homework:'5s 16dk', review:'5s 16dk' },
+      { id:'sos', emoji:'🌍', name:'Sosyal Bilgiler',  teacher:'Selin Aydın',  time:'12s 14dk', live:'4s 28dk', homework:'3s 52dk', review:'3s 54dk' },
+      { id:'ing', emoji:'🔤', name:'İngilizce',        teacher:'Emre Çelik',    time:'10s 42dk', live:'3s 48dk', homework:'3s 24dk', review:'3s 30dk' },
+      { id:'din', emoji:'🕌', name:'Din Kültürü',     teacher:'Ayşe Korkmaz',  time:'8s 36dk',  live:'3s 02dk', homework:'2s 48dk', review:'2s 46dk' }
+    ]
+  };
+
+  // Devamsızlık — Bu Dönem + aya göre seçenekler
+  // Her ay 28 hücrelik heatmap: 0..27 indexleri (gün 1..28)
+  var ATT_DATA = {
+    term:    { excused: 7, unexcused: 1, days: 28, excusedDays: [3, 7, 11, 14, 18, 22, 25], unexcusedDays: [15], todayIdx: 27 },
+    jun2026: { excused: 1, unexcused: 0, days: 28, excusedDays: [22], unexcusedDays: [], todayIdx: 9 },
+    may2026: { excused: 0, unexcused: 0, days: 28, excusedDays: [], unexcusedDays: [], todayIdx: -1 },
+    apr2026: { excused: 1, unexcused: 0, days: 28, excusedDays: [10], unexcusedDays: [], todayIdx: -1 },
+    mar2026: { excused: 2, unexcused: 0, days: 28, excusedDays: [5, 18], unexcusedDays: [], todayIdx: -1 },
+    feb2026: { excused: 1, unexcused: 0, days: 28, excusedDays: [12], unexcusedDays: [], todayIdx: -1 },
+    jan2026: { excused: 0, unexcused: 1, days: 28, excusedDays: [], unexcusedDays: [8], todayIdx: -1 },
+    dec2025: { excused: 1, unexcused: 0, days: 28, excusedDays: [16], unexcusedDays: [], todayIdx: -1 },
+    nov2025: { excused: 0, unexcused: 0, days: 28, excusedDays: [], unexcusedDays: [], todayIdx: -1 },
+    oct2025: { excused: 1, unexcused: 0, days: 28, excusedDays: [4], unexcusedDays: [], todayIdx: -1 },
+    sep2025: { excused: 0, unexcused: 0, days: 28, excusedDays: [], unexcusedDays: [], todayIdx: -1 }
+  };
+
+  // Ders Bazlı Performans — range'e göre per-subject skorlar
+  var SUBJECT_SCORES = {
+    week:  { mat:[80,76], fen:[72,70], trk:[78,80], sos:[68,70], din:[74,72], ing:[86,84] },
+    month: { mat:[82,78], fen:[75,72], trk:[80,82], sos:[70,68], din:[76,74], ing:[88,85] },
+    term:  { mat:[78,74], fen:[73,70], trk:[81,79], sos:[69,67], din:[76,74], ing:[85,82] }
+  };
+
+  var SUBJECT_RANGE_LABEL = {
+    week:  'Bu Hafta',
+    month: 'Bu Ay',
+    term:  'Bu Dönem'
+  };
+
+  // Ders drawer — range'e göre istatistikler (engagement = Derste parmak kaldırıp söz alma sayısı)
+  var SUBJECT_STATS_BY_RANGE = {
+    week: {
+      mat: { correct: 32, wrong: 6,  blank: 2, xp: '+95',  attend: '3/4',  engagement: 9 },
+      fen: { correct: 28, wrong: 8,  blank: 3, xp: '+82',  attend: '3/4',  engagement: 6 },
+      trk: { correct: 36, wrong: 5,  blank: 1, xp: '+88',  attend: '4/4',  engagement: 12 },
+      sos: { correct: 22, wrong: 10, blank: 4, xp: '+68',  attend: '2/4',  engagement: 4 },
+      ing: { correct: 40, wrong: 3,  blank: 1, xp: '+105', attend: '4/4',  engagement: 14 },
+      din: { correct: 24, wrong: 6,  blank: 2, xp: '+72',  attend: '2/4',  engagement: 5 }
+    },
+    month: {
+      mat: { correct: 58, wrong: 12, blank: 4, xp: '+210', attend: '6/8',  engagement: 26 },
+      fen: { correct: 48, wrong: 14, blank: 6, xp: '+185', attend: '5/8',  engagement: 18 },
+      trk: { correct: 62, wrong: 9,  blank: 3, xp: '+198', attend: '7/8',  engagement: 34 },
+      sos: { correct: 38, wrong: 16, blank: 8, xp: '+142', attend: '4/8',  engagement: 12 },
+      ing: { correct: 72, wrong: 6,  blank: 2, xp: '+228', attend: '8/8',  engagement: 38 },
+      din: { correct: 42, wrong: 11, blank: 4, xp: '+156', attend: '5/8',  engagement: 16 }
+    },
+    term: {
+      mat: { correct: 142, wrong: 28, blank: 10, xp: '+420', attend: '8/10',  engagement: 58 },
+      fen: { correct: 118, wrong: 32, blank: 14, xp: '+380', attend: '7/10',  engagement: 44 },
+      trk: { correct: 156, wrong: 22, blank: 8,  xp: '+395', attend: '9/10',  engagement: 72 },
+      sos: { correct: 98,  wrong: 38, blank: 18, xp: '+310', attend: '6/10',  engagement: 28 },
+      ing: { correct: 168, wrong: 14, blank: 6,  xp: '+445', attend: '10/10', engagement: 86 },
+      din: { correct: 108, wrong: 26, blank: 10, xp: '+328', attend: '6/9',   engagement: 38 }
+    }
+  };
+
+  var SUBJECTS = [
+    { id:'mat', name:'Matematik',     teacher:'Ali Demir',     emoji:'📐', color:['#ff6dc6','#e5047b'], score:82, prevScore:78,
+      stats:{ correct:142, wrong:28, blank:10, xp:'+420', attend:'8/10' },
+      topics:[
+        { name:'Doğal Sayılar',       pct:95, lastExam:'18/20' },
+        { name:'Trigonometri',         pct:75, lastExam:'14/20' },
+        { name:'Cebirsel İfadeler',    pct:88, lastExam:'17/20' },
+        { name:'Türev',                pct:65, lastExam:'12/20' },
+        { name:'İntegral',             pct:50, lastExam:'—' }
+      ],
+      hw:[
+        { title:'Trigonometri Çalışma Soruları', date:'12 Haz', status:'done' },
+        { title:'Türev Pratik Test',             date:'14 Haz', status:'open' },
+        { title:'İntegral Konu Anlatımı',         date:'08 Haz', status:'late' }
+      ] },
+    { id:'fen', name:'Fen Bilimleri', teacher:'Zeynep Yıldız', emoji:'⚛️', color:['#6dd49e','#3da66e'], score:75, prevScore:72,
+      stats:{ correct:118, wrong:32, blank:14, xp:'+380', attend:'7/10' },
+      topics:[
+        { name:'Madde ve Özellikleri',  pct:90, lastExam:'19/20' },
+        { name:'Kuvvet ve Hareket',     pct:80, lastExam:'16/20' },
+        { name:'Elektrik',              pct:70, lastExam:'14/20' },
+        { name:'Modern Fizik',          pct:60, lastExam:'12/20' }
+      ],
+      hw:[
+        { title:'Elektrik Devreleri Ödevi',  date:'13 Haz', status:'done' },
+        { title:'Modern Fizik Quiz',          date:'15 Haz', status:'open' }
+      ] },
+    { id:'trk', name:'Türkçe',         teacher:'Mehmet Kaya',   emoji:'📖', color:['#4ad6ff','#1c8fb5'], score:80, prevScore:82,
+      stats:{ correct:156, wrong:22, blank:8, xp:'+395', attend:'9/10' },
+      topics:[
+        { name:'Sözcükte Anlam',  pct:90, lastExam:'18/20' },
+        { name:'Cümlede Anlam',   pct:85, lastExam:'17/20' },
+        { name:'Paragraf Anlamı', pct:78, lastExam:'15/20' },
+        { name:'Yazım Kuralları', pct:72, lastExam:'14/20' }
+      ],
+      hw:[
+        { title:'Paragraf Test 7',       date:'12 Haz', status:'done' },
+        { title:'Cümle Bilgisi Pratiği', date:'14 Haz', status:'done' }
+      ] },
+    { id:'sos', name:'Sosyal Bilgiler', teacher:'Selin Aydın',  emoji:'🌍', color:['#a8a4f0','#6964c4'], score:70, prevScore:68,
+      stats:{ correct:98, wrong:38, blank:18, xp:'+310', attend:'6/10' },
+      topics:[
+        { name:'Türkiye Coğrafyası', pct:80, lastExam:'16/20' },
+        { name:'Atatürk İlkeleri',   pct:75, lastExam:'15/20' },
+        { name:'İslam Tarihi',       pct:65, lastExam:'13/20' },
+        { name:'Bölgeler',           pct:60, lastExam:'12/20' }
+      ],
+      hw:[
+        { title:'Türkiye Bölgeleri Çalışması', date:'11 Haz', status:'done' },
+        { title:'Tarih Kavramları',             date:'07 Haz', status:'late' }
+      ] },
+    { id:'din', name:'Din Kültürü',       teacher:'Ayşe Korkmaz', emoji:'🕌', color:['#5e9be8','#3a6eb5'], score:76, prevScore:74,
+      stats:{ correct:108, wrong:26, blank:10, xp:'+328', attend:'6/9' },
+      topics:[
+        { name:'İbadetler',            pct:82, lastExam:'16/20' },
+        { name:'Peygamberimizin Hayatı', pct:78, lastExam:'15/20' },
+        { name:'Kur\'an-ı Kerim',     pct:74, lastExam:'14/20' },
+        { name:'Ahlaki Değerler',      pct:70, lastExam:'13/20' }
+      ],
+      hw:[
+        { title:'İbadetler Ünitesi',        date:'10 Haz', status:'done' },
+        { title:'Kur\'an-ı Kerim Okuma',    date:'14 Haz', status:'open' }
+      ] },
+    { id:'ing', name:'İngilizce',      teacher:'Emre Çelik',    emoji:'🔤', color:['#ffd84a','#d6970a'], score:88, prevScore:85,
+      stats:{ correct:168, wrong:14, blank:6, xp:'+445', attend:'10/10' },
+      topics:[
+        { name:'Tenses',         pct:95, lastExam:'19/20' },
+        { name:'Phrasal Verbs',  pct:80, lastExam:'16/20' },
+        { name:'Vocabulary',     pct:90, lastExam:'18/20' },
+        { name:'Reading Comp.',  pct:85, lastExam:'17/20' }
+      ],
+      hw:[
+        { title:'Phrasal Verbs Workbook', date:'13 Haz', status:'done' },
+        { title:'Reading Practice',        date:'15 Haz', status:'open' }
+      ] }
+  ];
+
+  var RANKING = [
+    { rank:1, name:'Deniz Arslan',  cls:'8A', score:'1.890', avatarKind:'gold',   initials:'DA' },
+    { rank:2, name:'Cem Yıldırım',  cls:'8A', score:'1.620', avatarKind:'aqua',   initials:'CY' },
+    { rank:3, name:'Mira Yılmaz',   cls:'8A', score:'1.480', avatarKind:'purple', initials:'M', isMe:true, emoji:'🧒' },
+    { rank:4, name:'Ada Tekin',     cls:'8A', score:'1.420', avatarKind:'brand',  initials:'AT' },
+    { rank:5, name:'Berke Demir',   cls:'8A', score:'1.310', avatarKind:'green',  initials:'BD' }
+  ];
+
+  // ============================================================
+  // RENDER
+  // ============================================================
+
+  // ---- Hero trend chart — 36 eğitim haftası, eksenli alan+çizgi grafiği ----
+  (function () {
+    var wrap = document.getElementById('perfHeroChart');
+    var pointsWrap = document.getElementById('perfHeroPoints');
+    var labelsWrap = document.getElementById('perfHeroLabels');
+    var yaxisWrap = document.getElementById('perfHeroYaxis');
+    var gridEl = document.getElementById('perfHeroGrid');
+    var lineEl = document.getElementById('perfHeroLine');
+    var areaEl = document.getElementById('perfHeroArea');
+    if (!wrap || !lineEl || !areaEl) return;
+
+    var COLOR = '#4ad6ff';
+    // 36 eğitim haftası — başarı endeksi (kademeli yükseliş + gerçekçi dalgalanma)
+    var data = [
+      55, 56, 58, 57, 60, 62, 61, 64, 66, 65,
+      67, 69, 68, 70, 71, 70, 72, 73, 72, 74,
+      75, 74, 76, 75, 77, 78, 77, 79, 80, 79,
+      81, 80, 82, 83, 82, 84
+    ];
+    var n = data.length;
+
+    // Y ekseni aralığı: 40–100 (başarı endeksi okunaklı kalsın)
+    var Y_MIN = 40, Y_MAX = 100;
+    var Y_TICKS = [100, 85, 70, 55, 40];
+    var W = 320, top = 10, bottom = 130, range = bottom - top;
+
+    function yFor(v) { return bottom - ((v - Y_MIN) / (Y_MAX - Y_MIN)) * range; }
+    function xFor(i) { return (i / (n - 1)) * W; }
+
+    var pts = data.map(function (v, i) { return [xFor(i), yFor(v)]; });
+
+    // Düzgün (smooth) eğri — Catmull-Rom → kübik bezier
+    function smoothPath(points) {
+      if (points.length < 2) return '';
+      var d = 'M' + points[0][0].toFixed(1) + ',' + points[0][1].toFixed(1);
+      for (var i = 0; i < points.length - 1; i++) {
+        var p0 = points[i - 1] || points[i];
+        var p1 = points[i];
+        var p2 = points[i + 1];
+        var p3 = points[i + 2] || p2;
+        var c1x = p1[0] + (p2[0] - p0[0]) / 6;
+        var c1y = p1[1] + (p2[1] - p0[1]) / 6;
+        var c2x = p2[0] - (p3[0] - p1[0]) / 6;
+        var c2y = p2[1] - (p3[1] - p1[1]) / 6;
+        d += ' C' + c1x.toFixed(1) + ',' + c1y.toFixed(1) + ' ' +
+             c2x.toFixed(1) + ',' + c2y.toFixed(1) + ' ' +
+             p2[0].toFixed(1) + ',' + p2[1].toFixed(1);
+      }
+      return d;
+    }
+
+    var linePath = smoothPath(pts);
+    lineEl.setAttribute('d', linePath);
+    areaEl.setAttribute('d', linePath + ' L' + W + ',140 L0,140 Z');
+
+    // Yatay grid çizgileri (Y tick hizalarında)
+    if (gridEl) {
+      gridEl.innerHTML = Y_TICKS.map(function (v) {
+        var y = yFor(v).toFixed(1);
+        return '<line x1="0" y1="' + y + '" x2="' + W + '" y2="' + y + '" ' +
+          'stroke="rgba(255,255,255,0.07)" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>';
+      }).join('');
+    }
+
+    // Y ekseni etiketleri
+    if (yaxisWrap) {
+      yaxisWrap.innerHTML = Y_TICKS.map(function (v) {
+        var topPct = (yFor(v) / 140 * 100).toFixed(2);
+        return '<span class="perf-hero-yaxis-tick" style="top:' + topPct + '%;">' + v + '</span>';
+      }).join('');
+    }
+
+    // X ekseni etiketleri — 36 hafta için her 6 haftada bir + son
+    var xTicks = [0, 5, 11, 17, 23, 29, 35];
+    if (labelsWrap) {
+      labelsWrap.innerHTML = xTicks.map(function (i) {
+        var leftPct = (xFor(i) / W * 100).toFixed(2);
+        return '<span class="perf-hero-chart-label" style="left:' + leftPct + '%;">H' + (i + 1) + '</span>';
+      }).join('');
+    }
+
+    // Milestone noktaları (X tick'leriyle aynı) — hover ile detay
+    if (pointsWrap) {
+      pointsWrap.innerHTML = xTicks.map(function (i) {
+        var p = pts[i];
+        var isFirst = i === 0;
+        var isLast = i === n - 1;
+        var leftPct = (p[0] / W * 100).toFixed(2);
+        var topPct = (p[1] / 140 * 100).toFixed(2);
+        var val = data[i];
+        var prev = i > 0 ? data[i - 1] : null;
+        var trendHtml = '';
+        if (prev !== null) {
+          var diff = val - prev;
+          var cls = diff > 0 ? 'is-up' : (diff < 0 ? 'is-down' : 'is-flat');
+          var arrow = diff > 0 ? '▲' : (diff < 0 ? '▼' : '—');
+          var sign = diff > 0 ? '+' : '';
+          trendHtml = '<span class="perf-hero-pt-tip-trend ' + cls + '">' + arrow + ' ' + sign + diff + ' puan</span>';
+        }
+        var edge = (isFirst ? ' is-first' : '') + (isLast ? ' is-last' : '') + (!isLast ? ' is-milestone' : '');
+        return '<span class="perf-hero-pt' + edge + '" style="left:' + leftPct + '%; top:' + topPct + '%; --pt-color:' + COLOR + ';">'
+          + '<span class="perf-hero-pt-tip">'
+          +   '<span class="perf-hero-pt-tip-label">' + (i + 1) + '. Hafta</span>'
+          +   '<span class="perf-hero-pt-tip-main">'
+          +     '<span class="perf-hero-pt-tip-val">' + val + '</span>'
+          +     trendHtml
+          +   '</span>'
+          + '</span>'
+          + '</span>';
+      }).join('');
+    }
+  })();
+
+  // ---- Ders bazlı performans listesi (filter-aware) ----
+  function renderSubjects(range) {
+    var list = document.getElementById('perfSubjList');
+    if (!list) return;
+    range = range || 'term';
+    var scores = SUBJECT_SCORES[range] || SUBJECT_SCORES.term;
+    list.innerHTML = SUBJECTS.map(function (s) {
+      var pair = scores[s.id] || [s.score, s.prevScore];
+      var curr = pair[0], prev = pair[1];
+      var diff = curr - prev;
+      var trendCls = diff >= 0 ? 'is-up' : 'is-down';
+      var trendSign = diff >= 0 ? '+' : '';
+      return '<button type="button" class="perf-subj-row" data-subj-id="' + s.id + '" data-perf-tip="' + s.name + ' dersindeki başarı puanın: ' + curr + '. Detaylı istatistikleri görmek için tıkla.">' +
+        '<span class="perf-subj-emoji">' + s.emoji + '</span>' +
+        '<span class="perf-subj-info">' +
+          '<span class="perf-subj-name">' + s.name + '</span>' +
+          '<span class="perf-subj-bar"><span class="perf-subj-bar-fill" style="--p:' + curr + '%;--c-from:' + s.color[0] + ';--c-to:' + s.color[1] + ';transition:width 0.6s cubic-bezier(0.22,0.61,0.36,1)"></span></span>' +
+        '</span>' +
+        '<span class="perf-subj-score">' +
+          '<strong>' + curr + '</strong>' +
+          '<span class="perf-subj-score-trend ' + trendCls + '">' + trendSign + diff + ' puan</span>' +
+        '</span>' +
+        '<span class="perf-subj-chevron" aria-hidden="true">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>' +
+        '</span>' +
+      '</button>';
+    }).join('');
+    list.querySelectorAll('[data-subj-id]').forEach(function (row) {
+      row.addEventListener('click', function () { openSubjDrawer(row.getAttribute('data-subj-id')); });
+    });
+    bindPerfTips();
+  }
+  renderSubjects('term');
+
+  // ---- Donut + Ödev İstatistikleri (filter-aware) ----
+  var DONUT_C = 2 * Math.PI * 48; // 301.6
+  var currentHwCardRange = 'month';
+
+  function renderHomework(range) {
+    range = range || 'month';
+    currentHwCardRange = range;
+    var d = getHwSummary(range);
+    var done = document.getElementById('perfDonutDone');
+    var late = document.getElementById('perfDonutLate');
+    var open = document.getElementById('perfDonutOpen');
+    var total = document.getElementById('perfDonutTotal');
+    var hwDone = document.getElementById('perfHwDone');
+    var hwOpen = document.getElementById('perfHwOpen');
+    var hwLate = document.getElementById('perfHwLate');
+    var hwXp = document.getElementById('perfHwXp');
+    var hwXpLabel = document.getElementById('perfHwXpLabel');
+    if (total) total.textContent = d.total;
+    if (hwDone) hwDone.textContent = d.done;
+    if (hwOpen) hwOpen.textContent = d.open;
+    if (hwLate) hwLate.textContent = d.late;
+    if (hwXp) hwXp.textContent = d.xp.toLocaleString('tr-TR');
+    if (hwXpLabel) hwXpLabel.textContent = d.label;
+    if (!done || !d.total) {
+      if (done) done.setAttribute('stroke-dasharray', '0 ' + DONUT_C);
+      if (open) open.setAttribute('stroke-dasharray', '0 ' + DONUT_C);
+      if (late) late.setAttribute('stroke-dasharray', '0 ' + DONUT_C);
+      return;
+    }
+    var doneArc = (d.done / d.total) * DONUT_C;
+    var openArc = (d.open / d.total) * DONUT_C;
+    var lateArc = (d.late / d.total) * DONUT_C;
+    done.setAttribute('stroke-dasharray', doneArc.toFixed(1) + ' ' + DONUT_C);
+    done.setAttribute('stroke-dashoffset', '0');
+    open.setAttribute('stroke-dasharray', openArc.toFixed(1) + ' ' + DONUT_C);
+    open.setAttribute('stroke-dashoffset', (-doneArc).toFixed(1));
+    late.setAttribute('stroke-dasharray', lateArc.toFixed(1) + ' ' + DONUT_C);
+    late.setAttribute('stroke-dashoffset', (-(doneArc + openArc)).toFixed(1));
+  }
+  // İlk yükleme — animation gecikme
+  setTimeout(function () { renderHomework('month'); }, 300);
+
+  // ---- En Çok Çalıştığın Dersler (filter-aware) ----
+  var currentTopicsRange = 'month';
+
+  var TOPIC_DRAWER_METRICS = [
+    {
+      key: 'live',
+      icon: '📡',
+      label: 'Canlı Derse Katılım Süresi',
+      desc: 'Bu ders için canlı derslere katılarak geçirdiğin toplam süre.'
+    },
+    {
+      key: 'homework',
+      icon: '✏️',
+      label: 'Ödev Çözme Süresi',
+      desc: 'Bu dersle ilgili ödevleri çözerken harcadığın toplam süre.'
+    },
+    {
+      key: 'review',
+      icon: '🔁',
+      label: 'Ders Tekrarı İzleme Süresi',
+      desc: 'Konu anlatımı ve tekrar videolarını izlerken geçirdiğin toplam süre.'
+    }
+  ];
+
+  function renderTopics(range) {
+    range = range || 'month';
+    currentTopicsRange = range;
+    var data = SUBJECTS_STUDY_DATA[range] || SUBJECTS_STUDY_DATA.month;
+    var list = document.getElementById('perfTopicList');
+    if (!list) return;
+    list.innerHTML = data.map(function (s, i) {
+      var rank = i + 1;
+      return '<button type="button" class="perf-topic-row" data-topic-id="' + s.id + '" data-perf-tip="' + s.name + ' dersinde toplam ' + s.time + ' çalıştın. Süre dağılımını görmek için tıkla.">' +
+        '<span class="perf-topic-rank">' + rank + '.</span>' +
+        '<span class="perf-topic-emoji">' + s.emoji + '</span>' +
+        '<span class="perf-topic-name">' + s.name + '</span>' +
+        '<span class="perf-topic-time">' + s.time + '</span>' +
+      '</button>';
+    }).join('');
+    list.querySelectorAll('[data-topic-id]').forEach(function (row) {
+      row.addEventListener('click', function () { openTopicDrawer(row.getAttribute('data-topic-id')); });
+    });
+    bindPerfTips();
+  }
+  renderTopics('month');
+
+  // ---- Devamsızlık (filter-aware) ----
+  function renderAttendance(range) {
+    range = range || 'term';
+    var d = ATT_DATA[range] || ATT_DATA.term;
+    // Stat numbers
+    var statBoxes = document.querySelectorAll('[data-widget="attendance"] .perf-att-stat-num');
+    if (statBoxes[0]) statBoxes[0].textContent = d.excused;
+    if (statBoxes[1]) statBoxes[1].textContent = d.unexcused;
+    // Calendar grid
+    var cal = document.getElementById('perfAttCal');
+    if (cal) {
+      var html = '';
+      for (var i = 0; i < d.days; i++) {
+        var cls = 'is-present';
+        if (d.excusedDays.indexOf(i) >= 0) cls = 'is-excused';
+        else if (d.unexcusedDays.indexOf(i) >= 0) cls = 'is-unexcused';
+        if (i === d.todayIdx) cls += ' is-today';
+        html += '<div class="perf-att-cal-day ' + cls + '" title="Gün ' + (i + 1) + '"></div>';
+      }
+      cal.innerHTML = html;
+    }
+  }
+  renderAttendance('term');
+
+  // ---- Sınıf sıralaması ----
+  (function () {
+    var list = document.getElementById('perfRankList');
+    if (!list) return;
+    list.innerHTML = RANKING.map(function (r) {
+      var posCls = r.rank === 1 ? 'is-top-1' : r.rank === 2 ? 'is-top-2' : r.rank === 3 ? 'is-top-3' : '';
+      var meCls = r.isMe ? 'is-me' : '';
+      var avContent = r.emoji ? r.emoji : r.initials;
+      return '<div class="perf-rank-row ' + posCls + ' ' + meCls + '">' +
+        '<span class="perf-rank-pos">' + r.rank + '.</span>' +
+        '<span class="perf-rank-avatar" style="background:linear-gradient(135deg, var(--p-' + (r.avatarKind === 'purple' ? 'purple-mid' : r.avatarKind === 'aqua' ? 'aqua' : r.avatarKind === 'gold' ? 'aqua' : r.avatarKind === 'brand' ? 'brand' : 'purple-mid') + '), var(--p-' + (r.avatarKind === 'aqua' ? 'purple' : 'purple') + '));">' + avContent + '</span>' +
+        '<span class="perf-rank-name">' + r.name + (r.isMe ? ' <span style="color:#4ad6ff">· SEN</span>' : '') + '<br><span class="perf-rank-meta">' + r.cls + ' · Bilenyum</span></span>' +
+        '<span class="perf-rank-score">' + r.score + ' XP</span>' +
+      '</div>';
+    }).join('');
+  })();
+
+  var DRAWER_METRICS = [
+    { key: 'correct',    icon: '✅', label: 'Toplam Doğru Sayısı',  desc: 'Bu derste çözdüğün sorulardan doğru işaretlediklerinin toplamı.' },
+    { key: 'wrong',      icon: '❌', label: 'Toplam Yanlış Sayısı', desc: 'Yanlış cevapladığın sorular. Her yanlış, deneme netini biraz düşürür.' },
+    { key: 'blank',      icon: '⚪', label: 'Toplam Boş Sayısı',    desc: 'Boş bıraktığın sorular. Düzenli pratik yaparak bu sayıyı azaltabilirsin.' },
+    { key: 'engagement', icon: '✋', label: 'Derste Ortalama Etkin Olma Sayısı', desc: 'Katıldığın canlı derslerde parmak kaldırıp söz alarak gösterdiğin ortalama etkin katılım (toplam etkinlik ÷ katıldığın ders sayısı).' },
+    { key: 'xp',         icon: '⚡', label: 'Kazanılan Toplam XP',  desc: 'Bu derste canlı ders, ödev ve etkinliklerden kazandığın deneyim puanı.' },
+    { key: 'attend',     icon: '📹', label: 'Derse Katılım Sayısı', desc: 'Katıldığın canlı ders sayısı ve bu ders için planlanan toplam canlı ders sayısı.' }
+  ];
+
+  // ============================================================
+  // DERS DETAY DRAWER
+  // ============================================================
+  var drawer = document.getElementById('perfSubjDrawer');
+  var dIcon = document.getElementById('perfDrawerIcon');
+  var dTitle = document.getElementById('perfDrawerTitle');
+  var dTeacher = document.getElementById('perfDrawerTeacher');
+  var dOverall = document.getElementById('perfDrawerStatOverall');
+  var dMetrics = document.getElementById('perfDrawerMetrics');
+  var subjDrawerFilterLabel = document.getElementById('perfSubjDrawerFilterLabel');
+  var currentSubjId = null;
+  var currentSubjDrawerRange = 'term';
+
+  function getSubjectsCardRange() {
+    var card = document.querySelector('[data-widget="subjects"]');
+    if (!card) return 'term';
+    var active = card.querySelector('.perf-filter-item.is-active');
+    return active ? (active.getAttribute('data-range') || 'term') : 'term';
+  }
+
+  function getSubjectStats(subjId, range) {
+    var pool = SUBJECT_STATS_BY_RANGE[range] || SUBJECT_STATS_BY_RANGE.term;
+    var fallback = (SUBJECTS.find(function (x) { return x.id === subjId; }) || {}).stats || {};
+    return pool[subjId] || fallback;
+  }
+
+  function getSubjectScore(subjId, range) {
+    var scores = SUBJECT_SCORES[range] || SUBJECT_SCORES.term;
+    var pair = scores[subjId];
+    if (pair) return pair[0];
+    var s = SUBJECTS.find(function (x) { return x.id === subjId; });
+    return s ? s.score : 0;
+  }
+
+  function parseAttendCount(attend) {
+    if (!attend) return 0;
+    var parts = String(attend).split('/');
+    return parseInt(parts[0], 10) || 0;
+  }
+
+  function getQuestionTotal(stats) {
+    return (stats.correct || 0) + (stats.wrong || 0) + (stats.blank || 0);
+  }
+
+  function formatDrawerMetricValue(key, stats) {
+    if (key === 'xp') return stats.xp;
+    if (key === 'attend') return stats.attend;
+    if (key === 'engagement') {
+      var attended = parseAttendCount(stats.attend);
+      var engagementTotal = stats.engagement != null ? stats.engagement : 0;
+      if (!attended) return '—';
+      var avg = Math.round((engagementTotal / attended) * 10) / 10;
+      return String(avg).replace('.', ',');
+    }
+    if (key === 'correct' || key === 'wrong' || key === 'blank') {
+      var qTotal = getQuestionTotal(stats);
+      var val = stats[key] || 0;
+      if (!qTotal) return String(val);
+      return val + '<sub>/ ' + qTotal + '</sub>';
+    }
+    return String(stats[key]);
+  }
+
+  function renderSubjDrawer() {
+    if (!currentSubjId) return;
+    var s = SUBJECTS.find(function (x) { return x.id === currentSubjId; });
+    if (!s) return;
+    var range = currentSubjDrawerRange;
+    var stats = getSubjectStats(currentSubjId, range);
+    if (dOverall) dOverall.textContent = getSubjectScore(currentSubjId, range);
+    if (dMetrics) {
+      dMetrics.innerHTML = DRAWER_METRICS.map(function (m) {
+        return '<div class="perf-drawer-metric">' +
+          '<span class="perf-drawer-metric-icon">' + (m.icon || '•') + '</span>' +
+          '<div class="perf-drawer-metric-main">' +
+            '<span class="perf-drawer-metric-num">' + formatDrawerMetricValue(m.key, stats) + '</span>' +
+            '<span class="perf-drawer-metric-label">' + m.label + '</span>' +
+          '</div>' +
+          '<p class="perf-drawer-metric-desc">' + m.desc + '</p>' +
+        '</div>';
+      }).join('');
+    }
+    if (subjDrawerFilterLabel) subjDrawerFilterLabel.textContent = SUBJECT_RANGE_LABEL[range] || 'Bu Dönem';
+    var menu = document.getElementById('perfSubjDrawerFilterMenu');
+    if (menu) {
+      menu.querySelectorAll('[data-subj-range]').forEach(function (btn) {
+        btn.classList.toggle('is-active', btn.getAttribute('data-subj-range') === range);
+      });
+    }
+  }
+
+  function setSubjDrawerRange(range) {
+    currentSubjDrawerRange = range;
+    renderSubjDrawer();
+  }
+
+  function openSubjDrawer(subjId) {
+    closeTopicDrawer();
+    closeHwDrawer();
+    var s = SUBJECTS.find(function (x) { return x.id === subjId; });
+    if (!s || !drawer) return;
+    currentSubjId = subjId;
+    currentSubjDrawerRange = getSubjectsCardRange();
+    dIcon.textContent = s.emoji;
+    dTitle.textContent = s.name;
+    dTeacher.textContent = s.teacher;
+    renderSubjDrawer();
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSubjDrawer() {
+    if (!drawer) return;
+    drawer.classList.remove('is-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    if ((!topicDrawer || !topicDrawer.classList.contains('is-open')) &&
+        (!hwDrawer || !hwDrawer.classList.contains('is-open'))) {
+      document.body.style.overflow = '';
+    }
+  }
+  if (drawer) {
+    drawer.querySelectorAll('[data-perf-close]').forEach(function (x) {
+      x.addEventListener('click', closeSubjDrawer);
+    });
+  }
+
+  (function () {
+    var wrap = document.getElementById('perfSubjDrawerFilter');
+    var btn = document.getElementById('perfSubjDrawerFilterBtn');
+    var menu = document.getElementById('perfSubjDrawerFilterMenu');
+    if (!wrap || !btn || !menu) return;
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      wrap.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', wrap.classList.contains('is-open') ? 'true' : 'false');
+    });
+    menu.querySelectorAll('[data-subj-range]').forEach(function (item) {
+      item.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setSubjDrawerRange(item.getAttribute('data-subj-range'));
+        wrap.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+    document.addEventListener('click', function () {
+      wrap.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+  })();
+
+  // ============================================================
+  // KONU ÇALIŞMA SÜRESİ DRAWER
+  // ============================================================
+  var topicDrawer = document.getElementById('perfTopicDrawer');
+  var tdIcon = document.getElementById('perfTopicDrawerIcon');
+  var tdTitle = document.getElementById('perfTopicDrawerTitle');
+  var tdSub = document.getElementById('perfTopicDrawerSub');
+  var tdTotal = document.getElementById('perfTopicDrawerTotal');
+  var tdMetrics = document.getElementById('perfTopicDrawerMetrics');
+  var topicDrawerFilterLabel = document.getElementById('perfTopicDrawerFilterLabel');
+  var currentTopicId = null;
+  var currentTopicDrawerRange = 'month';
+
+  var TOPIC_RANGE_LABEL = {
+    week:  'Bu Hafta',
+    month: 'Bu Ay',
+    term:  'Bu Dönem'
+  };
+
+  function findTopic(topicId, range) {
+    var pool = SUBJECTS_STUDY_DATA[range || currentTopicDrawerRange] || SUBJECTS_STUDY_DATA.month;
+    return pool.find(function (x) { return x.id === topicId; });
+  }
+
+  function renderTopicDrawer() {
+    if (!currentTopicId) return;
+    var range = currentTopicDrawerRange;
+    var t = findTopic(currentTopicId, range);
+    if (!t) return;
+    if (tdIcon) tdIcon.textContent = t.emoji;
+    if (tdTitle) tdTitle.textContent = t.name;
+    if (tdSub) tdSub.textContent = t.teacher;
+    if (tdTotal) tdTotal.textContent = t.time;
+    if (tdMetrics) {
+      tdMetrics.innerHTML = TOPIC_DRAWER_METRICS.map(function (m) {
+        return '<div class="perf-drawer-metric">' +
+          '<span class="perf-drawer-metric-icon">' + (m.icon || '•') + '</span>' +
+          '<div class="perf-drawer-metric-main">' +
+            '<span class="perf-drawer-metric-num">' + t[m.key] + '</span>' +
+            '<span class="perf-drawer-metric-label">' + m.label + '</span>' +
+          '</div>' +
+          '<p class="perf-drawer-metric-desc">' + m.desc + '</p>' +
+        '</div>';
+      }).join('');
+    }
+    if (topicDrawerFilterLabel) topicDrawerFilterLabel.textContent = TOPIC_RANGE_LABEL[range] || 'Bu Ay';
+    var menu = document.getElementById('perfTopicDrawerFilterMenu');
+    if (menu) {
+      menu.querySelectorAll('[data-topic-range]').forEach(function (btn) {
+        btn.classList.toggle('is-active', btn.getAttribute('data-topic-range') === range);
+      });
+    }
+  }
+
+  function setTopicDrawerRange(range) {
+    if (!findTopic(currentTopicId, range)) return;
+    currentTopicDrawerRange = range;
+    renderTopicDrawer();
+  }
+
+  function openTopicDrawer(topicId) {
+    closeSubjDrawer();
+    closeHwDrawer();
+    currentTopicDrawerRange = currentTopicsRange || 'month';
+    currentTopicId = topicId;
+    var t = findTopic(topicId, currentTopicDrawerRange);
+    if (!t || !topicDrawer) return;
+    renderTopicDrawer();
+    topicDrawer.classList.add('is-open');
+    topicDrawer.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeTopicDrawer() {
+    if (!topicDrawer) return;
+    topicDrawer.classList.remove('is-open');
+    topicDrawer.setAttribute('aria-hidden', 'true');
+    if (!drawer || !drawer.classList.contains('is-open')) {
+      if (!hwDrawer || !hwDrawer.classList.contains('is-open')) {
+        document.body.style.overflow = '';
+      }
+    }
+  }
+
+  if (topicDrawer) {
+    topicDrawer.querySelectorAll('[data-topic-close]').forEach(function (x) {
+      x.addEventListener('click', closeTopicDrawer);
+    });
+  }
+
+  (function () {
+    var wrap = document.getElementById('perfTopicDrawerFilter');
+    var btn = document.getElementById('perfTopicDrawerFilterBtn');
+    var menu = document.getElementById('perfTopicDrawerFilterMenu');
+    if (!wrap || !btn || !menu) return;
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      wrap.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', wrap.classList.contains('is-open') ? 'true' : 'false');
+    });
+    menu.querySelectorAll('[data-topic-range]').forEach(function (item) {
+      item.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setTopicDrawerRange(item.getAttribute('data-topic-range'));
+        wrap.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+    document.addEventListener('click', function () {
+      wrap.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+  })();
+
+  // ============================================================
+  // ÖDEV LİSTESİ DRAWER
+  // ============================================================
+  var hwDrawer = document.getElementById('perfHwDrawer');
+  var hwListView = document.getElementById('perfHwListView');
+  var hwDetailView = document.getElementById('perfHwDetailView');
+  var hwDrawerTitle = document.getElementById('perfHwDrawerTitle');
+  var hwDrawerSub = document.getElementById('perfHwDrawerSub');
+  var hwDrawerList = document.getElementById('perfHwDrawerList');
+  var hwDrawerFilterLabel = document.getElementById('perfHwDrawerFilterLabel');
+  var hwDetailBack = document.getElementById('perfHwDetailBack');
+  var hwDetailCta = document.getElementById('perfHwDetailCta');
+  var hwDetailRetryNote = document.getElementById('perfHwDetailRetryNote');
+  var hwDetailLateXpNote = document.getElementById('perfHwDetailLateXpNote');
+  var hwDetailStatusChip = document.getElementById('perfHwDetailStatus');
+  var currentHwDrawerRange = 'month';
+  var currentHwDrawerTab = 'all';
+  var currentHwItem = null;
+
+  var HW_DRAWER_TAB_LABEL = {
+    all:     'Tüm ödevler',
+    done:    'Tamamlanan ödevler',
+    active:  'Devam eden ödevler',
+    overdue: 'Gecikmiş ödevler'
+  };
+
+  var HW_RANGE_LABEL = {
+    week:  'Bu Hafta',
+    month: 'Bu Ay',
+    all:   'Bu Zamana kadar'
+  };
+
+  var HW_MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+
+  function findHwItem(id) {
+    return HW_ITEMS.find(function (h) { return h.id === id; });
+  }
+
+  function parseHwDatetime(str) {
+    if (!str) return null;
+    var parts = str.split(' ');
+    var d = parts[0].split('-');
+    var t = (parts[1] || '00:00').split(':');
+    return new Date(+d[0], +d[1] - 1, +d[2], +t[0], +t[1], 0);
+  }
+
+  function fmtHwDueLong(str) {
+    var d = parseHwDatetime(str);
+    if (!d) return '—';
+    return d.getDate() + ' ' + HW_MONTHS[d.getMonth()] + ' ' + d.getFullYear() + ', ' +
+      String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+
+  function fmtHwDueShort(d) {
+    var diff = d.getTime() - TODAY.getTime();
+    if (diff < 0) return 'Süresi geçti';
+    var hr = Math.floor(diff / 3600000);
+    if (hr < 1) return Math.max(1, Math.floor(diff / 60000)) + ' dk kaldı';
+    if (hr < 24) return hr + ' sa kaldı';
+    return Math.floor(hr / 24) + ' gün kaldı';
+  }
+
+  function getHwDesc(h) {
+    if (h.desc) return h.desc;
+    var subj = (HW_SUBJ[h.subject] || {}).name || 'ders';
+    if (h.status === 'done') {
+      return subj + ' dersindeki bu ödevi tamamladın. Öğretmenin geri bildirimini ve puanını aşağıdan görebilirsin.';
+    }
+    if (h.status === 'overdue') {
+      return subj + ' dersindeki bu ödevin teslim tarihi geçti. Hâlâ tamamlayabilirsin; öğretmenin geç teslim olarak değerlendirebilir.';
+    }
+    return subj + ' dersindeki bu ödevi zamanında tamamlaman gerekiyor. Açıklamayı okuyup ödeve başlayabilirsin.';
+  }
+
+  var HW_OVERDUE_XP_RATE = 0.5;
+
+  function getPerfHwBaseXp(h) {
+    return h && (h.maxXp || h.xp) ? (h.maxXp || h.xp) : 0;
+  }
+
+  function getPerfHwOverdueXp(h) {
+    return Math.max(1, Math.round(getPerfHwBaseXp(h) * HW_OVERDUE_XP_RATE));
+  }
+
+  function getPerfHwStatusLabel(h) {
+    if (!h) return '';
+    if (h.status === 'done') return 'Tamamlandı';
+    if (h.status === 'overdue') return 'Gecikmiş';
+    return isPerfHwInProgress(h) ? 'Devam Eden' : 'Bekliyor';
+  }
+
+  function getPerfLateXpNoteText(h) {
+    if (!h || h.status !== 'overdue') return '';
+    var full = getPerfHwBaseXp(h);
+    var late = getPerfHwOverdueXp(h);
+    return 'Bu ödevin teslim süresi geçti; yine de tamamlayabilirsin. Gecikmiş teslimde en fazla '
+      + '<strong>' + late + ' XP</strong> kazanabilirsin (zamanında teslimde <strong>' + full + ' XP</strong>).';
+  }
+
+  function setPerfLateXpNote(h) {
+    if (!hwDetailLateXpNote) return;
+    var html = getPerfLateXpNoteText(h);
+    if (html) {
+      hwDetailLateXpNote.innerHTML = html;
+      hwDetailLateXpNote.hidden = false;
+    } else {
+      hwDetailLateXpNote.hidden = true;
+      hwDetailLateXpNote.textContent = '';
+    }
+  }
+
+  function setPerfHwStatusChip(h) {
+    if (!hwDetailStatusChip) return;
+    var label = getPerfHwStatusLabel(h);
+    if (!label) {
+      hwDetailStatusChip.hidden = true;
+      return;
+    }
+    fillPerfHwDetail('status', label);
+    hwDetailStatusChip.hidden = false;
+    hwDetailStatusChip.className = 'perf-hw-detail-chip';
+    if (h.status === 'done') hwDetailStatusChip.classList.add('is-status-done');
+    else if (h.status === 'overdue') hwDetailStatusChip.classList.add('is-status-overdue');
+    else hwDetailStatusChip.classList.add('is-status-active');
+  }
+
+  function resolvePerfHwId(h) {
+    return h && h.hwId ? h.hwId : null;
+  }
+
+  function perfLsGet(key) {
+    try { return localStorage.getItem('bilenyum.' + key); } catch (e) { return null; }
+  }
+
+  function hasPerfHwSession(hwId) {
+    if (!hwId) return false;
+    return !!perfLsGet('homeworkSession.' + hwId);
+  }
+
+  function isPerfHwInProgress(h) {
+    if (!h || h.status === 'done') return false;
+    if (h.started) return true;
+    return hasPerfHwSession(resolvePerfHwId(h));
+  }
+
+  function formatPerfEduWeek(week) {
+    var n = parseInt(week, 10);
+    if (!n || n < 1) return '';
+    return n + '. Eğitim Haftası';
+  }
+
+  function syncPerfHwFromStorage() {
+    HW_ITEMS.forEach(function (hw) {
+      var hwId = resolvePerfHwId(hw);
+      if (!hwId) return;
+      var raw = perfLsGet('homeworkDone.' + hwId);
+      if (!raw) return;
+      try {
+        var data = JSON.parse(raw);
+        hw.status = 'done';
+        if (data.pct != null) hw.score = data.pct;
+        if (data.earnedXp != null) hw.xp = data.earnedXp;
+        if (data.completedAt) {
+          var d = new Date(data.completedAt);
+          if (!isNaN(d.getTime())) {
+            hw.doneAt = d.getFullYear() + '-' +
+              String(d.getMonth() + 1).padStart(2, '0') + '-' +
+              String(d.getDate()).padStart(2, '0') + ' ' +
+              String(d.getHours()).padStart(2, '0') + ':' +
+              String(d.getMinutes()).padStart(2, '0');
+          }
+        }
+      } catch (e) {}
+    });
+  }
+
+  syncPerfHwFromStorage();
+
+  function fillPerfHwDetail(key, value) {
+    var el = hwDetailView && hwDetailView.querySelector('[data-hw-fill="' + key + '"]');
+    if (el) el.textContent = value;
+  }
+
+  function showHwListView() {
+    if (hwListView) hwListView.classList.add('is-active');
+    if (hwDetailView) {
+      hwDetailView.classList.remove('is-active');
+      hwDetailView.removeAttribute('data-hw-type');
+    }
+    var fmtEl = document.getElementById('perfHwDetailFormat');
+    var fmtDescEl = document.getElementById('perfHwDetailFormatDesc');
+    if (fmtEl) fmtEl.hidden = true;
+    if (fmtDescEl) fmtDescEl.hidden = true;
+    currentHwItem = null;
+  }
+
+  function showHwDetailView() {
+    if (hwListView) hwListView.classList.remove('is-active');
+    if (hwDetailView) hwDetailView.classList.add('is-active');
+  }
+
+  function updateHwDetailCta() {
+    if (!hwDetailCta || !currentHwItem) return;
+    var h = currentHwItem;
+    var hwId = resolvePerfHwId(h);
+    var inProgress = isPerfHwInProgress(h);
+    hwDetailCta.className = 'perf-hw-detail-cta';
+    hwDetailCta.disabled = false;
+    if (hwDetailRetryNote) hwDetailRetryNote.hidden = true;
+    setPerfLateXpNote(h);
+
+    if (h.status === 'done') {
+      if (hwDetailRetryNote) hwDetailRetryNote.hidden = false;
+      if (hwId) {
+        hwDetailCta.textContent = 'Tekrar Çöz';
+        hwDetailCta.classList.add('is-retry');
+      } else {
+        hwDetailCta.textContent = 'Ödev Tamamlandı';
+        hwDetailCta.disabled = true;
+        hwDetailCta.classList.add('is-completed');
+      }
+      return;
+    }
+
+    if (inProgress) {
+      hwDetailCta.textContent = 'Ödeve Devam Et';
+      hwDetailCta.classList.add(h.status === 'overdue' ? 'is-overdue' : 'is-continue');
+      return;
+    }
+
+    hwDetailCta.textContent = 'Ödevi Yapmaya Başla';
+    hwDetailCta.classList.add(h.status === 'overdue' ? 'is-overdue' : 'is-active');
+  }
+
+  function openHwDetail(id) {
+    var h = findHwItem(id);
+    if (!h) return;
+    currentHwItem = h;
+    var subj = HW_SUBJ[h.subject] || { name: h.subject, emoji: '📝' };
+    var teacher = HW_TEACHERS[h.teacher] || { full: h.teacher, role: subj.name + ' Öğretmeni', avatar: '' };
+    var badge = HW_BADGES[h.subject] || { name: 'Yeni Rozet', icon: '🏆' };
+
+    if (hwDetailView) {
+      hwDetailView.setAttribute('data-subject', h.subject);
+      hwDetailView.setAttribute('data-hw-type', resolveHwFormat(h));
+    }
+    var iconEl = document.getElementById('perfHwDetailIcon');
+    var subjEl = document.getElementById('perfHwDetailSubject');
+    var topicEl = document.getElementById('perfHwDetailTopic');
+    var fmtEl = document.getElementById('perfHwDetailFormat');
+    var fmtDescEl = document.getElementById('perfHwDetailFormatDesc');
+    var descEl = document.getElementById('perfHwDetailDesc');
+    var avatarEl = document.getElementById('perfHwDetailAvatar');
+    var badgeIconEl = document.getElementById('perfHwDetailBadgeIcon');
+    var eduWeekChip = document.getElementById('perfHwDetailEduWeek');
+    var scoreChip = document.getElementById('perfHwDetailScore');
+
+    if (iconEl) iconEl.textContent = subj.emoji;
+    if (subjEl) subjEl.textContent = subj.name.toLocaleUpperCase('tr-TR');
+    if (topicEl) topicEl.textContent = h.topic;
+    var fmt = resolveHwFormat(h);
+    if (fmtEl) {
+      fmtEl.textContent = hwTypeLabel(fmt);
+      fmtEl.className = 'perf-hw-type is-' + fmt;
+      fmtEl.hidden = false;
+    }
+    if (fmtDescEl) {
+      fmtDescEl.textContent = hwTypeDesc(fmt);
+      fmtDescEl.className = 'perf-hw-format-hint is-' + fmt;
+      fmtDescEl.hidden = false;
+    }
+    if (descEl) descEl.textContent = getHwDesc(h);
+
+    fillPerfHwDetail('date', h.status === 'done' && h.doneAt
+      ? 'Teslim: ' + fmtHwDueLong(h.doneAt)
+      : 'Teslim: ' + fmtHwDueLong(h.due));
+
+    if (h.status === 'done') {
+      fillPerfHwDetail('time', 'Teslim edildi · ' + (h.doneAt ? fmtHwDueLong(h.doneAt) : 'Tamamlandı'));
+    } else if (h.status === 'overdue') {
+      fillPerfHwDetail('time', 'Süresi geçti');
+    } else {
+      fillPerfHwDetail('time', fmtHwDueShort(parseHwDatetime(h.due)));
+    }
+
+    var weekLabel = formatPerfEduWeek(h.eduWeek);
+    if (eduWeekChip) {
+      if (weekLabel) {
+        fillPerfHwDetail('eduWeek', weekLabel);
+        eduWeekChip.hidden = false;
+      } else {
+        eduWeekChip.hidden = true;
+      }
+    }
+
+    if (scoreChip) {
+      if (h.status === 'done' && h.score) {
+        fillPerfHwDetail('score', '%' + h.score + ' başarı');
+        scoreChip.hidden = false;
+      } else {
+        scoreChip.hidden = true;
+      }
+    }
+
+    if (avatarEl) {
+      avatarEl.src = teacher.avatar || '';
+      avatarEl.alt = teacher.full;
+    }
+    fillPerfHwDetail('teacher', teacher.full);
+    fillPerfHwDetail('teacherRole', teacher.role);
+    if (h.status === 'overdue') {
+      fillPerfHwDetail('xp', getPerfHwOverdueXp(h) + ' XP');
+    } else {
+      fillPerfHwDetail('xp', getPerfHwBaseXp(h) + ' XP');
+    }
+    fillPerfHwDetail('badge', badge.name);
+    if (badgeIconEl) badgeIconEl.textContent = badge.icon;
+
+    setPerfHwStatusChip(h);
+    updateHwDetailCta();
+    showHwDetailView();
+    if (hwDetailCta) {
+      requestAnimationFrame(function () {
+        hwDetailCta.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      });
+    }
+  }
+
+  function filterHwItems(range, tab) {
+    return HW_ITEMS.filter(function (h) {
+      if (!inHwRange(h, range)) return false;
+      if (tab !== 'all' && h.status !== tab) return false;
+      return true;
+    }).sort(function (a, b) {
+      var da = hwItemDate(a).getTime();
+      var db = hwItemDate(b).getTime();
+      return db - da;
+    });
+  }
+
+  function renderHwDrawerList() {
+    if (!hwDrawerList) return;
+    var items = filterHwItems(currentHwDrawerRange, currentHwDrawerTab);
+    if (!items.length) {
+      hwDrawerList.innerHTML = '<p class="perf-drawer-hw-empty">Bu filtrede gösterilecek ödev bulunamadı.</p>';
+      return;
+    }
+    hwDrawerList.innerHTML = items.map(function (h) {
+      var subj = HW_SUBJ[h.subject] || { name: h.subject, emoji: '📝' };
+      var dateStr = h.status === 'done' && h.doneAt
+        ? 'Teslim: ' + formatHwDate(h.doneAt)
+        : 'Son: ' + formatHwDate(h.due);
+      var extra = h.status === 'done' && h.score ? ' · %' + h.score : ' · ' + h.xp + ' XP';
+      var tip = HW_STATUS_TIP[h.status] || '';
+      return '<button type="button" class="perf-drawer-hw-item" data-hw-id="' + h.id + '" data-hw-type="' + resolveHwFormat(h) + '" data-perf-tip="' + tip + '">' +
+        '<span class="perf-drawer-hw-emoji">' + subj.emoji + '</span>' +
+        '<div class="perf-drawer-hw-info">' +
+          '<div class="perf-drawer-hw-title-row">' +
+            '<span class="perf-drawer-hw-title">' + h.topic + '</span>' +
+            hwTypeBadgeHtml(h) +
+          '</div>' +
+          '<small>' + subj.name + ' · ' + h.teacher + ' · ' + dateStr + extra + '</small>' +
+        '</div>' +
+        '<span class="perf-drawer-hw-status ' + hwStatusClass(h.status) + '">' + HW_STATUS_LABEL[h.status] + '</span>' +
+      '</button>';
+    }).join('');
+    hwDrawerList.querySelectorAll('[data-hw-id]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        openHwDetail(parseInt(btn.getAttribute('data-hw-id'), 10));
+      });
+    });
+    bindPerfTips();
+  }
+
+  function setHwDrawerTab(tab) {
+    currentHwDrawerTab = tab;
+    var tabs = document.getElementById('perfHwDrawerTabs');
+    if (tabs) {
+      tabs.querySelectorAll('[data-hw-tab]').forEach(function (btn) {
+        btn.classList.toggle('is-active', btn.getAttribute('data-hw-tab') === tab);
+      });
+    }
+    if (hwDrawerSub) hwDrawerSub.textContent = HW_DRAWER_TAB_LABEL[tab] || 'Ödevlerim';
+    renderHwDrawerList();
+  }
+
+  function setHwDrawerRange(range) {
+    currentHwDrawerRange = range;
+    if (hwDrawerFilterLabel) hwDrawerFilterLabel.textContent = HW_RANGE_LABEL[range] || 'Bu Ay';
+    var menu = document.getElementById('perfHwDrawerFilterMenu');
+    if (menu) {
+      menu.querySelectorAll('[data-hw-range]').forEach(function (btn) {
+        btn.classList.toggle('is-active', btn.getAttribute('data-hw-range') === range);
+      });
+    }
+    renderHwDrawerList();
+  }
+
+  function openHwDrawer(tab, range) {
+    closeSubjDrawer();
+    closeTopicDrawer();
+    if (!hwDrawer) return;
+    showHwListView();
+    currentHwDrawerRange = range || currentHwCardRange || 'month';
+    if (hwDrawerFilterLabel) hwDrawerFilterLabel.textContent = HW_RANGE_LABEL[currentHwDrawerRange];
+    var menu = document.getElementById('perfHwDrawerFilterMenu');
+    if (menu) {
+      menu.querySelectorAll('[data-hw-range]').forEach(function (btn) {
+        btn.classList.toggle('is-active', btn.getAttribute('data-hw-range') === currentHwDrawerRange);
+      });
+    }
+    setHwDrawerTab(tab || 'all');
+    hwDrawer.classList.add('is-open');
+    hwDrawer.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeHwDrawer() {
+    if (!hwDrawer) return;
+    showHwListView();
+    hwDrawer.classList.remove('is-open');
+    hwDrawer.setAttribute('aria-hidden', 'true');
+    if ((!drawer || !drawer.classList.contains('is-open')) &&
+        (!topicDrawer || !topicDrawer.classList.contains('is-open'))) {
+      document.body.style.overflow = '';
+    }
+  }
+
+  if (hwDetailBack) {
+    hwDetailBack.addEventListener('click', showHwListView);
+  }
+
+  if (hwDetailCta) {
+    hwDetailCta.addEventListener('click', function () {
+      if (!currentHwItem || hwDetailCta.disabled) return;
+      var hwId = resolvePerfHwId(currentHwItem);
+      if (hwId) {
+        var url = 'odev-coz.html?hw=' + encodeURIComponent(hwId);
+        if (currentHwItem.status === 'done') url += '&retry=1';
+        location.href = url;
+        return;
+      }
+      location.href = 'odevler.html';
+    });
+  }
+
+  document.querySelectorAll('[data-hw-open]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      openHwDrawer(btn.getAttribute('data-hw-open'), currentHwCardRange);
+    });
+  });
+
+  (function () {
+    var wrap = document.getElementById('perfHwDrawerFilter');
+    var btn = document.getElementById('perfHwDrawerFilterBtn');
+    var menu = document.getElementById('perfHwDrawerFilterMenu');
+    if (!wrap || !btn || !menu) return;
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      wrap.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', wrap.classList.contains('is-open') ? 'true' : 'false');
+    });
+    menu.querySelectorAll('[data-hw-range]').forEach(function (item) {
+      item.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setHwDrawerRange(item.getAttribute('data-hw-range'));
+        wrap.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+    document.addEventListener('click', function () {
+      wrap.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+  })();
+
+  var hwTabs = document.getElementById('perfHwDrawerTabs');
+  if (hwTabs) {
+    hwTabs.querySelectorAll('[data-hw-tab]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        setHwDrawerTab(btn.getAttribute('data-hw-tab'));
+      });
+    });
+  }
+
+  if (hwDrawer) {
+    hwDrawer.querySelectorAll('[data-hw-close]').forEach(function (x) {
+      x.addEventListener('click', closeHwDrawer);
+    });
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (hwDrawer && hwDrawer.classList.contains('is-open')) {
+      if (hwDetailView && hwDetailView.classList.contains('is-active')) {
+        showHwListView();
+      } else {
+        closeHwDrawer();
+      }
+      return;
+    }
+    if (topicDrawer && topicDrawer.classList.contains('is-open')) closeTopicDrawer();
+    else if (drawer && drawer.classList.contains('is-open')) closeSubjDrawer();
+  });
+
+})();
+</script>
+
+<!-- Paylaşılan inbox + chat sistemi -->
+<script src="assets/assessment.js"></script>
+<script src="assets/inbox.js"></script>
+
+</body>
+</html>

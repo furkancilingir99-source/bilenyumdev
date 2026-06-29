@@ -1,0 +1,2482 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Bilenyum'a Hoş Geldin — Onboarding</title>
+<meta name="description" content="Bilenyum eğitim deneyimini sana özel hâle getirelim: öğrenci, veli ve okul bilgilerini birkaç adımda ekle." />
+<link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%233e3a8e'/%3E%3Ctext x='50' y='65' text-anchor='middle' font-family='Inter,system-ui,sans-serif' font-size='62' font-weight='900' fill='white' letter-spacing='-3'%3Eb%3C/text%3E%3C/svg%3E" />
+<link rel="stylesheet" href="assets/tokens.css">
+
+<style>
+  :root {
+    /* Onboarding-only token: sayfa zemini için açık tema.
+       Kanonik --bg-1 'dark navy' anlamı taşıdığı için isim karışmasın diye
+       kendi semantik adıyla tanımlandı. Diğer tüm değişkenler tokens.css'ten
+       kanonik değerlerle gelir (önceki override'lar ya kullanılmıyordu ya da
+       fark görsel olarak fark edilmeyecek 2-3 piksel idi). */
+    --ob-bg-page: white;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--ob-bg-page);
+    color: var(--ink-dark-0);
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; }
+
+  /* ============ TOPBAR (Bilenyum logo only) ============ */
+  .ob-topbar {
+    background: white;
+    border-bottom: 1px solid rgba(20,22,50,0.04);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .ob-topbar-logo { display: inline-flex; }
+  .ob-topbar-logo img { height: 32px; width: auto; display: block; }
+
+  /* ============ MAIN ============ */
+  .ob-main {
+    flex: 1;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 48px 28px 80px;
+    display: flex; flex-direction: column;
+  }
+
+  /* ============ STEP INDICATOR ============ */
+  .ob-stepper {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0;
+    margin-bottom: 42px;
+  }
+  .ob-step-node {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px;
+    position: relative;
+    min-width: 88px;
+  }
+  .ob-step-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid rgba(40,38,90,0.18);
+    color: var(--ink-dark-2);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 800;
+    transition: all 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+    position: relative;
+    z-index: 2;
+  }
+  .ob-step-label {
+    font-size: 12px; font-weight: 700;
+    color: var(--ink-dark-2);
+    letter-spacing: 0.02em;
+    transition: color 0.25s ease;
+    white-space: nowrap;
+  }
+  /* Active state */
+  .ob-step-node.is-active .ob-step-dot {
+    background: var(--p-purple);
+    border-color: var(--p-purple);
+    color: white;
+    box-shadow: 0 0 0 4px rgba(62,58,142,0.14);
+  }
+  .ob-step-node.is-active .ob-step-label {
+    color: var(--p-purple);
+    font-weight: 800;
+  }
+  /* Done state (filled w/ check) */
+  .ob-step-node.is-done .ob-step-dot {
+    background: var(--p-purple);
+    border-color: var(--p-purple);
+    color: white;
+  }
+  .ob-step-node.is-done .ob-step-dot .ob-step-num { display: none; }
+  .ob-step-node.is-done .ob-step-dot .ob-step-check { display: inline-block; }
+  .ob-step-node:not(.is-done) .ob-step-dot .ob-step-check { display: none; }
+  .ob-step-dot .ob-step-check { width: 14px; height: 14px; }
+  .ob-step-node.is-done .ob-step-label { color: var(--ink-dark-0); }
+
+  /* Connector line */
+  .ob-step-line {
+    flex: 1; max-width: 80px;
+    height: 2px;
+    background: rgba(40,38,90,0.14);
+    margin: 0 -12px; /* overlap with dots */
+    margin-top: -19px; /* align to dot center (32 + 8 + 12/2 ish) */
+    position: relative;
+    transition: background 0.3s ease;
+  }
+  .ob-step-line.is-active {
+    background: var(--p-purple);
+  }
+
+  /* ============ STEP PANELS ============ */
+  .ob-panel {
+    animation: obPanelIn 0.42s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .ob-panel[hidden] { display: none; }
+  @keyframes obPanelIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .ob-panel-head {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .ob-title {
+    font-size: 26px; font-weight: 800;
+    color: var(--ink-dark-0);
+    line-height: 1.25;
+    margin: 0 0 10px;
+    letter-spacing: -0.012em;
+  }
+  .ob-sub {
+    font-size: 14px; font-weight: 500;
+    color: var(--ink-dark-1);
+    line-height: 1.55;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ============ FORM ============ */
+  .ob-form { display: flex; flex-direction: column; gap: 18px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .form-field > label {
+    font-size: 13px; font-weight: 600;
+    color: var(--ink-dark-1);
+  }
+  .form-field-input { position: relative; display: flex; align-items: center; }
+  .form-field-input .field-icon {
+    position: absolute; left: 16px;
+    width: 18px; height: 18px;
+    color: var(--ink-dark-2);
+    pointer-events: none;
+  }
+  .form-field input,
+  .form-field select {
+    width: 100%; height: 52px;
+    padding: 0 16px 0 46px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(40,38,90,0.12);
+    background: white;
+    color: var(--ink-dark-0);
+    font-family: inherit; font-size: 15px;
+    outline: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+  .form-field input.no-icon,
+  .form-field select.no-icon { padding-left: 16px; }
+  .form-field input::placeholder { color: var(--ink-dark-2); }
+  .form-field input:focus,
+  .form-field select:focus {
+    border-color: var(--p-purple);
+    box-shadow: 0 0 0 4px rgba(62,58,142,0.12);
+  }
+  .form-field select {
+    appearance: none; -webkit-appearance: none; -moz-appearance: none;
+    cursor: pointer;
+    padding-right: 44px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23797ea6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 18px;
+  }
+  .form-field select:invalid { color: var(--ink-dark-2); }
+  .form-field select option { color: var(--ink-dark-0); }
+  .form-field select option[disabled] { color: var(--ink-dark-2); }
+  .form-field select::-ms-expand { display: none; }
+
+  /* Help/hint text */
+  .form-hint {
+    font-size: 12px; font-weight: 500;
+    color: var(--ink-dark-2);
+    margin-top: -2px;
+  }
+
+  /* Radio group (segmented pill style) */
+  .form-radio-group {
+    display: flex; flex-wrap: wrap;
+    gap: 8px;
+  }
+  .form-radio-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    cursor: pointer;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: white;
+    border: 1.5px solid rgba(40,38,90,0.14);
+    font-size: 13px; font-weight: 700;
+    color: var(--ink-dark-1);
+    transition: all 0.15s ease;
+  }
+  .form-radio-pill input { position: absolute; opacity: 0; pointer-events: none; }
+  .form-radio-pill:hover { border-color: rgba(62,58,142,0.32); color: var(--p-purple); }
+  .form-radio-pill.is-checked,
+  .form-radio-pill:has(input:checked) {
+    background: var(--p-purple);
+    border-color: var(--p-purple);
+    color: white;
+  }
+
+  /* ============ Smooth reveal (used by school name) ============ */
+  .ob-reveal-wrap {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin-top: -18px; /* counter the parent .ob-form { gap: 18px } */
+    transform: translateY(-6px);
+    transition: max-height 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+                opacity 0.4s ease,
+                transform 0.4s ease,
+                margin-top 0.4s ease;
+  }
+  .ob-reveal-wrap.show {
+    max-height: 120px;
+    opacity: 1;
+    margin-top: 0;
+    transform: translateY(0);
+  }
+
+  /* ============ School type cards (3-col compact) ============ */
+  .school-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .school-card {
+    position: relative;
+    cursor: pointer;
+    background: white;
+    border: 1.5px solid rgba(40,38,90,0.12);
+    border-radius: 14px;
+    padding: 12px 44px 12px 12px;
+    display: flex; flex-direction: row; align-items: center;
+    gap: 12px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease, background 0.18s ease;
+    overflow: hidden;
+  }
+  .school-card input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0; height: 0;
+  }
+  .school-card:hover {
+    border-color: rgba(62,58,142,0.32);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px -16px rgba(40,38,90,0.28);
+  }
+  .school-card-thumb {
+    display: block;
+    flex-shrink: 0;
+    width: 52px; height: 52px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(62,58,142,0.04);
+  }
+  .school-card-thumb svg { width: 100%; height: 100%; display: block; }
+  .school-card-label {
+    flex: 1;
+    font-size: 14px; font-weight: 700;
+    color: var(--ink-dark-0);
+    text-align: left;
+    letter-spacing: 0.005em;
+  }
+  .school-card-check {
+    position: absolute;
+    top: 50%; right: 12px;
+    transform: translateY(-50%);
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: white;
+    border: 1.5px solid rgba(40,38,90,0.20);
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all 0.18s ease;
+  }
+  .school-card-check svg { width: 12px; height: 12px; opacity: 0; transition: opacity 0.18s ease; }
+  .school-card.is-checked,
+  .school-card:has(input:checked) {
+    border-color: var(--p-purple);
+    background: rgba(62,58,142,0.03);
+    box-shadow: 0 0 0 3px rgba(62,58,142,0.10);
+  }
+  .school-card.is-checked .school-card-check,
+  .school-card:has(input:checked) .school-card-check {
+    background: var(--p-purple);
+    border-color: var(--p-purple);
+  }
+  .school-card.is-checked .school-card-check svg,
+  .school-card:has(input:checked) .school-card-check svg {
+    opacity: 1;
+  }
+
+  /* ============ Step 1 — Sınıf pill butonları (dropdown yerine) ============ */
+  .ob-grade-pills {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  }
+  .ob-grade-pill {
+    position: relative;
+    cursor: pointer;
+    background: white;
+    border: 1.5px solid rgba(40,38,90,0.12);
+    border-radius: 12px;
+    padding: 12px 8px;
+    text-align: center;
+    font-size: 13.5px; font-weight: 700;
+    color: var(--ink-dark-0);
+    font-family: inherit;
+    transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, transform 0.18s ease, box-shadow 0.2s ease;
+  }
+  .ob-grade-pill input {
+    position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0;
+  }
+  .ob-grade-pill:hover {
+    border-color: rgba(62,58,142,0.32);
+    background: rgba(62,58,142,0.04);
+    transform: translateY(-1px);
+  }
+  .ob-grade-pill.is-checked,
+  .ob-grade-pill:has(input:checked) {
+    background: linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 8px 18px -8px rgba(62,58,142,0.45);
+  }
+  @media (max-width: 560px) {
+    .ob-grade-pills { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ============ Step 4 — Haftalık Program kartları (yatay, alt alta) ============ */
+  /* Önemli bilgi alanı — dönem boyu sabit program seçimi hatırlatması */
+  .ob-prog-info {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: rgba(255,181,71,0.10);
+    border: 1px solid rgba(255,181,71,0.32);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin: 0 0 16px;
+    color: var(--ink-dark-1);
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .ob-prog-info-icon {
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffb547, #d68808);
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px -2px rgba(214,136,8,0.40);
+  }
+  .ob-prog-info-icon svg { width: 14px; height: 14px; }
+  .ob-prog-info strong { color: var(--ink-dark-0); font-weight: 700; }
+
+  .ob-prog-cards {
+    display: flex; flex-direction: column;
+    gap: 10px;
+  }
+  .ob-prog-card {
+    position: relative;
+    cursor: pointer;
+    background: white;
+    border: 1.5px solid rgba(40,38,90,0.12);
+    border-radius: 14px;
+    padding: 14px 50px 14px 16px;
+    display: flex; gap: 16px;
+    align-items: center;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease, background 0.18s ease;
+  }
+  .ob-prog-card input {
+    position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0;
+  }
+  .ob-prog-card:hover {
+    border-color: rgba(62,58,142,0.32);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -16px rgba(40,38,90,0.30);
+  }
+  .ob-prog-card.is-checked,
+  .ob-prog-card:has(input:checked) {
+    border-color: var(--p-purple);
+    background: rgba(62,58,142,0.03);
+    box-shadow: 0 0 0 3px rgba(62,58,142,0.10);
+  }
+  .ob-prog-check {
+    position: absolute;
+    top: 50%; right: 14px;
+    transform: translateY(-50%);
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: white;
+    border: 1.5px solid rgba(40,38,90,0.20);
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all 0.18s ease;
+  }
+  .ob-prog-check svg { width: 12px; height: 12px; opacity: 0; transition: opacity 0.18s ease; }
+  .ob-prog-card.is-checked .ob-prog-check,
+  .ob-prog-card:has(input:checked) .ob-prog-check {
+    background: var(--p-purple);
+    border-color: var(--p-purple);
+  }
+  .ob-prog-card.is-checked .ob-prog-check svg,
+  .ob-prog-card:has(input:checked) .ob-prog-check svg {
+    opacity: 1;
+  }
+  .ob-prog-icon {
+    flex-shrink: 0;
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: white;
+  }
+  .ob-prog-icon svg { width: 22px; height: 22px; }
+  .ob-prog-icon-1 { background: linear-gradient(135deg, #ffb547, #d68808); }
+  .ob-prog-icon-2 { background: linear-gradient(135deg, var(--p-purple), var(--p-deep)); }
+  .ob-prog-icon-3 { background: linear-gradient(135deg, #4ad6ff, #1c8fb5); }
+  .ob-prog-icon-4 { background: linear-gradient(135deg, var(--p-brand), var(--p-brand-deep)); }
+  .ob-prog-body {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .ob-prog-name {
+    font-size: 15.5px; font-weight: 800;
+    color: var(--ink-dark-0);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .ob-prog-meta {
+    display: flex; align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--ink-dark-1);
+  }
+  .ob-prog-days, .ob-prog-time, .ob-prog-lessons {
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .ob-prog-days svg,
+  .ob-prog-time svg,
+  .ob-prog-lessons svg {
+    width: 13px; height: 13px;
+    flex-shrink: 0;
+  }
+  .ob-prog-days { color: var(--ink-dark-1); }
+  .ob-prog-days svg { color: #1c8fb5; }
+  .ob-prog-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 700;
+    color: var(--p-purple);
+    white-space: nowrap;
+  }
+  .ob-prog-time svg { color: var(--p-purple); }
+  .ob-prog-lessons { color: var(--ink-dark-1); }
+  .ob-prog-lessons svg { color: var(--p-brand); }
+  .ob-prog-lessons strong { color: var(--ink-dark-0); font-weight: 700; }
+  .ob-prog-link {
+    flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(62,58,142,0.06);
+    border: 1px solid rgba(62,58,142,0.16);
+    color: var(--p-purple);
+    font-family: inherit; font-size: 12.5px; font-weight: 700;
+    cursor: pointer;
+    padding: 7px 12px;
+    border-radius: 999px;
+    transition: background 0.18s ease, color 0.15s ease, border-color 0.18s ease;
+  }
+  .ob-prog-link:hover {
+    background: var(--p-purple);
+    color: white;
+    border-color: var(--p-purple);
+  }
+  .ob-prog-link svg { width: 12px; height: 12px; }
+
+  /* ============ Program Detail Overlay ============ */
+  .ob-prog-overlay {
+    position: fixed; inset: 0;
+    z-index: 9000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px 16px;
+  }
+  .ob-prog-overlay[hidden] { display: none; }
+  .ob-prog-overlay-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(15, 12, 35, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: obProgOverlayIn 0.25s ease;
+  }
+  @keyframes obProgOverlayIn { from { opacity: 0; } to { opacity: 1; } }
+  .ob-prog-overlay-card {
+    position: relative;
+    width: calc(100vw - 32px);
+    max-width: 1320px;
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 30px 80px -20px rgba(15,12,35,0.55);
+    padding: 28px 28px 24px;
+    animation: obProgCardIn 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  @keyframes obProgCardIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .ob-prog-overlay-close {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: rgba(20,22,50,0.05);
+    border: none;
+    color: var(--ink-dark-1);
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .ob-prog-overlay-close:hover {
+    background: rgba(229,4,123,0.10);
+    color: var(--p-brand);
+  }
+  .ob-prog-overlay-close svg { width: 16px; height: 16px; }
+  .ob-prog-overlay-head { margin-bottom: 20px; padding-right: 50px; }
+  .ob-prog-overlay-head h2 {
+    font-size: 22px; font-weight: 800;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.015em;
+    margin: 0 0 4px;
+  }
+  .ob-prog-overlay-head p {
+    font-size: 13.5px; color: var(--ink-dark-1);
+    margin: 0;
+  }
+  .ob-prog-overlay-tabs {
+    display: flex; gap: 6px;
+    margin-bottom: 18px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+  .ob-prog-tab {
+    flex-shrink: 0;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: rgba(62,58,142,0.06);
+    border: 1px solid transparent;
+    color: var(--ink-dark-1);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.18s ease, color 0.18s ease;
+  }
+  .ob-prog-tab:hover { background: rgba(62,58,142,0.12); color: var(--p-deep); }
+  .ob-prog-tab.is-active {
+    background: linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    color: white;
+    box-shadow: 0 6px 14px -6px rgba(62,58,142,0.45);
+  }
+
+  .ob-prog-overlay-panel { display: none; }
+  .ob-prog-overlay-panel.is-active { display: block; animation: obProgPanelIn 0.28s ease; }
+  @keyframes obProgPanelIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Schedule component — paket-detay ile aynı */
+  .sch-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;
+  }
+  .sch-day {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 12px;
+    padding: 12px 8px;
+    display: flex; flex-direction: column; gap: 10px;
+    min-height: 200px;
+  }
+  .sch-day-head {
+    text-align: center;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(20,22,50,0.08);
+  }
+  .sch-day-head strong {
+    display: block;
+    font-size: 12.5px; font-weight: 700;
+    color: var(--ink-dark-0);
+    margin-bottom: 2px;
+  }
+  .sch-day-head small {
+    font-size: 11px;
+    color: var(--ink-dark-2);
+    font-weight: 500;
+  }
+  .sch-day-body {
+    display: flex; flex-direction: column;
+    gap: 6px;
+    flex: 1;
+  }
+  .sch-lesson {
+    background: #f4eeff;
+    border: 1px solid rgba(62,58,142,0.14);
+    border-radius: 9px;
+    padding: 8px 9px;
+    display: flex; flex-direction: column; gap: 4px;
+    transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+  }
+  .sch-lesson:hover {
+    background: #ece4ff;
+    border-color: rgba(62,58,142,0.30);
+    transform: translateY(-1px);
+  }
+  .sch-lesson-time {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px; font-weight: 700;
+    color: var(--p-brand);
+    align-self: flex-start;
+    white-space: nowrap;
+  }
+  .sch-lesson-time svg { width: 10px; height: 10px; flex-shrink: 0; }
+  .sch-lesson-name {
+    font-size: 13px; font-weight: 700;
+    color: var(--ink-dark-0);
+    line-height: 1.3;
+    margin: 0;
+  }
+  .sch-lesson-meta {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10.5px;
+    color: var(--ink-dark-2);
+  }
+  .sch-lesson-meta svg { width: 10px; height: 10px; flex-shrink: 0; opacity: 0.7; }
+  .sch-day-empty {
+    font-size: 11.5px;
+    color: var(--ink-dark-2);
+    text-align: center;
+    padding: 24px 6px;
+    line-height: 1.5;
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sch-legend {
+    margin-top: 18px;
+    padding: 13px 16px;
+    background: rgba(62,58,142,0.05);
+    border: none;
+    border-radius: 11px;
+    display: flex; align-items: center;
+    gap: 10px 24px;
+    flex-wrap: wrap;
+  }
+  .sch-legend-item {
+    display: inline-flex; align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--ink-dark-1);
+    line-height: 1.4;
+  }
+  .sch-legend-item svg {
+    width: 13px; height: 13px;
+    flex-shrink: 0;
+  }
+  .sch-legend-item:nth-child(1) svg { color: #1c8fb5; }
+  .sch-legend-item:nth-child(2) svg { color: #2a8a5a; }
+  .sch-legend-item:nth-child(3) svg { color: var(--p-brand); }
+  .sch-legend-item strong { color: var(--ink-dark-0); font-weight: 700; }
+
+  @media (max-width: 760px) {
+    .ob-prog-card {
+      flex-wrap: wrap;
+      padding: 14px 44px 14px 14px;
+      gap: 12px;
+    }
+    .ob-prog-body { flex-basis: calc(100% - 60px); }
+    .ob-prog-link {
+      margin-left: 60px;
+      flex-basis: calc(100% - 60px);
+      justify-content: center;
+    }
+    .ob-prog-overlay-card { padding: 22px 18px 18px; }
+    .sch-grid { grid-template-columns: repeat(2, 1fr); }
+    .sch-day { min-height: auto; }
+  }
+  @media (max-width: 1080px) {
+    .sch-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  /* Gender thumbnail cards — yatay yan yana (form yüksekliği azalır) */
+  .gender-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .gender-card {
+    position: relative;
+    cursor: pointer;
+    background: white;
+    border: 1.5px solid rgba(40,38,90,0.12);
+    border-radius: 14px;
+    padding: 12px 44px 12px 12px;
+    display: flex; flex-direction: row; align-items: center;
+    gap: 12px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease, background 0.18s ease;
+    overflow: hidden;
+  }
+  .gender-card input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0; height: 0;
+  }
+  .gender-card:hover {
+    border-color: rgba(62,58,142,0.32);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px -16px rgba(40,38,90,0.28);
+  }
+  .gender-card-thumb {
+    display: block;
+    flex-shrink: 0;
+    width: 52px; height: 52px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(62,58,142,0.04);
+  }
+  .gender-card-thumb svg { width: 100%; height: 100%; display: block; }
+  .gender-card-label {
+    flex: 1;
+    font-size: 14px; font-weight: 700;
+    color: var(--ink-dark-0);
+    letter-spacing: 0.005em;
+    text-align: left;
+  }
+  /* Check indicator — center right */
+  .gender-card-check {
+    position: absolute;
+    top: 50%; right: 12px;
+    transform: translateY(-50%);
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: white;
+    border: 1.5px solid rgba(40,38,90,0.20);
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all 0.18s ease;
+  }
+  .gender-card-check svg { width: 12px; height: 12px; opacity: 0; transition: opacity 0.18s ease; }
+  /* Selected state */
+  .gender-card.is-checked,
+  .gender-card:has(input:checked) {
+    border-color: var(--p-purple);
+    background: rgba(62,58,142,0.03);
+    box-shadow: 0 0 0 3px rgba(62,58,142,0.10);
+  }
+  .gender-card.is-checked .gender-card-check,
+  .gender-card:has(input:checked) .gender-card-check {
+    background: var(--p-purple);
+    border-color: var(--p-purple);
+  }
+  .gender-card.is-checked .gender-card-check svg,
+  .gender-card:has(input:checked) .gender-card-check svg {
+    opacity: 1;
+  }
+
+  /* ============ ACTIONS ============ */
+  .ob-actions {
+    margin-top: 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .ob-actions.has-back { justify-content: space-between; }
+  .ob-actions:not(.has-back) { justify-content: flex-end; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px;
+    border: 0; cursor: pointer;
+    font-family: inherit;
+    font-size: 14.5px; font-weight: 700;
+    border-radius: 12px;
+    padding: 13px 22px;
+    transition: transform 0.12s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    text-decoration: none;
+  }
+  .btn svg { width: 18px; height: 18px; }
+  .btn-primary {
+    background: var(--p-purple);
+    color: white;
+    box-shadow: 0 10px 24px -10px rgba(62,58,142,0.55);
+  }
+  .btn-primary:hover { background: #2f2b73; box-shadow: 0 14px 30px -10px rgba(62,58,142,0.65); }
+  .btn-primary:active { transform: translateY(1px); }
+  .btn-primary:disabled,
+  .btn-primary.is-disabled {
+    background: rgba(62,58,142,0.30);
+    box-shadow: none;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-dark-1);
+    border: 1.5px solid rgba(40,38,90,0.12);
+  }
+  .btn-ghost:hover { background: rgba(62,58,142,0.05); color: var(--p-purple); border-color: rgba(62,58,142,0.32); }
+  .btn-skip {
+    background: transparent;
+    color: var(--ink-dark-2);
+    padding: 13px 14px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .btn-skip:hover { color: var(--p-purple); }
+
+  /* ============ ONBOARDING PROCESSING OVERLAY ============ */
+  .ob-processing {
+    position: fixed; inset: 0; z-index: 600;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 48px;
+    background: rgba(244,242,252,0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    animation: obPpFadeIn 0.32s ease both;
+    padding: 24px;
+  }
+  .ob-processing[hidden] { display: none; }
+  @keyframes obPpFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .ob-pp-visual {
+    position: relative;
+    width: 220px; height: 220px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ob-pp-ring {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    border: 2px solid var(--p-purple);
+    opacity: 0;
+    animation: obPpRing 2.8s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  }
+  .ob-pp-ring:nth-child(2) { animation-delay: 0.93s; }
+  .ob-pp-ring:nth-child(3) { animation-delay: 1.86s; }
+  @keyframes obPpRing {
+    0%   { transform: scale(0.30); opacity: 0; border-width: 3px; }
+    18%  { opacity: 0.55; }
+    100% { transform: scale(1); opacity: 0; border-width: 0.5px; }
+  }
+  .ob-pp-halo {
+    position: absolute; width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(62,58,142,0.22) 0%, rgba(62,58,142,0) 70%);
+    filter: blur(8px);
+    animation: obPpHalo 2.4s ease-in-out infinite;
+  }
+  @keyframes obPpHalo {
+    0%, 100% { transform: scale(1);    opacity: 0.8; }
+    50%      { transform: scale(1.18); opacity: 1; }
+  }
+  .ob-pp-orbit {
+    position: absolute; width: 150px; height: 150px;
+    animation: obPpOrbit 3.6s linear infinite;
+  }
+  .ob-pp-orbit-dot {
+    position: absolute; top: -4px; left: 50%;
+    transform: translateX(-50%);
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--p-brand);
+  }
+  @keyframes obPpOrbit { to { transform: rotate(360deg); } }
+
+  .ob-pp-icon {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--p-purple);
+    animation: obPpIconFloat 3.2s ease-in-out infinite;
+  }
+  .ob-pp-icon svg {
+    width: 80px; height: 80px;
+    filter: drop-shadow(0 12px 24px rgba(62,58,142,0.25));
+  }
+  @keyframes obPpIconFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-4px); }
+  }
+
+  .ob-pp-text-wrap {
+    text-align: center;
+    max-width: 460px;
+    animation: obPpStageIn 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  @keyframes obPpStageIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .ob-pp-text {
+    font-size: 24px; font-weight: 800;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.012em;
+    line-height: 1.25;
+  }
+  .ob-pp-substep {
+    font-size: 14.5px; font-weight: 500;
+    color: var(--ink-dark-1);
+    margin-top: 10px;
+    line-height: 1.55;
+  }
+
+  /* ============ FINAL STATE (legacy — kept for fallback) ============ */
+  .ob-final {
+    text-align: center;
+    padding: 40px 0 24px;
+    animation: obPanelIn 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .ob-final[hidden] { display: none; }
+  .ob-final-icon {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6dd49e 0%, #4caf80 100%);
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin: 0 auto 22px;
+    box-shadow: 0 18px 36px -12px rgba(76,175,128,0.50);
+    animation: obFinalPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation-delay: 0.1s;
+  }
+  .ob-final-icon svg { width: 46px; height: 46px; }
+  @keyframes obFinalPop {
+    0%   { transform: scale(0.4); opacity: 0; }
+    60%  { transform: scale(1.12); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+  .ob-final-title {
+    font-size: 28px; font-weight: 800;
+    color: var(--ink-dark-0);
+    line-height: 1.25;
+    margin: 0 0 12px;
+    letter-spacing: -0.012em;
+  }
+  .ob-final-sub {
+    font-size: 15px; font-weight: 500;
+    color: var(--ink-dark-1);
+    line-height: 1.55;
+    max-width: 460px;
+    margin: 0 auto 32px;
+  }
+
+  /* ============ TOAST ============ */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(28px);
+    background: var(--p-deep);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 13.5px; font-weight: 600;
+    box-shadow: 0 16px 36px -12px rgba(20,22,50,0.40);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 700;
+    transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+  .toast.error { background: #c12c5b; }
+  .toast svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 720px) {
+    .ob-topbar { padding: 12px 20px; }
+    .ob-topbar-logo img { height: 28px; }
+    .ob-main { padding: 32px 18px 60px; }
+    .ob-stepper { margin-bottom: 30px; gap: 0; }
+    .ob-step-node { min-width: 70px; }
+    .ob-step-label { font-size: 11px; }
+    .ob-step-line { max-width: 40px; }
+    .ob-title { font-size: 22px; }
+    .ob-sub { font-size: 13.5px; }
+    .form-row { grid-template-columns: 1fr; }
+    .ob-actions { flex-direction: column-reverse; align-items: stretch; }
+    .ob-actions .btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Minimal topbar: logo only -->
+<header class="ob-topbar">
+  <a href="index.html" class="ob-topbar-logo" aria-label="Bilenyum anasayfa">
+    <img src="assets/bilenyum-logo.svg" alt="Bilenyum" />
+  </a>
+</header>
+
+<main class="ob-main">
+
+  <!-- Step indicator -->
+  <div class="ob-stepper" role="progressbar" aria-label="Onboarding ilerleme">
+    <div class="ob-step-node is-active" data-step="1">
+      <div class="ob-step-dot">
+        <span class="ob-step-num">1</span>
+        <svg class="ob-step-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="ob-step-label">Öğrenci</div>
+    </div>
+    <div class="ob-step-line" data-line="1"></div>
+    <div class="ob-step-node" data-step="2">
+      <div class="ob-step-dot">
+        <span class="ob-step-num">2</span>
+        <svg class="ob-step-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="ob-step-label">Veli</div>
+    </div>
+    <div class="ob-step-line" data-line="2"></div>
+    <div class="ob-step-node" data-step="3">
+      <div class="ob-step-dot">
+        <span class="ob-step-num">3</span>
+        <svg class="ob-step-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="ob-step-label">Okul</div>
+    </div>
+    <div class="ob-step-line" data-line="3"></div>
+    <div class="ob-step-node" data-step="4">
+      <div class="ob-step-dot">
+        <span class="ob-step-num">4</span>
+        <svg class="ob-step-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="ob-step-label">Program</div>
+    </div>
+  </div>
+
+  <!-- ============ STEP 1: ÖĞRENCİ ============ -->
+  <section class="ob-panel" id="obPanel1">
+    <div class="ob-panel-head">
+      <h1 class="ob-title">Öğrenciyi Tanıyalım</h1>
+      <p class="ob-sub">Bu bilgilerle Bilenyum'u sana özel uyarlıyoruz; dersleri, hedefleri ve yol haritanı buna göre kuruyoruz.</p>
+    </div>
+
+    <form class="ob-form" id="obForm1" autocomplete="on" novalidate>
+      <!-- Gender (thumbnail cards) — first, prominent choice -->
+      <div class="form-field">
+        <label>Öğrenci</label>
+        <div class="gender-cards" id="genderCards">
+          <label class="gender-card" data-gender="kiz">
+            <input type="radio" name="ob-s-gender" value="kiz" required />
+            <span class="gender-card-thumb">
+              <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gcKizBg" x1="0" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#fce4f3"/>
+                    <stop offset="100%" stop-color="#f4cce4"/>
+                  </linearGradient>
+                  <linearGradient id="gcKizDress" x1="60" y1="60" x2="60" y2="120" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#e5047b"/>
+                    <stop offset="100%" stop-color="#a30358"/>
+                  </linearGradient>
+                </defs>
+                <!-- Background -->
+                <rect width="120" height="120" rx="14" fill="url(#gcKizBg)"/>
+                <!-- Soft stars -->
+                <circle cx="22" cy="22" r="1.6" fill="#fff" opacity="0.85"/>
+                <circle cx="100" cy="30" r="2" fill="#fff" opacity="0.7"/>
+                <circle cx="14" cy="60" r="1.2" fill="#fff" opacity="0.55"/>
+                <circle cx="106" cy="78" r="1.4" fill="#fff" opacity="0.55"/>
+                <!-- Hair back -->
+                <path d="M36 56 C36 40, 48 26, 60 26 C72 26, 84 40, 84 56 L84 80 C84 80, 82 78, 76 78 L44 78 C38 78, 36 80, 36 80 Z" fill="#4a2c1f"/>
+                <!-- Face -->
+                <circle cx="60" cy="50" r="14" fill="#fce4cf"/>
+                <!-- Hair fringe -->
+                <path d="M46 44 C48 36, 56 32, 60 32 C64 32, 72 36, 74 44 C70 42, 64 41, 60 41 C56 41, 50 42, 46 44 Z" fill="#4a2c1f"/>
+                <!-- Cheeks -->
+                <circle cx="52" cy="55" r="2" fill="#f7b3c6" opacity="0.7"/>
+                <circle cx="68" cy="55" r="2" fill="#f7b3c6" opacity="0.7"/>
+                <!-- Eyes -->
+                <circle cx="54" cy="51" r="1.6" fill="#1a1842"/>
+                <circle cx="66" cy="51" r="1.6" fill="#1a1842"/>
+                <!-- Smile -->
+                <path d="M55 58 Q60 62, 65 58" stroke="#1a1842" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                <!-- Neck + body (school uniform shape) -->
+                <rect x="56" y="62" width="8" height="6" fill="#fce4cf"/>
+                <path d="M40 116 L40 92 C40 80, 48 72, 60 72 C72 72, 80 80, 80 92 L80 116 Z" fill="url(#gcKizDress)"/>
+                <!-- Collar -->
+                <path d="M52 72 L60 80 L68 72" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <!-- Bow accent -->
+                <circle cx="60" cy="86" r="2.5" fill="#fff"/>
+                <!-- Book in hand -->
+                <rect x="34" y="92" width="12" height="14" rx="1" fill="#3e3a8e"/>
+                <rect x="36" y="94" width="8" height="1.5" fill="#fff" opacity="0.7"/>
+                <rect x="36" y="97" width="6" height="1.5" fill="#fff" opacity="0.5"/>
+              </svg>
+            </span>
+            <span class="gender-card-label">Kız Öğrenci</span>
+            <span class="gender-card-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+          </label>
+
+          <label class="gender-card" data-gender="erkek">
+            <input type="radio" name="ob-s-gender" value="erkek" required />
+            <span class="gender-card-thumb">
+              <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gcErkekBg" x1="0" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#e5e3f8"/>
+                    <stop offset="100%" stop-color="#cfcae8"/>
+                  </linearGradient>
+                  <linearGradient id="gcErkekShirt" x1="60" y1="60" x2="60" y2="120" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#3e3a8e"/>
+                    <stop offset="100%" stop-color="#28265a"/>
+                  </linearGradient>
+                </defs>
+                <!-- Background -->
+                <rect width="120" height="120" rx="14" fill="url(#gcErkekBg)"/>
+                <!-- Soft stars -->
+                <circle cx="100" cy="22" r="1.6" fill="#fff" opacity="0.85"/>
+                <circle cx="22" cy="34" r="2" fill="#fff" opacity="0.7"/>
+                <circle cx="108" cy="60" r="1.2" fill="#fff" opacity="0.55"/>
+                <circle cx="14" cy="78" r="1.4" fill="#fff" opacity="0.55"/>
+                <!-- Hair -->
+                <path d="M46 44 C46 34, 52 28, 60 28 C68 28, 74 34, 74 44 L74 50 C70 42, 64 41, 60 41 C56 41, 50 42, 46 50 Z" fill="#2a1810"/>
+                <!-- Face -->
+                <circle cx="60" cy="50" r="14" fill="#fce4cf"/>
+                <!-- Hair top accent -->
+                <path d="M50 42 C54 38, 58 36, 62 38 C66 36, 70 40, 72 44 C68 41, 64 40, 60 40 C56 40, 52 41, 50 42 Z" fill="#1f110a"/>
+                <!-- Cheeks -->
+                <circle cx="52" cy="55" r="1.8" fill="#f7b3c6" opacity="0.55"/>
+                <circle cx="68" cy="55" r="1.8" fill="#f7b3c6" opacity="0.55"/>
+                <!-- Eyes -->
+                <circle cx="54" cy="51" r="1.6" fill="#1a1842"/>
+                <circle cx="66" cy="51" r="1.6" fill="#1a1842"/>
+                <!-- Smile -->
+                <path d="M55 58 Q60 62, 65 58" stroke="#1a1842" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                <!-- Neck + body -->
+                <rect x="56" y="62" width="8" height="6" fill="#fce4cf"/>
+                <path d="M40 116 L40 92 C40 80, 48 72, 60 72 C72 72, 80 80, 80 92 L80 116 Z" fill="url(#gcErkekShirt)"/>
+                <!-- Tie -->
+                <path d="M58 72 L60 78 L62 72 L62 88 L60 92 L58 88 Z" fill="#e5047b"/>
+                <!-- Backpack strap -->
+                <path d="M44 76 L44 100" stroke="#1a1842" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+                <!-- Book in hand -->
+                <rect x="78" y="92" width="12" height="14" rx="1" fill="#e5047b"/>
+                <rect x="80" y="94" width="8" height="1.5" fill="#fff" opacity="0.7"/>
+                <rect x="80" y="97" width="6" height="1.5" fill="#fff" opacity="0.5"/>
+              </svg>
+            </span>
+            <span class="gender-card-label">Erkek Öğrenci</span>
+            <span class="gender-card-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="ob-s-name">Ad</label>
+          <div class="form-field-input">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="ob-s-name" required placeholder="Adın" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="ob-s-surname">Soyad</label>
+          <div class="form-field-input">
+            <input type="text" id="ob-s-surname" class="no-icon" required placeholder="Soyadın" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>Sınıf</label>
+        <div class="ob-grade-pills" role="radiogroup" aria-label="Sınıf">
+          <label class="ob-grade-pill">
+            <input type="radio" name="ob-s-grade" value="5" required />
+            5. Sınıf
+          </label>
+          <label class="ob-grade-pill">
+            <input type="radio" name="ob-s-grade" value="6" required />
+            6. Sınıf
+          </label>
+          <label class="ob-grade-pill">
+            <input type="radio" name="ob-s-grade" value="7" required />
+            7. Sınıf
+          </label>
+          <label class="ob-grade-pill">
+            <input type="radio" name="ob-s-grade" value="8" required />
+            8. Sınıf (LGS)
+          </label>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="ob-s-birth">Doğum tarihi</label>
+        <div class="form-field-input">
+          <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <input type="date" id="ob-s-birth" />
+        </div>
+      </div>
+    </form>
+
+    <div class="ob-actions">
+      <button type="button" class="btn btn-primary" data-next-step="1">
+        İleri
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 2: VELİ ============ -->
+  <section class="ob-panel" id="obPanel2" hidden>
+    <div class="ob-panel-head">
+      <h1 class="ob-title">Veli Bilgileri</h1>
+      <p class="ob-sub">Süreci birlikte yürüteceğimiz veli iletişim bilgilerini paylaş. Önemli güncellemeleri sana da ileteceğiz.</p>
+    </div>
+
+    <form class="ob-form" id="obForm2" autocomplete="on" novalidate>
+      <!-- Veli (anne / baba) thumbnail kartları -->
+      <div class="form-field">
+        <label>Veli</label>
+        <div class="gender-cards" id="parentCards">
+          <label class="gender-card" data-gender="anne">
+            <input type="radio" name="ob-p-gender" value="anne" required />
+            <span class="gender-card-thumb">
+              <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gcAnneBg" x1="0" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#ffe8d6"/>
+                    <stop offset="100%" stop-color="#f8c8a7"/>
+                  </linearGradient>
+                  <linearGradient id="gcAnneShirt" x1="60" y1="60" x2="60" y2="120" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#d97757"/>
+                    <stop offset="100%" stop-color="#b85f3f"/>
+                  </linearGradient>
+                </defs>
+                <!-- Background -->
+                <rect width="120" height="120" rx="14" fill="url(#gcAnneBg)"/>
+                <!-- Soft stars -->
+                <circle cx="22" cy="22" r="1.6" fill="#fff" opacity="0.85"/>
+                <circle cx="100" cy="30" r="2" fill="#fff" opacity="0.7"/>
+                <circle cx="14" cy="62" r="1.2" fill="#fff" opacity="0.55"/>
+                <circle cx="106" cy="78" r="1.4" fill="#fff" opacity="0.55"/>
+                <!-- Long wavy hair (back) -->
+                <path d="M36 56 C36 36, 48 22, 60 22 C72 22, 84 36, 84 56 L84 90 C82 88, 78 86, 74 88 L46 88 C42 86, 38 88, 36 90 Z" fill="#6d3c1f"/>
+                <!-- Face -->
+                <circle cx="60" cy="52" r="14" fill="#fce4cf"/>
+                <!-- Hair fringe -->
+                <path d="M46 44 C50 36, 58 32, 60 32 C62 32, 70 36, 74 44 C70 42, 64 41, 60 41 C56 41, 50 42, 46 44 Z" fill="#6d3c1f"/>
+                <!-- Earrings -->
+                <circle cx="46" cy="56" r="1.4" fill="#e5b04d"/>
+                <circle cx="74" cy="56" r="1.4" fill="#e5b04d"/>
+                <!-- Cheeks -->
+                <circle cx="52" cy="57" r="2" fill="#f7b3c6" opacity="0.7"/>
+                <circle cx="68" cy="57" r="2" fill="#f7b3c6" opacity="0.7"/>
+                <!-- Eyes -->
+                <circle cx="54" cy="53" r="1.6" fill="#1a1842"/>
+                <circle cx="66" cy="53" r="1.6" fill="#1a1842"/>
+                <!-- Smile -->
+                <path d="M55 60 Q60 64, 65 60" stroke="#1a1842" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                <!-- Neck + body (blouse) -->
+                <rect x="56" y="64" width="8" height="6" fill="#fce4cf"/>
+                <path d="M40 116 L40 92 C40 80, 48 72, 60 72 C72 72, 80 80, 80 92 L80 116 Z" fill="url(#gcAnneShirt)"/>
+                <!-- Blouse V-neckline -->
+                <path d="M52 72 L60 84 L68 72" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.55"/>
+                <!-- Necklace -->
+                <path d="M52 76 Q60 81, 68 76" stroke="#fff" stroke-width="1" fill="none" opacity="0.7"/>
+                <circle cx="60" cy="81" r="1.5" fill="#e5b04d"/>
+              </svg>
+            </span>
+            <span class="gender-card-label">Kadın</span>
+            <span class="gender-card-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+          </label>
+
+          <label class="gender-card" data-gender="baba">
+            <input type="radio" name="ob-p-gender" value="baba" required />
+            <span class="gender-card-thumb">
+              <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gcBabaBg" x1="0" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#d4ebf2"/>
+                    <stop offset="100%" stop-color="#a8d4e8"/>
+                  </linearGradient>
+                  <linearGradient id="gcBabaShirt" x1="60" y1="60" x2="60" y2="120" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#2a8a8a"/>
+                    <stop offset="100%" stop-color="#1d6464"/>
+                  </linearGradient>
+                </defs>
+                <!-- Background -->
+                <rect width="120" height="120" rx="14" fill="url(#gcBabaBg)"/>
+                <!-- Soft stars -->
+                <circle cx="100" cy="22" r="1.6" fill="#fff" opacity="0.85"/>
+                <circle cx="22" cy="34" r="2" fill="#fff" opacity="0.7"/>
+                <circle cx="108" cy="60" r="1.2" fill="#fff" opacity="0.55"/>
+                <circle cx="14" cy="78" r="1.4" fill="#fff" opacity="0.55"/>
+                <!-- Short neat hair -->
+                <path d="M46 44 C46 32, 52 24, 60 24 C68 24, 74 32, 74 44 L74 50 C70 42, 64 41, 60 41 C56 41, 50 42, 46 50 Z" fill="#3a2812"/>
+                <!-- Face -->
+                <circle cx="60" cy="52" r="14" fill="#fce4cf"/>
+                <!-- Hair top -->
+                <path d="M50 42 C54 38, 58 36, 62 38 C66 36, 70 40, 72 44 C68 41, 64 40, 60 40 C56 40, 52 41, 50 42 Z" fill="#2a1b08"/>
+                <!-- Eyebrows -->
+                <path d="M50.5 49.5 L57 49" stroke="#3a2812" stroke-width="1.4" stroke-linecap="round"/>
+                <path d="M63 49 L69.5 49.5" stroke="#3a2812" stroke-width="1.4" stroke-linecap="round"/>
+                <!-- Eyes -->
+                <circle cx="54" cy="53" r="1.6" fill="#1a1842"/>
+                <circle cx="66" cy="53" r="1.6" fill="#1a1842"/>
+                <!-- Light stubble shadow -->
+                <path d="M52 62 Q60 68, 68 62 Q66 66, 60 67 Q54 66, 52 62" fill="#3a2812" opacity="0.18"/>
+                <!-- Smile -->
+                <path d="M55 60 Q60 64, 65 60" stroke="#1a1842" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                <!-- Neck + body (button-up shirt) -->
+                <rect x="56" y="64" width="8" height="6" fill="#fce4cf"/>
+                <path d="M40 116 L40 92 C40 80, 48 72, 60 72 C72 72, 80 80, 80 92 L80 116 Z" fill="url(#gcBabaShirt)"/>
+                <!-- Collar -->
+                <path d="M50 72 L60 82 L70 72" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <!-- Buttons -->
+                <circle cx="60" cy="88" r="1.2" fill="#fff" opacity="0.85"/>
+                <circle cx="60" cy="96" r="1.2" fill="#fff" opacity="0.7"/>
+                <circle cx="60" cy="104" r="1.2" fill="#fff" opacity="0.55"/>
+              </svg>
+            </span>
+            <span class="gender-card-label">Erkek</span>
+            <span class="gender-card-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="ob-p-name">Veli adı</label>
+          <div class="form-field-input">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="ob-p-name" required placeholder="Veli adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="ob-p-surname">Veli soyadı</label>
+          <div class="form-field-input">
+            <input type="text" id="ob-p-surname" class="no-icon" required placeholder="Veli soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="ob-p-email">E-posta</label>
+        <div class="form-field-input">
+          <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+          <input type="email" id="ob-p-email" required placeholder="ornek@email.com" autocomplete="email" data-rule="email" maxlength="120" />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="ob-p-phone">Telefon</label>
+        <div class="form-field-input">
+          <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <input type="tel" id="ob-p-phone" required placeholder="+90 5XX XXX XX XX" inputmode="numeric" autocomplete="tel" maxlength="17" data-rule="phone-tr" />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>İletişim tercihi</label>
+        <div class="form-radio-group">
+          <label class="form-radio-pill"><input type="radio" name="ob-p-contact" value="both" checked /> E-posta ve SMS</label>
+          <label class="form-radio-pill"><input type="radio" name="ob-p-contact" value="email" /> Sadece e-posta</label>
+          <label class="form-radio-pill"><input type="radio" name="ob-p-contact" value="sms" /> Sadece SMS</label>
+        </div>
+      </div>
+    </form>
+
+    <div class="ob-actions has-back">
+      <button type="button" class="btn btn-ghost" data-prev-step="2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Geri
+      </button>
+      <button type="button" class="btn btn-primary" data-next-step="2">
+        İleri
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 3: OKUL ============ -->
+  <section class="ob-panel" id="obPanel3" hidden>
+    <div class="ob-panel-head">
+      <h1 class="ob-title">Okul Bilgileri</h1>
+      <p class="ob-sub">Müfredatı ve sınav takvimini doğru hizalayabilmemiz için okuluna dair birkaç bilgiye daha ihtiyacımız var.</p>
+    </div>
+
+    <form class="ob-form" id="obForm3" autocomplete="on" novalidate>
+      <!-- Okul türü: thumbnail kartlar (3 seçim) -->
+      <div class="form-field">
+        <label>Okul türü</label>
+        <div class="school-cards">
+          <label class="school-card" data-school="devlet">
+            <input type="radio" name="ob-sch-type" value="devlet" required />
+            <span class="school-card-thumb">
+              <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                  <linearGradient id="schDevletBg" x1="0" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#e0eafe"/>
+                    <stop offset="100%" stop-color="#c5d3f3"/>
+                  </linearGradient>
+                </defs>
+                <rect width="120" height="120" rx="12" fill="url(#schDevletBg)"/>
+                <!-- Soft clouds -->
+                <circle cx="20" cy="22" r="1.4" fill="#fff" opacity="0.85"/>
+                <circle cx="100" cy="30" r="1.8" fill="#fff" opacity="0.7"/>
+                <!-- Flagpole + flag -->
+                <line x1="60" y1="44" x2="60" y2="20" stroke="#1a1842" stroke-width="1.5" stroke-linecap="round"/>
+                <rect x="60" y="22" width="14" height="9" fill="#e30a17"/>
+                <text x="64.5" y="29.5" font-family="serif" font-size="7" font-weight="900" fill="#fff" text-anchor="middle">★</text>
+                <!-- Roof -->
+                <polygon points="18,52 60,36 102,52" fill="#3e3a8e"/>
+                <polygon points="22,52 60,40 98,52" fill="#28265a"/>
+                <!-- Building body -->
+                <rect x="22" y="52" width="76" height="52" fill="#fff"/>
+                <!-- Columns -->
+                <rect x="30" y="60" width="5" height="40" fill="#d2dbf0"/>
+                <rect x="44" y="60" width="5" height="40" fill="#d2dbf0"/>
+                <rect x="58" y="60" width="5" height="40" fill="#d2dbf0"/>
+                <rect x="72" y="60" width="5" height="40" fill="#d2dbf0"/>
+                <rect x="86" y="60" width="5" height="40" fill="#d2dbf0"/>
+                <!-- Door -->
+                <rect x="54" y="80" width="12" height="20" rx="6 6 0 0" fill="#3e3a8e"/>
+                <!-- Base steps -->
+                <rect x="18" y="100" width="84" height="4" fill="#a5b3d4"/>
+                <rect x="14" y="104" width="92" height="4" fill="#8a99bf"/>
+              </svg>
+            </span>
+            <span class="school-card-label">Devlet</span>
+            <span class="school-card-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+          </label>
+
+          <label class="school-card" data-school="ozel">
+            <input type="radio" name="ob-sch-type" value="ozel" required />
+            <span class="school-card-thumb">
+              <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                  <linearGradient id="schOzelBg" x1="0" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#e2f4ed"/>
+                    <stop offset="100%" stop-color="#c0e4d4"/>
+                  </linearGradient>
+                </defs>
+                <rect width="120" height="120" rx="12" fill="url(#schOzelBg)"/>
+                <!-- Soft accents -->
+                <circle cx="100" cy="20" r="1.6" fill="#fff" opacity="0.85"/>
+                <circle cx="18" cy="28" r="1.4" fill="#fff" opacity="0.7"/>
+                <!-- Tree (left) -->
+                <rect x="20" y="80" width="3" height="22" fill="#5a3a1e"/>
+                <circle cx="21.5" cy="74" r="11" fill="#3a8a5a"/>
+                <circle cx="16" cy="76" r="6" fill="#4ca56e"/>
+                <circle cx="27" cy="76" r="6" fill="#4ca56e"/>
+                <!-- Modern building (tall + low block) -->
+                <!-- Tall tower -->
+                <rect x="38" y="34" width="28" height="70" fill="#fff"/>
+                <rect x="38" y="34" width="28" height="6" fill="#3e3a8e"/>
+                <!-- Glass facade lines -->
+                <line x1="38" y1="46" x2="66" y2="46" stroke="#cfe4f0" stroke-width="2"/>
+                <line x1="38" y1="56" x2="66" y2="56" stroke="#cfe4f0" stroke-width="2"/>
+                <line x1="38" y1="66" x2="66" y2="66" stroke="#cfe4f0" stroke-width="2"/>
+                <line x1="38" y1="76" x2="66" y2="76" stroke="#cfe4f0" stroke-width="2"/>
+                <line x1="38" y1="86" x2="66" y2="86" stroke="#cfe4f0" stroke-width="2"/>
+                <line x1="52" y1="40" x2="52" y2="104" stroke="#cfe4f0" stroke-width="1.5"/>
+                <!-- Low block -->
+                <rect x="66" y="60" width="34" height="44" fill="#fff"/>
+                <rect x="66" y="60" width="34" height="5" fill="#28265a"/>
+                <!-- Low block windows -->
+                <rect x="72" y="72" width="8" height="8" rx="1" fill="#a8d4e8"/>
+                <rect x="84" y="72" width="8" height="8" rx="1" fill="#a8d4e8"/>
+                <rect x="72" y="84" width="8" height="8" rx="1" fill="#a8d4e8"/>
+                <rect x="84" y="84" width="8" height="8" rx="1" fill="#a8d4e8"/>
+                <!-- Entrance -->
+                <rect x="46" y="92" width="12" height="12" fill="#3e3a8e"/>
+                <!-- Base -->
+                <rect x="14" y="104" width="92" height="4" fill="#8aab9b"/>
+              </svg>
+            </span>
+            <span class="school-card-label">Özel</span>
+            <span class="school-card-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- İl -->
+      <div class="form-field">
+        <label for="ob-sch-city">İl</label>
+        <div class="form-field-input">
+          <select id="ob-sch-city" class="no-icon" required>
+            <option value="" disabled selected>İl seç</option>
+            <option>Adana</option><option>Ankara</option><option>Antalya</option><option>Aydın</option>
+            <option>Balıkesir</option><option>Bursa</option><option>Denizli</option><option>Diyarbakır</option>
+            <option>Eskişehir</option><option>Gaziantep</option><option>Hatay</option><option>Isparta</option>
+            <option>İstanbul</option><option>İzmir</option><option>Kayseri</option><option>Kocaeli</option>
+            <option>Konya</option><option>Malatya</option><option>Manisa</option><option>Mersin</option>
+            <option>Muğla</option><option>Ordu</option><option>Sakarya</option><option>Samsun</option>
+            <option>Şanlıurfa</option><option>Tekirdağ</option><option>Trabzon</option><option>Van</option>
+            <option>Yalova</option><option>Diğer</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- İlçe -->
+      <div class="form-field">
+        <label for="ob-sch-district">İlçe</label>
+        <div class="form-field-input">
+          <select id="ob-sch-district" class="no-icon" required disabled>
+            <option value="" disabled selected>Önce il seç</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Okul adı (il + ilçe doldurulunca smooth reveal) -->
+      <div class="ob-reveal-wrap" id="schoolNameWrap">
+        <div class="form-field">
+          <label for="ob-sch-name">Okul adı</label>
+          <div class="form-field-input">
+            <select id="ob-sch-name" class="no-icon">
+              <option value="" disabled selected>Okul seç</option>
+              <option>Atatürk Ortaokulu</option>
+              <option>Cumhuriyet Ortaokulu</option>
+              <option>Fatih Sultan Mehmet Ortaokulu</option>
+              <option>Gazi Ortaokulu</option>
+              <option>İstiklal Ortaokulu</option>
+              <option>Mehmet Akif Ersoy Ortaokulu</option>
+              <option>Mustafa Kemal Ortaokulu</option>
+              <option>Şehit Öğretmen Ortaokulu</option>
+              <option>Yunus Emre Ortaokulu</option>
+              <option>Ziya Gökalp Ortaokulu</option>
+              <option value="diger">Listede bulamadım</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="ob-actions has-back">
+      <button type="button" class="btn btn-ghost" data-prev-step="3">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Geri
+      </button>
+      <button type="button" class="btn btn-primary" data-next-step="3">
+        Devam
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 4: HAFTALIK PROGRAM ============ -->
+  <section class="ob-panel" id="obPanel4" hidden>
+    <div class="ob-panel-head">
+      <h1 class="ob-title">Günlük rutinine en uygun<br>ders programını seç.</h1>
+    </div>
+
+    <form class="ob-form" id="obForm4" autocomplete="off" novalidate>
+      <div class="ob-prog-info" role="note">
+        <span class="ob-prog-info-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </span>
+        <span>Seçeceğin program <strong>dönem boyu sabit</strong> kalacağı için, <strong>"Programı İncele"</strong> butonuna basarak program detaylarını incelemeyi unutma.</span>
+      </div>
+
+      <div class="ob-prog-cards">
+        <!-- 1. Hafta İçi Erken -->
+        <label class="ob-prog-card" data-prog="weekday-early">
+          <input type="radio" name="ob-program" value="weekday-early" required>
+          <span class="ob-prog-check" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <div class="ob-prog-icon ob-prog-icon-1" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+          </div>
+          <div class="ob-prog-body">
+            <h3 class="ob-prog-name">Hafta İçi Erken</h3>
+            <div class="ob-prog-meta">
+              <span class="ob-prog-days"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Pzt · Salı · Çar</span>
+              <span class="ob-prog-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 16:50 — 20:00</span>
+              <span class="ob-prog-lessons"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> <strong>4 ders</strong> / gün</span>
+            </div>
+          </div>
+          <button type="button" class="ob-prog-link" data-prog-detail="weekday-early">
+            Programı İncele
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </label>
+
+        <!-- 2. Hafta İçi Geç -->
+        <label class="ob-prog-card" data-prog="weekday-late">
+          <input type="radio" name="ob-program" value="weekday-late" required>
+          <span class="ob-prog-check" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <div class="ob-prog-icon ob-prog-icon-2" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </div>
+          <div class="ob-prog-body">
+            <h3 class="ob-prog-name">Hafta İçi Geç</h3>
+            <div class="ob-prog-meta">
+              <span class="ob-prog-days"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Pzt · Salı · Çar</span>
+              <span class="ob-prog-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:50 — 21:00</span>
+              <span class="ob-prog-lessons"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> <strong>4 ders</strong> / gün</span>
+            </div>
+          </div>
+          <button type="button" class="ob-prog-link" data-prog-detail="weekday-late">
+            Programı İncele
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </label>
+
+        <!-- 3. Hafta Sonu Sabah -->
+        <label class="ob-prog-card" data-prog="weekend-early">
+          <input type="radio" name="ob-program" value="weekend-early" required>
+          <span class="ob-prog-check" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <div class="ob-prog-icon ob-prog-icon-3" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          </div>
+          <div class="ob-prog-body">
+            <h3 class="ob-prog-name">Hafta Sonu Sabah</h3>
+            <div class="ob-prog-meta">
+              <span class="ob-prog-days"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Cmts · Pazar</span>
+              <span class="ob-prog-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 09:00 — 14:20</span>
+              <span class="ob-prog-lessons"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> <strong>6 ders</strong> / gün</span>
+            </div>
+          </div>
+          <button type="button" class="ob-prog-link" data-prog-detail="weekend-early">
+            Programı İncele
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </label>
+
+        <!-- 4. Hafta Sonu Akşam -->
+        <label class="ob-prog-card" data-prog="weekend-late">
+          <input type="radio" name="ob-program" value="weekend-late" required>
+          <span class="ob-prog-check" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <div class="ob-prog-icon ob-prog-icon-4" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/><line x1="23" y1="22" x2="1" y2="22"/></svg>
+          </div>
+          <div class="ob-prog-body">
+            <h3 class="ob-prog-name">Hafta Sonu Akşam</h3>
+            <div class="ob-prog-meta">
+              <span class="ob-prog-days"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Cmts · Pazar</span>
+              <span class="ob-prog-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 15:00 — 20:20</span>
+              <span class="ob-prog-lessons"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> <strong>6 ders</strong> / gün</span>
+            </div>
+          </div>
+          <button type="button" class="ob-prog-link" data-prog-detail="weekend-late">
+            Programı İncele
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </label>
+      </div>
+    </form>
+
+    <div class="ob-actions has-back">
+      <button type="button" class="btn btn-ghost" data-prev-step="4">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Geri
+      </button>
+      <button type="button" class="btn btn-primary" id="obFinishBtn">
+        Kontrol Merkezine Git
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ PROGRAM DETAIL OVERLAY ============ -->
+  <div class="ob-prog-overlay" id="obProgOverlay" hidden aria-hidden="true" role="dialog" aria-labelledby="obProgOverlayTitle">
+    <div class="ob-prog-overlay-backdrop" data-prog-close></div>
+    <div class="ob-prog-overlay-card">
+      <button type="button" class="ob-prog-overlay-close" data-prog-close aria-label="Kapat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <header class="ob-prog-overlay-head">
+        <h2 id="obProgOverlayTitle">Haftalık Ders Programları</h2>
+        <p>Tüm program seçeneklerini karşılaştır.</p>
+      </header>
+      <div class="ob-prog-overlay-tabs" role="tablist">
+        <button type="button" class="ob-prog-tab is-active" data-prog-tab="weekday-early">Hafta İçi Erken</button>
+        <button type="button" class="ob-prog-tab" data-prog-tab="weekday-late">Hafta İçi Geç</button>
+        <button type="button" class="ob-prog-tab" data-prog-tab="weekend-early">Hafta Sonu Sabah</button>
+        <button type="button" class="ob-prog-tab" data-prog-tab="weekend-late">Hafta Sonu Akşam</button>
+      </div>
+
+      <!-- 4 schedule panels (paket-detay component) -->
+      <div class="ob-prog-overlay-panel is-active" data-prog-panel="weekday-early">
+<!-- 7-day grid -->
+      <div class="sch-grid">
+        <!-- Pazartesi -->
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 10:00 - 11:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Matematik</h4>
+            </div>
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 13:00 - 14:00</span>
+              <h4 class="sch-lesson-name">Soru Çözümü</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Salı -->
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Salı</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="fen">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 11:00 - 12:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Fen Bilimleri</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Çarşamba — BUGÜN -->
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Çarşamba</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="trk">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 10:00 - 11:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Türkçe</h4>
+            </div>
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 20:00 - 21:00</span>
+              <h4 class="sch-lesson-name">PDR Görüşmesi</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Perşembe -->
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Perşembe</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ink">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 14:00 - 16:00</span>
+              <h4 class="sch-lesson-name">İnkılap Tarihi (Görev)</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 9 8.5 12 2"/></svg> Sistem Ataması</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cuma -->
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cuma</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ing">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 15:00 - 16:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf İngilizce</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cumartesi -->
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cumartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 10:00 - 12:15</span>
+              <h4 class="sch-lesson-name">LGS Türkiye Geneli Denemesi</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Sınav Modülü</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pazar -->
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazar</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-day-empty">Tatil / Bireysel<br>Tekrar Günü</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sch-legend">
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Haftalık <strong>6 canlı ders</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>PDR görüşmesi: <strong>15 günde 1</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>LGS Türkiye Geneli denemesi: <strong>Her ayın 2. Cumartesi</strong></span>
+        </div>
+      </div>
+      </div>
+
+      <div class="ob-prog-overlay-panel" data-prog-panel="weekday-late">
+<div class="sch-grid">
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 14:00 - 15:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Matematik</h4>
+            </div>
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:00 - 18:00</span>
+              <h4 class="sch-lesson-name">Soru Çözümü</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Salı</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="fen">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 15:00 - 16:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Fen Bilimleri</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Çarşamba</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="trk">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 14:00 - 15:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Türkçe</h4>
+            </div>
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 19:30 - 20:30</span>
+              <h4 class="sch-lesson-name">PDR Görüşmesi</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Perşembe</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ink">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:00 - 18:30</span>
+              <h4 class="sch-lesson-name">İnkılap Tarihi (Görev)</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 9 8.5 12 2"/></svg> Sistem Ataması</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cuma</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ing">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 18:00 - 19:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf İngilizce</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cumartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 14:00 - 16:15</span>
+              <h4 class="sch-lesson-name">LGS Türkiye Geneli Denemesi</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Sınav Modülü</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazar</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-day-empty">Tatil / Bireysel<br>Tekrar Günü</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sch-legend">
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Haftalık <strong>6 canlı ders</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>PDR görüşmesi: <strong>15 günde 1</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>LGS Türkiye Geneli denemesi: <strong>Her ayın 2. Cumartesi</strong></span>
+        </div>
+      </div>
+      </div>
+
+      <div class="ob-prog-overlay-panel" data-prog-panel="weekend-early">
+<div class="sch-grid">
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:00 - 18:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Matematik</h4>
+            </div>
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 19:30 - 20:30</span>
+              <h4 class="sch-lesson-name">Soru Çözümü</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Salı</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="fen">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 18:00 - 19:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Fen Bilimleri</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Çarşamba</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="trk">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:00 - 18:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Türkçe</h4>
+            </div>
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 20:00 - 21:00</span>
+              <h4 class="sch-lesson-name">PDR Görüşmesi</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Perşembe</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ink">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 18:30 - 20:00</span>
+              <h4 class="sch-lesson-name">İnkılap Tarihi (Görev)</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 9 8.5 12 2"/></svg> Sistem Ataması</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cuma</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ing">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:30 - 19:00</span>
+              <h4 class="sch-lesson-name">8. Sınıf İngilizce</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cumartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:00 - 19:15</span>
+              <h4 class="sch-lesson-name">LGS Türkiye Geneli Denemesi</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Sınav Modülü</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazar</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-day-empty">Tatil / Bireysel<br>Tekrar Günü</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sch-legend">
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Haftalık <strong>6 canlı ders</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>PDR görüşmesi: <strong>15 günde 1</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>LGS Türkiye Geneli denemesi: <strong>Her ayın 2. Cumartesi</strong></span>
+        </div>
+      </div>
+      </div>
+
+      <div class="ob-prog-overlay-panel" data-prog-panel="weekend-late">
+<div class="sch-grid">
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 19:00 - 20:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Matematik</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Salı</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="fen">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 20:00 - 21:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Fen Bilimleri</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Çarşamba</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="trk">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 19:30 - 21:00</span>
+              <h4 class="sch-lesson-name">8. Sınıf Türkçe</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Perşembe</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ink">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 20:00 - 21:30</span>
+              <h4 class="sch-lesson-name">İnkılap Tarihi (Görev)</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 9 8.5 12 2"/></svg> Sistem Ataması</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cuma</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ing">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 19:30 - 21:00</span>
+              <h4 class="sch-lesson-name">8. Sınıf İngilizce</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cumartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 16:00 - 17:30</span>
+              <h4 class="sch-lesson-name">Soru Çözümü</h4>
+            </div>
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 18:00 - 20:15</span>
+              <h4 class="sch-lesson-name">LGS Türkiye Geneli Denemesi</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Sınav Modülü</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazar</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:00 - 18:00</span>
+              <h4 class="sch-lesson-name">PDR Görüşmesi</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sch-legend">
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Haftalık <strong>6 canlı ders</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>PDR görüşmesi: <strong>15 günde 1</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>LGS Türkiye Geneli denemesi: <strong>Her ayın 2. Cumartesi</strong></span>
+        </div>
+      </div>
+      </div>
+
+  </div>
+  </div>
+
+  <!-- ============ FINAL STATE ============ -->
+</main>
+
+<!-- Onboarding processing overlay (info kaydediliyor → dashboard'a yönlendir) -->
+<div class="ob-processing" id="obProcessing" hidden aria-live="polite" aria-busy="true">
+  <div class="ob-pp-visual">
+    <span class="ob-pp-ring"></span>
+    <span class="ob-pp-ring"></span>
+    <span class="ob-pp-ring"></span>
+    <span class="ob-pp-halo"></span>
+    <span class="ob-pp-orbit"><span class="ob-pp-orbit-dot"></span></span>
+    <div class="ob-pp-icon">
+      <!-- Cloud-save / data sync icon -->
+      <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M48 42 a10 10 0 0 0 -2 -19.6 a14 14 0 0 0 -27 4 a8 8 0 0 0 -1 15.6"/>
+        <polyline points="22 38 32 48 50 30"/>
+      </svg>
+    </div>
+  </div>
+  <div class="ob-pp-text-wrap">
+    <div class="ob-pp-text">Bilgilerin kaydediliyor</div>
+    <div class="ob-pp-substep">Bilenyum Kontrol Merkezin sana özel olarak hazırlanıyor…</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  <span id="toastText">Mesaj</span>
+</div>
+
+<script>
+  // ---------- Toast ----------
+  function showToast(msg, type) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    toast.classList.toggle('error', type !== 'success');
+    toast.classList.add('show');
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+
+  // ---------- Step navigation ----------
+  (function() {
+    const panels = [
+      document.getElementById('obPanel1'),
+      document.getElementById('obPanel2'),
+      document.getElementById('obPanel3'),
+      document.getElementById('obPanel4')
+    ];
+    const nodes = document.querySelectorAll('.ob-step-node');
+    const lines = document.querySelectorAll('.ob-step-line');
+    // (legacy: inline final state removed; flow goes overlay → dashboard.html)
+
+    function setStep(n, opts) {
+      // Show n-th panel (1-4), update indicator
+      panels.forEach((p, i) => { p.hidden = (i !== n - 1); });
+      nodes.forEach((node, i) => {
+        node.classList.remove('is-active', 'is-done');
+        if (i + 1 < n) node.classList.add('is-done');
+        else if (i + 1 === n) node.classList.add('is-active');
+      });
+      lines.forEach((line, i) => {
+        line.classList.toggle('is-active', (i + 1) < n);
+      });
+      if (opts && opts.scroll !== false) window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Validate required fields in a given panel; returns first invalid field (or null)
+    function validatePanel(panel) {
+      // Radio groups: if any radio in a group is required, at least one must be checked
+      const radioGroups = {};
+      panel.querySelectorAll('input[type="radio"][required]').forEach(r => {
+        radioGroups[r.name] = radioGroups[r.name] || [];
+        radioGroups[r.name].push(r);
+      });
+      for (const name in radioGroups) {
+        if (!radioGroups[name].some(r => r.checked)) return radioGroups[name][0];
+      }
+      // Other required fields
+      const reqs = panel.querySelectorAll('input[required]:not([type="radio"]), select[required]');
+      for (let i = 0; i < reqs.length; i++) {
+        const el = reqs[i];
+        if (!el.value || (typeof el.value === 'string' && !el.value.trim())) {
+          return el;
+        }
+        if (el.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim())) {
+          return el;
+        }
+        if (el.type === 'tel') {
+          const digits = el.value.replace(/\D/g, '');
+          if (digits.length < 10) return el;
+        }
+      }
+      return null;
+    }
+
+    // Flash the field (or its wrapper for invisible radios) with a red border
+    function flashError(el) {
+      // For invisible radios (gender cards / radio pills), highlight the wrapper instead
+      const wrapper = el.closest('.gender-card, .form-radio-pill');
+      const target = wrapper || el;
+      const originalShadow = target.style.boxShadow;
+      target.style.borderColor = '#c12c5b';
+      target.style.boxShadow = '0 0 0 3px rgba(193,44,91,0.18)';
+      setTimeout(() => {
+        target.style.borderColor = '';
+        target.style.boxShadow = originalShadow;
+      }, 2000);
+      // Focus the actual element only if it's visible/focusable
+      if (!wrapper) {
+        try { el.focus(); } catch (e) { /* noop */ }
+      } else {
+        // For wrapper-targeted errors, scroll the wrapper into view
+        wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    // Next button
+    document.querySelectorAll('[data-next-step]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cur = parseInt(btn.dataset.nextStep, 10);
+        const panel = panels[cur - 1];
+        const invalid = validatePanel(panel);
+        if (invalid) {
+          flashError(invalid);
+          showToast('Lütfen zorunlu alanları doldur.');
+          return;
+        }
+        setStep(cur + 1);
+      });
+    });
+
+    // Prev button
+    document.querySelectorAll('[data-prev-step]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cur = parseInt(btn.dataset.prevStep, 10);
+        setStep(cur - 1);
+      });
+    });
+
+    // Finish button → show processing overlay → redirect to dashboard
+    const finishBtn = document.getElementById('obFinishBtn');
+    const overlay   = document.getElementById('obProcessing');
+    if (finishBtn) {
+      finishBtn.addEventListener('click', () => {
+        // Panel 4 = haftalık program seçimi — radio buton seçili olmalı
+        const programChecked = document.querySelector('input[name="ob-program"]:checked');
+        if (!programChecked) {
+          showToast('Bir program seç.');
+          const firstCard = document.querySelector('.ob-prog-card');
+          if (firstCard) firstCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+        // Disable button to prevent double submit
+        finishBtn.disabled = true;
+        finishBtn.style.opacity = '0.6';
+        finishBtn.style.pointerEvents = 'none';
+
+        // Mark all steps as done
+        nodes.forEach(node => node.classList.remove('is-active'));
+        nodes.forEach((node, i) => { if (i <= 3) node.classList.add('is-done'); });
+        lines.forEach(line => line.classList.add('is-active'));
+
+        // Show processing overlay
+        if (overlay) overlay.hidden = false;
+
+        // Yeni öğrenci — zorunlu sınav dönemi başlat
+        try {
+          var _name = (document.getElementById('ob-s-name')?.value || '').trim();
+          var _surname = (document.getElementById('ob-s-surname')?.value || '').trim();
+          var _grade = document.querySelector('input[name="ob-s-grade"]:checked')?.value || '8';
+          var _full = (_name + ' ' + _surname).trim() || 'Mira Yılmaz';
+          localStorage.setItem('bilenyum.studentName', _full);
+          localStorage.setItem('bilenyum.studentGrade', _grade);
+          localStorage.setItem('bilenyum.assignedProgram', programChecked.value);
+          var _dl = new Date();
+          _dl.setDate(_dl.getDate() + 3);
+          localStorage.setItem('bilenyum.isNewStudent', '1');
+          localStorage.setItem('bilenyum.assessmentStartedAt', new Date().toISOString());
+          localStorage.setItem('bilenyum.assessmentDeadline', _dl.toISOString());
+          localStorage.removeItem('bilenyum.placementComplete');
+          localStorage.removeItem('bilenyum.attentionComplete');
+          localStorage.removeItem('bilenyum.assessmentModalDismissed');
+          localStorage.removeItem('bilenyum.placementResults');
+          localStorage.removeItem('bilenyum.attentionResults');
+          localStorage.removeItem('bilenyum.combinedResults');
+          localStorage.removeItem('bilenyum.assignedClan');
+          localStorage.removeItem('bilenyum.placementSayisalDone');
+          localStorage.removeItem('bilenyum.placementAnswers');
+          localStorage.removeItem('bilenyum.placementSayisalEndAt');
+          localStorage.removeItem('bilenyum.placementSubjectIdx');
+          localStorage.removeItem('bilenyum.placementActiveSubject');
+          localStorage.removeItem('bilenyum.placementBreakEndAt');
+          localStorage.removeItem('bilenyum.placementSozelStarted');
+          localStorage.removeItem('bilenyum.crossBreakTarget');
+          localStorage.removeItem('bilenyum.crossBreakEndAt');
+        } catch (e) {}
+
+        // After ~3s redirect to dashboard
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 3000);
+      });
+    }
+
+    // ============ Program detail overlay ============
+    const progOverlay = document.getElementById('obProgOverlay');
+    if (progOverlay) {
+      function openProgOverlay(initialKey) {
+        // Set active tab + panel
+        document.querySelectorAll('.ob-prog-tab').forEach(t => {
+          t.classList.toggle('is-active', t.getAttribute('data-prog-tab') === initialKey);
+        });
+        document.querySelectorAll('.ob-prog-overlay-panel').forEach(p => {
+          p.classList.toggle('is-active', p.getAttribute('data-prog-panel') === initialKey);
+        });
+        progOverlay.hidden = false;
+        progOverlay.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeProgOverlay() {
+        progOverlay.hidden = true;
+        progOverlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      // "Programı İncele" → open overlay with that program's tab
+      document.querySelectorAll('[data-prog-detail]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          openProgOverlay(btn.getAttribute('data-prog-detail'));
+        });
+      });
+      // Close handlers
+      document.querySelectorAll('[data-prog-close]').forEach(el => {
+        el.addEventListener('click', closeProgOverlay);
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !progOverlay.hidden) closeProgOverlay();
+      });
+      // Tab switching within overlay
+      document.querySelectorAll('.ob-prog-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const key = tab.getAttribute('data-prog-tab');
+          document.querySelectorAll('.ob-prog-tab').forEach(t => {
+            t.classList.toggle('is-active', t === tab);
+          });
+          document.querySelectorAll('.ob-prog-overlay-panel').forEach(p => {
+            p.classList.toggle('is-active', p.getAttribute('data-prog-panel') === key);
+          });
+        });
+      });
+    }
+  })();
+
+  // ---------- Radio pill / thumbnail card: visual sync (fallback for browsers w/o :has()) ----------
+  function syncRadioGroup(name) {
+    document.querySelectorAll('input[type="radio"][name="' + name + '"]').forEach(inp => {
+      const wrapper = inp.closest('.form-radio-pill, .gender-card, .school-card, .ob-prog-card, .ob-grade-pill');
+      if (wrapper) wrapper.classList.toggle('is-checked', inp.checked);
+    });
+  }
+  document.querySelectorAll('.form-radio-pill input, .gender-card input, .school-card input, .ob-prog-card input, .ob-grade-pill input').forEach(input => {
+    input.addEventListener('change', () => syncRadioGroup(input.name));
+  });
+
+  // ---------- İl → İlçe dynamic dropdown + smooth reveal: Okul adı ----------
+  (function() {
+    const cityEl  = document.getElementById('ob-sch-city');
+    const distEl  = document.getElementById('ob-sch-district');
+    const nameSel = document.getElementById('ob-sch-name');
+    const wrap    = document.getElementById('schoolNameWrap');
+    if (!cityEl || !distEl || !nameSel || !wrap) return;
+
+    // İlçe verisi: il → ilçeler. Türkiye'nin en kalabalık illerinin tüm ilçeleri.
+    // Diğer iller için generic fallback (Merkez + Diğer).
+    const DISTRICTS = {
+      'İstanbul': ['Adalar','Arnavutköy','Ataşehir','Avcılar','Bağcılar','Bahçelievler','Bakırköy','Başakşehir','Bayrampaşa','Beşiktaş','Beykoz','Beylikdüzü','Beyoğlu','Büyükçekmece','Çatalca','Çekmeköy','Esenler','Esenyurt','Eyüpsultan','Fatih','Gaziosmanpaşa','Güngören','Kadıköy','Kağıthane','Kartal','Küçükçekmece','Maltepe','Pendik','Sancaktepe','Sarıyer','Şile','Silivri','Şişli','Sultanbeyli','Sultangazi','Tuzla','Ümraniye','Üsküdar','Zeytinburnu'],
+      'Ankara': ['Akyurt','Altındağ','Ayaş','Bala','Beypazarı','Çamlıdere','Çankaya','Çubuk','Elmadağ','Etimesgut','Evren','Gölbaşı','Güdül','Haymana','Kahramankazan','Kalecik','Keçiören','Kızılcahamam','Mamak','Nallıhan','Polatlı','Pursaklar','Sincan','Şereflikoçhisar','Yenimahalle'],
+      'İzmir': ['Aliağa','Balçova','Bayındır','Bayraklı','Bergama','Beydağ','Bornova','Buca','Çeşme','Çiğli','Dikili','Foça','Gaziemir','Güzelbahçe','Karabağlar','Karaburun','Karşıyaka','Kemalpaşa','Kınık','Kiraz','Konak','Menderes','Menemen','Narlıdere','Ödemiş','Seferihisar','Selçuk','Tire','Torbalı','Urla'],
+      'Bursa': ['Büyükorhan','Gemlik','Gürsu','Harmancık','İnegöl','İznik','Karacabey','Keles','Kestel','Mudanya','Mustafakemalpaşa','Nilüfer','Orhaneli','Orhangazi','Osmangazi','Yenişehir','Yıldırım'],
+      'Antalya': ['Akseki','Aksu','Alanya','Demre','Döşemealtı','Elmalı','Finike','Gazipaşa','Gündoğmuş','İbradı','Kaş','Kemer','Kepez','Konyaaltı','Korkuteli','Kumluca','Manavgat','Muratpaşa','Serik'],
+      'Adana': ['Aladağ','Ceyhan','Çukurova','Feke','İmamoğlu','Karaisalı','Karataş','Kozan','Pozantı','Saimbeyli','Sarıçam','Seyhan','Tufanbeyli','Yumurtalık','Yüreğir'],
+      'Konya': ['Ahırlı','Akören','Akşehir','Altınekin','Beyşehir','Bozkır','Cihanbeyli','Çeltik','Çumra','Derbent','Derebucak','Doğanhisar','Emirgazi','Ereğli','Güneysınır','Hadim','Halkapınar','Hüyük','Ilgın','Kadınhanı','Karapınar','Karatay','Kulu','Meram','Sarayönü','Selçuklu','Seydişehir','Taşkent','Tuzlukçu','Yalıhüyük','Yunak'],
+      'Gaziantep': ['Araban','İslahiye','Karkamış','Nizip','Nurdağı','Oğuzeli','Şahinbey','Şehitkamil','Yavuzeli'],
+      'Kayseri': ['Akkışla','Bünyan','Develi','Felahiye','Hacılar','İncesu','Kocasinan','Melikgazi','Özvatan','Pınarbaşı','Sarıoğlan','Sarız','Talas','Tomarza','Yahyalı','Yeşilhisar'],
+      'Mersin': ['Akdeniz','Anamur','Aydıncık','Bozyazı','Çamlıyayla','Erdemli','Gülnar','Mezitli','Mut','Silifke','Tarsus','Toroslar','Yenişehir'],
+      'Eskişehir': ['Alpu','Beylikova','Çifteler','Günyüzü','Han','İnönü','Mahmudiye','Mihalgazi','Mihalıççık','Odunpazarı','Sarıcakaya','Seyitgazi','Sivrihisar','Tepebaşı'],
+      'Diyarbakır': ['Bağlar','Bismil','Çermik','Çınar','Çüngüş','Dicle','Eğil','Ergani','Hani','Hazro','Kayapınar','Kocaköy','Kulp','Lice','Silvan','Sur','Yenişehir'],
+      'Samsun': ['19 Mayıs','Alaçam','Asarcık','Atakum','Ayvacık','Bafra','Canik','Çarşamba','Havza','İlkadım','Kavak','Ladik','Salıpazarı','Tekkeköy','Terme','Vezirköprü','Yakakent'],
+      'Denizli': ['Acıpayam','Akköy','Babadağ','Baklan','Bekilli','Beyağaç','Bozkurt','Buldan','Çal','Çameli','Çardak','Çivril','Güney','Honaz','Kale','Merkezefendi','Pamukkale','Sarayköy','Serinhisar','Tavas'],
+      'Şanlıurfa': ['Akçakale','Birecik','Bozova','Ceylanpınar','Eyyübiye','Halfeti','Haliliye','Harran','Hilvan','Karaköprü','Siverek','Suruç','Viranşehir'],
+      'Hatay': ['Altınözü','Antakya','Arsuz','Belen','Defne','Dörtyol','Erzin','Hassa','İskenderun','Kırıkhan','Kumlu','Payas','Reyhanlı','Samandağ','Yayladağı'],
+      'Trabzon': ['Akçaabat','Araklı','Arsin','Beşikdüzü','Çarşıbaşı','Çaykara','Dernekpazarı','Düzköy','Hayrat','Köprübaşı','Maçka','Of','Ortahisar','Sürmene','Şalpazarı','Tonya','Vakfıkebir','Yomra'],
+      'Aydın': ['Bozdoğan','Buharkent','Çine','Didim','Efeler','Germencik','İncirliova','Karacasu','Karpuzlu','Koçarlı','Köşk','Kuşadası','Kuyucak','Nazilli','Söke','Sultanhisar','Yenipazar'],
+      'Balıkesir': ['Altıeylül','Ayvalık','Balya','Bandırma','Bigadiç','Burhaniye','Dursunbey','Edremit','Erdek','Gömeç','Gönen','Havran','İvrindi','Karesi','Kepsut','Manyas','Marmara','Savaştepe','Sındırgı','Susurluk'],
+      'Manisa': ['Ahmetli','Akhisar','Alaşehir','Demirci','Gölmarmara','Gördes','Kırkağaç','Köprübaşı','Kula','Salihli','Sarıgöl','Saruhanlı','Selendi','Şehzadeler','Soma','Turgutlu','Yunusemre'],
+      'Kocaeli': ['Başiskele','Çayırova','Darıca','Derince','Dilovası','Gebze','Gölcük','İzmit','Kandıra','Karamürsel','Kartepe','Körfez'],
+      'Sakarya': ['Adapazarı','Akyazı','Arifiye','Erenler','Ferizli','Geyve','Hendek','Karapürçek','Karasu','Kaynarca','Kocaali','Pamukova','Sapanca','Serdivan','Söğütlü','Taraklı'],
+      'Tekirdağ': ['Çerkezköy','Çorlu','Ergene','Hayrabolu','Kapaklı','Malkara','Marmaraereğlisi','Muratlı','Saray','Şarköy','Süleymanpaşa'],
+      'Malatya': ['Akçadağ','Arapgir','Arguvan','Battalgazi','Darende','Doğanşehir','Doğanyol','Hekimhan','Kale','Kuluncak','Pütürge','Yazıhan','Yeşilyurt'],
+      'Muğla': ['Bodrum','Dalaman','Datça','Fethiye','Kavaklıdere','Köyceğiz','Marmaris','Menteşe','Milas','Ortaca','Seydikemer','Ula','Yatağan'],
+      'Ordu': ['Akkuş','Altınordu','Aybastı','Çamaş','Çatalpınar','Çaybaşı','Fatsa','Gölköy','Gülyalı','Gürgentepe','İkizce','Kabadüz','Kabataş','Korgan','Kumru','Mesudiye','Perşembe','Ulubey','Ünye'],
+      'Van': ['Bahçesaray','Başkale','Çaldıran','Çatak','Edremit','Erciş','Gevaş','Gürpınar','İpekyolu','Muradiye','Özalp','Saray','Tuşba'],
+      'Isparta': ['Aksu','Atabey','Eğirdir','Gelendost','Gönen','Keçiborlu','Merkez','Senirkent','Sütçüler','Şarkikaraağaç','Uluborlu','Yalvaç','Yenişarbademli'],
+      'Yalova': ['Altınova','Armutlu','Çiftlikköy','Çınarcık','Merkez','Termal']
+    };
+
+    // Generic fallback for cities not in the dataset
+    const FALLBACK_DISTRICTS = ['Merkez', 'Diğer'];
+
+    function populateDistricts(city) {
+      const list = DISTRICTS[city] || FALLBACK_DISTRICTS;
+      // Reset
+      distEl.innerHTML = '';
+      const placeholder = document.createElement('option');
+      placeholder.value = ''; placeholder.disabled = true; placeholder.selected = true;
+      placeholder.textContent = 'İlçe seç';
+      distEl.appendChild(placeholder);
+      list.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d; opt.textContent = d;
+        distEl.appendChild(opt);
+      });
+      distEl.disabled = false;
+    }
+
+    function resetDistricts() {
+      distEl.innerHTML = '<option value="" disabled selected>Önce il seç</option>';
+      distEl.disabled = true;
+    }
+
+    function checkReveal() {
+      const ready = !!cityEl.value && !!distEl.value;
+      wrap.classList.toggle('show', ready);
+      if (ready) nameSel.setAttribute('required', '');
+      else nameSel.removeAttribute('required');
+    }
+
+    cityEl.addEventListener('change', () => {
+      if (cityEl.value) populateDistricts(cityEl.value);
+      else resetDistricts();
+      checkReveal();
+    });
+    distEl.addEventListener('change', checkReveal);
+    checkReveal(); // initial
+  })();
+</script>
+
+<script src="assets/input-rules.js"></script>
+</body>
+</html>

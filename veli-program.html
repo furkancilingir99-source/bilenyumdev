@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Öğrenci Ders Programı · Veli Kontrol Merkezi · Bilenyum</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="description" content="Bilenyum Veli Kontrol Merkezi — öğrenci haftalık ders programı." />
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
+<link rel="stylesheet" href="assets/veli-shell.css">
+<link rel="stylesheet" href="assets/program-page.css">
+<link rel="stylesheet" href="assets/prog-lesson-cards.css">
+<script src="assets/dashboard-switcher.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<style>
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  background: var(--bg-page);
+  color: var(--ink-dark-0);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+button, a { font-family: inherit; cursor: pointer; }
+a { text-decoration: none; color: inherit; }
+
+.pvd-shell {
+  position: relative; z-index: 5;
+  padding: 10px 22px 14px;
+  height: calc(100vh - 88px);
+  max-height: calc(100vh - 88px);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: "nav main";
+  gap: 12px;
+}
+.pvd-nav { grid-area: nav; align-self: start; }
+.pvd-nav .nav-rail { height: auto; }
+.pvd-nav .nav-item { padding: 10px 4px 8px; gap: 4px; }
+.pvd-nav .nav-item svg { width: 22px; height: 22px; }
+.pvd-nav .nav-item-label { font-size: 9px; letter-spacing: 0.08em; }
+.pvd-main {
+  grid-area: main;
+  min-width: 0; min-height: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.pvd-wrap {
+  flex: 1; min-height: 0; min-width: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.pvd-wrap .prog-wrap {
+  padding: 6px 2px 10px;
+}
+
+@media (max-width: 900px) {
+  body { overflow-y: auto; }
+  .pvd-shell {
+    height: auto; max-height: none;
+    grid-template-columns: 1fr;
+    grid-template-areas: "main";
+    padding-bottom: 40px;
+  }
+  .pvd-nav { display: none; }
+  .prog-toolbar { flex-wrap: wrap; }
+  .prog-legend { width: 100%; margin-left: 0; }
+  .prog-edu-picker { left: 0; width: 100%; }
+}
+
+/* Ders detay drawer — veli dashboard drawer teması */
+.pv-sem-drawer { position: fixed; inset: 0; z-index: 10000; pointer-events: none; visibility: hidden; transition: visibility 0.22s ease; }
+.pv-sem-drawer.is-open { pointer-events: auto; visibility: visible; }
+.pv-sem-drawer-overlay {
+  position: absolute; inset: 0;
+  background: rgba(40,38,90,0.55);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  opacity: 0; transition: opacity 0.22s ease;
+}
+.pv-sem-drawer.is-open .pv-sem-drawer-overlay { opacity: 1; }
+.pv-sem-drawer-panel {
+  position: absolute; top: 0; right: 0; bottom: 0;
+  width: 520px; max-width: 92vw;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--brand-purple-14);
+  padding: 28px;
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+  gap: 22px;
+  transform: translateX(100%);
+  transition: transform 0.30s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pv-sem-drawer.is-open .pv-sem-drawer-panel { transform: translateX(0); }
+.pv-sem-drawer-close {
+  position: absolute; top: 18px; right: 18px;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--brand-purple-06); border: 1px solid var(--brand-purple-14);
+  color: var(--ink-dark-2); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; z-index: 2; transition: background 0.18s;
+}
+.pv-sem-drawer-close:hover { background: var(--brand-purple-10); color: var(--brand-navy); }
+.pv-sem-drawer-close svg { width: 16px; height: 16px; }
+.pv-sem-drawer-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 44px 16px 0; margin-bottom: 4px;
+  border-bottom: 1px dashed var(--brand-purple-18);
+}
+.pv-sem-drawer-ico {
+  width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 46px; line-height: 1; flex-shrink: 0;
+  filter: drop-shadow(0 5px 10px rgba(40,38,90,0.22));
+}
+.pv-sem-drawer-meta { flex: 1; min-width: 0; }
+.pv-sem-drawer-eyebrow {
+  display: block; font-family: var(--font-mono);
+  font-size: 11.5px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--brand-purple); margin-bottom: 6px;
+}
+.pv-sem-drawer-title {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 800;
+  color: var(--brand-navy);
+  letter-spacing: -0.02em; line-height: 1.2; margin: 0;
+}
+.pv-sem-drawer-due {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 8px;
+  margin-top: 10px;
+}
+.pv-sem-drawer-due-label {
+  font-size: 11px; font-weight: 700; color: var(--ink-dark-2);
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.pv-sem-drawer-due-value {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px;
+  font-size: 14px; font-weight: 600; color: var(--brand-navy);
+}
+.pv-sem-drawer-due-value strong { font-weight: 800; }
+.pv-sem-drawer-due-sub {
+  font-size: 12px; font-weight: 600; color: var(--ink-dark-2);
+}
+.pv-hw-drawer-head-actions {
+  display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+}
+.pv-prog-drawer-status {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.04em; white-space: nowrap;
+}
+.pv-prog-drawer-status.is-attended {
+  background: rgba(46,168,106,0.10); border: 1px solid rgba(46,168,106,0.24); color: #15803d;
+}
+.pv-prog-drawer-status.is-absent {
+  background: rgba(220,38,38,0.10); border: 1px solid rgba(220,38,38,0.24); color: #b91c1c;
+}
+.pv-prog-drawer-status.is-upcoming {
+  background: var(--brand-purple-08); border: 1px solid var(--brand-purple-18); color: var(--brand-purple);
+}
+.pv-prog-drawer-status[hidden] { display: none !important; }
+.pv-sem-drawer-section { display: flex; flex-direction: column; gap: 8px; }
+.pv-sem-drawer-label {
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 800;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--brand-purple);
+}
+.pv-prog-drawer-content {
+  padding: 14px 16px; border-radius: 14px;
+  background: var(--brand-purple-04, rgba(62,58,142,0.04));
+  border: 1px solid var(--brand-purple-12);
+}
+.pv-prog-drawer-content p {
+  margin: 0; font-size: 15px; line-height: 1.6; color: var(--ink-dark-1);
+}
+.pv-prog-drawer-kazanim {
+  display: flex; align-items: flex-start; gap: 8px;
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px dashed var(--brand-purple-14);
+}
+.pv-prog-drawer-kazanim[hidden] { display: none !important; }
+.pv-prog-drawer-kazanim-tag {
+  flex-shrink: 0; padding: 3px 8px; border-radius: 6px;
+  background: var(--brand-magenta-08); border: 1px solid var(--brand-magenta-35);
+  font-size: 9.5px; font-weight: 800; color: var(--brand-magenta);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.pv-prog-drawer-kazanim-text {
+  font-size: 13px; font-weight: 600; line-height: 1.45; color: var(--ink-dark-1);
+}
+.pv-abs-drawer-replay-alert {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px; border-radius: 14px;
+  background: linear-gradient(135deg, rgba(220,38,38,0.11) 0%, rgba(251,146,60,0.09) 100%);
+  border: 1.5px solid rgba(220,38,38,0.38);
+  box-shadow: 0 6px 22px -10px rgba(220,38,38,0.45);
+}
+.pv-abs-drawer-replay-alert[hidden] { display: none !important; }
+.pv-abs-drawer-replay-alert-ico {
+  flex-shrink: 0; width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 11px; background: rgba(220,38,38,0.14);
+  border: 1px solid rgba(220,38,38,0.28); color: #b91c1c;
+}
+.pv-abs-drawer-replay-alert-ico svg { width: 20px; height: 20px; display: block; }
+.pv-abs-drawer-replay-alert-body {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px;
+}
+.pv-abs-drawer-replay-alert-title {
+  display: block; font-family: var(--font-display);
+  font-size: 14px; font-weight: 800; color: #991b1b;
+  letter-spacing: -0.02em; line-height: 1.25;
+}
+.pv-abs-drawer-replay-alert-text {
+  margin: 0; font-size: 12.5px; font-weight: 600;
+  line-height: 1.55; color: var(--ink-dark-1);
+}
+.pv-abs-drawer-replay-alert-text strong { font-weight: 800; color: var(--brand-navy); }
+.pv-abs-drawer-replay-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  align-self: flex-start; margin-top: 2px; padding: 9px 14px; border-radius: 10px;
+  background: linear-gradient(135deg, #dc2626 0%, #c2410c 100%);
+  border: 1px solid rgba(185,28,28,0.45); color: #fff;
+  font-size: 12px; font-weight: 800; text-decoration: none;
+  box-shadow: 0 4px 14px -6px rgba(220,38,38,0.55);
+  transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
+}
+.pv-abs-drawer-replay-btn:hover {
+  transform: translateY(-1px); filter: brightness(1.05);
+  box-shadow: 0 6px 18px -6px rgba(220,38,38,0.6); color: #fff;
+}
+.pv-abs-drawer-replay-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+.pv-sem-drawer-footer { margin-top: auto; padding-top: 4px; }
+.pv-abs-drawer-note {
+  margin: 0 0 12px; font-size: 12px; line-height: 1.5; color: var(--ink-dark-2);
+}
+.pv-prog-drawer-kazanim-box {
+  padding: 14px 16px; border-radius: 14px;
+  background: rgba(230,8,123,0.05);
+  border: 1px solid rgba(230,8,123,0.18);
+}
+.pv-prog-drawer-kazanim-box p {
+  margin: 0; font-size: 14px; font-weight: 600; line-height: 1.55; color: var(--ink-dark-1);
+}
+/* Drawer CTA — veli-dashboard pv-sem-drawer-cta ile birebir dil */
+.pv-sem-drawer-cta {
+  width: 100%;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 10px; padding: 16px; border-radius: 14px;
+  font-family: inherit; font-size: 14.5px; font-weight: 700;
+  letter-spacing: -0.005em; border: none; cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.18s, filter 0.18s;
+}
+.pv-sem-drawer-cta .cta-label { font-weight: 700; }
+.pv-sem-drawer-cta svg { width: 16px; height: 16px; flex-shrink: 0; }
+.pv-sem-drawer-cta.is-waiting {
+  background: var(--brand-purple-06);
+  border: 1px solid var(--brand-purple-18);
+  color: var(--ink-dark-1);
+}
+.pv-sem-drawer-cta.is-waiting:hover {
+  background: var(--brand-purple-10); transform: translateY(-1px);
+}
+.pv-sem-drawer-cta.is-active {
+  background: linear-gradient(135deg, var(--brand-magenta), #c0066a);
+  border-color: transparent; color: white;
+  box-shadow: 0 20px 40px -12px rgba(230,8,123,0.50), inset 0 2px 0 rgba(255,255,255,0.22);
+}
+.pv-sem-drawer-cta.is-active:hover { transform: translateY(-2px); filter: brightness(1.03); color: #fff; }
+.pv-prog-perf-btn[hidden] { display: none !important; }
+.pv-prog-perf-pending {
+  margin: 0 0 12px; padding: 14px 16px; border-radius: 14px;
+  background: var(--brand-purple-06); border: 1px solid var(--brand-purple-14);
+  font-size: 13px; font-weight: 600; line-height: 1.55; color: var(--ink-dark-1);
+}
+.pv-prog-perf-pending.is-absent {
+  background: rgba(220,38,38,0.06); border-color: rgba(220,38,38,0.22);
+}
+.pv-prog-perf-pending[hidden] { display: none !important; }
+
+/* KİD / RUD — drawer rozet ve açıklama */
+.pv-hw-drawer-head-line {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px;
+}
+.d3-drawer-lesson-type {
+  display: inline-flex; align-items: center;
+  padding: 4px 10px; border-radius: 8px;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+  letter-spacing: 0.1em; line-height: 1.2; white-space: nowrap; flex-shrink: 0;
+}
+.d3-drawer-lesson-type.is-kid {
+  background: rgba(124, 58, 237, 0.14); border: 1.5px solid rgba(124, 58, 237, 0.38); color: #5b21b6;
+}
+.d3-drawer-lesson-type.is-rud {
+  background: rgba(16, 185, 129, 0.14); border: 1.5px solid rgba(16, 185, 129, 0.38); color: #047857;
+}
+.d3-drawer-format-hint {
+  margin: 10px 0 0;
+  padding: 11px 13px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.d3-drawer-format-hint.is-kid {
+  background: rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(124, 58, 237, 0.22);
+  border-left: 4px solid #7c3aed;
+  color: #5b21b6;
+}
+.d3-drawer-format-hint.is-rud {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  border-left: 4px solid #10b981;
+  color: #047857;
+}
+.d3-drawer-format-hint[hidden],
+.d3-drawer-lesson-type[hidden] { display: none !important; }
+
+/* Performans detay satırları — veli-dashboard pv-abs-perf-* birebir */
+.pv-abs-perf-stats { display: flex; flex-direction: column; gap: 10px; }
+.pv-abs-perf-row {
+  display: grid; grid-template-columns: minmax(108px, 34%) 1fr;
+  gap: 12px; align-items: center; padding: 12px 14px; border-radius: 12px;
+  border: 1px solid var(--brand-purple-14);
+  background: var(--brand-purple-06);
+}
+.pv-abs-perf-row-data { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.pv-abs-perf-stat-val {
+  font-family: var(--font-display); font-size: 22px; font-weight: 800;
+  color: var(--brand-navy); line-height: 1; letter-spacing: -0.02em;
+}
+.pv-abs-perf-stat-val sub { font-size: 13px; font-weight: 700; color: var(--ink-dark-2); vertical-align: baseline; }
+.pv-abs-perf-stat-label { font-size: 10.5px; font-weight: 700; color: var(--ink-dark-1); line-height: 1.25; }
+.pv-abs-perf-row-desc {
+  margin: 0; padding-left: 12px; border-left: 2px solid var(--brand-purple-14);
+  font-size: 12px; font-weight: 500; line-height: 1.5; color: var(--ink-dark-2);
+}
+.pv-abs-perf-row.is-correct { background: rgba(46,168,106,0.06); border-color: rgba(46,168,106,0.22); }
+.pv-abs-perf-row.is-correct .pv-abs-perf-stat-val { color: #15803d; }
+.pv-abs-perf-row.is-correct .pv-abs-perf-row-desc { border-left-color: rgba(46,168,106,0.35); }
+.pv-abs-perf-row.is-hand { background: rgba(91,84,201,0.06); border-color: rgba(91,84,201,0.22); }
+.pv-abs-perf-row.is-hand .pv-abs-perf-stat-val { color: #5b54c9; }
+.pv-abs-perf-row.is-hand .pv-abs-perf-row-desc { border-left-color: rgba(91,84,201,0.35); }
+.pv-abs-perf-row.is-time { background: rgba(43,159,212,0.06); border-color: rgba(43,159,212,0.22); }
+.pv-abs-perf-row.is-time .pv-abs-perf-stat-val { color: #1d7aa8; }
+.pv-abs-perf-row.is-time .pv-abs-perf-row-desc { border-left-color: rgba(43,159,212,0.35); }
+.pv-abs-perf-row.is-xp { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.28); }
+.pv-abs-perf-row.is-xp .pv-abs-perf-stat-val { color: #b45309; }
+.pv-abs-perf-row.is-xp .pv-abs-perf-row-desc { border-left-color: rgba(245,158,11,0.4); }
+.pv-abs-perf-row.is-board { background: rgba(139,92,246,0.07); border-color: rgba(139,92,246,0.24); }
+.pv-abs-perf-row.is-board .pv-abs-perf-stat-val { color: #6d28d9; }
+.pv-abs-perf-row.is-board .pv-abs-perf-row-desc { border-left-color: rgba(139,92,246,0.35); }
+.pv-abs-perf-row.is-participation { background: rgba(230,8,123,0.06); border-color: rgba(230,8,123,0.22); }
+.pv-abs-perf-row.is-participation .pv-abs-perf-stat-val { color: var(--brand-magenta); }
+.pv-abs-perf-row.is-participation .pv-abs-perf-row-desc { border-left-color: rgba(230,8,123,0.32); }
+.pv-abs-perf-row.is-muted { background: rgba(100,116,139,0.05); border-color: rgba(100,116,139,0.18); }
+.pv-abs-perf-row.is-muted .pv-abs-perf-stat-val { color: var(--ink-dark-2); font-size: 18px; }
+.pv-abs-perf-row.is-muted .pv-abs-perf-row-desc { border-left-color: rgba(100,116,139,0.28); }
+@media (max-width: 560px) { .pv-sem-drawer-panel { width: 100vw; max-width: 100vw; } }
+</style>
+</head>
+<body>
+
+<header class="hud pv-hud" role="banner">
+  <a class="hud-brand" href="index.html" aria-label="Bilenyum anasayfa">
+    <img src="assets/bilenyum-logo.svg" alt="Bilenyum" />
+  </a>
+  <div class="pv-hud-student" aria-label="Takip edilen öğrenci">
+    <button type="button" class="pv-hud-student-btn" id="ctxSwitchBtn" aria-haspopup="dialog" aria-expanded="false" aria-label="Öğrenci değiştir">
+      <span class="pv-ava pv-ava--sm pv-ava--student" id="ctxAva" aria-hidden="true">F</span>
+      <span class="pv-hud-student-text">
+        <span class="pv-hud-student-name" id="ctxName">—</span>
+        <span class="pv-hud-student-meta">
+          <span id="ctxClan">—</span>
+          <span class="pv-hud-student-sep" aria-hidden="true">·</span>
+          <span id="ctxProgram">—</span>
+        </span>
+      </span>
+      <svg class="pv-hud-student-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+  </div>
+  <div class="hud-stats pv-actions">
+    <div class="pv-notif-wrap">
+      <button type="button" class="stat-icon-btn is-notif" id="notifBtn"
+              aria-haspopup="dialog" aria-expanded="false" aria-label="Bildirimler">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="pv-badge is-hidden" id="notifBadge">0</span>
+      </button>
+    </div>
+    <div class="hud-profile pv-profile-wrap" id="profileWrap">
+      <button type="button" class="pv-trigger pv-profile-trigger" id="parentProfileBtn"
+              aria-haspopup="true" aria-expanded="false" aria-label="Veli profili menüsü">
+        <span class="pv-ava pv-ava--sm pv-ava--parent" id="parentAva" aria-hidden="true">AÇ</span>
+        <span class="pv-trigger-text">
+          <span class="pv-trigger-name" id="parentName">—</span>
+        </span>
+        <svg class="pv-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="hud-menu" id="parentProfileMenu" role="menu">
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profilim
+        </button>
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Hesap ayarları
+        </button>
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Bildirim tercihleri
+        </button>
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Yardım
+        </button>
+        <div class="hud-menu-divider"></div>
+        <button type="button" class="hud-menu-item is-danger" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Çıkış yap
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="pv-modal" id="studentModal" aria-hidden="true">
+  <div class="pv-modal-overlay" data-pv-modal-close></div>
+  <div class="pv-modal-card" role="dialog" aria-modal="true" aria-labelledby="pvModalTitle">
+    <button type="button" class="pv-modal-close" data-pv-modal-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="pv-modal-head">
+      <span class="pv-modal-eyebrow">Veli Kontrol Merkezi</span>
+      <h2 class="pv-modal-title" id="pvModalTitle">Öğrenci Seç</h2>
+      <p class="pv-modal-desc">Takip etmek istediğin öğrenciyi seç veya yeni öğrenci ekle.</p>
+    </div>
+    <div class="pv-profiles" id="profileGrid" role="listbox" aria-label="Öğrenciler"></div>
+    <div class="pv-modal-foot">
+      <button type="button" class="pv-add-btn" id="addStudentBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Öğrenci Ekle
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="pv-drawer" id="pvNotifDrawer" aria-hidden="true">
+  <div class="pv-drawer-overlay" data-pv-drawer-close></div>
+  <aside class="pv-drawer-panel" role="dialog" aria-labelledby="pvNotifTitle" aria-modal="true">
+    <header class="pv-drawer-head">
+      <h3 class="pv-drawer-title" id="pvNotifTitle">Bildirimler</h3>
+      <button type="button" class="pv-drawer-close" data-pv-drawer-close aria-label="Kapat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </header>
+    <div class="pv-drawer-body" id="pvNotifBody"></div>
+  </aside>
+</div>
+
+<main class="pvd-shell">
+  <div class="pvd-nav">
+    <aside class="nav-rail" aria-label="Veli menüsü">
+      <a class="nav-item" href="veli-dashboard.html" title="Merkez">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-item-label">Merkez</span>
+      </a>
+      <a class="nav-item" href="veli-ogrenci-detay.html" title="Öğrenci Detay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-item-label">Öğrenci Detay</span>
+      </a>
+      <a class="nav-item is-active" href="veli-program.html" title="Öğrenci Ders Programı" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="nav-item-label">Ders Programı</span>
+      </a>
+      <a class="nav-item" href="veli-seminerler.html" title="Seminerler">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <span class="nav-item-label">Seminerler</span>
+      </a>
+      <a class="nav-item" href="veli-sonuclar.html" title="Sonuçlar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 14 11 16 15 12"/></svg>
+        <span class="nav-item-label">Sonuçlar</span>
+      </a>
+      <a class="nav-item" href="veli-performans.html" title="Performans">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span class="nav-item-label">Performans</span>
+      </a>
+    </aside>
+  </div>
+
+  <div class="pvd-main">
+    <div class="pvd-wrap">
+      <div class="prog-wrap" id="progWrap">
+        <header class="prog-section-head" aria-labelledby="progSectionTitle">
+          <h2 class="prog-section-title" id="progSectionTitle">Ders Programı</h2>
+          <span class="prog-section-line" aria-hidden="true"></span>
+        </header>
+
+        <section class="prog-page" id="progPage">
+          <div class="prog-toolbar">
+            <div class="prog-edu-nav">
+              <button type="button" class="prog-edu-nav-btn" id="progPrev" aria-label="Önceki hafta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <div class="prog-edu-nav-label">
+                <span class="prog-edu-nav-eyebrow" id="progWeekEyebrow">12. Eğitim Haftası</span>
+                <div class="prog-edu-nav-range-row">
+                  <strong class="prog-edu-nav-range" id="progDateLabel">— —</strong>
+                  <button type="button" class="prog-edu-nav-cal-btn" id="progWeekCalBtn" aria-label="Hafta seç" aria-expanded="false" aria-controls="progWeekPicker">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </button>
+                </div>
+              </div>
+              <button type="button" class="prog-edu-nav-btn" id="progNext" aria-label="Sonraki hafta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+              <div class="prog-edu-picker" id="progWeekPicker" hidden role="dialog" aria-label="Eğitim haftası seç">
+                <div class="prog-edu-picker-head">Eğitim Haftası Seç</div>
+                <div class="prog-edu-picker-list" id="progWeekPickerList"></div>
+              </div>
+            </div>
+            <div class="prog-legend" aria-hidden="true">
+              <span><i class="is-attended"></i> Katıldı</span>
+              <span><i class="is-absent"></i> Katılmadı</span>
+              <span><i class="is-upcoming"></i> Gelecek Ders</span>
+            </div>
+          </div>
+
+          <div class="prog-week" id="progWeek">
+            <div class="prog-week-grid prog-week-grid--7" id="progWeekGrid"></div>
+          </div>
+
+          <div class="prog-month" id="progMonth" hidden>
+            <div class="prog-month-weekdays">
+              <div>Pzt</div><div>Sal</div><div>Çar</div><div>Per</div><div>Cum</div><div>Cmt</div><div>Paz</div>
+            </div>
+            <div class="prog-month-grid" id="progMonthGrid"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="pv-sem-drawer pv-prog-drawer" id="progDrawer" data-subject="mat" aria-hidden="true">
+  <div class="pv-sem-drawer-overlay" data-prog-drawer-close></div>
+  <aside class="pv-sem-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="progDrawerTopic">
+    <button type="button" class="pv-sem-drawer-close" data-prog-drawer-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="pv-sem-drawer-head">
+      <span class="pv-sem-drawer-ico" id="progDrawerIcon" aria-hidden="true">📐</span>
+      <div class="pv-sem-drawer-meta">
+        <div class="pv-hw-drawer-head-line">
+          <span class="pv-sem-drawer-eyebrow" id="progDrawerSubject">MATEMATİK</span>
+          <span class="d3-drawer-lesson-type" id="progDrawerLessonType">KİD</span>
+        </div>
+        <h2 class="pv-sem-drawer-title" id="progDrawerTopic">Konu Adı</h2>
+        <p class="d3-drawer-format-hint" id="progDrawerLessonTypeDesc">—</p>
+        <div class="pv-sem-drawer-due">
+          <span class="pv-sem-drawer-due-label">Tarih &amp; Saat:</span>
+          <span class="pv-sem-drawer-due-value">
+            <strong id="progDrawerDateText">—</strong>
+            <span class="pv-sem-drawer-due-sub" id="progDrawerTimeText">—</span>
+          </span>
+        </div>
+        <div class="pv-hw-drawer-head-actions">
+          <span class="pv-prog-drawer-status is-upcoming" id="progDrawerStatus" hidden>Katılım Durumu</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pv-abs-drawer-replay-alert" id="progDrawerReplayAlert" hidden role="alert">
+      <span class="pv-abs-drawer-replay-alert-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </span>
+      <div class="pv-abs-drawer-replay-alert-body">
+        <strong class="pv-abs-drawer-replay-alert-title">Öğrenciniz Bu Derse Katılmamış</strong>
+        <p class="pv-abs-drawer-replay-alert-text" id="progDrawerReplayText">—</p>
+        <a class="pv-abs-drawer-replay-btn" id="progDrawerReplay" href="tekrarlar.html">
+          Canlı Ders Tekrarlarını İzletin
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="pv-sem-drawer-section">
+      <span class="pv-sem-drawer-label">Ders İçeriği</span>
+      <div class="pv-prog-drawer-content">
+        <p id="progDrawerDesc">—</p>
+      </div>
+    </div>
+
+    <div class="pv-sem-drawer-section" id="progDrawerKazanimSection">
+      <span class="pv-sem-drawer-label">Kazanım</span>
+      <div class="pv-prog-drawer-kazanim-box">
+        <p id="progDrawerKazanim">—</p>
+      </div>
+    </div>
+
+    <div class="pv-sem-drawer-footer">
+      <p class="pv-abs-drawer-note" id="progDrawerFooterNote">Öğrencinizin ders katılım durumunu buradan takip edebilirsiniz.</p>
+      <p class="pv-prog-perf-pending" id="progDrawerPerfPending" hidden></p>
+      <button type="button" class="pv-sem-drawer-cta is-active pv-prog-perf-btn" id="progDrawerPerfBtn" data-perf-lesson="a1">
+        <span class="cta-label">Performans Detaylarını Gör</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+  </aside>
+</div>
+
+<!-- ====== CANLI DERS PERFORMANS DRAWER (in-page) ====== -->
+<div class="pv-sem-drawer pv-abs-drawer" id="progPerfDrawer" data-subject="mat" aria-hidden="true">
+  <div class="pv-sem-drawer-overlay" data-perf-drawer-close></div>
+  <aside class="pv-sem-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="progPerfTitle" tabindex="-1">
+    <button type="button" class="pv-sem-drawer-close" data-perf-drawer-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="pv-sem-drawer-head">
+      <span class="pv-sem-drawer-ico" id="progPerfIco" aria-hidden="true">📐</span>
+      <div class="pv-sem-drawer-meta">
+        <div class="pv-hw-drawer-head-line">
+          <span class="pv-sem-drawer-eyebrow" id="progPerfEyebrow">CANLI DERS</span>
+          <span class="d3-drawer-lesson-type" id="progPerfLessonType">KİD</span>
+        </div>
+        <h2 class="pv-sem-drawer-title" id="progPerfTitle">—</h2>
+        <p class="d3-drawer-format-hint" id="progPerfLessonTypeDesc">—</p>
+        <div class="pv-sem-drawer-due">
+          <span class="pv-sem-drawer-due-label">Tarih &amp; Saat:</span>
+          <span class="pv-sem-drawer-due-value">
+            <strong id="progPerfDate">—</strong>
+            <span class="pv-sem-drawer-due-sub" id="progPerfTime">—</span>
+          </span>
+        </div>
+        <div class="pv-hw-drawer-head-actions">
+          <span class="pv-prog-drawer-status" id="progPerfStatus">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pv-abs-drawer-replay-alert" id="progPerfReplayAlert" hidden role="alert">
+      <span class="pv-abs-drawer-replay-alert-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </span>
+      <div class="pv-abs-drawer-replay-alert-body">
+        <strong class="pv-abs-drawer-replay-alert-title">Öğrenciniz Bu Derse Katılmamış</strong>
+        <p class="pv-abs-drawer-replay-alert-text" id="progPerfReplayText">—</p>
+        <a class="pv-abs-drawer-replay-btn" id="progPerfReplayBtn" href="tekrarlar.html">
+          Canlı Ders Tekrarlarını İzletin
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="pv-sem-drawer-section">
+      <span class="pv-sem-drawer-label">Performans Detayları</span>
+      <div class="pv-abs-perf-stats">
+        <div class="pv-abs-perf-row is-correct" id="progPerfRowCorrect">
+          <div class="pv-abs-perf-row-data">
+            <span class="pv-abs-perf-stat-label">Doğru / Toplam Soru</span>
+            <span class="pv-abs-perf-stat-val" id="progPerfCorrect">—</span>
+          </div>
+          <p class="pv-abs-perf-row-desc" id="progPerfCorrectDesc">—</p>
+        </div>
+        <div class="pv-abs-perf-row is-xp" id="progPerfRowXp">
+          <div class="pv-abs-perf-row-data">
+            <span class="pv-abs-perf-stat-label">Kazanılan XP</span>
+            <span class="pv-abs-perf-stat-val" id="progPerfXp">—</span>
+          </div>
+          <p class="pv-abs-perf-row-desc" id="progPerfXpDesc">—</p>
+        </div>
+        <div class="pv-abs-perf-row is-hand" id="progPerfRowHands">
+          <div class="pv-abs-perf-row-data">
+            <span class="pv-abs-perf-stat-label">Parmak Kaldırma</span>
+            <span class="pv-abs-perf-stat-val" id="progPerfHands">—</span>
+          </div>
+          <p class="pv-abs-perf-row-desc" id="progPerfHandsDesc">—</p>
+        </div>
+        <div class="pv-abs-perf-row is-board" id="progPerfRowBoard">
+          <div class="pv-abs-perf-row-data">
+            <span class="pv-abs-perf-stat-label">Tahtaya Kalkma Sayısı</span>
+            <span class="pv-abs-perf-stat-val" id="progPerfBoard">—</span>
+          </div>
+          <p class="pv-abs-perf-row-desc" id="progPerfBoardDesc">—</p>
+        </div>
+        <div class="pv-abs-perf-row is-participation" id="progPerfRowParticipation">
+          <div class="pv-abs-perf-row-data">
+            <span class="pv-abs-perf-stat-label">Derse Katılma Sayısı</span>
+            <span class="pv-abs-perf-stat-val" id="progPerfParticipation">—</span>
+          </div>
+          <p class="pv-abs-perf-row-desc" id="progPerfParticipationDesc">—</p>
+        </div>
+        <div class="pv-abs-perf-row is-time" id="progPerfRowDuration">
+          <div class="pv-abs-perf-row-data">
+            <span class="pv-abs-perf-stat-label">Derste Geçirilen Süre</span>
+            <span class="pv-abs-perf-stat-val" id="progPerfDuration">—</span>
+          </div>
+          <p class="pv-abs-perf-row-desc" id="progPerfDurationDesc">—</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pv-sem-drawer-footer">
+      <p class="pv-abs-drawer-note" id="progPerfNote">Öğrencinizin canlı ders performansını buradan inceleyebilirsiniz.</p>
+      <button type="button" class="pv-sem-drawer-cta is-waiting pv-perf-back-btn" id="progPerfBackBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        <span class="cta-label">Ders Detayına Dön</span>
+      </button>
+    </div>
+  </aside>
+</div>
+
+<script src="assets/veli-parent.js"></script>
+<script src="assets/program-page.js"></script>
+<script>
+(function () {
+  function syncProgTitle(s) {
+    if (s && typeof updateProgSectionTitle === 'function') updateProgSectionTitle(s.clanName);
+  }
+  function init() {
+    VeliParent.init({ onStudentChange: function (_, s) { syncProgTitle(s); } });
+    syncProgTitle(VeliParent.getStudentById(VeliParent.getSelectedStudentId()));
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

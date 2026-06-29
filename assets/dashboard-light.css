@@ -1,0 +1,3129 @@
+/* ====================================================================
+ * Bilenyum dashboard-light.css
+ * Dashboard / ödevler / sınavlar / program sayfaları — aydınlık tema
+ * Inline stillerin ÜZERİNE yüklenir (head'in sonunda).
+ * Website (marketing) sayfalarına dokunulmaz.
+ * ==================================================================== */
+
+/* ---- Temel ---- */
+body {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+
+/* ---- Arka plan ---- */
+.scene {
+  background:
+    radial-gradient(ellipse 920px 540px at 6% -8%, rgba(168, 164, 240, 0.14), transparent 58%),
+    radial-gradient(ellipse 780px 500px at 96% 102%, rgba(227, 92, 151, 0.08), transparent 55%),
+    radial-gradient(ellipse 640px 420px at 82% 8%, rgba(62, 58, 142, 0.07), transparent 52%),
+    var(--bg-page) !important;
+}
+.scene::before { display: none !important; }
+.scene-grid { display: none !important; }
+.stars, .star, #stars .star { display: none !important; }
+.orb { opacity: 0.28 !important; filter: blur(70px) !important; }
+.orb-1 { background: radial-gradient(circle, rgba(62, 58, 142, 0.20), transparent 70%) !important; }
+.orb-2 { background: radial-gradient(circle, rgba(227, 92, 151, 0.16), transparent 70%) !important; }
+.orb-3 { background: radial-gradient(circle, rgba(230, 8, 123, 0.12), transparent 70%) !important; }
+
+/* ---- Ortak kart kabuğu ---- */
+.profile-banner,
+.d3-card,
+.pb-card,
+.nav-rail,
+.pop-panel,
+.daily-card,
+.lc-card,
+.lc-tile,
+.quest-hero,
+.hw-card,
+.hw-item,
+.mission-card,
+.tp-card,
+.ov-card,
+.sn-card,
+.tk-card,
+.prog-card,
+.perf-card,
+.d3-drawer-panel,
+.yumi-chat,
+.asm-gate-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-md) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Kart varyasyonları — el yapımı renk dokunuşları */
+.d3-card-program  { border-top: 3px solid var(--brand-purple) !important; }
+.d3-card-hero     { border-top: 3px solid var(--brand-magenta) !important; }
+.d3-card-tasks    { border-top: 3px solid var(--brand-rose) !important; }
+.d3-card-progress { border-top: 3px solid #2ea86a !important; }
+.d3-card-profile  { border-top: 3px solid var(--brand-navy) !important; }
+.pb-card[data-subject="mat"] { background: linear-gradient(165deg, #fff, rgba(230, 8, 123, 0.04)) !important; }
+.pb-card[data-subject="fen"] { background: linear-gradient(165deg, #fff, rgba(46, 168, 106, 0.05)) !important; }
+.pb-card[data-subject="trk"] { background: linear-gradient(165deg, #fff, rgba(62, 58, 142, 0.05)) !important; }
+.pb-card[data-subject="sos"] { background: linear-gradient(165deg, #fff, rgba(227, 92, 151, 0.05)) !important; }
+
+/* ---- HUD ---- */
+.hud-player,
+.stat-pill,
+.stat-icon-btn:not(.is-notif):not(.is-msg) {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-sm) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.hud-menu {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+  backdrop-filter: none !important;
+}
+.player-name,
+.stat-value,
+.pop-title,
+.pop-name,
+.pb-name,
+.pb-card-xp,
+.d3-head-title,
+.d3-title,
+.d3-item-title,
+.d3-task-title,
+.daily-title,
+.lc-head-title,
+.lc-title,
+.qh-teacher-name,
+.hw-title,
+.hw-name,
+.tp-title,
+.yumi-chat-name,
+.d3-drawer-title,
+.sn-title,
+.tk-title,
+.prog-title,
+.perf-title,
+.ov-title {
+  color: var(--brand-navy) !important;
+}
+
+/* İkincil metin */
+.pb-sub,
+.pb-hello,
+.pop-preview,
+.pop-time,
+.pop-meta,
+.d3-sub,
+.d3-desc,
+.d3-muted,
+.d3-task-meta,
+.daily-meta,
+.lc-sub,
+.qh-meta,
+.hw-meta,
+.hw-due,
+.tp-meta,
+.yumi-chat-status,
+.d3-drawer-sub,
+.asm-gate-text {
+  color: var(--ink-dark-1) !important;
+}
+
+/* Soluk etiketler */
+.pb-card-label,
+.d3-label,
+.d3-kicker,
+.d3-head-pill,
+.nav-item-label,
+.pop-foot,
+.stat-label {
+  color: var(--asm-text-label) !important;
+}
+
+/* Menü & liste satırları */
+.hud-menu-item,
+.pop-item,
+.d3-task,
+.daily-item,
+.d3-news-item,
+.d3-badge-item {
+  color: var(--brand-navy) !important;
+}
+.hud-menu-item:hover,
+.pop-item:hover,
+.d3-task:hover,
+.daily-item:hover {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+}
+.hud-player-chevron { color: var(--ink-dark-2) !important; }
+.hud-player[aria-expanded="true"] .hud-player-chevron { color: var(--brand-purple) !important; }
+
+.player-clan { color: var(--brand-purple) !important; }
+.player-clan::before { background: var(--brand-magenta) !important; box-shadow: none !important; }
+.player-avatar { border-color: var(--bg-surface) !important; }
+
+.stat-icon-btn:hover {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+}
+.stat-icon-btn.is-notif {
+  background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy)) !important;
+  color: #fff !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.stat-icon-btn.is-msg {
+  background: linear-gradient(135deg, var(--brand-rose), var(--brand-magenta)) !important;
+  color: #fff !important;
+  border-color: var(--brand-magenta-35) !important;
+}
+
+/* Nav rail */
+.nav-rail::before {
+  background: linear-gradient(90deg, transparent, var(--brand-purple-18), transparent) !important;
+}
+.nav-item {
+  color: var(--ink-dark-2) !important;
+}
+.nav-item:hover {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+}
+.nav-item.is-active {
+  background: linear-gradient(135deg, var(--brand-magenta-12), var(--brand-purple-06)) !important;
+  border-color: var(--brand-magenta-35) !important;
+  color: var(--brand-navy) !important;
+  box-shadow: var(--shadow-brand) !important;
+}
+.nav-item.is-active::before {
+  background: linear-gradient(180deg, var(--brand-rose), var(--brand-magenta)) !important;
+  box-shadow: none !important;
+}
+
+/* Profil banner vurguları */
+.pb-hello { color: var(--brand-magenta) !important; }
+.pb-name em { color: var(--brand-rose) !important; }
+.pb-sub strong { color: var(--brand-purple) !important; }
+.pb-progress { background: var(--brand-purple-10) !important; }
+.pb-progress-fill { background: linear-gradient(90deg, var(--brand-magenta), var(--brand-rose)) !important; }
+.pb-streak { background: var(--brand-magenta-08) !important; border-color: var(--brand-magenta-35) !important; }
+.pb-streak-text { color: var(--brand-magenta) !important; }
+
+/* Kart başlık ikonları — marka gradyanları */
+.d3-head-icon { color: #fff !important; box-shadow: var(--shadow-sm) !important; }
+.d3-head-icon.is-plan     { background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy)) !important; }
+.d3-head-icon.is-hero     { background: linear-gradient(135deg, var(--brand-rose), var(--brand-magenta)) !important; }
+.d3-head-icon.is-tasks    { background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy)) !important; }
+.d3-head-icon.is-progress { background: linear-gradient(135deg, #3dba72, #2ea86a) !important; }
+.d3-head-icon.is-tip      { background: linear-gradient(135deg, var(--brand-rose), var(--brand-purple)) !important; }
+.d3-head-icon.is-badges   { background: linear-gradient(135deg, #e8a020, var(--brand-magenta)) !important; }
+.d3-head-icon.is-news     { background: linear-gradient(135deg, var(--brand-purple), var(--brand-magenta)) !important; }
+
+.d3-head-link { color: var(--brand-purple) !important; }
+.d3-head-link:hover { color: var(--brand-magenta) !important; }
+
+/* Quest hero — açık kart */
+.quest-hero-subject { color: var(--brand-magenta) !important; }
+.qh-badge,
+.lc-badge {
+  background: var(--brand-purple-06) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  color: var(--brand-purple) !important;
+}
+
+/* Günlük görevler */
+.daily-item.is-done .daily-title {
+  color: var(--ink-dark-2) !important;
+}
+.daily-check {
+  border-color: var(--brand-purple-28) !important;
+  background: var(--bg-surface) !important;
+}
+.daily-item.is-done .daily-check {
+  background: rgba(46, 168, 106, 0.12) !important;
+  border-color: rgba(46, 168, 106, 0.45) !important;
+  color: #2ea86a !important;
+}
+
+/* Yumi sohbet */
+.yumi-chat-head {
+  border-bottom: 1px solid var(--brand-purple-10) !important;
+  background: var(--bg-subtle) !important;
+}
+.yumi-chat-body { background: var(--bg-page) !important; }
+.yumi-chat-msg.from-bot {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.yumi-chat-msg.from-user {
+  background: linear-gradient(135deg, var(--brand-magenta-12), var(--brand-rose-14)) !important;
+  border: 1px solid var(--brand-magenta-35) !important;
+  color: var(--brand-navy) !important;
+}
+.yumi-chat-field {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  color: var(--brand-navy) !important;
+}
+.yumi-chat-field::placeholder { color: var(--ink-dark-2) !important; }
+.yumi-chat-send {
+  background: linear-gradient(135deg, var(--brand-rose), var(--brand-magenta)) !important;
+  color: #fff !important;
+}
+
+/* Drawer & popover */
+.d3-drawer-backdrop { background: var(--brand-navy-45) !important; }
+.d3-drawer-head,
+.pop-head {
+  border-bottom: 1px dashed var(--brand-purple-14) !important;
+  padding-bottom: 16px !important;
+}
+.pop-foot {
+  border-top: 1px solid var(--brand-purple-10) !important;
+  color: var(--brand-purple) !important;
+}
+.pop-foot:hover { color: var(--brand-magenta) !important; background: var(--brand-purple-06) !important; }
+
+/* Scrollbar */
+.stage-col { scrollbar-color: var(--brand-purple-18) transparent !important; }
+.stage-col::-webkit-scrollbar-thumb { background: var(--brand-purple-18) !important; }
+
+/* Assessment banner dashboard içinde */
+.asm-banner {
+  background: linear-gradient(135deg, var(--brand-magenta-12), var(--brand-purple-06)) !important;
+  border: 1px solid var(--brand-magenta-35) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.asm-banner-title { color: var(--brand-navy) !important; }
+.asm-banner-text { color: var(--ink-dark-1) !important; }
+.asm-banner-deadline { color: var(--brand-purple) !important; }
+.asm-banner-icon { background: var(--bg-surface) !important; }
+
+/* Performans / sınavlar sayfa özel başlıklar */
+.sn-pagehead-title,
+.tk-pagehead-title,
+.perf-pagehead-title,
+.ov-pagehead-title,
+.prog-title,
+.prog-section-title,
+.ov-hero-title,
+.ov-section-title,
+.sn-section-title,
+.sn-card-title,
+.perf-hero-num,
+.perf-subj-name,
+.tk-card-title,
+.ov-card-title {
+  color: var(--brand-navy) !important;
+}
+
+/* ============================================================
+ * d3 — Merkez dashboard bileşenleri
+ * ============================================================ */
+.d3-head-title,
+.d3-title,
+.d3-item-title,
+.d3-task-title,
+.d3-hero-title,
+.d3-bar-name,
+.d3-profile-name,
+.d3-profile-level-head strong,
+.d3-ring-num,
+.d3-news-title,
+.d3-badge-name,
+.d3-mega-title,
+.d3-drawer-title,
+.d3-status,
+.d3-program-allbtn,
+.d3-tasks-overdue-title,
+.d3-hero-chip-value,
+.d3-hero-teacher-name,
+.d3-hero-teacher-name strong {
+  color: var(--brand-navy) !important;
+}
+
+.d3-sub,
+.d3-desc,
+.d3-muted,
+.d3-task-meta,
+.d3-hero-sub,
+.d3-bar-pct,
+.d3-profile-meta,
+.d3-news-meta,
+.d3-mega-sub,
+.d3-drawer-sub,
+.d3-hero-chip-label,
+.d3-tasks-overdue-meta,
+.d3-program-date,
+.d3-ring-label,
+.d3-ring-num sup {
+  color: var(--ink-dark-1) !important;
+}
+
+.d3-label,
+.d3-kicker,
+.d3-head-pill,
+.d3-hero-eyebrow,
+.d3-profile-clan-label {
+  color: var(--asm-text-label) !important;
+}
+
+.d3-card,
+.d3-mega,
+.d3-drawer-panel,
+.lc-card,
+.tp-card,
+.quest-hero,
+.rank-card,
+.d3-profile-card,
+.d3-tasks-overdue,
+.d3-program-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-md) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.d3-task,
+.d3-news-item,
+.d3-badge-item,
+.d3-mega-item,
+.rank-row,
+.tp-item-body {
+  color: var(--brand-navy) !important;
+}
+.d3-task:hover,
+.d3-news-item:hover {
+  background: var(--brand-purple-06) !important;
+}
+
+.d3-head-icon { color: #fff !important; }
+.d3-status.is-planned {
+  background: var(--brand-purple-06) !important;
+  color: var(--ink-dark-1) !important;
+  border-color: var(--brand-purple-18) !important;
+}
+button.d3-status.is-join {
+  background: var(--brand-magenta-12) !important;
+  color: var(--brand-magenta) !important;
+  border-color: var(--brand-magenta-35) !important;
+}
+.d3-program-allbtn {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.d3-program-allbtn:hover {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-purple) !important;
+}
+
+/* Quest hero — açık kart, görsel üstünde okunaklı metin */
+.quest-hero {
+  background: linear-gradient(145deg, #fff 0%, rgba(227, 92, 151, 0.06) 100%) !important;
+  border-top: 3px solid var(--brand-magenta) !important;
+}
+.qh-thumb::after {
+  background: linear-gradient(155deg, rgba(227, 92, 151, 0.12), rgba(62, 58, 142, 0.08) 55%, transparent) !important;
+}
+.quest-hero-title,
+.qh-teacher-name,
+.qh-teacher-label {
+  color: var(--brand-navy) !important;
+}
+.quest-hero-subject { color: var(--brand-magenta) !important; }
+
+/* Canlı ders / leaderboard başlıkları */
+.lc-head-title { color: var(--brand-navy) !important; }
+.lc-head-count {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-18) !important;
+  color: var(--brand-purple) !important;
+}
+.lc-tile,
+.tp-item {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-10) !important;
+}
+.lc-tile-title,
+.tp-title,
+.tp-time,
+.rank-name {
+  color: var(--brand-navy) !important;
+}
+.lc-tile-meta,
+.tp-meta,
+.rank-xp {
+  color: var(--ink-dark-1) !important;
+}
+
+/* Yumi widget */
+.yumi-bubble,
+.yumi-tip {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.yumi-x { color: var(--ink-dark-2) !important; }
+.yumi-x:hover { background: var(--brand-purple-06) !important; color: var(--brand-navy) !important; }
+
+/* ============================================================
+ * ov — Ödevler sayfası
+ * ============================================================ */
+.ov-toolbar,
+.ov-stat-card,
+.ov-card,
+.ov-empty,
+.ov-list-section {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-sm) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Ödev grupları — lila bölüm kutuları (Eğitim Setleri divider tonu) */
+.ov-section {
+  position: relative !important;
+  border-radius: 16px !important;
+  padding: 14px 16px 16px !important;
+  overflow: hidden !important;
+  background: linear-gradient(165deg, #faf8ff 0%, #f0ecfb 55%, #ebe6f8 100%) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.ov-section::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--lilac-glow);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.ov-section--today {
+  background: linear-gradient(165deg, #fff6fb 0%, #f5f0fc 100%) !important;
+  border-color: rgba(230, 8, 123, 0.16) !important;
+  border-top: 3px solid rgba(230, 8, 123, 0.32) !important;
+}
+.ov-section--active {
+  background: linear-gradient(165deg, #faf8ff 0%, #eceaf6 100%) !important;
+  border-top: 3px solid var(--brand-purple-28) !important;
+}
+.ov-section--overdue {
+  background: linear-gradient(165deg, #fff9f6 0%, #f5f0fc 100%) !important;
+  border-color: rgba(255, 122, 74, 0.18) !important;
+  border-top: 3px solid rgba(255, 122, 74, 0.32) !important;
+}
+.ov-section--done {
+  background: linear-gradient(165deg, #f6fcf9 0%, #f0ecfb 100%) !important;
+  border-color: rgba(46, 168, 106, 0.16) !important;
+  border-top: 3px solid rgba(46, 168, 106, 0.32) !important;
+}
+.ov-section-head {
+  padding: 10px 12px !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.72) !important;
+  border: 1px solid var(--brand-purple-10) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+}
+.ov-section-line {
+  background: linear-gradient(90deg, var(--brand-purple-18), transparent) !important;
+}
+.ov-section-count { display: none !important; }
+
+.ov-week-eyebrow,
+.ov-hero-eyebrow,
+.ov-card-meta,
+.ov-card-due,
+.ov-stat-label,
+.ov-empty-text {
+  color: var(--ink-dark-1) !important;
+}
+
+.ov-week-range,
+.ov-hero-subject,
+.ov-card-subject,
+.ov-stat-val {
+  color: var(--brand-navy) !important;
+}
+
+.ov-week-btn,
+.ov-subj-chip,
+.ov-filter-chip {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.ov-week-btn:hover,
+.ov-subj-chip:hover {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.ov-week-cal-btn {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.ov-week-cal-btn:hover,
+.ov-week-cal-btn.is-open {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-purple) !important;
+}
+.ov-week-picker {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.ov-week-picker-head {
+  color: var(--asm-text-label) !important;
+  border-bottom-color: var(--brand-purple-10) !important;
+}
+.ov-week-picker-item {
+  color: var(--brand-navy) !important;
+}
+.ov-week-picker-item span {
+  color: var(--ink-dark-1) !important;
+}
+.ov-week-picker-item:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-14) !important;
+}
+.ov-week-picker-item.is-active {
+  background: var(--brand-magenta-10) !important;
+  border-color: var(--brand-magenta-30) !important;
+}
+.ov-week-picker-item.is-active span {
+  color: var(--ink-dark-1) !important;
+}
+
+/* Durum filtresi dropdown — açık tema */
+.ov-status-filter-btn {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.ov-status-filter-btn:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.ov-status-filter-menu {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.ov-status-filter-item { color: var(--brand-navy) !important; }
+.ov-status-filter-item:hover {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+}
+.ov-status-filter-item.is-active {
+  background: var(--brand-magenta-12) !important;
+  border-color: var(--brand-magenta-35) !important;
+  color: var(--brand-navy) !important;
+}
+
+.ov-overdue-banner {
+  background: linear-gradient(135deg, rgba(255,122,74,0.10), rgba(255,107,107,0.06)) !important;
+  border-color: rgba(255,122,74,0.28) !important;
+}
+.ov-overdue-banner strong { color: #c44a12 !important; }
+.ov-overdue-banner p { color: var(--ink-dark-1) !important; }
+.ov-overdue-back {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.ov-overdue-back:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-purple) !important;
+}
+
+.ov-subj-chip.is-active {
+  background: var(--brand-magenta-12) !important;
+  border-color: var(--brand-magenta-35) !important;
+  color: var(--brand-navy) !important;
+  box-shadow: var(--shadow-brand) !important;
+}
+
+.ov-today-btn {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-purple) !important;
+}
+
+.ov-hero {
+  background: linear-gradient(145deg, #fff 0%, color-mix(in srgb, var(--ov-c, var(--brand-purple)) 8%, #fff) 100%) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  border-left: 4px solid var(--ov-c, var(--brand-magenta)) !important;
+}
+.ov-hero-glow { opacity: 0.35 !important; }
+.ov-hero-desc { color: var(--ink-dark-1) !important; }
+
+.ov-card {
+  border-left: 3px solid var(--ov-c, var(--brand-purple)) !important;
+}
+.ov-card:hover {
+  border-color: var(--brand-purple-28) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.ov-card-go { color: var(--brand-purple) !important; }
+.ov-card:hover .ov-card-go { color: var(--brand-magenta) !important; }
+
+.hw-item {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.hw-item:hover { border-color: var(--brand-purple-28) !important; }
+.hw-title { color: var(--brand-navy) !important; }
+.hw-meta, .hw-due { color: var(--ink-dark-1) !important; }
+
+/* ============================================================
+ * sn — Sınavlar sayfası
+ * ============================================================ */
+.sn-upcoming {
+  background: linear-gradient(145deg, #fff 0%, var(--lilac-100) 100%) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  border-left: 4px solid var(--brand-magenta) !important;
+  box-shadow: var(--shadow-md) !important;
+  backdrop-filter: none !important;
+}
+.sn-upcoming-title,
+.sn-upcoming-desc,
+.sn-countdown-unit strong,
+.sn-card-sub,
+.sn-row-title,
+.sn-perf-val,
+.sn-key-cell,
+.sn-detail-title {
+  color: var(--brand-navy) !important;
+}
+.sn-upcoming-meta-item,
+.sn-upcoming-meta-item svg,
+.sn-section-count,
+.sn-row-meta,
+.sn-row-meta-sep,
+.sn-perf-label,
+.sn-key-legend-item {
+  color: var(--ink-dark-1) !important;
+}
+.sn-upcoming-meta-item strong { color: var(--brand-navy) !important; }
+
+.sn-filter-chip,
+.sn-row,
+.sn-card,
+.sn-perf-card,
+.sn-key-panel,
+.sn-detail-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  backdrop-filter: none !important;
+}
+.sn-key-overlay {
+  background: var(--brand-navy-45) !important;
+}
+.sn-key-close {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.sn-key-close:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+.sn-key-head,
+.sn-key-foot {
+  border-color: var(--brand-purple-10) !important;
+}
+.sn-key-eyebrow {
+  color: var(--brand-purple) !important;
+}
+.sn-key-title {
+  color: var(--brand-navy) !important;
+}
+.sn-key-meta-item {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.sn-key-meta-net {
+  background: rgba(46, 168, 106, 0.10) !important;
+  border-color: rgba(46, 168, 106, 0.30) !important;
+}
+.sn-key-meta-label {
+  color: #2ea86a !important;
+}
+.sn-key-meta-net strong {
+  color: #2ea86a !important;
+}
+.sn-key-hint {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-18) !important;
+  color: var(--ink-dark-1) !important;
+  font-family: var(--font-sans) !important;
+}
+.sn-key-hint svg {
+  color: var(--brand-purple) !important;
+}
+.sn-key-section-title {
+  color: var(--brand-purple) !important;
+}
+.sn-key-section-line {
+  background: linear-gradient(90deg, var(--brand-purple-18), transparent) !important;
+}
+.sn-key-section-stat.is-correct {
+  background: rgba(46, 168, 106, 0.10) !important;
+  border-color: rgba(46, 168, 106, 0.28) !important;
+  color: #2ea86a !important;
+}
+.sn-key-section-stat.is-wrong {
+  background: rgba(220, 38, 38, 0.08) !important;
+  border-color: rgba(220, 38, 38, 0.22) !important;
+  color: #dc2626 !important;
+}
+.sn-key-section-stat.is-blank {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.sn-key-back {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.sn-key-back:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+.sn-key-download {
+  background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy)) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: var(--shadow-brand) !important;
+  font-family: var(--font-sans) !important;
+}
+.sn-key-download:hover {
+  background: linear-gradient(135deg, var(--brand-magenta), var(--brand-rose)) !important;
+  box-shadow: 0 8px 24px var(--brand-magenta-18) !important;
+}
+.sn-detail-overlay {
+  background: var(--brand-navy-45) !important;
+}
+.sn-detail-panel {
+  background: var(--bg-surface) !important;
+  border-left-color: var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.sn-detail-close {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.sn-detail-close:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+.sn-detail-head,
+.sn-detail-foot {
+  border-color: var(--brand-purple-10) !important;
+}
+.sn-detail-eyebrow {
+  color: #d4920a !important;
+}
+.sn-detail-meta-item {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.sn-detail-rank-chip {
+  background: rgba(212, 146, 10, 0.08) !important;
+  border-color: rgba(212, 146, 10, 0.28) !important;
+}
+.sn-detail-rank-label {
+  color: var(--ink-dark-2) !important;
+}
+.sn-detail-rank-chip strong {
+  color: var(--brand-navy) !important;
+}
+.sn-detail-pdf {
+  background: rgba(212, 146, 10, 0.10) !important;
+  border: 1px solid rgba(212, 146, 10, 0.32) !important;
+  color: #a86d08 !important;
+  font-family: var(--font-sans) !important;
+}
+.sn-detail-pdf:hover {
+  background: rgba(212, 146, 10, 0.16) !important;
+  border-color: rgba(212, 146, 10, 0.45) !important;
+  color: var(--brand-navy) !important;
+}
+.sn-detail-stat {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+}
+.sn-detail-stat-label {
+  color: var(--ink-dark-2) !important;
+}
+.sn-detail-stat.is-net .sn-detail-stat-value { color: #2ea86a !important; }
+.sn-detail-stat.is-d .sn-detail-stat-value { color: #248f58 !important; }
+.sn-detail-stat.is-y .sn-detail-stat-value { color: var(--brand-magenta) !important; }
+.sn-detail-stat.is-b .sn-detail-stat-value { color: var(--brand-purple) !important; }
+.sn-detail-section-title {
+  color: var(--brand-purple) !important;
+}
+.sn-detail-table-wrap {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+}
+.sn-detail-table th {
+  color: var(--ink-dark-2) !important;
+  background: var(--brand-purple-06) !important;
+}
+.sn-detail-table td {
+  border-bottom-color: var(--brand-purple-10) !important;
+}
+.sn-detail-td-subj { color: var(--brand-navy) !important; }
+.sn-detail-td-d { color: #248f58 !important; }
+.sn-detail-td-y { color: var(--brand-magenta) !important; }
+.sn-detail-td-b { color: var(--brand-purple) !important; }
+.sn-detail-td-net { color: #2ea86a !important; }
+.sn-detail-table tfoot td {
+  background: var(--brand-purple-06) !important;
+  border-top-color: var(--brand-purple-18) !important;
+}
+.sn-detail-xp {
+  background: linear-gradient(135deg, rgba(212, 146, 10, 0.10), rgba(255, 216, 74, 0.08)) !important;
+  border-color: rgba(212, 146, 10, 0.30) !important;
+}
+.sn-detail-xp-label {
+  color: var(--ink-dark-1) !important;
+  font-family: var(--font-sans) !important;
+}
+.sn-detail-xp-value {
+  color: #d4920a !important;
+}
+.sn-detail-xp-value svg {
+  color: #d4920a !important;
+}
+.sn-detail-key {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.sn-detail-key:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-purple) !important;
+}
+.sn-detail-videos {
+  background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy)) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: var(--shadow-brand) !important;
+  font-family: var(--font-sans) !important;
+}
+.sn-detail-videos:hover {
+  background: linear-gradient(135deg, var(--brand-magenta), var(--brand-rose)) !important;
+  box-shadow: 0 8px 24px var(--brand-magenta-18) !important;
+}
+.sn-filter-chip { color: var(--ink-dark-1) !important; }
+.sn-filter-chip:hover {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+}
+.sn-filter-chip.is-active {
+  background: var(--selected-bg) !important;
+  border-color: var(--selected-border) !important;
+  color: var(--selected-strong) !important;
+  box-shadow: inset 0 0 0 1px var(--brand-purple-06) !important;
+}
+
+.sn-countdown-unit {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.sn-countdown-eyebrow,
+.sn-countdown-unit span {
+  color: var(--asm-text-label) !important;
+}
+.sn-countdown-sep { color: var(--brand-purple) !important; }
+
+.sn-upcoming-eyebrow { color: #fff !important; } /* gradyan rozet üzerinde */
+
+.sn-upcoming-visual {
+  box-shadow: var(--shadow-md) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  background: var(--bg-subtle) !important;
+}
+.sn-upcoming-visual-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Ödev drawer — blur için şeffaf kabuk (beyaz kart arka planı blur'u engeller) */
+.d3-drawer {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.sn-remind-modal-backdrop {
+  background: var(--brand-navy-45) !important;
+}
+.sn-remind-modal-card {
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.sn-remind-modal-title { color: var(--brand-navy) !important; }
+.sn-remind-modal-sub { color: var(--ink-dark-1) !important; }
+.sn-remind-modal-close {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.sn-remind-cal {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+}
+.sn-remind-cal-nav-btn {
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.sn-remind-cal-label { color: var(--brand-navy) !important; }
+.sn-remind-cal-weekdays span { color: var(--ink-dark-2) !important; }
+.sn-remind-cal-cell { color: var(--brand-navy) !important; }
+.sn-remind-cal-cell.is-disabled { color: var(--ink-dark-2) !important; opacity: 0.45; }
+.sn-remind-cal-cell.is-selected {
+  background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy)) !important;
+  color: #fff !important;
+}
+.sn-remind-time-select {
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple-18) !important;
+  color: var(--brand-navy) !important;
+}
+.sn-remind-time-label { color: var(--ink-dark-2) !important; }
+.sn-remind-time-sep { color: var(--ink-dark-2) !important; }
+.sn-remind-preview {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-18) !important;
+  color: var(--ink-dark-1) !important;
+}
+.sn-remind-before-check span {
+  color: var(--brand-navy) !important;
+}
+.sn-remind-btn--ghost {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.sn-remind-btn--danger {
+  background: var(--brand-magenta-08) !important;
+  border-color: var(--brand-magenta-35) !important;
+  color: var(--brand-magenta) !important;
+}
+.sn-remind-btn--primary {
+  background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy)) !important;
+  color: #fff !important;
+}
+
+.sn-card { border-top: 3px solid var(--brand-purple) !important; }
+.sn-card:nth-child(3n+2) { border-top-color: var(--brand-rose) !important; }
+.sn-card:nth-child(3n)   { border-top-color: var(--brand-magenta) !important; }
+
+/* ============================================================
+ * perf — Performans sayfası
+ * ============================================================ */
+.perf-pagehead-sub,
+.perf-hero-label,
+.perf-hero-sub,
+.perf-subj-meta,
+.perf-hero-chart-label,
+.perf-donut-label,
+.perf-hw-stat-label {
+  color: var(--ink-dark-1) !important;
+}
+
+.perf-card,
+.perf-hero,
+.perf-subj-row,
+.perf-hw-stat {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-sm) !important;
+  backdrop-filter: none !important;
+}
+
+.perf-hero {
+  background: linear-gradient(145deg, #fff 0%, rgba(62, 58, 142, 0.06) 100%) !important;
+  border-top: 3px solid var(--brand-purple) !important;
+}
+
+.perf-filter-btn {
+  background: var(--selected-bg) !important;
+  border-color: var(--selected-border) !important;
+  color: var(--selected-text) !important;
+}
+.perf-filter-menu {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.perf-filter-item.is-active {
+  background: var(--selected-bg) !important;
+  border-color: var(--selected-border) !important;
+  color: var(--selected-strong) !important;
+}
+
+.perf-subj-row:hover { background: var(--brand-purple-06) !important; }
+.perf-subj-bar { background: var(--brand-purple-10) !important; }
+.perf-subj-bar-fill { background: linear-gradient(90deg, var(--brand-magenta), var(--brand-rose)) !important; }
+.perf-subj-score { color: var(--brand-navy) !important; }
+.perf-donut-track { stroke: var(--brand-purple-10) !important; }
+
+/* ============================================================
+ * prog — Program sayfası
+ * ============================================================ */
+.prog-page {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-md) !important;
+  backdrop-filter: none !important;
+}
+.prog-section-title {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-display) !important;
+}
+.prog-section-line,
+.tk-pagehead-line,
+.sn-pagehead .sn-section-line,
+.sn-section-line {
+  background: linear-gradient(90deg, var(--brand-purple-18), transparent) !important;
+}
+.prog-eyebrow,
+.prog-edu-nav-eyebrow { color: var(--brand-magenta) !important; }
+.prog-date-label,
+.prog-edu-nav-range,
+.prog-month-day-num,
+.prog-drawer-meta {
+  color: var(--ink-dark-1) !important;
+}
+.prog-nav-btn,
+.prog-edu-nav-btn,
+.prog-edu-nav-cal-btn,
+.prog-view-btn {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.prog-nav-btn:hover,
+.prog-edu-nav-btn:hover,
+.prog-edu-nav-cal-btn:hover,
+.prog-edu-nav-cal-btn.is-open,
+.prog-view-btn:hover {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+}
+.prog-edu-nav-cal-btn:hover,
+.prog-edu-nav-cal-btn.is-open {
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-purple) !important;
+}
+.prog-edu-picker {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.prog-edu-picker-head {
+  color: var(--asm-text-label) !important;
+  border-bottom-color: var(--brand-purple-10) !important;
+}
+.prog-edu-picker-item { color: var(--brand-navy) !important; }
+.prog-edu-picker-item span { color: var(--ink-dark-1) !important; }
+.prog-edu-picker-item:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-14) !important;
+}
+.prog-edu-picker-item.is-active {
+  background: var(--brand-magenta-10) !important;
+  border-color: var(--brand-magenta-30) !important;
+}
+.prog-edu-picker-item.is-active span { color: var(--ink-dark-1) !important; }
+.prog-view-btn.is-active {
+  background: var(--brand-magenta-12) !important;
+  border-color: var(--brand-magenta-35) !important;
+  color: var(--brand-navy) !important;
+}
+.prog-today-btn {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-purple) !important;
+}
+/* prog-week / prog-event → assets/prog-lesson-cards.css */
+.prog-drawer-panel {
+  background: var(--bg-surface) !important;
+  border-left: 1px solid var(--brand-purple-14) !important;
+}
+.prog-drawer-title { color: var(--brand-navy) !important; }
+.prog-month-day {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-08) !important;
+  color: var(--brand-navy) !important;
+}
+.prog-month-day.is-today {
+  border-color: var(--brand-magenta-35) !important;
+  background: var(--brand-magenta-08) !important;
+}
+
+/* ============================================================
+ * tk — Tekrarlar sayfası
+ * ============================================================ */
+.tk-filter-chip,
+.tk-card-body {
+  color: var(--brand-navy) !important;
+}
+.tk-card-meta,
+.tk-card-date,
+.tk-pagehead-sub {
+  color: var(--ink-dark-1) !important;
+}
+.tk-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.tk-card:hover {
+  border-color: var(--brand-purple-28) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.tk-filter-chip {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.tk-filter-chip.is-active {
+  background: var(--brand-magenta-12) !important;
+  border-color: var(--brand-magenta-35) !important;
+}
+
+/* Video oynatıcı — kabuk açık, video üstü kontroller koyu kalır */
+.tk-player-shell {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.tk-player-shell[data-subject="trk"] { --ov-c: var(--brand-purple) !important; }
+.tk-player-close {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.tk-player-close:hover {
+  background: var(--brand-magenta-12) !important;
+  border-color: var(--brand-magenta-35) !important;
+  color: var(--brand-magenta) !important;
+}
+.tk-player-body,
+.tk-player-info {
+  background: var(--bg-surface) !important;
+  color: var(--brand-navy) !important;
+}
+.tk-player-title,
+.tk-player-eyebrow,
+.tk-player-desc,
+.tk-player-section-label,
+.tk-player-info .tk-player-title,
+.tk-player-info .tk-player-desc,
+.tk-player-info .tk-player-section-label {
+  color: var(--brand-navy) !important;
+}
+.tk-player-eyebrow { color: var(--brand-purple) !important; font-family: var(--font-mono) !important; }
+.tk-player-section-label { color: var(--asm-text-label) !important; }
+.tk-player-desc { color: var(--ink-dark-1) !important; }
+.tk-player-teacher-card {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.tk-player-teacher-text strong { color: var(--brand-navy) !important; }
+.tk-player-teacher-role { color: var(--ink-dark-1) !important; }
+.tk-player-teacher-profile:hover { background: var(--brand-purple-06) !important; }
+.tk-player-teacher-msg {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-purple) !important;
+}
+.tk-player-teacher-msg:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+.tk-player-speed-menu {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.tk-player-speed-item {
+  color: var(--brand-navy) !important;
+}
+.tk-player-speed-item:hover {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+}
+.tk-player-speed-item.is-active,
+.tk-player-ctrl.is-active {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-purple) !important;
+}
+.tk-player-bigplay { color: var(--brand-magenta) !important; }
+
+/* Scrollbar — sayfa içi */
+.ov-page,
+.sn-page,
+.perf-page,
+.tk-page,
+.prog-page {
+  scrollbar-color: var(--brand-purple-18) transparent !important;
+}
+
+/* ============================================================
+ * MERKEZ (dashboard.html) — okunabilirlik tamamlayıcı
+ * Inline stillerdeki color:white kurallarını ezer
+ * ============================================================ */
+
+/* Profil banner */
+.pb-name {
+  color: var(--brand-navy) !important;
+}
+.pb-name em {
+  background: linear-gradient(120deg, var(--brand-magenta), var(--brand-purple)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+.pb-level { color: var(--brand-purple) !important; }
+.profile-banner {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-md) !important;
+  backdrop-filter: none !important;
+}
+
+/* Quest hero */
+.quest-hero-title {
+  color: var(--brand-navy) !important;
+}
+.btn-ghost {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  color: var(--brand-navy) !important;
+}
+.btn-ghost:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+
+/* Günlük görevler */
+.daily-xp { color: var(--brand-purple) !important; }
+.daily-meta { color: var(--ink-dark-1) !important; }
+
+/* Canlı ders / program timeline */
+.tp-type { color: var(--asm-text-label) !important; }
+.tp-name { color: var(--brand-navy) !important; }
+.tp-time { color: var(--brand-purple) !important; }
+.tp-xp { color: var(--brand-magenta) !important; }
+.tp-allbtn {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-purple) !important;
+}
+.tp-allbtn:hover {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+}
+
+/* Sıralama */
+.rank-xp { color: var(--ink-dark-1) !important; }
+
+/* Yumi dock */
+.yumi-panel {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+  backdrop-filter: none !important;
+}
+.yumi-notif-name,
+.yumi-notif-text,
+.yumi-next {
+  color: var(--brand-navy) !important;
+}
+.yumi-next {
+  background: var(--brand-purple-06) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+}
+.yumi-next:hover {
+  background: var(--brand-magenta-12) !important;
+  border-color: var(--brand-magenta-35) !important;
+}
+
+/* Mega kart — Bugünün Akışı */
+.d3-card-mega {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  border-top: 3px solid var(--brand-purple) !important;
+}
+.d3-mega-head {
+  border-bottom: 1px dashed var(--brand-purple-14) !important;
+  padding-bottom: 12px !important;
+}
+.d3-mega-head-date { color: var(--ink-dark-1) !important; }
+.d3-mega-right {
+  border-top: 1px solid var(--brand-purple-10) !important;
+}
+
+/* Kart başlıkları — içerikten ayırıcı (drawer quote header tonu) */
+.d3-head {
+  border-bottom: 1px dashed var(--brand-purple-14) !important;
+  padding-bottom: 12px !important;
+  margin-bottom: 16px !important;
+}
+.d3-card-tasks .d3-head {
+  border-bottom-color: rgba(227, 92, 151, 0.22) !important;
+}
+.d3-card-progress .d3-head {
+  border-bottom-color: rgba(46, 168, 106, 0.22) !important;
+}
+.d3-card-profile .d3-head {
+  border-bottom-color: rgba(62, 58, 142, 0.18) !important;
+}
+.d3-card-badges .d3-head {
+  border-bottom-color: rgba(232, 160, 32, 0.22) !important;
+}
+.d3-card-news .d3-head {
+  border-bottom-color: var(--brand-purple-14) !important;
+}
+.d3-card-mega .d3-mega-head {
+  border-bottom-color: var(--brand-purple-14) !important;
+}
+
+/* Öğretmen Merkez — Haftalık Ders Programı (sağ sütun) */
+.td-teacher-stage .td-week-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  border-top: 3px solid var(--brand-purple) !important;
+  box-shadow: var(--shadow-md) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.td-week-card > .td-week-head.d3-head {
+  border-bottom-color: var(--brand-purple-14) !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 12px !important;
+}
+.td-week-head .d3-head-title {
+  color: var(--brand-navy) !important;
+}
+.td-week-head .td-week-filter-bar {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+}
+.td-week-filter-label {
+  color: var(--brand-navy) !important;
+}
+.td-week-select {
+  background: var(--bg-surface) !important;
+  color: var(--brand-navy) !important;
+  border-color: var(--brand-purple-18) !important;
+}
+.td-week-select-chevron {
+  color: var(--brand-navy) !important;
+}
+.td-week-edu-eyebrow {
+  color: var(--brand-magenta) !important;
+}
+.td-week-edu-range {
+  color: var(--brand-navy) !important;
+}
+.td-week-edu-btn,
+.td-week-edu-cal-btn {
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple-18) !important;
+  color: var(--brand-navy) !important;
+}
+.td-week-edu-btn:hover:not(:disabled),
+.td-week-edu-cal-btn:hover,
+.td-week-edu-cal-btn.is-open {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.td-week-edu-picker {
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.td-week-edu-picker-head {
+  color: var(--ink-dark-2) !important;
+  border-bottom-color: var(--brand-purple-10) !important;
+}
+.td-week-edu-picker-item {
+  color: var(--brand-navy) !important;
+}
+.td-week-edu-picker-item span {
+  color: var(--ink-dark-1) !important;
+}
+.td-week-edu-picker-item.is-active strong {
+  color: var(--brand-magenta) !important;
+}
+.td-week-chip-val {
+  color: var(--brand-navy) !important;
+}
+.td-week-chip-label {
+  color: var(--ink-dark-1) !important;
+}
+.td-teacher-stage .td-state {
+  color: var(--ink-dark-1) !important;
+}
+.td-teacher-stage .td-state.is-error {
+  color: #dc2626 !important;
+}
+.td-wcal-day-group {
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple-14) !important;
+}
+.td-wcal-day-hd {
+  color: var(--brand-purple) !important;
+  background: var(--brand-purple-06) !important;
+  border-bottom-color: var(--brand-purple-14) !important;
+}
+.td-wcal-day-num {
+  color: var(--brand-navy) !important;
+}
+.td-wcal-item-subject {
+  color: var(--brand-navy) !important;
+}
+.td-wcal-item-topic,
+.td-wcal-item-clan {
+  color: var(--ink-dark-1) !important;
+}
+.td-wcal-day-empty {
+  color: var(--ink-dark-2) !important;
+  background: var(--brand-purple-04) !important;
+  border-color: var(--brand-purple-14) !important;
+}
+.td-wcal-nav-btn {
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple) !important;
+  color: var(--brand-purple) !important;
+}
+.td-wcal-nav-btn:hover:not(:disabled) {
+  background: var(--brand-purple) !important;
+  color: #fff !important;
+}
+
+/* Canlı video alanı — koyu overlay üstünde beyaz metin kalsın */
+.d3-hero-video-info .d3-hero-video-title,
+.d3-hero-video-info .d3-hero-video-meta,
+.d3-hero-video-info .d3-hero-video-meta strong,
+.d3-hero-video-info .d3-hero-video-meta-sep,
+.d3-hero-video-info .d3-hero-video-week {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+.d3-hero-video-info .d3-hero-video-meta-sep { color: rgba(255, 255, 255, 0.45) !important; }
+.d3-hero-video-info .d3-hero-video-subject { color: #fff !important; }
+
+/* Timeline — sonraki dersler */
+.d3-tl-time { color: var(--brand-purple) !important; }
+.d3-tl-card {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-10) !important;
+}
+.d3-tl-card:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.d3-tl-topic { color: var(--brand-navy) !important; }
+.d3-tl-week {
+  margin-left: auto !important;
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-18) !important;
+  color: var(--ink-dark-1) !important;
+}
+.d3-prog-yumi-text { color: var(--brand-navy) !important; }
+.d3-prog-yumi-text strong { color: var(--brand-purple) !important; }
+
+/* Ödevler carousel */
+.d3-task {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-10) !important;
+}
+.d3-task:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.d3-task-name { color: var(--brand-navy) !important; }
+.d3-task-due { color: var(--ink-dark-1) !important; }
+.d3-task.is-done {
+  background: var(--brand-navy-04) !important;
+  border-color: var(--brand-purple-10) !important;
+}
+.d3-task.is-done .d3-task-name { color: var(--ink-dark-2) !important; }
+.d3-task.is-done .d3-task-due { color: var(--ink-dark-2) !important; }
+.d3-task-xp {
+  background: linear-gradient(135deg, #fff8eb 0%, #ffefc8 100%) !important;
+  border: 1px solid rgba(180, 120, 0, 0.38) !important;
+  color: #8a5800 !important;
+  font-family: var(--font-mono) !important;
+  font-weight: 800 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 3px rgba(180, 120, 0, 0.12) !important;
+}
+.d3-task-xp.is-max-xp,
+.d3-task-xp.is-min-xp {
+  font-size: 10px !important;
+  letter-spacing: 0.03em !important;
+}
+.d3-task.is-done .d3-task-xp {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--ink-dark-2) !important;
+  box-shadow: none !important;
+}
+.d3-tasks-nav {
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple-18) !important;
+  color: var(--brand-navy) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.d3-tasks-nav:hover:not(:disabled) {
+  background: var(--brand-magenta-12) !important;
+  border-color: var(--brand-magenta-35) !important;
+}
+.d3-tasks-overdue {
+  background: linear-gradient(135deg, rgba(212, 146, 10, 0.10), rgba(230, 8, 123, 0.06)) !important;
+  border-color: rgba(212, 146, 10, 0.35) !important;
+  color: var(--brand-navy) !important;
+}
+.d3-tasks-overdue-text strong { color: #b87a08 !important; }
+
+/* Gelişim özeti */
+.d3-ring-bg { stroke: var(--brand-purple-10) !important; }
+.d3-ring-num { color: var(--brand-navy) !important; }
+.d3-bar-val { color: var(--brand-purple) !important; }
+.d3-bar-track { background: var(--brand-purple-10) !important; }
+
+/* Rozetler & haberler */
+.d3-badge-name { color: var(--ink-dark-1) !important; }
+.d3-badge-item.is-locked .d3-badge-name { color: var(--ink-dark-2) !important; }
+.d3-news-text { color: var(--ink-dark-1) !important; }
+.d3-news-nav-btn {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.d3-news-nav-btn:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-purple) !important;
+}
+
+/* Profil kartı */
+.d3-profile-name,
+.d3-profile-clan,
+.d3-profile-stat-val {
+  color: var(--brand-navy) !important;
+}
+.d3-profile-stat-label { color: var(--asm-text-label) !important; }
+.d3-profile-level-track { background: var(--brand-purple-10) !important; }
+
+/* Drawer — açık tema */
+.d3-drawer-panel {
+  background: var(--bg-surface) !important;
+  border-left: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.d3-drawer-close {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.d3-drawer-close:hover { background: var(--brand-purple-06) !important; }
+.d3-drawer-eyebrow { color: var(--asm-text-label) !important; }
+.d3-drawer-title {
+  color: var(--brand-navy) !important;
+}
+.d3-drawer-text,
+.d3-drawer-reward-text,
+.d3-drawer-progress-head,
+.d3-drawer-progress-head strong,
+.d3-drawer-file-name,
+.d3-drawer-game-level-head strong {
+  color: var(--brand-navy) !important;
+}
+.d3-drawer-sub,
+.d3-drawer-meta,
+.d3-drawer-file-meta,
+.d3-drawer-game-level-sub {
+  color: var(--ink-dark-1) !important;
+}
+.d3-drawer-progress-track { background: var(--brand-purple-10) !important; }
+.d3-prog-select-item { color: var(--ink-dark-1) !important; }
+.d3-prog-select-item.is-active {
+  background: var(--brand-magenta-12) !important;
+  color: var(--brand-navy) !important;
+}
+
+/* Gelişim grafiği — bar chart & istatistikler */
+.d3-prog-val { color: var(--brand-navy) !important; }
+.d3-prog-label { color: var(--asm-text-label) !important; }
+.d3-prog-stat-val { color: var(--brand-navy) !important; }
+.d3-prog-stat-val sup { color: var(--ink-dark-1) !important; }
+.d3-prog-stat-label { color: var(--asm-text-label) !important; }
+.d3-prog-select-btn {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.d3-prog-select-btn:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.d3-prog-select-menu {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+  backdrop-filter: none !important;
+}
+
+/* Öğrenci kartı — profil detay */
+.d3-profile-grade { color: var(--asm-text-label) !important; }
+.d3-profile-clan { color: var(--brand-purple) !important; }
+.d3-profile-level-head { color: var(--ink-dark-1) !important; }
+.d3-profile-level-head strong { color: var(--brand-navy) !important; }
+.d3-profile-stat {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-10) !important;
+}
+.d3-profile-stat-link:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.d3-profile-stat-arrow {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-purple) !important;
+}
+.d3-profile-level {
+  border-color: var(--brand-purple-10) !important;
+}
+
+/* Kart başlık sayaçları */
+.d3-head-count { color: var(--brand-magenta) !important; }
+.d3-head-overdue { color: #b87a08 !important; }
+
+/* Rozet ilerleme & haber kartı alt detay */
+.d3-next-badge-label { color: var(--ink-dark-1) !important; }
+.d3-next-badge-val { color: var(--asm-text-label) !important; }
+.d3-next-badge-track { background: var(--brand-purple-10) !important; }
+.d3-stack .d3-card { background: var(--bg-surface) !important; }
+
+/* Rozetler sayfası */
+.rbz-title { color: var(--brand-navy) !important; }
+.rbz-sub, .rbz-back { color: var(--ink-dark-2) !important; }
+.rbz-back:hover { color: var(--brand-navy) !important; }
+.rbz-summary-stat {
+  background: linear-gradient(165deg, #faf8ff 0%, #f0ecfb 100%) !important;
+  border-color: var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.rbz-summary-stat.is-unlocked {
+  background: linear-gradient(165deg, #f6fcf9 0%, #f0ecfb 100%) !important;
+  border-color: rgba(46, 168, 106, 0.28) !important;
+}
+.rbz-summary-val { color: var(--brand-navy) !important; }
+.rbz-summary-lbl { color: var(--ink-dark-2) !important; }
+
+/* Kategori kutuları — ödev bölümleri ile uyumlu lila tema */
+.rbz-page > .rbz-section {
+  flex-shrink: 0 !important;
+}
+.rbz-section {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  border-radius: 16px !important;
+  padding: 14px 16px 16px !important;
+  background: linear-gradient(165deg, #faf8ff 0%, #f0ecfb 55%, #ebe6f8 100%) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.rbz-section::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--lilac-glow);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.rbz-section-head {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 10px 12px !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.72) !important;
+  border: 1px solid var(--brand-purple-10) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+  flex-shrink: 0 !important;
+}
+.rbz-section .d3-badges-row {
+  flex-shrink: 0;
+  width: 100%;
+}
+.rbz-section-line {
+  background: linear-gradient(90deg, var(--brand-purple-18), transparent) !important;
+}
+.rbz-section-title { color: var(--brand-navy) !important; }
+.rbz-section-dot { box-shadow: none !important; background: var(--rbz-c, var(--brand-purple)) !important; }
+
+.rbz-section--basari {
+  background: linear-gradient(165deg, #fffbf3 0%, #f5f0fc 100%) !important;
+  border-top: 3px solid rgba(255, 180, 40, 0.38) !important;
+}
+.rbz-section--seri {
+  background: linear-gradient(165deg, #fff8f4 0%, #f5f0fc 100%) !important;
+  border-top: 3px solid rgba(255, 122, 74, 0.32) !important;
+}
+.rbz-section--baslangic {
+  background: linear-gradient(165deg, #faf8ff 0%, #eceaf6 100%) !important;
+  border-top: 3px solid var(--brand-purple-28) !important;
+}
+.rbz-section--xp {
+  background: linear-gradient(165deg, #f4fbff 0%, #f0ecfb 100%) !important;
+  border-top: 3px solid rgba(74, 214, 255, 0.32) !important;
+}
+.rbz-section--calisma {
+  background: linear-gradient(165deg, #f4f8ff 0%, #f0ecfb 100%) !important;
+  border-top: 3px solid rgba(62, 58, 142, 0.32) !important;
+}
+.rbz-section--sinav {
+  background: linear-gradient(165deg, #fff7f7 0%, #f5f0fc 100%) !important;
+  border-top: 3px solid rgba(255, 107, 107, 0.30) !important;
+}
+.rbz-section--odev {
+  background: linear-gradient(165deg, #fffcf3 0%, #f5f0fc 100%) !important;
+  border-top: 3px solid rgba(212, 146, 10, 0.32) !important;
+}
+.rbz-section--klan {
+  background: linear-gradient(165deg, #f6f7ff 0%, #f0ecfb 100%) !important;
+  border-top: 3px solid rgba(62, 58, 142, 0.28) !important;
+}
+.rbz-section--kesif {
+  background: linear-gradient(165deg, #f6fcf9 0%, #f0ecfb 100%) !important;
+  border-top: 3px solid rgba(46, 168, 106, 0.32) !important;
+}
+
+.rbz-badge-desc { color: var(--ink-dark-2) !important; }
+.d3-badge-item.is-locked .rbz-badge-desc { color: var(--ink-dark-3) !important; }
+
+/* ============================================================
+ * Klan Detayları sayfası
+ * ============================================================ */
+.klan-pagehead-title {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-display) !important;
+}
+.klan-pagehead-line {
+  background: linear-gradient(90deg, var(--brand-purple-18), transparent) !important;
+}
+.klan-detail-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-md) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.klan-detail-card::before { opacity: 0.65 !important; }
+.klan-detail-eyebrow {
+  color: var(--asm-text-label) !important;
+  font-family: var(--font-mono) !important;
+}
+.klan-detail-name {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-display) !important;
+}
+.klan-stat {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.klan-stat-label {
+  color: var(--asm-text-label) !important;
+  font-family: var(--font-mono) !important;
+}
+.klan-stat-val {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-display) !important;
+}
+.klan-stat-val.is-rank { color: #9a6808 !important; }
+.klan-stat-val.is-program {
+  color: var(--brand-navy) !important;
+  font-size: 18px !important;
+}
+.klan-page { scrollbar-color: var(--brand-purple-18) transparent !important; }
+
+.klan-section-title {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-display) !important;
+  font-size: 20px !important;
+}
+.klan-section-line {
+  background: linear-gradient(90deg, var(--brand-purple-18), transparent) !important;
+}
+.klan-rank-panel {
+  background: linear-gradient(165deg, #faf8ff 0%, #f5f1fc 55%, #f0ecfb 100%) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-md) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.klan-rank-panel--clan {
+  border-top-color: var(--brand-magenta) !important;
+}
+.klan-rank-panel--student {
+  border-top-color: #5eb8e8 !important;
+}
+.klan-rank-panel-head {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border-bottom: 1px solid var(--brand-purple-14) !important;
+}
+.klan-rank-panel-icon {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.klan-rank-panel--clan .klan-rank-panel-icon {
+  background: var(--brand-magenta-08) !important;
+  border-color: var(--brand-magenta-35) !important;
+}
+.klan-rank-panel--student .klan-rank-panel-icon {
+  background: rgba(94, 184, 232, 0.10) !important;
+  border-color: rgba(94, 184, 232, 0.28) !important;
+}
+.klan-rank-panel-title {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-display) !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+}
+.klan-rank-panel-line {
+  background: linear-gradient(90deg, var(--brand-purple-18), transparent) !important;
+}
+.klan-rank-gap { color: var(--brand-purple-28) !important; font-family: var(--font-mono) !important; }
+.klan-rank-row {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.klan-rank-row.is-me {
+  background: linear-gradient(90deg, var(--brand-magenta-08), var(--brand-purple-06)) !important;
+  border-color: var(--brand-magenta-35) !important;
+  box-shadow: none !important;
+}
+.klan-rank-row.is-blurred .klan-rank-row-body {
+  filter: blur(5px) !important;
+  opacity: 0.38 !important;
+}
+.klan-rank-name {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+}
+.klan-rank-sub {
+  color: var(--ink-dark-2) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 11px !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+.klan-rank-row.is-me .klan-rank-sub { color: var(--brand-magenta) !important; }
+.klan-rank-xp {
+  color: var(--brand-purple) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 13px !important;
+}
+.klan-rank-num {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-mono) !important;
+}
+.klan-rank-row.is-top-1 .klan-rank-num {
+  background: linear-gradient(135deg, #ffd84a, #ff9a3a) !important;
+  color: #1a0828 !important;
+}
+.klan-rank-row.is-top-2 .klan-rank-num {
+  background: #d8dce8 !important;
+  color: #1a0828 !important;
+}
+.klan-rank-row.is-top-3 .klan-rank-num {
+  background: linear-gradient(135deg, #d8814f, #b35e35) !important;
+  color: #fff !important;
+}
+.klan-rank-emblem {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+}
+.klan-rank-avatar {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-14) !important;
+}
+.klan-rank-you {
+  background: linear-gradient(135deg, var(--brand-magenta), var(--brand-rose)) !important;
+  color: #fff !important;
+  border: none !important;
+  font-family: var(--font-mono) !important;
+}
+
+/* Grafik tooltip — açık kart */
+.d3-prog-pt-tip {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.d3-prog-pt-tip-label,
+.d3-prog-pt-tip-meta {
+  color: var(--ink-dark-1) !important;
+}
+.d3-prog-pt-tip-meta strong { color: var(--brand-navy) !important; }
+.d3-prog-pt-tip-meta-sep { color: var(--ink-dark-2) !important; }
+.d3-prog-pt-tip-trend.is-flat { color: var(--ink-dark-2) !important; }
+
+/* Mesaj modal */
+.d3-msg-modal-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  color: var(--brand-navy) !important;
+}
+.d3-msg-modal-title,
+.d3-msg-modal-label {
+  color: var(--brand-navy) !important;
+}
+.d3-msg-modal-textarea {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  color: var(--brand-navy) !important;
+}
+.d3-msg-modal-textarea::placeholder { color: var(--ink-dark-2) !important; }
+.d3-msg-modal-cancel {
+  background: var(--bg-subtle) !important;
+  color: var(--ink-dark-1) !important;
+  border-color: var(--brand-purple-14) !important;
+}
+.d3-msg-modal-cancel:hover {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+}
+
+/* ============================================================
+ * Dashboard — tipografi (Poppins) + marka butonları
+ * ============================================================ */
+
+.stage,
+.stage-center,
+.stage-left,
+.stage-right,
+.d3-card,
+.d3-page,
+.profile-banner,
+.pb-card,
+.daily-card,
+.rank-card,
+.lc-card,
+.quest-hero,
+.sn-page,
+.d3-drawer-panel,
+.yumi-panel {
+  font-family: var(--font-sans) !important;
+}
+
+/* Sayılar / XP / süre — mono */
+.stat-value,
+.pb-card-xp,
+.d3-ring-num,
+.d3-bar-val,
+.d3-prog-val,
+.rank-xp,
+.rank-num,
+.d3-head-count,
+.tp-xp,
+.daily-xp {
+  font-family: var(--font-mono) !important;
+}
+
+/* Öğrenci kartı, gelişim, rozetler — Montserrat + Poppins */
+.d3-prog-stat-val,
+.d3-prog-stat-trend-row,
+.d3-prog-select-btn,
+.d3-profile-name,
+.d3-profile-stat-val,
+.d3-profile-level-head strong,
+.d3-profile-cta,
+.d3-badge-name {
+  font-family: var(--font-display) !important;
+}
+.d3-prog-stat-label,
+.d3-prog-chart-labels,
+.d3-profile-grade,
+.d3-profile-clan,
+.d3-profile-stat-label,
+.d3-profile-level-head {
+  font-family: var(--font-sans) !important;
+}
+
+/* Etiket & gövde metinleri */
+.nav-item-label,
+.d3-mega-head-date,
+.d3-program-date,
+.d3-tl-type,
+.d3-news-title,
+.pb-card-label,
+.d3-hero-chip-label,
+.d3-program-allbtn,
+.d3-head-link,
+.d3-mega-sub,
+.d3-news-text {
+  font-family: var(--font-sans) !important;
+}
+
+.pb-card-label { color: var(--asm-text-label) !important; }
+.pb-card-xp    { color: var(--brand-navy) !important; font-weight: 800 !important; }
+
+.d3-hero-chip-value { color: var(--brand-navy) !important; }
+.d3-hero-chip-label { color: var(--asm-text-label) !important; }
+
+/* Birincil CTA — marka gradyan */
+.d3-hero-cta,
+button.d3-status.is-join,
+.asm-btn-primary,
+.d3-msg-modal-send,
+.sn-row-btn-primary {
+  background: linear-gradient(135deg, var(--brand-magenta), var(--brand-rose)) !important;
+  color: #fff !important;
+  border: none !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 700 !important;
+  box-shadow: var(--shadow-brand) !important;
+}
+.d3-hero-cta:hover,
+button.d3-status.is-join:hover,
+.asm-btn-primary:hover,
+.d3-msg-modal-send:hover {
+  filter: brightness(1.04) !important;
+  box-shadow: 0 14px 32px var(--brand-magenta-35) !important;
+}
+.d3-hero-cta.is-waiting,
+.d3-hero-cta.is-waiting:hover {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+  cursor: default !important;
+}
+
+/* İkincil / hayalet butonlar */
+.d3-program-allbtn,
+.tp-allbtn,
+.btn-ghost,
+.d3-msg-modal-cancel,
+.d3-tasks-nav,
+.d3-news-nav-btn,
+.d3-prog-select-btn,
+.sn-row-btn,
+.asm-btn-ghost {
+  font-family: var(--font-sans) !important;
+  font-weight: 600 !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.d3-program-allbtn:hover,
+.tp-allbtn:hover,
+.btn-ghost:hover,
+.d3-tasks-nav:hover:not(:disabled),
+.d3-news-nav-btn:hover,
+.d3-prog-select-btn:hover,
+.sn-row-btn:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-purple) !important;
+}
+
+/* Durum rozetleri */
+.d3-status.is-soon {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-purple) !important;
+  font-family: var(--font-sans) !important;
+}
+button.d3-status.is-join {
+  font-family: var(--font-sans) !important;
+}
+
+.d3-msg-modal-send {
+  border: none !important;
+}
+
+/* Günlük görev satırları */
+.daily-item {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-10) !important;
+}
+.daily-title { color: var(--brand-navy) !important; font-family: var(--font-sans) !important; }
+.daily-status {
+  background: var(--brand-purple-06) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-purple) !important;
+  font-family: var(--font-sans) !important;
+}
+
+/* Yumi panel — açık tema metin */
+.yumi-notif-text,
+.yumi-chat-msg,
+.yumi-chip {
+  font-family: var(--font-sans) !important;
+  color: var(--brand-navy) !important;
+}
+.yumi-notif-text {
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+  color: var(--ink-dark-1) !important;
+}
+.yumi-notif-name {
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+}
+.yumi-chat-send {
+  background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy)) !important;
+  border: none !important;
+}
+.yumi-chat-field {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+.yumi-chat-field::placeholder { color: var(--ink-dark-2) !important; }
+.yumi-chat-name { color: var(--brand-navy) !important; font-family: var(--font-sans) !important; }
+.yumi-chat-status { color: var(--ink-dark-2) !important; font-family: var(--font-sans) !important; }
+
+/* ============================================================
+ * Shell — kalan cyan/beyaz kalıntılar
+ * ============================================================ */
+
+.d3-news-dot {
+  background: var(--brand-purple-14) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+}
+.d3-news-dot.is-active {
+  background: var(--brand-magenta) !important;
+  border-color: var(--brand-magenta) !important;
+  box-shadow: 0 0 0 3px var(--brand-magenta-12) !important;
+}
+.d3-news-dot:hover:not(.is-active) {
+  background: var(--brand-purple-28) !important;
+}
+
+.yumi-dot {
+  background: var(--brand-purple-18) !important;
+}
+.yumi-dot.is-read {
+  background: var(--brand-purple-28) !important;
+}
+.yumi-dot.is-active {
+  background: var(--brand-magenta) !important;
+  box-shadow: 0 0 0 3px var(--brand-magenta-12) !important;
+}
+
+.yumi-chip:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+
+.lc-head-icon {
+  color: #fff !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.lc-head-icon.is-hw {
+  background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy)) !important;
+}
+.lc-head-title {
+  color: var(--brand-navy) !important;
+}
+
+.tp-item[data-subject="trk"] { --tp-accent: var(--brand-purple) !important; }
+
+.ov-today-btn {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.ov-today-btn:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-purple) !important;
+}
+
+.prog-nav-btn:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+.prog-view-btn:hover:not(.is-active) {
+  color: var(--brand-navy) !important;
+  background: var(--brand-purple-06) !important;
+}
+
+.d3-prog-select-item.is-active {
+  background: var(--brand-magenta-12) !important;
+  border-color: var(--brand-magenta-35) !important;
+  color: var(--brand-navy) !important;
+}
+
+/* ============================================================
+ * Ödev / program sağ drawer — tam okunurluk (prog-drawer + d3-drawer)
+ * ============================================================ */
+
+.prog-drawer-overlay,
+.d3-drawer-overlay {
+  background: var(--brand-navy-45) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+
+.prog-drawer-panel,
+.d3-drawer-panel {
+  background: var(--bg-surface) !important;
+  background-image: none !important;
+  border-left: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-lg) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+
+.prog-drawer-close,
+.d3-drawer-close {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.prog-drawer-close:hover,
+.d3-drawer-close:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+
+.prog-drawer-body,
+.d3-drawer-panel {
+  font-family: var(--font-sans) !important;
+}
+
+.prog-drawer-eyebrow,
+.d3-drawer-eyebrow {
+  color: var(--brand-purple) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.prog-drawer-title,
+.d3-drawer-title {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 700 !important;
+}
+
+.prog-drawer-label,
+.d3-drawer-label {
+  color: var(--asm-text-label) !important;
+  font-family: var(--font-mono) !important;
+  border-bottom-color: var(--brand-purple-14) !important;
+}
+
+.prog-drawer-section,
+.prog-drawer-game {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  border-radius: 14px !important;
+  padding: 14px 16px !important;
+}
+
+.prog-drawer-meta-row {
+  background: var(--brand-purple-06) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  border-radius: 12px !important;
+  padding: 12px 14px !important;
+}
+
+.prog-drawer-text,
+.d3-drawer-text,
+.d3-drawer-quote-text {
+  color: var(--ink-dark-1) !important;
+  font-family: var(--font-sans) !important;
+  line-height: 1.6 !important;
+}
+
+.d3-drawer-quote-header {
+  border-bottom-color: var(--brand-purple-14) !important;
+}
+.prog-drawer-sep {
+  background: linear-gradient(90deg, transparent, var(--brand-purple-14), transparent) !important;
+}
+
+/* Meta chip'ler */
+.prog-drawer-chip {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-mono) !important;
+}
+.prog-drawer-chip.is-live {
+  background: var(--brand-magenta-08) !important;
+  border-color: var(--brand-magenta-35) !important;
+  color: var(--brand-magenta) !important;
+}
+.prog-drawer-chip.is-live::before {
+  background: var(--brand-magenta) !important;
+  box-shadow: none !important;
+}
+.prog-drawer-chip.is-exam {
+  background: rgba(212, 146, 10, 0.1) !important;
+  border-color: rgba(212, 146, 10, 0.35) !important;
+  color: #9a6808 !important;
+}
+.prog-drawer-chip.is-edu-week {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-18) !important;
+  color: var(--brand-purple) !important;
+}
+
+/* Teslim tarihi */
+.d3-drawer-due-label { color: var(--asm-text-label) !important; font-family: var(--font-mono) !important; }
+.d3-drawer-due-value { color: var(--brand-navy) !important; font-family: var(--font-sans) !important; }
+.d3-drawer-due-value strong { color: var(--brand-navy) !important; }
+.d3-drawer-due-sub { color: #9a6808 !important; font-family: var(--font-mono) !important; }
+
+.d3-drawer-edu-week {
+  background: var(--brand-purple-06) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.d3-drawer-kazanim { border-top-color: var(--brand-purple-14) !important; }
+.d3-drawer-kazanim-tag { color: #9a6808 !important; font-family: var(--font-mono) !important; }
+.d3-drawer-kazanim-text { color: var(--ink-dark-1) !important; font-family: var(--font-sans) !important; }
+
+/* KİD / RUD — drawer rozet + açıklama kutusu */
+.d3-drawer-format-hint,
+.prog-drawer-format-hint {
+  color: var(--ink-dark-1) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 1.55 !important;
+}
+.d3-drawer-format-hint.is-kid,
+.prog-drawer-format-hint.is-kid,
+.tk-player-format-hint.is-kid,
+.perf-hw-format-hint.is-kid {
+  background: rgba(124, 58, 237, 0.08) !important;
+  border-left: 3px solid rgba(124, 58, 237, 0.45) !important;
+  color: #5b21b6 !important;
+}
+.d3-drawer-format-hint.is-rud,
+.prog-drawer-format-hint.is-rud,
+.tk-player-format-hint.is-rud,
+.perf-hw-format-hint.is-rud {
+  background: rgba(16, 185, 129, 0.08) !important;
+  border-left: 3px solid rgba(16, 185, 129, 0.42) !important;
+  color: #047857 !important;
+}
+.d3-drawer-lesson-type.is-kid,
+.prog-drawer-hw-type.is-kid,
+.prog-drawer-chip.is-hw-type.is-kid,
+.d3-drawer-hw-type.is-kid,
+.d3-task-type.is-kid,
+.d3-tl-format.is-kid,
+.d3-hero-format.is-kid,
+.tk-card-format.is-kid,
+.tk-player-format.is-kid,
+.perf-hw-type.is-kid {
+  background: rgba(124, 58, 237, 0.12) !important;
+  border: 1px solid rgba(124, 58, 237, 0.28) !important;
+  color: #6d28d9 !important;
+}
+.d3-drawer-lesson-type.is-rud,
+.prog-drawer-hw-type.is-rud,
+.prog-drawer-chip.is-hw-type.is-rud,
+.d3-drawer-hw-type.is-rud,
+.d3-task-type.is-rud,
+.d3-tl-format.is-rud,
+.d3-hero-format.is-rud,
+.tk-card-format.is-rud,
+.tk-player-format.is-rud,
+.perf-hw-type.is-rud {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border: 1px solid rgba(16, 185, 129, 0.28) !important;
+  color: #047857 !important;
+}
+.d3-drawer-head {
+  border-bottom-color: var(--brand-purple-14) !important;
+}
+.d3-drawer-att-chip.is-upcoming {
+  background: var(--brand-purple-08) !important;
+  color: var(--brand-purple) !important;
+}
+
+.d3-drawer-cta.is-waiting {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  color: var(--ink-dark-1) !important;
+  cursor: default !important;
+  box-shadow: none !important;
+}
+.d3-drawer-cta.is-past {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-10) !important;
+  color: var(--ink-dark-2) !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+.d3-drawer-cta.is-active .cta-label,
+.d3-drawer-cta.is-active .cta-time {
+  color: #fff !important;
+}
+
+/* Öğretmen kartı */
+.prog-drawer-teacher {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+.d3-drawer-quote {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.prog-drawer-teacher-avatar,
+.d3-drawer-quote-avatar {
+  border-color: var(--brand-purple-28) !important;
+  box-shadow: none !important;
+}
+.prog-drawer-teacher-label,
+.d3-drawer-quote-role {
+  color: var(--asm-text-label) !important;
+  font-family: var(--font-mono) !important;
+}
+.prog-drawer-teacher-name,
+.d3-drawer-quote-name {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+.prog-drawer-teacher-role {
+  color: var(--ink-dark-1) !important;
+  font-family: var(--font-sans) !important;
+}
+
+.prog-drawer-teacher-action,
+.d3-drawer-quote-action {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-purple) !important;
+}
+.prog-drawer-teacher-action:hover,
+.d3-drawer-quote-action:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+
+.d3-drawer-quote-text::before {
+  color: var(--brand-purple-18) !important;
+}
+
+.d3-drawer-quote-file {
+  background: var(--brand-purple-06) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  color: var(--brand-navy) !important;
+}
+.d3-drawer-quote-file:hover {
+  background: var(--brand-purple-10) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.d3-drawer-quote-file-name { color: var(--brand-navy) !important; }
+.d3-drawer-quote-file-meta { color: var(--ink-dark-2) !important; font-family: var(--font-mono) !important; }
+.d3-drawer-quote-file-arrow { color: var(--brand-purple) !important; }
+
+.d3-drawer-file {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.d3-drawer-file:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.d3-drawer-file-download {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-purple) !important;
+}
+.d3-drawer-file-download:hover {
+  background: var(--brand-purple-10) !important;
+  color: var(--brand-navy) !important;
+}
+
+/* Ödüller */
+.prog-drawer-game-label,
+.d3-drawer-game-label {
+  color: var(--asm-text-label) !important;
+  font-family: var(--font-mono) !important;
+  border-bottom: 1px dashed var(--brand-purple-14) !important;
+  padding-bottom: 8px !important;
+}
+.prog-drawer-game-label::before,
+.d3-drawer-game-label::before {
+  display: none !important;
+}
+
+.prog-drawer-game-reward,
+.d3-drawer-game-reward,
+.d3-drawer-reward {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-10) !important;
+}
+
+.prog-drawer-game-reward-text strong,
+.d3-drawer-game-reward-text strong,
+.d3-drawer-reward-text,
+.d3-drawer-progress-head,
+.d3-drawer-progress-head strong {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+
+.prog-drawer-game-reward-text > span,
+.d3-drawer-game-reward-text > span {
+  color: var(--ink-dark-2) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.prog-drawer-game-reward-kicker {
+  color: var(--ink-dark-2) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.prog-drawer-game-level-head,
+.d3-drawer-game-level-head {
+  color: var(--ink-dark-1) !important;
+  font-family: var(--font-mono) !important;
+}
+.prog-drawer-game-level-head strong,
+.d3-drawer-game-level-head strong {
+  color: var(--brand-navy) !important;
+}
+.prog-drawer-game-level-arrow,
+.d3-drawer-game-level-arrow {
+  color: var(--ink-dark-2) !important;
+}
+
+.prog-drawer-game-level-track,
+.d3-drawer-game-level-track,
+.d3-drawer-progress-track {
+  background: var(--brand-purple-10) !important;
+}
+.prog-drawer-game-level-current,
+.d3-drawer-game-level-current {
+  background: linear-gradient(90deg, var(--brand-purple), var(--brand-navy)) !important;
+}
+.prog-drawer-game-level-gain,
+.d3-drawer-game-level-gain,
+.d3-drawer-progress-gain {
+  background: linear-gradient(90deg, #d4920a, var(--brand-magenta)) !important;
+  box-shadow: none !important;
+}
+
+.d3-drawer-progress-hint { color: var(--ink-dark-1) !important; }
+.d3-drawer-progress-hint strong { color: var(--brand-magenta) !important; }
+
+/* Alt CTA */
+.prog-drawer-footer {
+  background: var(--bg-subtle) !important;
+  border-top: 1px solid var(--brand-purple-14) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+.prog-drawer-retry-note,
+.d3-drawer-retry-note {
+  border-color: rgba(154, 104, 8, 0.28) !important;
+  background: rgba(255, 180, 80, 0.14) !important;
+  color: #9a6808 !important;
+  font-family: var(--font-sans) !important;
+}
+/* Geciken ödev — gecikmiş teslim / XP uyarısı (light tema) */
+.prog-drawer-late-xp-note {
+  border: 1px solid rgba(154, 104, 8, 0.28) !important;
+  background: linear-gradient(135deg, rgba(255,180,80,0.16) 0%, rgba(220,38,38,0.08) 100%) !important;
+  color: #9a6808 !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 600 !important;
+  line-height: 1.55 !important;
+}
+.prog-drawer-late-xp-note strong { color: #b45309 !important; font-weight: 800 !important; }
+.d3-drawer-footer {
+  margin-top: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+.prog-drawer-cta,
+.d3-drawer-cta {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  color: var(--ink-dark-1) !important;
+  font-family: var(--font-sans) !important;
+}
+.prog-drawer-cta .cta-time {
+  color: var(--brand-navy) !important;
+  background: var(--brand-purple-06) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.prog-drawer-cta.is-active,
+.d3-drawer-cta:not(.is-waiting) {
+  background: linear-gradient(135deg, var(--brand-magenta), var(--brand-rose)) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: var(--shadow-brand) !important;
+  cursor: pointer !important;
+}
+.prog-drawer-cta.is-active:hover,
+.d3-drawer-cta:not(.is-waiting):hover {
+  filter: brightness(1.04) !important;
+  box-shadow: 0 14px 32px var(--brand-magenta-35) !important;
+}
+
+.prog-drawer-cta.is-overdue {
+  background: linear-gradient(135deg, #e35c97, var(--brand-magenta)) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+}
+
+.prog-drawer-cta.is-active.is-retry,
+.prog-drawer-cta.is-retry {
+  background: linear-gradient(135deg, var(--brand-magenta), var(--brand-rose)) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: var(--shadow-brand) !important;
+  cursor: pointer !important;
+}
+.prog-drawer-cta.is-completed {
+  background: rgba(46, 168, 106, 0.12) !important;
+  border-color: rgba(46, 168, 106, 0.38) !important;
+  color: #248f58 !important;
+  cursor: default !important;
+  box-shadow: none !important;
+}
+
+.prog-drawer-cta.is-past {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-10) !important;
+  color: var(--ink-dark-2) !important;
+}
+
+/* ===== program.html ders drawer — kaçırılan ders uyarısı + tekrar butonu + süre geçti CTA (light tema) ===== */
+.d3-drawer-missed-alert {
+  background: linear-gradient(135deg, rgba(220,38,38,0.10) 0%, rgba(251,146,60,0.09) 100%) !important;
+  border: 1px solid rgba(220,38,38,0.34) !important;
+}
+.d3-drawer-missed-alert svg { color: #dc2626 !important; }
+.d3-drawer-missed-alert p {
+  color: #991b1b !important;
+  font-family: var(--font-sans) !important;
+}
+.d3-drawer-replay-btn {
+  background: linear-gradient(135deg, #dc2626 0%, #c2410c 100%) !important;
+  border: 1px solid rgba(185,28,28,0.45) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px -6px rgba(220,38,38,0.50) !important;
+  font-family: var(--font-sans) !important;
+}
+.d3-drawer-replay-btn:hover {
+  filter: brightness(1.05) !important;
+  box-shadow: 0 6px 18px -6px rgba(220,38,38,0.60) !important;
+  color: #fff !important;
+}
+/* "Canlı Ders Süresi Geçti" — is-past + is-waiting birlikte gelir; okunur disabled görünüm */
+.d3-drawer-footer .d3-drawer-cta.is-past {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+.d3-drawer-footer .d3-drawer-cta.is-past .cta-time {
+  background: var(--brand-purple-06) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--ink-dark-2) !important;
+}
+
+.prog-drawer-cover {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.d3-drawer-deadline {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+
+.d3-drawer-eyebrow [data-fill="name"],
+.d3-drawer-meta span {
+  color: inherit !important;
+}
+
+/* Öğretmene mesaj modalı */
+.prog-msg-modal-overlay,
+.d3-msg-modal-overlay {
+  background: var(--brand-navy-45) !important;
+}
+.prog-msg-modal-panel,
+.d3-msg-modal-panel {
+  background: var(--bg-surface) !important;
+  background-image: none !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+  color: var(--brand-navy) !important;
+}
+.prog-msg-modal-close,
+.d3-msg-modal-close {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.prog-msg-modal-name,
+.d3-msg-modal-name,
+.d3-msg-modal-title {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+.prog-msg-modal-role,
+.d3-msg-modal-role,
+.d3-msg-modal-label {
+  color: var(--ink-dark-1) !important;
+}
+.prog-msg-modal-textarea,
+.d3-msg-modal-textarea {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+.prog-msg-modal-textarea::placeholder,
+.d3-msg-modal-textarea::placeholder {
+  color: var(--ink-dark-2) !important;
+}
+.prog-msg-modal-send {
+  background: linear-gradient(135deg, var(--brand-magenta), var(--brand-rose)) !important;
+  color: #fff !important;
+  border: none !important;
+  font-family: var(--font-sans) !important;
+}
+
+.prog-msg-modal-cancel,
+.d3-msg-modal-cancel {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+.prog-msg-modal-cancel:hover,
+.d3-msg-modal-cancel:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+
+.prog-msg-modal-file-label,
+.d3-msg-modal-file-label {
+  background: var(--brand-magenta-08) !important;
+  border-color: var(--brand-magenta-35) !important;
+  color: var(--brand-magenta) !important;
+  font-family: var(--font-sans) !important;
+}
+.prog-msg-modal-file-chip,
+.d3-msg-modal-file-chip {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.prog-msg-modal-file-chip-name,
+.d3-msg-modal-file-chip-name {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+.prog-msg-modal-file-chip-size,
+.d3-msg-modal-file-chip-size {
+  color: var(--ink-dark-2) !important;
+  font-family: var(--font-mono) !important;
+}
+
+/* Aktif CTA — geri sayım rozeti de okunaklı */
+.prog-drawer-cta.is-active .cta-label,
+.prog-drawer-cta.is-overdue .cta-label,
+.prog-drawer-cta.is-active .cta-time,
+.prog-drawer-cta.is-overdue .cta-time {
+  color: #fff !important;
+}
+.prog-drawer-cta.is-active .cta-time,
+.prog-drawer-cta.is-overdue .cta-time {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+}
+
+/* ============================================================
+ * Inbox + Chat drawer — açık tema okunabilirlik
+ * ============================================================ */
+.sn-inbox-overlay,
+.sn-chat-overlay {
+  background: var(--brand-navy-45) !important;
+}
+.sn-inbox-panel,
+.sn-chat-panel {
+  background: var(--bg-surface) !important;
+  border-left-color: var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.sn-inbox-close,
+.sn-chat-back {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.sn-inbox-close:hover,
+.sn-chat-back:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+.sn-inbox-head,
+.sn-inbox-toolbar,
+.sn-chat-head,
+.sn-msg-teachers {
+  border-bottom-color: var(--brand-purple-10) !important;
+}
+.sn-inbox-title,
+.sn-inbox-item .pop-name,
+.sn-chat-head-name,
+.sn-msg-teacher-name {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+.sn-inbox-group-label,
+.sn-msg-teachers-label {
+  color: var(--ink-dark-2) !important;
+  font-family: var(--font-sans) !important;
+}
+.sn-inbox-mark {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+  font-family: var(--font-sans) !important;
+}
+.sn-inbox-mark:hover {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+}
+.sn-inbox-item {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-10) !important;
+}
+.sn-inbox-item:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.sn-inbox-item.is-unread {
+  background:
+    linear-gradient(135deg, var(--brand-magenta-08) 0%, var(--brand-purple-06) 100%),
+    var(--bg-surface) !important;
+  border-color: var(--brand-magenta-35) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.sn-inbox-item.is-unread:hover {
+  background:
+    linear-gradient(135deg, var(--brand-magenta-12) 0%, var(--brand-purple-10) 100%),
+    var(--bg-surface) !important;
+  border-color: var(--brand-magenta-35) !important;
+}
+.sn-inbox-item:not(.is-unread) .pop-name {
+  color: var(--ink-dark-1) !important;
+}
+.sn-inbox-item .pop-preview {
+  color: var(--ink-dark-1) !important;
+  font-family: var(--font-sans) !important;
+}
+.sn-inbox-item.is-unread .pop-preview {
+  color: var(--brand-navy) !important;
+}
+.sn-inbox-item:not(.is-unread) .pop-preview {
+  color: var(--ink-dark-2) !important;
+}
+.sn-inbox-item .pop-time {
+  color: var(--ink-dark-2) !important;
+  font-family: var(--font-mono) !important;
+}
+.sn-inbox-new-dot {
+  background: var(--brand-magenta) !important;
+  box-shadow: 0 0 0 2px var(--brand-magenta-12) !important;
+  animation: none !important;
+}
+.sn-inbox-empty,
+.sn-chat-empty {
+  color: var(--ink-dark-2) !important;
+  font-family: var(--font-sans) !important;
+}
+.sn-inbox-item .pop-actions .pop-btn.is-ghost {
+  background: var(--bg-surface) !important;
+  color: var(--brand-navy) !important;
+  border-color: var(--brand-purple-18) !important;
+}
+.sn-inbox-item .pop-actions .pop-btn.is-ghost:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.sn-inbox-item .pop-actions .pop-btn.is-set {
+  background: rgba(46, 168, 106, 0.10) !important;
+  color: #2ea86a !important;
+  border-color: rgba(46, 168, 106, 0.35) !important;
+}
+.sn-inbox-item.is-system:not(.is-unread):hover {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-10) !important;
+  transform: none !important;
+}
+.sn-inbox-item.is-system.is-unread:hover {
+  background:
+    linear-gradient(135deg, var(--brand-magenta-12) 0%, var(--brand-purple-10) 100%),
+    var(--bg-surface) !important;
+  border-color: var(--brand-magenta-35) !important;
+  transform: none !important;
+}
+.sn-msg-teachers::after {
+  background: linear-gradient(90deg, transparent 0%, var(--bg-surface) 100%) !important;
+}
+.sn-msg-teacher:hover {
+  background: var(--brand-purple-06) !important;
+}
+.sn-msg-teacher-title,
+.sn-chat-head-status {
+  color: var(--ink-dark-2) !important;
+  font-family: var(--font-sans) !important;
+}
+.sn-msg-teacher-msg-icon {
+  border-color: var(--bg-surface) !important;
+}
+.sn-chat-body {
+  background: var(--bg-page) !important;
+}
+.sn-chat-body::-webkit-scrollbar-thumb {
+  background: var(--brand-purple-18) !important;
+}
+.sn-chat-bubble.from-teacher {
+  background: var(--bg-surface) !important;
+  color: var(--brand-navy) !important;
+  border-color: var(--brand-purple-14) !important;
+  font-family: var(--font-sans) !important;
+}
+.sn-chat-bubble.from-me {
+  background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy)) !important;
+  color: #fff !important;
+  font-family: var(--font-sans) !important;
+}
+.sn-chat-bubble-time {
+  color: var(--ink-dark-2) !important;
+  opacity: 1 !important;
+}
+.sn-chat-bubble.from-me .sn-chat-bubble-time {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+.sn-chat-input {
+  background: var(--bg-subtle) !important;
+  border-top-color: var(--brand-purple-10) !important;
+}
+.sn-chat-field {
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple-18) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+.sn-chat-field::placeholder {
+  color: var(--ink-dark-2) !important;
+}
+.sn-chat-field:focus {
+  border-color: var(--brand-purple-45) !important;
+  background: var(--bg-surface) !important;
+}
+.sn-chat-send {
+  background: linear-gradient(135deg, var(--brand-purple), var(--brand-navy)) !important;
+  border: none !important;
+  color: #fff !important;
+}
+.sn-chat-send:hover {
+  box-shadow: var(--shadow-brand) !important;
+}
+.pop-icon--live {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-purple) !important;
+  box-shadow: inset 0 0 0 1px var(--brand-purple-18) !important;
+}
+.pop-icon--exam {
+  background: var(--brand-magenta-08) !important;
+  color: var(--brand-magenta) !important;
+  box-shadow: inset 0 0 0 1px var(--brand-magenta-35) !important;
+}
+.pop-icon--rank {
+  background: rgba(212, 146, 10, 0.10) !important;
+  color: #d4920a !important;
+  box-shadow: inset 0 0 0 1px rgba(212, 146, 10, 0.28) !important;
+}
+.pop-icon--clan {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-purple) !important;
+  box-shadow: inset 0 0 0 1px var(--brand-purple-18) !important;
+}
+.pop-icon--sys {
+  background: rgba(46, 168, 106, 0.10) !important;
+  color: #2ea86a !important;
+  box-shadow: inset 0 0 0 1px rgba(46, 168, 106, 0.28) !important;
+}

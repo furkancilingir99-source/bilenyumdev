@@ -1,0 +1,1277 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sıkça Sorulan Sorular — Bilenyum</title>
+<meta name="description" content="Bilenyum hakkında en çok sorulan sorular: eğitim modeli, ödeme, uygulama, veli paneli ve daha fazlası. Aradığını anında bul." />
+<link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%233e3a8e'/%3E%3Ctext x='50' y='65' text-anchor='middle' font-family='Inter,system-ui,sans-serif' font-size='62' font-weight='900' fill='white' letter-spacing='-3'%3Eb%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/trial-modal.css">
+<style>
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg-3); color: var(--ink-dark-0); }
+
+  /* ============ HERO ============ */
+  .sss-hero {
+    background:
+      radial-gradient(900px 380px at 88% 12%, rgba(229,4,123,0.10), transparent 60%),
+      radial-gradient(800px 360px at 6% 30%, rgba(74,214,255,0.10), transparent 60%),
+      linear-gradient(180deg, #fcfaff 0%, #f4eeff 100%);
+    position: relative; z-index: 2; overflow: hidden;
+  }
+  .sss-hero-inner {
+    position: relative; z-index: 2;
+    max-width: 880px; margin: 0 auto;
+    padding: 28px 32px 0;
+    text-align: center;
+  }
+  .sss-hero h1 {
+    font-size: 48px; font-weight: 800;
+    line-height: 1.08; margin: 14px 0 16px;
+    letter-spacing: -0.02em;
+    color: var(--ink-dark-0);
+    text-wrap: balance;
+  }
+  .hero-accent {
+    background: linear-gradient(120deg, var(--p-brand) 0%, var(--p-brand-deep) 50%, var(--p-purple) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .sss-hero .lead {
+    font-size: 18px; color: var(--ink-dark-1);
+    line-height: 1.6; margin: 0 auto 24px;
+    max-width: 640px;
+  }
+
+  /* Search */
+  .sss-search {
+    max-width: 560px; margin: 0 auto;
+    position: relative;
+  }
+  .sss-search input {
+    width: 100%;
+    height: 56px;
+    padding: 0 50px 0 52px;
+    border-radius: 14px;
+    border: 1px solid rgba(20,22,50,0.12);
+    background: white;
+    font-family: inherit; font-size: 15.5px;
+    color: var(--ink-dark-0);
+    box-shadow: 0 10px 28px -16px rgba(40,38,90,0.30);
+    transition: border-color 0.18s ease, box-shadow 0.2s ease;
+  }
+  .sss-search input::placeholder { color: var(--ink-dark-2); }
+  .sss-search input:focus {
+    outline: none;
+    border-color: var(--p-purple);
+    box-shadow: 0 12px 28px -12px rgba(62,58,142,0.30);
+  }
+  .sss-search-icon {
+    position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+    color: var(--ink-dark-2);
+    pointer-events: none;
+  }
+  .sss-search-icon svg { width: 20px; height: 20px; display: block; }
+  .sss-search-clear {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(62,58,142,0.08);
+    color: var(--p-deep);
+    cursor: pointer; font-family: inherit;
+    display: none; align-items: center; justify-content: center;
+    transition: background 0.18s ease;
+  }
+  .sss-search-clear:hover { background: rgba(62,58,142,0.16); }
+  .sss-search-clear svg { width: 14px; height: 14px; }
+  .sss-search-clear.is-visible { display: inline-flex; }
+
+  /* ============ SPACE DIVIDER ============ */
+  .sss-divider {
+    position: relative;
+    width: 100%; height: 160px;
+    background: linear-gradient(180deg, #f4eeff 0%, #efe7ff 100%);
+    overflow: hidden;
+  }
+  .sss-divider .bd-wave {
+    position: absolute;
+    bottom: -1px;
+    width: 130%; left: -15%;
+    height: 100%;
+    display: block;
+    z-index: 1;
+  }
+  .bd-shape { position: absolute; z-index: 2; pointer-events: none; }
+  .bd-circle {
+    width: 56px; height: 56px;
+    top: 26%; left: 42%;
+    border: 1.5px solid rgba(62,58,142,0.30);
+    border-radius: 50%;
+  }
+  .bd-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .bd-dot-1 { top: 22%; left: 14%; background: var(--p-purple); opacity: 0.60; }
+  .bd-dot-2 { top: 18%; left: 86%; background: var(--p-aqua); opacity: 0.70; }
+  .bd-line {
+    width: 36px; height: 2px;
+    top: 36%; left: 64%;
+    background: linear-gradient(90deg, transparent, rgba(229,4,123,0.55), transparent);
+    transform: rotate(-12deg);
+  }
+  .bd-tri {
+    width: 0; height: 0;
+    top: 32%; left: 22%;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 10px solid rgba(62,58,142,0.35);
+    transform: rotate(18deg);
+  }
+
+  /* ============ TRENDING ============ */
+  .sss-trending { background: var(--bg-3); }
+  .sss-trending .sec-inner { padding-top: 28px; padding-bottom: 48px; }
+  .sss-section-head {
+    margin-bottom: 24px;
+  }
+  .sss-section-title {
+    font-size: 26px; font-weight: 800;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    margin: 0;
+  }
+  .trending-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  }
+  .trending-card {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex; align-items: center; gap: 14px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.18s ease;
+    position: relative;
+  }
+  .trending-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px -20px rgba(40,38,90,0.25);
+    border-color: rgba(62,58,142,0.20);
+  }
+  .trending-num {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    background: rgba(62,58,142,0.08);
+    color: var(--p-purple);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600; font-size: 13px;
+  }
+  .trending-text {
+    font-size: 14.5px; font-weight: 700;
+    color: var(--ink-dark-0);
+    line-height: 1.4;
+    flex: 1; min-width: 0;
+  }
+  .trending-arrow {
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    color: var(--ink-dark-2);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: color 0.18s ease, transform 0.18s ease;
+  }
+  .trending-card:hover .trending-arrow {
+    color: var(--p-purple);
+    transform: translateX(3px);
+  }
+  .trending-arrow svg { width: 14px; height: 14px; }
+
+  /* ============ TWO-COLUMN LAYOUT (sidebar + panel) ============ */
+  .sss-layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 36px;
+    align-items: start;
+  }
+  .sss-sidebar {
+    position: sticky;
+    top: 24px;
+    background: white;
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 18px;
+    padding: 18px 16px;
+    box-shadow: 0 6px 24px -16px rgba(40,38,90,0.15);
+  }
+  .sss-sidebar-head {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    color: var(--p-purple);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 4px 14px 14px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(20,22,50,0.08);
+  }
+  .sss-cat-list { list-style: none; padding: 0; margin: 0; }
+  .sss-cat-list li + li { margin-top: 2px; }
+  .sss-cat-item {
+    width: 100%;
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px;
+    border-radius: 12px;
+    border: none; background: transparent;
+    text-align: left;
+    cursor: pointer;
+    color: var(--ink-dark-1);
+    font-family: inherit;
+    transition: background 0.18s ease, color 0.18s ease;
+    position: relative;
+  }
+  .sss-cat-item:hover { background: rgba(62,58,142,0.06); color: var(--p-deep); }
+  .sss-cat-item.is-active {
+    background: linear-gradient(135deg, rgba(62,58,142,0.10) 0%, rgba(229,4,123,0.06) 100%);
+    color: var(--p-deep);
+  }
+  .sss-cat-item.is-active::before {
+    content: '';
+    position: absolute;
+    left: -16px; top: 50%; transform: translateY(-50%);
+    width: 3px; height: 24px;
+    background: linear-gradient(180deg, var(--p-brand), var(--p-purple));
+    border-radius: 0 4px 4px 0;
+  }
+  .sss-cat-item-icon {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--c-bg, var(--p-purple)), var(--c-bg2, var(--p-deep)));
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 14px -6px var(--c-glow, rgba(40,38,90,0.40));
+  }
+  .sss-cat-item-icon svg { width: 16px; height: 16px; }
+  /* Sidebar icon kategori renkleri — sağ paneldeki .sss-section ile aynı tonlar */
+  .sss-cat-item[data-cat="satinalim"] { --c-bg: var(--p-brand);      --c-bg2: var(--p-brand-deep); --c-glow: rgba(229,4,123,0.45); }
+  .sss-cat-item[data-cat="platform"]  { --c-bg: #4ad6ff;             --c-bg2: #1c8fb5;             --c-glow: rgba(74,214,255,0.45); }
+  .sss-cat-item[data-cat="veli"]      { --c-bg: var(--p-purple-mid); --c-bg2: var(--p-purple);     --c-glow: rgba(105,100,196,0.45); }
+  .sss-cat-item[data-cat="ogrenci"]   { --c-bg: #6dd49e;             --c-bg2: #2a8a5a;             --c-glow: rgba(109,212,158,0.45); }
+  .sss-cat-item[data-cat="icerik"]    { --c-bg: #ffb547;             --c-bg2: #c47800;             --c-glow: rgba(255,181,71,0.45); }
+  .sss-cat-item-text { flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .sss-cat-item-text strong {
+    font-size: 15px; font-weight: 700;
+    line-height: 1.25;
+    color: inherit;
+  }
+  .sss-cat-item-text small {
+    font-size: 11.5px;
+    color: var(--ink-dark-2);
+    font-weight: 600;
+  }
+  .sss-cat-item.is-active .sss-cat-item-text small { color: var(--p-purple); }
+  .sss-cat-item-arrow {
+    flex-shrink: 0;
+    color: var(--ink-dark-2);
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  .sss-cat-item:hover .sss-cat-item-arrow,
+  .sss-cat-item.is-active .sss-cat-item-arrow {
+    opacity: 1;
+    transform: translateX(2px);
+    color: var(--p-purple);
+  }
+  .sss-cat-item-arrow svg { width: 14px; height: 14px; }
+
+  .sss-panel { min-width: 0; }
+  .sss-panel .sss-section { display: none; margin-bottom: 0; }
+  .sss-panel .sss-section.is-active {
+    display: block;
+    animation: sssFadeInUp 0.32s ease;
+  }
+  .sss-panel.is-searching .sss-section { display: none; }
+  .sss-panel.is-searching .sss-section.has-matches { display: block; }
+  @keyframes sssFadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ FAQ CONTENT ============ */
+  .sss-content { background: var(--bg-3); }
+  .sss-content .sec-inner { padding-top: 56px; padding-bottom: 56px; max-width: var(--maxw); }
+  .sss-section {
+    margin-bottom: 48px;
+    scroll-margin-top: 24px;
+  }
+  .sss-section:last-of-type { margin-bottom: 0; }
+  .sss-cat-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(20,22,50,0.10);
+  }
+  .sss-cat-icon {
+    flex-shrink: 0;
+    width: 42px; height: 42px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--c-bg, var(--p-purple)), var(--c-bg2, var(--p-deep)));
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 22px -10px var(--c-glow, rgba(62,58,142,0.40));
+  }
+  .sss-section[data-cat="satinalim"] { --c-bg: var(--p-brand);      --c-bg2: var(--p-brand-deep); --c-glow: rgba(229,4,123,0.45); }
+  .sss-section[data-cat="platform"]  { --c-bg: #4ad6ff;             --c-bg2: #1c8fb5;             --c-glow: rgba(74,214,255,0.45); }
+  .sss-section[data-cat="veli"]      { --c-bg: var(--p-purple-mid); --c-bg2: var(--p-purple);     --c-glow: rgba(105,100,196,0.45); }
+  .sss-section[data-cat="ogrenci"]   { --c-bg: #6dd49e;             --c-bg2: #2a8a5a;             --c-glow: rgba(109,212,158,0.45); }
+  .sss-section[data-cat="icerik"]    { --c-bg: #ffb547;             --c-bg2: #c47800;             --c-glow: rgba(255,181,71,0.45); }
+  .sss-cat-icon svg { width: 22px; height: 22px; }
+  .sss-cat-body { flex: 1; min-width: 0; }
+  .sss-cat-body h2 {
+    font-size: 20px; font-weight: 800;
+    color: var(--ink-dark-0);
+    margin: 0 0 2px;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+  }
+  .sss-cat-body p {
+    font-size: 13.5px; color: var(--ink-dark-1);
+    margin: 0;
+    line-height: 1.45;
+  }
+
+  /* Accordion items */
+  .sss-list { display: flex; flex-direction: column; gap: 10px; }
+  .sss-item {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.18s ease, box-shadow 0.2s ease;
+  }
+  .sss-item:hover { border-color: rgba(62,58,142,0.14); }
+  .sss-item[open] {
+    border-color: rgba(62,58,142,0.24);
+    box-shadow: 0 12px 30px -18px rgba(40,38,90,0.22);
+  }
+  .sss-item summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 18px 22px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--ink-dark-0);
+    line-height: 1.4;
+    user-select: none;
+  }
+  .sss-item summary::-webkit-details-marker { display: none; }
+  .sss-item summary::marker { display: none; }
+  .sss-q { flex: 1; min-width: 0; }
+  .sss-icon {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    background: rgba(62,58,142,0.08);
+    position: relative;
+    transition: background 0.2s ease;
+  }
+  .sss-icon::before, .sss-icon::after {
+    content: '';
+    position: absolute;
+    background: var(--p-purple);
+    border-radius: 2px;
+    top: 50%; left: 50%;
+    transition: background 0.2s ease, transform 0.25s ease;
+  }
+  .sss-icon::before {
+    width: 12px; height: 2px;
+    transform: translate(-50%, -50%);
+  }
+  .sss-icon::after {
+    width: 2px; height: 12px;
+    transform: translate(-50%, -50%);
+  }
+  .sss-item[open] .sss-icon {
+    background: linear-gradient(135deg, var(--p-brand), var(--p-purple));
+  }
+  .sss-item[open] .sss-icon::before,
+  .sss-item[open] .sss-icon::after {
+    background: white;
+  }
+  .sss-item[open] .sss-icon::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+  .sss-answer {
+    padding: 0 22px 22px;
+    color: var(--ink-dark-1);
+    font-size: 15px;
+    line-height: 1.65;
+  }
+  .sss-answer p { margin: 0 0 10px; }
+  .sss-answer p:last-child { margin-bottom: 0; }
+  .sss-answer ul, .sss-answer ol {
+    padding-left: 22px;
+    margin: 0 0 10px;
+  }
+  .sss-answer li { margin-bottom: 6px; }
+  .sss-answer strong { color: var(--ink-dark-0); font-weight: 700; }
+  .sss-answer a {
+    color: var(--p-brand);
+    text-decoration: underline;
+    text-decoration-color: rgba(229,4,123,0.30);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.18s ease;
+  }
+  .sss-answer a:hover { text-decoration-color: var(--p-brand); }
+
+  .sss-empty {
+    text-align: center; padding: 56px 32px;
+    color: var(--ink-dark-2); font-size: 15px;
+    background: white; border-radius: 18px;
+    border: 1px dashed rgba(20,22,50,0.15);
+    display: none;
+  }
+  .sss-empty.is-visible { display: block; }
+  .sss-empty strong { color: var(--ink-dark-0); display: block; margin-bottom: 4px; font-size: 16px; }
+  .sss-empty-icon {
+    width: 56px; height: 56px; margin: 0 auto 16px;
+    border-radius: 16px;
+    background: rgba(62,58,142,0.08);
+    color: var(--p-purple);
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .sss-empty-icon svg { width: 26px; height: 26px; }
+
+  /* ============ HELP STRIP CTA (egitim-setleri ile aynı UI) ============ */
+  .sec-help { background: var(--bg-3); padding: 0 32px 96px; }
+  .help-strip {
+    background:
+      radial-gradient(600px 300px at 80% 50%, rgba(229,4,123,0.30), transparent 60%),
+      radial-gradient(700px 400px at 10% 50%, rgba(168,164,240,0.18), transparent 60%),
+      linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    border-radius: 28px;
+    padding: 48px 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 32px;
+    max-width: var(--maxw); margin: 0 auto;
+    color: white;
+    flex-wrap: wrap;
+    box-shadow: 0 30px 80px -30px rgba(40,38,90,0.50);
+  }
+  .help-text { flex: 1; min-width: 240px; }
+  .help-title {
+    font-size: 28px; font-weight: 800;
+    line-height: 1.15; letter-spacing: -0.015em;
+    margin: 0 0 8px;
+  }
+  .help-sub { font-size: 15.5px; opacity: 0.86; max-width: 460px; line-height: 1.5; margin: 0; }
+  .help-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .help-strip .btn-ghost {
+    background: rgba(255,255,255,0.10);
+    color: white; border-color: rgba(255,255,255,0.22);
+    backdrop-filter: blur(4px);
+  }
+  .help-strip .btn-ghost:hover { background: rgba(255,255,255,0.18); }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1080px) {
+    .trending-grid { grid-template-columns: repeat(2, 1fr); }
+    .sss-layout { grid-template-columns: 280px 1fr; gap: 24px; }
+  }
+  @media (max-width: 880px) {
+    /* Sidebar → horizontal scroll pills */
+    .sss-layout {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    .sss-sidebar {
+      position: static;
+      padding: 12px;
+      box-shadow: none;
+    }
+    .sss-sidebar-head { display: none; }
+    .sss-cat-list {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      padding-bottom: 4px;
+    }
+    .sss-cat-list::-webkit-scrollbar { height: 4px; }
+    .sss-cat-list::-webkit-scrollbar-thumb { background: rgba(62,58,142,0.18); border-radius: 999px; }
+    .sss-cat-list li { flex-shrink: 0; }
+    .sss-cat-list li + li { margin-top: 0; }
+    .sss-cat-item {
+      padding: 9px 14px;
+      border-radius: 999px;
+    }
+    .sss-cat-item.is-active::before { display: none; }
+    .sss-cat-item.is-active {
+      background: linear-gradient(135deg, var(--p-purple), var(--p-deep));
+      color: white;
+    }
+    .sss-cat-item.is-active .sss-cat-item-icon {
+      background: rgba(255,255,255,0.18);
+      color: white;
+    }
+    .sss-cat-item.is-active .sss-cat-item-text small { color: rgba(255,255,255,0.75); }
+    .sss-cat-item-arrow { display: none; }
+    .sss-cat-item-text small { display: none; }
+  }
+  @media (max-width: 760px) {
+    .sss-hero h1 { font-size: 32px; }
+    .sss-hero .lead { font-size: 15px; }
+    .trending-grid { grid-template-columns: 1fr; }
+    .sss-cat-header { flex-wrap: wrap; }
+    .sss-cat-body h2 { font-size: 20px; }
+    .help-strip { padding: 36px 28px; }
+    .help-title { font-size: 22px; }
+    .sss-content .sec-inner { padding-left: 20px; padding-right: 20px; }
+    .sss-item summary { padding: 16px 18px; font-size: 14.5px; }
+    .sss-answer { padding: 0 18px 18px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-contact">
+      <a href="https://wa.me/905551234567" class="wa-link" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.9L4 20l4.2-1.1A7.93 7.93 0 0 0 12.05 20h.01a7.95 7.95 0 0 0 5.55-13.68z"/></svg>
+        <span>+90 555 123 45 67</span>
+      </a>
+      <a href="tel:+908501234567">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 0 0-1.02.24l-2.2 2.2a15.07 15.07 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 4c0-.55-.45-1-1-1H4a1 1 0 0 0-1 1 17 17 0 0 0 17 17c.55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+        <span class="topbar-phone-text">0850 123 45 67</span>
+      </a>
+      <a href="mailto:info@bilenyum.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <span class="topbar-mail-text">info@bilenyum.com</span>
+      </a>
+    </div>
+    <div class="topbar-social">
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.39A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.73 1.46 1.39 2.13a5.88 5.88 0 0 0 2.13 1.39c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.39 5.88 5.88 0 0 0 1.39-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.39-2.13A5.88 5.88 0 0 0 19.86.63C19.1.33 18.22.13 16.95.07 15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/></svg></a>
+      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.13C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.52A3.02 3.02 0 0 0 .5 6.2C0 8.07 0 12 0 12s0 3.93.5 5.8a3.02 3.02 0 0 0 2.12 2.13c1.88.52 9.38.52 9.38.52s7.5 0 9.38-.52a3.02 3.02 0 0 0 2.12-2.13C24 15.93 24 12 24 12s0-3.93-.5-5.8zM9.6 15.6V8.4L15.84 12 9.6 15.6z"/></svg></a>
+      <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.66H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.26 2.37 4.26 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html"><img src="assets/bilenyum-logo.svg" alt="Bilenyum" class="logo-img" /></a>
+    <div class="nav-links">
+      <a href="egitim-setleri.html">Eğitim Setleri</a>
+      <a href="ornek-videolar.html">Örnek Videolar</a>
+      <a href="kadromuz.html">Ekibimiz</a>
+      <a href="neden-biz.html">Neden Biz?</a>
+      <a href="iletisim.html">İletişim</a>
+    </div>
+    <div class="nav-cta">
+      <a href="giris.html" class="btn btn-secondary btn-sm">Giriş Yap</a>
+      <button class="btn btn-primary btn-sm" data-trial-open type="button">Ücretsiz Deneme Dersi</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="sec sss-hero">
+  <nav class="breadcrumb" aria-label="Sayfa konumu">
+    <a href="index.html">Anasayfa</a>
+    <span class="sep">›</span>
+    <span class="current">Sıkça Sorulan Sorular</span>
+  </nav>
+  <div class="sss-hero-inner">
+    <h1>Merak ettiğin <span class="hero-accent">her şey tek bir yerde.</span></h1>
+    <p class="lead">
+      Ürün satın alma, veli-öğrenci kontrol panelleri, platform özellikleri ve teknik destek süreçleri hakkında en çok sorulan soruları sizin için yanıtladık.
+    </p>
+    <div class="sss-search">
+      <span class="sss-search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </span>
+      <input type="search" id="sssSearch" placeholder="Sorunu yaz, anında bulalım…" autocomplete="off" />
+      <button class="sss-search-clear" id="sssSearchClear" type="button" aria-label="Aramayı temizle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- SPACE DIVIDER -->
+<div class="sss-divider" aria-hidden="true">
+  <span class="bd-shape bd-circle"></span>
+  <span class="bd-shape bd-dot bd-dot-1"></span>
+  <span class="bd-shape bd-dot bd-dot-2"></span>
+  <span class="bd-shape bd-line"></span>
+  <span class="bd-shape bd-tri"></span>
+  <svg class="bd-wave" viewBox="0 0 1440 200" preserveAspectRatio="none">
+    <path d="M0,120 C320,160 640,90 960,140 C1180,175 1320,115 1440,150 L1440,200 L0,200 Z" fill="rgba(229,4,123,0.08)"/>
+    <path d="M0,150 C260,195 540,115 820,165 C1080,210 1300,140 1440,175 L1440,200 L0,200 Z" fill="rgba(168,164,240,0.22)"/>
+    <path d="M0,175 C200,215 460,145 720,178 C960,208 1180,148 1440,178 L1440,200 L0,200 Z" fill="#f3f2ff"/>
+  </svg>
+</div>
+
+<!-- TRENDING -->
+<section class="sec sss-trending" id="trending">
+  <div class="sec-inner">
+    <div class="sss-section-head">
+      <h2 class="sss-section-title">En çok merak edilen sorular</h2>
+    </div>
+    <div class="trending-grid">
+      <a class="trending-card" href="#q-satin-alma-erisim">
+        <span class="trending-num">1</span>
+        <span class="trending-text">Satın alma sonrası erişim nasıl sağlanır?</span>
+        <span class="trending-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </a>
+      <a class="trending-card" href="#q-paket-yukseltme">
+        <span class="trending-num">2</span>
+        <span class="trending-text">Eğitim Seti değişikliği ya da yükseltme mümkün mü?</span>
+        <span class="trending-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </a>
+      <a class="trending-card" href="#q-canli-dersler">
+        <span class="trending-num">3</span>
+        <span class="trending-text">Canlı derslere nasıl katılırım?</span>
+        <span class="trending-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </a>
+      <a class="trending-card" href="#q-veli-merkez-icerik">
+        <span class="trending-num">4</span>
+        <span class="trending-text">Veli Kontrol Merkezi'nde neleri görebilirim?</span>
+        <span class="trending-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </a>
+      <a class="trending-card" href="#q-ogrenci-merkez-icerik">
+        <span class="trending-num">5</span>
+        <span class="trending-text">Öğrenci Kontrol Merkezi'nde neleri görebilirim?</span>
+        <span class="trending-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </a>
+      <a class="trending-card" href="#q-sinif-seviye">
+        <span class="trending-num">6</span>
+        <span class="trending-text">Farklı sınıf seviyeleri için içerik ayrımı var mı?</span>
+        <span class="trending-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ CONTENT (sidebar + panel) -->
+<section class="sec sss-content">
+  <div class="sec-inner" id="sssContent">
+    <div class="sss-layout">
+
+      <!-- SOL: SIDEBAR -->
+      <aside class="sss-sidebar" aria-label="Kategoriler">
+        <ul class="sss-cat-list" role="tablist">
+          <li>
+            <button class="sss-cat-item is-active" type="button" data-cat="satinalim" role="tab" aria-selected="true">
+              <span class="sss-cat-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+              </span>
+              <span class="sss-cat-item-text">
+                <strong>Satın Alım</strong>
+              </span>
+              <span class="sss-cat-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+            </button>
+          </li>
+          <li>
+            <button class="sss-cat-item" type="button" data-cat="platform" role="tab" aria-selected="false">
+              <span class="sss-cat-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              </span>
+              <span class="sss-cat-item-text">
+                <strong>Bilenyum Platformu</strong>
+              </span>
+              <span class="sss-cat-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+            </button>
+          </li>
+          <li>
+            <button class="sss-cat-item" type="button" data-cat="veli" role="tab" aria-selected="false">
+              <span class="sss-cat-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </span>
+              <span class="sss-cat-item-text">
+                <strong>Veli Kontrol Merkezi</strong>
+              </span>
+              <span class="sss-cat-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+            </button>
+          </li>
+          <li>
+            <button class="sss-cat-item" type="button" data-cat="ogrenci" role="tab" aria-selected="false">
+              <span class="sss-cat-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              </span>
+              <span class="sss-cat-item-text">
+                <strong>Öğrenci Kontrol Merkezi</strong>
+              </span>
+              <span class="sss-cat-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+            </button>
+          </li>
+          <li>
+            <button class="sss-cat-item" type="button" data-cat="icerik" role="tab" aria-selected="false">
+              <span class="sss-cat-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              </span>
+              <span class="sss-cat-item-text">
+                <strong>Eğitim İçerikleri</strong>
+              </span>
+              <span class="sss-cat-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+            </button>
+          </li>
+        </ul>
+      </aside>
+
+      <!-- SAĞ: PANEL -->
+      <div class="sss-panel" id="sssPanel">
+
+    <!-- ============ 1. SATIN ALIM ============ -->
+    <div class="sss-section is-active" id="cat-satinalim" data-cat="satinalim">
+      <header class="sss-cat-header">
+        <span class="sss-cat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        </span>
+        <div class="sss-cat-body">
+          <h2>Satın Alım</h2>
+          <p>Ödeme, taksit, iade, indirim ve çoklu öğrenci kaydı süreçleri.</p>
+        </div>
+      </header>
+      <div class="sss-list">
+        <details class="sss-item" id="q-odeme-yontemleri">
+          <summary><span class="sss-q">Hangi ödeme yöntemlerini kullanabilirim?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p><strong>12 aya varan taksit seçenekleriyle</strong> kredi kartı, banka kartı, çoklu kredi kartı, havale/EFT ve <strong>iyzico güvenli ödeme altyapısı</strong> üzerinden ödeme yapabilirsiniz. Taksit seçenekleri seçilen pakete ve bankaya göre değişiklik gösterebilir.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-satin-alma-erisim">
+          <summary><span class="sss-q">Satın alma sonrası erişim nasıl sağlanır?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Eğitim setlerimizden birini satın aldıktan sonra giriş bilgileriniz kısa süre içinde oluşturulur. Ardından <strong>kontrol merkezine yönlendirilerek</strong> Bilenyum deneyimine hemen başlayabilirsiniz. Giriş bilgileriniz kayıt sırasında kullandığınız <strong>e-posta adresi ve cep telefonu numaranıza</strong> iletilir.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-paket-yukseltme">
+          <summary><span class="sss-q">Eğitim seti değişikliği veya yükseltme mümkün mü?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Evet. Kontrol Merkezi'nde yer alan <strong>"Eğitim Seti Detayı"</strong> bölümünden eğitim setinizi yükseltebilir ve ders içerik kapsamını artırabilirsiniz. Yükseltme işlemi yalnızca alınan derslerin sayısını artırır; sunulan hizmet kalitesi ve diğer ayrıcalıklar tüm Eğitim Setlerinde aynıdır.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-iade-iptal">
+          <summary><span class="sss-q">İade ve iptal koşulları nelerdir?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>İade ve iptal süreçleri, satın alma sırasında onaylanan <strong>Mesafeli Satış Sözleşmesi</strong> ve hizmet koşulları kapsamında yürütülmektedir. Özel durumlar ve detaylı bilgi için çağrı merkezimizle iletişime geçebilirsiniz.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-kampanya-kodu">
+          <summary><span class="sss-q">Kampanya veya indirim kodu nasıl kullanılır?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Ödeme adımında yer alan <strong>kampanya/indirim kodu</strong> alanına size tanımlanan kodu girerek geçerli kampanya ve avantajlardan yararlanabilirsiniz.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-coklu-ogrenci">
+          <summary><span class="sss-q">Birden fazla öğrenci için kayıt yapılabilir mi?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Evet. <strong>Kardeş kaydı, çoklu öğrenci kaydı ve kurumsal kayıt</strong> talepleriniz için iletişim ekibimiz size özel süreç, avantaj ve teklif seçenekleri sunabilmektedir.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- ============ 2. BİLENYUM PLATFORMU ============ -->
+    <div class="sss-section" id="cat-platform" data-cat="platform">
+      <header class="sss-cat-header">
+        <span class="sss-cat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </span>
+        <div class="sss-cat-body">
+          <h2>Bilenyum Platformu</h2>
+          <p>Cihaz uyumu, canlı ders erişimi, teknik destek ve hesap güvenliği.</p>
+        </div>
+      </header>
+      <div class="sss-list">
+        <details class="sss-item" id="q-cihazlar">
+          <summary><span class="sss-q">Bilenyum platformuna hangi cihazlardan girebilirim?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Bilenyum'a <strong>bilgisayar, laptop, tablet ve telefon</strong> üzerinden erişebilirsiniz. Mobil uygulamalarımızı indirerek veya güncel bir tarayıcı üzerinden giriş yaparak tüm cihazlarınızdan kullanabilirsiniz.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-canli-dersler">
+          <summary><span class="sss-q">Canlı derslere nasıl katılırım?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Öğrenci Kontrol Merkezi'nde yer alan ders programı üzerinden ilgili dersin <strong>"Canlı Derse Katıl"</strong> bağlantısına tıklayarak canlı derse katılabilirsiniz. Canlı ders bağlantıları <strong>ders saati geldiğinde aktif olur</strong>.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-teknik-sorun">
+          <summary><span class="sss-q">Teknik sorun yaşarsam ne yapmalıyım?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Öncelikle <strong>internet bağlantınızı ve tarayıcınızın güncel olup olmadığını</strong> kontrol edin. Sorun devam ederse destek hattımız veya yardım merkezimiz üzerinden bize ulaşabilirsiniz. Ayrıca teknik destek ekibimize ulaşabilir ya da <strong>Yumi Eğitim Asistanı</strong>'ndan yardım alabilirsiniz.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-ders-kayitlari">
+          <summary><span class="sss-q">Geçmiş ders kayıtlarına her zaman erişebilir miyim?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Evet. İzlenmeyen derslerin kayıtlarına daha sonradan erişebilir; hem <strong>kaçırdığınız dersleri izlemek</strong> hem de <strong>geçmiş konuları tekrar etmek</strong> için ders kayıtlarını kullanabilirsiniz.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-sifre-sifirlama">
+          <summary><span class="sss-q">Şifremi unuttum, nasıl sıfırlarım?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Giriş ekranında yer alan <strong>"Şifremi Unuttum"</strong> bağlantısına tıklayarak kayıtlı <strong>e-posta adresiniz veya cep telefonu numaranız</strong> üzerinden şifre sıfırlama adımlarını tamamlayabilirsiniz.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-hesap-guvenligi">
+          <summary><span class="sss-q">Hesap güvenliği için önerileriniz nelerdir?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p><strong>Güçlü ve benzersiz bir şifre</strong> kullanmanız, hesabınızı paylaşmamanız ve giriş yaptığınız cihazlarda <strong>oturumunuzu kapatmanız</strong> önerilir. Güvenliğiniz için hesap bilgilerinizi üçüncü kişilerle paylaşmayın.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- ============ 3. VELİ KONTROL MERKEZİ ============ -->
+    <div class="sss-section" id="cat-veli" data-cat="veli">
+      <header class="sss-cat-header">
+        <span class="sss-cat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </span>
+        <div class="sss-cat-body">
+          <h2>Veli Kontrol Merkezi</h2>
+          <p>Çocuğunuzun gelişimini takip, öğretmen iletişimi, rapor ve KVKK.</p>
+        </div>
+      </header>
+      <div class="sss-list">
+        <details class="sss-item" id="q-veli-merkez-icerik">
+          <summary><span class="sss-q">Veli kontrol merkezinde neleri görebilirim?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Veli Kontrol Merkezi üzerinden öğrencinin <strong>deneme sınavı sonuçları, haftalık ders programı, eğitmen bilgileri, gelişim grafikleri, klan detayları</strong> ve izlenmeyen ders tekrarlarına erişebilirsiniz. Ayrıca <strong>psikolojik danışman görüşmeleri</strong> için randevu oluşturabilir ve süreci uçtan uca takip edebilirsiniz.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-gelisim-grafikleri">
+          <summary><span class="sss-q">Çocuğumun gelişim grafikleri güncellenir mi?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Evet. Öğrencinin <strong>deneme sınavlarına katılması, derslere devam etmesi ve ödevlerini tamamlamasıyla</strong> birlikte gelişim grafikleri düzenli olarak güncellenir.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-iletisim-ogretmen-pdr">
+          <summary><span class="sss-q">Öğretmenle ve psikolojik danışman ile nasıl iletişim kurarım?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Veli Kontrol Merkezi içerisindeki <strong>mesajlaşma bölümünü</strong> kullanarak öğretmenlere ve psikolojik danışmana anlık mesaj gönderebilirsiniz. Ayrıca psikolojik danışman ile <strong>2 haftada bir görüşme randevusu</strong> oluşturabilir ve <strong>aylık veli seminerlerine</strong> katılım sağlayabilirsiniz. Bu süreçler sayesinde öğrenci gelişimi daha yakından takip edilir ve daha güçlü bir iletişim sağlanır.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-coklu-ogrenci-takip">
+          <summary><span class="sss-q">Birden fazla öğrenciyi tek hesapta takip edebilir miyim?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Evet. Birden fazla öğrenciniz bulunuyorsa Veli Kontrol Merkezi'nde yer alan <strong>"Farklı Öğrenciye Geçiş Yap"</strong> seçeneği sayesinde öğrenciler arasında kolayca geçiş yapabilir ve tüm öğrencilerinizi <strong>tek bir veli hesabı</strong> üzerinden takip edebilirsiniz.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-pdf-rapor">
+          <summary><span class="sss-q">Raporları PDF veya e-posta ile alabilir miyim?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Evet. <strong>Deneme sınavı sonuçlarından gelişim raporlarına</strong>, ödev kontrol verilerinden devamsızlık ve ders programına kadar pek çok belgeyi uygun formatlarda <strong>bilgisayarınıza indirebilir veya e-posta olarak</strong> teslim alabilirsiniz.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-veri-paylasimi">
+          <summary><span class="sss-q">Verilerim kimlerle paylaşılır?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Kişisel verileriniz, <strong>KVKK (Kişisel Verilerin Korunması Kanunu)</strong> ve Aydınlatma Metnimiz doğrultusunda güvenle işlenir. Verilerinizin üçüncü taraflarla hangi durumlarda paylaşıldığına dair tüm detayları <strong>Gizlilik Politikamızda</strong> bulabilirsiniz.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- ============ 4. ÖĞRENCİ KONTROL MERKEZİ ============ -->
+    <div class="sss-section" id="cat-ogrenci" data-cat="ogrenci">
+      <header class="sss-cat-header">
+        <span class="sss-cat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        </span>
+        <div class="sss-cat-body">
+          <h2>Öğrenci Kontrol Merkezi</h2>
+          <p>Ders programı, ödevler, XP, rozetler, klan sıralaması ve daha fazlası.</p>
+        </div>
+      </header>
+      <div class="sss-list">
+        <details class="sss-item" id="q-ogrenci-merkez-icerik">
+          <summary><span class="sss-q">Öğrenci kontrol merkezinde neleri görebilirim?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Öğrenci Kontrol Merkezi, eğitim sürecini baştan sona tek bir noktadan kolayca yönetmen için tasarlandı. Bu panel üzerinden <strong>haftalık ders programına ve güncel ödevlerine</strong> ulaşabilir, <strong>deneme sınavı sonuçların</strong> ile ilerleme durumunu anlık olarak takip edebilirsin. Ayrıca <strong>klan bilgilerini ve kazandığın XP'leri</strong> görüntüleyebilir, öğretmenlerinle mesajlaşıp psikolojik danışman randevularını pratik bir şekilde organize edebilirsin.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-odev-takip">
+          <summary><span class="sss-q">Ödev teslim tarihlerini nasıl takip ederim?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Öğrenci Kontrol Merkezi'ndeki <strong>"Ödevlerim"</strong> bölümünden geçmiş ve güncel ödevlerini tüm derslerine göre filtreleyerek inceleyebilirsin. Bu alanda ödevlerini bilgisayarına indirebilir, tamamladıklarını teslim edebilir ve son teslim tarihlerini rahatça görebilirsin. <strong>Üstelik ödevlerini zamanından önce teslim ederek ekstra XP kazanabileceğini de unutma!</strong></p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-rozet-puan">
+          <summary><span class="sss-q">Rozet veya başarı puanları nasıl çalışır?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Yıl boyunca elde ettiğin XP'ler sayesinde <strong>öğretim yılı sonunda sıralamaya girerek harika hediyeler kazanabilirsin!</strong> Ayrıca kazandığın başarı puanlarına ve bu puanları hangi alanda topladığına bağlı olarak; <strong>"Deneme Uzmanı" veya "Erken Teslimatçı"</strong> gibi özel unvanlar içeren rozetler açabilir, bu rozetlerle <strong>Bitmoji'ni</strong> dilediğince özelleştirebilirsin.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-gec-katilim">
+          <summary><span class="sss-q">Canlı derse geç kaldım, katılabilir miyim?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Tabii ki, derse geç kalmış olsan bile hemen katılabilirsin! Dersin kaçırdığın kısmını hiç dert etme; daha sonra <strong>"Canlı Ders Tekrarı"</strong> bölümünden izleyerek eksiklerini kolayca kapatabilirsin.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-profil-guncelleme">
+          <summary><span class="sss-q">Profil bilgilerimi güncelleyebilir miyim?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Evet, Öğrenci Kontrol Merkezi'ndeki <strong>"Profil Ayarlarım"</strong> sayfasından izin verilen tüm bilgilerini güncelleyebilirsin. Değiştiremediğin diğer alanlarda bir hata veya eksiklik olduğunu düşünüyorsan, durumu düzeltmek için hemen <strong>teknik destek ekibimizle</strong> iletişime geçebilirsin.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-siralama-arkadas">
+          <summary><span class="sss-q">Her arkadaşımın sıralamasını görüntüleyebilir miyim?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Gizlilik kuralları gereği, her öğrenci yalnızca <strong>kendi klan ve genel sıralama konumunu</strong> görebilir. Ancak tatlı bir rekabet için liderlik tablosunu inceleyebilirsin! <strong>Klan sıralamasında ilk 3'e giren arkadaşlarını</strong>, <strong>genel sıralamada ise zirvedeki ilk 10 öğrenciyi</strong> dilediğin zaman görüntüleyebilirsin.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-mobil-web">
+          <summary><span class="sss-q">Mobil uygulama ile web uygulaması aynı mı?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Her iki uygulama da <strong>birebir aynı özelliklere ve uyuma</strong> sahip. Eğer daha akıcı ve performanslı bir çalışma ortamı istiyorsan, mobil uygulamamızı <strong>özellikle tablet üzerinden</strong> kullanmanı öneririz.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-hata-bildirim">
+          <summary><span class="sss-q">Teknik bir hata bildirmek için ne yapmalıyım?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>İletişim sayfamızda yer alan tüm kanalları kullanarak bize kolayca ulaşabilirsin. Karşılaştığın basit sorunları hızlıca çözmek için <strong>yapay zeka asistanın Yumi</strong> ile hemen konuşabilir ya da daha büyük aksilikler için doğrudan <strong>teknik destek ekibimizden</strong> yardım alabilirsin.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- ============ 5. EĞİTİM İÇERİKLERİ ============ -->
+    <div class="sss-section" id="cat-icerik" data-cat="icerik">
+      <header class="sss-cat-header">
+        <span class="sss-cat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </span>
+        <div class="sss-cat-body">
+          <h2>Eğitim İçerikleri</h2>
+          <p>Müfredat uyumu, ek kaynaklar, güncellemeler ve içerik önerileri.</p>
+        </div>
+      </header>
+      <div class="sss-list">
+        <details class="sss-item" id="q-meb-uyum">
+          <summary><span class="sss-q">Ders materyalleri MEB müfredatına uygun mu?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Kesinlikle! Platformdaki <strong>tüm ders materyalleri, alanında uzman yazarlar tarafından</strong> senin için özel olarak hazırlandı. İçeriklerimizin tamamı yeni <strong>"Türkiye Yüzyılı Maarif Modeli"</strong> müfredatı ile birebir uyumlu şekilde ilerlemeni sağlar.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-ek-kaynak">
+          <summary><span class="sss-q">Ek kaynak veya deneme setleri var mı?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Kesinlikle var! Gelişimini en üst seviyeye çıkarmak için hiçbir noktayı atlamadık. Platformda; <strong>kavram ve bağlam temelli ders ödevleri, aylık deneme sınavları ve ders özet çıktıları</strong> gibi ihtiyacın olan tüm kaynaklar seni bekliyor. Ayrıca <strong>psikolojik danışmanından alacağın taktikler</strong>, çok daha verimli çalışmanı sağlarken zamanı harika bir şekilde yönetmene de yardımcı olacak!</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-icerik-guncelleme">
+          <summary><span class="sss-q">İçerik güncellemeleri nasıl duyurulur?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Mobil ve web uygulamamız üzerinden gönderdiğimiz <strong>anlık bildirimler</strong> sayesinde hiçbir şeyi kaçırmazsın! Platformdaki tüm yeni gelişmelerden, içeriklerden ve güncellemelerden anında haberdar olmak için <strong>bildirimlerini açık tutman</strong> yeterli.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-sinif-seviye">
+          <summary><span class="sss-q">Farklı sınıf seviyeleri için içerik ayrımı var mı?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Kesinlikle var! Platformdaki tüm ders içerikleri ve materyalleri, tamamen senin bulunduğun sınıf kademesinin (<strong>5. sınıf, 6. sınıf, 7. sınıf ve 8. sınıf</strong>) gerektirdiği hedeflere ve kazanımlara göre özel olarak hazırlanıyor. Sunulan imkanlar ve platformun kalitesi tüm sınıf kademeleri için tamamen eşit olsa da her kademenin <strong>kendi seviyesine uygun, eksiksiz bir öğrenme süreci</strong> yaşaması amaçlanıyor.</p>
+          </div>
+        </details>
+
+        <details class="sss-item" id="q-icerik-onerisi">
+          <summary><span class="sss-q">İçerik önerisi veya geri bildirim verebilir miyim?</span><span class="sss-icon" aria-hidden="true"></span></summary>
+          <div class="sss-answer">
+            <p>Tabii ki! Senin deneyimini ve platformdan aldığın verimi her şeyden çok önemsiyoruz. Bilenyum'da görmek istediğin tüm içerik önerilerini ve geri bildirimlerini, <strong>iletişim sayfamızda yer alan "Bize Ulaşın" formu</strong> üzerinden bizimle dilediğin zaman paylaşabilirsin. <strong>Fikirlerin bizim için çok değerli!</strong></p>
+          </div>
+        </details>
+      </div>
+    </div>
+
+        <!-- Empty state (sadece arama yaparken görünür) -->
+        <div class="sss-empty" id="sssEmpty">
+          <span class="sss-empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
+          <strong>Aramana uygun bir soru bulamadık.</strong>
+          Farklı kelimelerle aramayı deneyebilir veya iletişim formundan bize ulaşabilirsin.
+        </div>
+
+      </div><!-- /.sss-panel -->
+    </div><!-- /.sss-layout -->
+  </div>
+</section>
+
+<!-- HELP STRIP CTA -->
+<section class="sec sec-help">
+  <div class="help-strip">
+    <div class="help-text">
+      <h3 class="help-title">Soruna cevap bulamadın mı?</h3>
+      <p class="help-sub">Aklındaki her soru için buradayız. İletişim formundan bize yaz, en kısa süre içerisinde dönüş yapalım.</p>
+    </div>
+    <div class="help-actions">
+      <a href="iletisim.html" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        İletişime Geç
+      </a>
+      <a href="index.html#yumi" class="btn btn-ghost">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <line x1="12" y1="3" x2="12" y2="5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="12" cy="2.3" r="1" fill="currentColor"/>
+          <rect x="4.5" y="5.5" width="15" height="13.5" rx="4.5" fill="currentColor"/>
+          <circle cx="9" cy="11.5" r="1.3" fill="#28265a"/>
+          <circle cx="15" cy="11.5" r="1.3" fill="#28265a"/>
+          <rect x="9.8" y="15" width="4.4" height="1.2" rx="0.6" fill="#28265a"/>
+        </svg>
+        Yumi'ye Sor
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="site-footer"></footer>
+
+<!-- ============ TRIAL MODAL ============ -->
+<div class="trial-modal" id="trialModal" aria-hidden="true">
+  <div class="trial-modal-overlay" data-trial-close></div>
+  <div class="trial-modal-card" role="dialog" aria-modal="true" aria-labelledby="trialModalTitle">
+    <div class="trial-modal-image" aria-hidden="true">[Banner Görseli]</div>
+    <button class="trial-modal-close" data-trial-close aria-label="Kapat" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="trial-modal-body">
+      <div class="trial-modal-head">
+        <span class="trial-modal-eyebrow">Ücretsiz Deneme Dersi</span>
+        <h2 class="trial-modal-title" id="trialModalTitle">Hadi tanışalım</h2>
+        <p class="trial-modal-sub">Çocuğunun seviyesi ve hedefine en uygun deneme dersini birlikte planlayalım.</p>
+      </div>
+      <form class="trial-step-form active" id="trialStep1" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-s-name">Öğrenci adı</label>
+            <input type="text" id="trial-s-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-s-surname">Öğrenci soyadı</label>
+            <input type="text" id="trial-s-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-grade">Sınıf seviyesi</label>
+          <select id="trial-s-grade" required>
+            <option value="" disabled selected>Sınıf seç</option>
+            <option value="5">5. Sınıf</option>
+            <option value="6">6. Sınıf</option>
+            <option value="7">7. Sınıf</option>
+            <option value="8">8. Sınıf (LGS)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-subject">Deneme dersi istenen alan</label>
+          <select id="trial-s-subject" required>
+            <option value="" disabled selected>Alan seç</option>
+            <option value="mat">Matematik</option>
+            <option value="fen">Fen Bilimleri</option>
+            <option value="trk">Türkçe</option>
+            <option value="ing">İngilizce</option>
+            <option value="sos">Sosyal Bilgiler</option>
+            <option value="all">Genel (tüm dersler)</option>
+          </select>
+        </div>
+        <div class="trial-actions">
+          <button type="submit" class="btn-modal btn-modal-primary">
+            İleri
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </form>
+      <form class="trial-step-form" id="trialStep2" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-p-name">Veli adı</label>
+            <input type="text" id="trial-p-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-p-surname">Veli soyadı</label>
+            <input type="text" id="trial-p-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-p-email">E-posta</label>
+          <input type="email" id="trial-p-email" required placeholder="ornek@email.com" autocomplete="email" data-rule="email" maxlength="120" />
+        </div>
+        <div class="form-field">
+          <label for="trial-p-phone">Telefon</label>
+          <input type="tel" id="trial-p-phone" required placeholder="+90 5XX XXX XX XX" inputmode="numeric" autocomplete="tel" maxlength="17" data-rule="phone-tr" />
+        </div>
+        <div class="trial-actions">
+          <button type="button" class="btn-modal btn-modal-ghost" id="trialBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Geri
+          </button>
+          <button type="submit" class="btn-modal btn-modal-primary">
+            Talebi Gönder
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      </form>
+      <div class="trial-success" id="trialSuccess">
+        <div class="trial-success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>Talebin alındı!</h3>
+        <p>1 iş günü içinde belirttiğin telefon numarasından sana ulaşacağız. Tanışmak için sabırsızlanıyoruz!</p>
+        <button type="button" class="btn-modal" data-trial-close>Tamam</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/dom.js"></script>
+<script src="assets/trial-modal.js"></script>
+<script src="assets/input-rules.js"></script>
+<script src="assets/footer.js"></script>
+
+<!-- SSS interactivity: sidebar, search, hash navigation -->
+<script>
+  (function () {
+    'use strict';
+    var search       = document.getElementById('sssSearch');
+    var clear        = document.getElementById('sssSearchClear');
+    var panel        = document.getElementById('sssPanel');
+    var sidebarItems = document.querySelectorAll('.sss-cat-item');
+    var sections     = document.querySelectorAll('.sss-section');
+    var items        = document.querySelectorAll('.sss-item');
+    var empty        = document.getElementById('sssEmpty');
+
+    /* Aktif kategoriyi değiştir: sidebar + panel section senkron */
+    function activateCategory(cat) {
+      sidebarItems.forEach(function (b) {
+        var isActive = b.getAttribute('data-cat') === cat;
+        b.classList.toggle('is-active', isActive);
+        b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+      sections.forEach(function (s) {
+        s.classList.toggle('is-active', s.getAttribute('data-cat') === cat);
+      });
+    }
+
+    /* Sidebar tıklama */
+    sidebarItems.forEach(function (b) {
+      b.addEventListener('click', function () {
+        // Arama açıkken kategoriye tıklarsan arama temizlensin (clean UX)
+        if (search && search.value) {
+          search.value = '';
+          applySearch();
+        }
+        activateCategory(b.getAttribute('data-cat'));
+        // Mobilde panel'in başına yumuşak scroll
+        if (panel && window.innerWidth <= 880) {
+          panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    /* Arama — multi-category: is-searching modunda tüm match'leri göster */
+    function applySearch() {
+      var q = (search.value || '').trim().toLowerCase();
+      clear.classList.toggle('is-visible', q.length > 0);
+
+      if (q === '') {
+        panel.classList.remove('is-searching');
+        items.forEach(function (item) {
+          item.style.display = '';
+          item.open = false;
+        });
+        sections.forEach(function (sec) { sec.classList.remove('has-matches'); });
+        empty.classList.remove('is-visible');
+        return;
+      }
+
+      panel.classList.add('is-searching');
+      var anyMatch = false;
+      sections.forEach(function (sec) {
+        var secMatch = false;
+        sec.querySelectorAll('.sss-item').forEach(function (item) {
+          var ok = (item.textContent || '').toLowerCase().indexOf(q) !== -1;
+          item.style.display = ok ? '' : 'none';
+          if (ok) {
+            item.open = true;
+            secMatch = true;
+            anyMatch = true;
+          }
+        });
+        sec.classList.toggle('has-matches', secMatch);
+      });
+      empty.classList.toggle('is-visible', !anyMatch);
+    }
+
+    if (search) search.addEventListener('input', applySearch);
+    if (clear) {
+      clear.addEventListener('click', function () {
+        search.value = '';
+        applySearch();
+        search.focus();
+      });
+    }
+
+    /* Hash navigation: trending kart / dış link → parent kategoriyi aç + scroll */
+    function openFromHash() {
+      var hash = location.hash.replace('#', '');
+      if (!hash) return;
+      var el = document.getElementById(hash);
+      if (!el) return;
+
+      if (el.tagName === 'DETAILS') {
+        // Önce parent kategoriyi aktive et
+        var section = el.closest('.sss-section');
+        if (section) activateCategory(section.getAttribute('data-cat'));
+        // Sonra details'i aç + scroll
+        el.open = true;
+        setTimeout(function () {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      } else if (el.classList.contains('sss-section')) {
+        activateCategory(el.getAttribute('data-cat'));
+        setTimeout(function () {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+    }
+    window.addEventListener('load', openFromHash);
+    window.addEventListener('hashchange', openFromHash);
+  })();
+</script>
+
+</body>
+</html>

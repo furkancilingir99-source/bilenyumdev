@@ -1,0 +1,1009 @@
+/* ====================================================================
+ * assessment-light.css
+ * Sınav · Ödev · Seviye Belirleme · Dikkat · Sonuç — aydınlık okunurluk
+ * Marka: #3e3a8e #28265a | #e35c97 #e6087b
+ * assessment.css'ten SONRA yüklenir.
+ * ==================================================================== */
+
+:root {
+  --asm-selected-bg:     var(--brand-purple-06);
+  --asm-selected-border: var(--brand-purple-28);
+  --asm-selected-text:   var(--brand-navy);
+  --asm-hover-bg:        var(--brand-magenta-08);
+  --asm-hover-border:    var(--brand-rose);
+}
+
+/* ---- Tipografi (tüm assessment yüzeyleri) ---- */
+[class*="asm-"],
+.asm-banner,
+.asm-modal-card {
+  font-family: var(--font-sans) !important;
+}
+
+/* ---- Sayfa zeminleri ---- */
+.asm-exam-page,
+.asm-placement-page,
+.asm-homework-page,
+.asm-attention-page {
+  background: var(--bg-page) !important;
+  color: var(--brand-navy) !important;
+}
+
+.asm-results-page {
+  min-height: 100vh !important;
+  background: var(--bg-page) !important;
+  color: var(--brand-navy) !important;
+}
+
+.asm-attention-page.is-exam-finished {
+  background: var(--bg-subtle) !important;
+}
+
+/* ---- Banner (dashboard) ---- */
+.asm-banner {
+  background: linear-gradient(135deg, var(--brand-purple-06), var(--brand-magenta-08)) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  backdrop-filter: none !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.asm-banner-icon {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-banner-title { color: var(--brand-navy) !important; }
+.asm-banner-text  { color: var(--ink-dark-1) !important; }
+.asm-banner-deadline { color: var(--brand-purple) !important; }
+
+/* ---- Modal / kapı kartları ---- */
+.asm-exam-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-exam-card-title { color: var(--brand-navy) !important; }
+.asm-exam-card-desc  { color: var(--ink-dark-1) !important; }
+
+.asm-gate-title { color: var(--brand-navy) !important; }
+.asm-gate-text  { color: var(--ink-dark-1) !important; }
+
+/* ---- Üst çubuk & öğrenci şeridi ---- */
+.asm-exam-topbar-title { color: var(--brand-navy) !important; }
+.asm-exam-topbar-meta  { color: var(--asm-text-muted) !important; font-family: var(--font-mono) !important; }
+
+.asm-results-back {
+  color: var(--brand-purple) !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  padding: 8px 12px !important;
+  border-radius: 10px !important;
+}
+.asm-results-back:hover {
+  color: var(--brand-magenta) !important;
+  background: var(--brand-magenta-08) !important;
+  border-color: var(--brand-magenta-35) !important;
+}
+
+/* ---- Ödev üst bar ---- */
+.asm-hw-topic { color: var(--ink-dark-1) !important; }
+.asm-hw-subject-badge {
+  background: var(--brand-purple-06) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-hw-subject-badge[data-subject="mat"] { color: var(--brand-magenta) !important; border-color: var(--brand-magenta-35) !important; background: var(--brand-magenta-08) !important; }
+.asm-hw-subject-badge[data-subject="fen"] { color: #248f58 !important; border-color: rgba(46, 168, 106, 0.35) !important; background: rgba(46, 168, 106, 0.08) !important; }
+.asm-hw-subject-badge[data-subject="trk"] { color: var(--brand-purple) !important; border-color: var(--brand-purple-28) !important; background: var(--brand-purple-06) !important; }
+.asm-hw-subject-badge[data-subject="ing"] { color: #9a6808 !important; border-color: rgba(212, 146, 10, 0.35) !important; background: rgba(212, 146, 10, 0.08) !important; }
+.asm-hw-back {
+  color: var(--brand-purple) !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-hw-back:hover {
+  color: var(--brand-magenta) !important;
+  background: var(--brand-magenta-08) !important;
+}
+
+/* ---- Bölüm / ders sekmeleri ---- */
+.asm-placement-section-label { color: var(--asm-text-label) !important; font-family: var(--font-sans) !important; }
+.asm-phase-step {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-phase-step.is-active {
+  background: var(--asm-selected-bg) !important;
+  border-color: var(--brand-purple-28) !important;
+  box-shadow: inset 0 0 0 1px var(--brand-purple-06) !important;
+}
+.asm-phase-step.is-done {
+  background: rgba(46, 168, 106, 0.08) !important;
+  border-color: rgba(46, 168, 106, 0.35) !important;
+}
+.asm-phase-step-num  { color: var(--brand-purple) !important; }
+.asm-phase-step-label { color: var(--brand-navy) !important; }
+.asm-phase-step-sub  { color: var(--ink-dark-2) !important; }
+
+.asm-subject-tab {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-subject-tab:hover {
+  background: var(--asm-hover-bg) !important;
+  border-color: var(--brand-rose) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-subject-tab.is-active {
+  background: var(--brand-magenta-12) !important;
+  border-color: var(--brand-magenta-35) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-subject-tab-count { color: var(--ink-dark-2) !important; }
+
+/* ---- Soru metni & görsel ---- */
+.asm-question-num {
+  color: var(--brand-magenta) !important;
+  font-family: var(--font-mono) !important;
+}
+.asm-question-text {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+.asm-question-text strong { color: var(--brand-navy) !important; }
+.asm-question-visual {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-question-visual-caption { color: var(--ink-dark-2) !important; }
+
+/* ---- Şıklar (genel) ---- */
+.asm-option {
+  background: var(--bg-surface) !important;
+  border: 1.5px solid var(--brand-purple-18) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+.asm-option:hover {
+  background: var(--asm-hover-bg) !important;
+  border-color: var(--brand-rose) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-option.is-selected {
+  background: var(--brand-magenta-12) !important;
+  border-color: var(--brand-magenta-35) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-option-letter {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-mono) !important;
+}
+.asm-option.is-selected .asm-option-letter {
+  background: linear-gradient(135deg, var(--brand-magenta), var(--brand-rose)) !important;
+  color: #fff !important;
+}
+.asm-option.is-wrong {
+  border-color: var(--brand-magenta-35) !important;
+  background: var(--brand-magenta-08) !important;
+}
+.asm-option-visual-label { color: var(--brand-navy) !important; }
+
+/* ---- Tahta şıkları ---- */
+.asm-hw-sheet-options .asm-option {
+  color: var(--brand-navy) !important;
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple-14) !important;
+}
+.asm-hw-sheet-options .asm-option:hover {
+  border-color: var(--brand-rose) !important;
+  background: var(--brand-magenta-08) !important;
+}
+.asm-hw-sheet-options .asm-option.is-selected {
+  border-color: var(--brand-magenta) !important;
+  background: var(--brand-magenta-12) !important;
+  box-shadow: inset 0 0 0 1px var(--brand-magenta-18) !important;
+}
+.asm-hw-sheet-options .asm-option-letter { color: var(--brand-navy) !important; background: var(--brand-purple-06) !important; }
+.asm-hw-sheet-options .asm-option.is-selected .asm-option-letter {
+  background: linear-gradient(135deg, var(--brand-magenta), var(--brand-rose)) !important;
+  color: #fff !important;
+}
+.asm-hw-sheet-options .asm-option.is-pending {
+  border-color: var(--brand-purple-28) !important;
+  background: var(--brand-purple-06) !important;
+  box-shadow: inset 0 0 0 1px var(--brand-purple-14) !important;
+}
+.asm-hw-sheet-options .asm-option.is-pending .asm-option-letter {
+  background: var(--brand-purple) !important;
+  color: #fff !important;
+}
+.asm-hw-sheet-subject[data-subject="trk"] {
+  color: var(--brand-purple) !important;
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-18) !important;
+}
+.asm-hw-sheet-guide,
+.asm-hw-sheet-guide strong { color: var(--ink-dark-1) !important; }
+
+/* ---- Soru paleti ---- */
+.asm-q-palette-wrap {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-q-palette-title { color: var(--asm-text-label) !important; }
+.asm-q-pill {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-mono) !important;
+}
+.asm-q-pill:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.asm-q-pill.is-current {
+  background: var(--asm-selected-bg) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+  box-shadow: inset 0 0 0 1px var(--brand-purple-06) !important;
+}
+.asm-q-pill.is-answered {
+  border-color: rgba(46, 168, 106, 0.45) !important;
+  color: #248f58 !important;
+  background: rgba(46, 168, 106, 0.08) !important;
+}
+.asm-q-pill.is-deferred {
+  border-color: rgba(212, 146, 10, 0.45) !important;
+  color: #9a6808 !important;
+  background: rgba(212, 146, 10, 0.08) !important;
+}
+.asm-q-pill.is-draft {
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-purple) !important;
+  background: var(--brand-purple-06) !important;
+}
+
+/* ---- İlerleme çubuğu ---- */
+.asm-exam-progress { background: var(--brand-purple-10) !important; }
+.asm-exam-progress-fill {
+  background: linear-gradient(90deg, var(--brand-magenta), var(--brand-purple)) !important;
+}
+
+/* ---- Tahta araçları ---- */
+.asm-hw-board-toolbar { background: var(--bg-surface) !important; }
+.asm-hw-tool {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-hw-tool:hover:not(:disabled) {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-hw-tool.is-active {
+  background: var(--asm-selected-bg) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-hw-toolbar-zoom .asm-hw-zoom-label {
+  color: var(--brand-navy) !important;
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  font-family: var(--font-mono) !important;
+}
+.asm-hw-pen-popover,
+.asm-hw-shape-popover,
+.asm-hw-eraser-popover {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-hw-pen-popover-label { color: var(--asm-text-label) !important; }
+
+/* Renk seçici — seçili renk görünür kalsın, sadece dış halka */
+.asm-hw-pen-color {
+  border-color: var(--brand-purple-18) !important;
+}
+.asm-hw-pen-color.is-active {
+  background: var(--swatch) !important;
+  transform: scale(1.1);
+  border-color: var(--brand-purple) !important;
+  box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--brand-purple) !important;
+}
+
+.asm-hw-pen-size.is-active,
+.asm-hw-shape-option.is-active,
+.asm-hw-eraser-size.is-active {
+  border-color: var(--brand-purple) !important;
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+}
+
+.asm-hw-pen-size,
+.asm-hw-eraser-size {
+  color: var(--brand-navy) !important;
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-hw-pen-size-labels span {
+  color: var(--ink-dark-2) !important;
+  font-family: var(--font-mono) !important;
+}
+.asm-hw-pen-size-preview {
+  box-shadow: 0 0 0 2px var(--brand-purple-14) !important;
+}
+.asm-hw-shape-option {
+  color: var(--brand-navy) !important;
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-hw-shape-option:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.asm-hw-pen-wrap.is-open .asm-hw-tool[data-tool="pen"],
+.asm-hw-shape-wrap.is-open .asm-hw-tool[data-tool="shape"],
+.asm-hw-eraser-wrap.is-open .asm-hw-tool[data-tool="eraser"] {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-hw-pen-color.is-light {
+  box-shadow: inset 0 0 0 1px var(--brand-purple-18) !important;
+}
+.asm-hw-pen-color.is-light.is-active {
+  border-color: var(--brand-purple) !important;
+}
+
+.asm-hw-pen-swatch {
+  border-color: var(--brand-purple-28) !important;
+  box-shadow: 0 0 0 1px var(--brand-purple-14) !important;
+}
+.asm-hw-nav-btn {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-hw-nav-btn:hover:not(:disabled) {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.asm-hw-nav-btn.is-next {
+  background: var(--brand-magenta-08) !important;
+  border-color: var(--brand-magenta-35) !important;
+}
+
+/* ---- Dikkat testi ---- */
+.asm-attention-stat {
+  color: var(--ink-dark-1) !important;
+  font-family: var(--font-mono) !important;
+}
+.asm-attention-stat strong { color: var(--brand-purple) !important; }
+.asm-attention-legend-item { color: var(--ink-dark-1) !important; }
+.asm-attention-legend kbd {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-attention-legend kbd.is-c { color: var(--brand-purple) !important; }
+.asm-letter-grid-wrap {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-letter {
+  background: var(--bg-surface) !important;
+  border: 1.5px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-mono) !important;
+}
+.asm-letter:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.asm-letter.is-marked {
+  background: var(--brand-magenta-12) !important;
+  border-color: var(--brand-magenta-35) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-letter.is-marked-demo {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-purple) !important;
+}
+
+/* ---- Bitiş / onay / mola modalları ---- */
+.asm-finish-overlay,
+.asm-confirm-backdrop,
+.asm-hw-skip-modal-backdrop,
+.asm-hw-q-status-backdrop,
+.asm-hw-video-modal-backdrop {
+  background: var(--brand-navy-45) !important;
+}
+
+.asm-finish-modal-inner,
+.asm-confirm-card,
+.asm-hw-skip-modal-card,
+.asm-hw-q-status-card,
+.asm-hw-video-modal-card,
+.asm-phase-transition-card,
+.asm-exam-done-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+  color: var(--brand-navy) !important;
+}
+
+.asm-finish-modal-title,
+.asm-confirm-title,
+.asm-hw-skip-modal-title,
+.asm-hw-q-status-title,
+.asm-hw-video-modal-title,
+.asm-phase-transition-card h2,
+.asm-exam-done-title {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+
+.asm-finish-modal-sub,
+.asm-confirm-text,
+.asm-hw-skip-modal-intro,
+.asm-hw-skip-option-text,
+.asm-hw-q-status-text,
+.asm-hw-video-modal-sub,
+.asm-phase-transition-card p,
+.asm-exam-done-text,
+.asm-finish-hints li {
+  color: var(--ink-dark-1) !important;
+  font-family: var(--font-sans) !important;
+}
+.asm-finish-hints li strong { color: var(--brand-navy) !important; }
+
+.asm-finish-score {
+  background: var(--brand-magenta-08) !important;
+  border: 1px solid var(--brand-magenta-35) !important;
+}
+.asm-finish-score-val {
+  color: var(--brand-navy) !important;
+  background: linear-gradient(135deg, var(--brand-magenta), var(--brand-purple)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+.asm-finish-score-lbl { color: var(--ink-dark-2) !important; }
+
+.asm-finish-table th { color: var(--asm-text-label) !important; border-color: var(--brand-purple-10) !important; }
+.asm-finish-table td { color: var(--brand-navy) !important; border-color: var(--brand-purple-08) !important; }
+.asm-finish-formula { color: var(--ink-dark-1) !important; }
+
+.asm-hw-skip-option {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-hw-skip-option--video {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-18) !important;
+}
+.asm-hw-skip-cancel {
+  color: var(--ink-dark-2) !important;
+}
+.asm-hw-skip-cancel:hover { color: var(--brand-purple) !important; }
+
+.asm-hw-q-status-close {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-hw-q-status-close:hover { background: var(--brand-purple-10) !important; }
+.asm-hw-q-status--correct .asm-hw-q-status-title { color: #248f58 !important; }
+.asm-hw-q-status--wrong .asm-hw-q-status-title,
+.asm-hw-q-status--wrong-video .asm-hw-q-status-title { color: var(--brand-magenta) !important; }
+.asm-hw-q-status--video .asm-hw-q-status-title,
+.asm-hw-q-status--video-blank .asm-hw-q-status-title { color: var(--brand-purple) !important; }
+
+.asm-hw-video-meta-label { color: var(--asm-text-label) !important; }
+.asm-hw-video-meta-val   { color: var(--brand-navy) !important; }
+.asm-hw-video-meta {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-hw-video-modal-notice {
+  color: #9a6808 !important;
+  background: rgba(212, 146, 10, 0.1) !important;
+  border: 1px solid rgba(212, 146, 10, 0.28) !important;
+}
+.asm-hw-vp-stage {
+  border-color: var(--brand-purple-18) !important;
+}
+.asm-hw-vp-stage:focus-visible {
+  box-shadow: 0 0 0 2px var(--brand-purple-28) !important;
+}
+
+/* ---- Sonuç sayfası ---- */
+.asm-res-hero {
+  background: linear-gradient(145deg, #fff 0%, var(--lilac-100) 100%) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-res-hero-glow { display: none !important; }
+.asm-res-hero-title,
+.asm-res-card-title,
+.asm-res-student-info strong,
+.asm-res-td-subj {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+.asm-res-hero-sub,
+.asm-res-score-lbl,
+.asm-res-student-info span,
+.asm-res-formula,
+.asm-res-att-lbl,
+.asm-res-split-label,
+.asm-exam-done-score-lbl {
+  color: var(--ink-dark-1) !important;
+}
+.asm-res-hero-clan,
+.asm-res-clan-result-score,
+.asm-finish-clan-result-score,
+.asm-exam-done-clan-result-score {
+  color: #9a6808 !important;
+}
+.asm-res-clan-result,
+.asm-finish-clan-result,
+.asm-exam-done-clan-result {
+  background: rgba(212, 146, 10, 0.08) !important;
+  border: 1px solid rgba(212, 146, 10, 0.28) !important;
+  color: var(--ink-dark-1) !important;
+}
+.asm-res-clan-result strong,
+.asm-finish-clan-result strong,
+.asm-exam-done-clan-result strong {
+  color: var(--brand-navy) !important;
+}
+.asm-res-card,
+.asm-exam-done-score,
+.asm-res-score-ring,
+.asm-res-att-stat,
+.asm-res-split-item {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-res-table th { color: var(--asm-text-label) !important; }
+.asm-res-table td { color: var(--brand-navy) !important; }
+.asm-res-note { color: #9a6808 !important; }
+
+/* Video çözümler */
+.asm-pl-videos-toggle {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-pl-videos-toggle.is-open {
+  background: var(--asm-selected-bg) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.asm-pl-videos-tab {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.asm-pl-videos-tab:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-pl-videos-tab.is-active {
+  background: var(--asm-selected-bg) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-pl-videos-q-title,
+.asm-pl-videos-answer-val { color: var(--brand-navy) !important; }
+.asm-pl-videos-q-meta,
+.asm-pl-videos-answer-label,
+.asm-pl-videos-section-label { color: var(--ink-dark-1) !important; }
+
+/* Ödev sonuç kartları */
+.asm-hw-res-hero {
+  background: linear-gradient(145deg, #fff 0%, var(--lilac-100) 100%) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-hw-res-hero-title { color: var(--brand-navy) !important; }
+.asm-hw-res-hero-sub  { color: var(--ink-dark-1) !important; }
+.asm-hw-res-card-title { color: var(--asm-text-label) !important; }
+.asm-hw-res-meta-label { color: var(--asm-text-label) !important; }
+.asm-hw-res-meta-value { color: var(--brand-navy) !important; }
+.asm-hw-res-meta-muted { color: var(--ink-dark-2) !important; }
+.asm-hw-res-desc-text  { color: var(--ink-dark-1) !important; }
+.asm-hw-res-meta-row   { border-color: var(--brand-purple-08) !important; }
+.asm-hw-res-clan       { color: #9a6808 !important; }
+.asm-hw-res-stat-lbl   { color: var(--ink-dark-1) !important; }
+.asm-hw-res-stat.is-good .asm-hw-res-stat-val { color: #248f58 !important; }
+.asm-hw-res-stat.is-blank .asm-hw-res-stat-val { color: var(--brand-purple) !important; }
+.asm-hw-res-stat.is-xp .asm-hw-res-stat-val { color: #9a6808 !important; }
+.asm-hw-res-retry-note {
+  border-color: rgba(154, 104, 8, 0.28) !important;
+  background: rgba(255, 180, 80, 0.14) !important;
+  color: #9a6808 !important;
+}
+.asm-hw-retry-banner {
+  border-color: rgba(154, 104, 8, 0.28) !important;
+  background: rgba(255, 180, 80, 0.14) !important;
+  color: #9a6808 !important;
+}
+.asm-hw-res-stat.is-retry .asm-hw-res-stat-val { color: var(--brand-purple) !important; }
+.asm-hw-res-card,
+.asm-hw-res-stat {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-hw-res-meta-label { color: var(--asm-text-label) !important; }
+.asm-hw-res-meta-val   { color: var(--brand-navy) !important; }
+.asm-hw-res-stat-val   { color: var(--brand-navy) !important; font-family: var(--font-mono) !important; }
+.asm-hw-res-stat-label { color: var(--ink-dark-1) !important; }
+
+/* Footer & faz butonları */
+.asm-exam-footer { background: var(--bg-surface) !important; }
+.asm-btn-finish-phase {
+  border-color: rgba(212, 146, 10, 0.45) !important;
+  color: #9a6808 !important;
+  background: rgba(212, 146, 10, 0.08) !important;
+}
+.asm-btn-finish-phase:hover {
+  background: rgba(212, 146, 10, 0.14) !important;
+  color: #7a5500 !important;
+}
+
+/* Mola */
+.asm-break-screen,
+.asm-cross-break {
+  background: var(--bg-page) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-break-timer-label { color: var(--asm-text-label) !important; }
+.asm-break-timer { color: var(--brand-purple) !important; font-family: var(--font-mono) !important; }
+.asm-break-skip-text { color: var(--ink-dark-1) !important; }
+
+/* Boş durum */
+.asm-hw-empty,
+.asm-res-empty {
+  color: var(--ink-dark-1) !important;
+}
+.asm-hw-empty strong,
+.asm-res-empty-title { color: var(--brand-navy) !important; }
+
+/* Yan panel (eski layout) */
+.asm-hw-panel {
+  background: var(--bg-surface) !important;
+  border-right: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-hw-panel-question,
+.asm-hw-panel-question.is-board-ref { color: var(--ink-dark-1) !important; }
+
+/* Video çözümler — tam açık tema */
+.asm-pl-videos-toggle {
+  background: linear-gradient(135deg, var(--brand-purple-06), var(--brand-magenta-08)) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+.asm-pl-videos-toggle:hover {
+  border-color: var(--brand-purple-28) !important;
+  background: linear-gradient(135deg, var(--brand-purple-10), var(--brand-magenta-12)) !important;
+}
+.asm-pl-videos-toggle.is-open {
+  background: linear-gradient(135deg, var(--brand-magenta-12), var(--brand-purple-06)) !important;
+  border-color: var(--brand-magenta-35) !important;
+}
+.asm-pl-videos-toggle-icon {
+  background: var(--bg-surface) !important;
+  color: var(--brand-purple) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-pl-videos-panel {
+  border-top-color: var(--brand-purple-14) !important;
+}
+.asm-pl-videos-intro { color: var(--ink-dark-1) !important; }
+.asm-pl-videos-tab-count {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-navy) !important;
+  font-family: var(--font-mono) !important;
+}
+
+/* Soru chip'leri — doğru / yanlış / boş renkleri korunur */
+.asm-pl-videos-q {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-pl-videos-q:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+}
+.asm-pl-videos-q-play {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-purple) !important;
+}
+.asm-pl-videos-q-num { color: inherit !important; }
+.asm-pl-videos-q.is-correct {
+  border-color: rgba(46, 168, 106, 0.45) !important;
+  background: rgba(46, 168, 106, 0.08) !important;
+  color: #248f58 !important;
+}
+.asm-pl-videos-q.is-correct .asm-pl-videos-q-play {
+  background: rgba(46, 168, 106, 0.12) !important;
+  color: #248f58 !important;
+}
+.asm-pl-videos-q.is-correct .asm-pl-videos-q-badge.is-correct {
+  background: rgba(46, 168, 106, 0.18) !important;
+  color: #248f58 !important;
+}
+.asm-pl-videos-q.is-wrong {
+  border-color: var(--brand-magenta-35) !important;
+  background: var(--brand-magenta-08) !important;
+  color: var(--brand-magenta) !important;
+}
+.asm-pl-videos-q.is-wrong .asm-pl-videos-q-play {
+  background: var(--brand-magenta-12) !important;
+  color: var(--brand-magenta) !important;
+}
+.asm-pl-videos-q.is-wrong .asm-pl-videos-q-badge.is-wrong {
+  background: var(--brand-magenta-12) !important;
+  color: var(--brand-magenta) !important;
+}
+.asm-pl-videos-q.is-blank {
+  border: 2px solid var(--brand-purple-28) !important;
+  background: var(--brand-purple-06) !important;
+  color: var(--ink-dark-1) !important;
+  box-shadow: none !important;
+}
+.asm-pl-videos-q.is-blank .asm-pl-videos-q-play {
+  background: var(--brand-purple-06) !important;
+  color: var(--brand-purple) !important;
+}
+.asm-pl-videos-q.is-blank .asm-pl-videos-q-num { color: var(--ink-dark-2) !important; }
+.asm-pl-videos-q-badge.is-blank {
+  border-color: var(--brand-purple-28) !important;
+  box-shadow: none !important;
+}
+.asm-pl-videos-q.is-active {
+  box-shadow: 0 0 0 2px var(--brand-purple-28) !important;
+}
+.asm-pl-videos-q.is-correct.is-active {
+  box-shadow: 0 0 0 2px rgba(46, 168, 106, 0.45) !important;
+}
+.asm-pl-videos-q.is-wrong.is-active {
+  box-shadow: 0 0 0 2px var(--brand-magenta-35) !important;
+}
+.asm-pl-videos-q.is-blank.is-active {
+  box-shadow: 0 0 0 2px var(--brand-purple-28) !important;
+}
+
+/* Oynatıcı alanı */
+.asm-pl-videos-player {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-pl-videos-player-title {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+.asm-pl-videos-answers-wrap {
+  border-top-color: var(--brand-purple-14) !important;
+}
+.asm-pl-videos-answer-row {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.asm-pl-videos-answer-row.is-correct {
+  border-color: rgba(46, 168, 106, 0.45) !important;
+  background: rgba(46, 168, 106, 0.08) !important;
+}
+.asm-pl-videos-answer-row.is-correct .asm-pl-videos-answer-val { color: #248f58 !important; }
+.asm-pl-videos-answer-row.is-wrong {
+  border-color: var(--brand-magenta-35) !important;
+  background: var(--brand-magenta-08) !important;
+}
+.asm-pl-videos-answer-row.is-wrong .asm-pl-videos-answer-val { color: var(--brand-magenta) !important; }
+.asm-pl-videos-answer-row.is-correct-key {
+  border-color: rgba(46, 168, 106, 0.35) !important;
+  background: rgba(46, 168, 106, 0.06) !important;
+}
+.asm-pl-videos-answer-row.is-correct-key .asm-pl-videos-answer-val { color: #248f58 !important; }
+.asm-pl-videos-answer-row.is-blank {
+  border-color: var(--brand-purple-14) !important;
+  background: var(--bg-subtle) !important;
+}
+.asm-pl-videos-answer-row.is-blank .asm-pl-videos-answer-val { color: var(--ink-dark-2) !important; }
+
+/* Tam ekran modal (sonuç sayfası) */
+.asm-pl-videos-overlay-backdrop {
+  background: var(--brand-navy-45) !important;
+}
+.asm-pl-videos-overlay-card {
+  background: var(--bg-surface) !important;
+  background-image: none !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-pl-videos-close {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-pl-videos-close:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-pl-videos-modal-title {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+.asm-pl-videos-section,
+.asm-pl-videos-player-wrap {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+
+/* Sonuç ekranı — video çözümleri butonu */
+.asm-finish-actions .asm-btn-ghost#asmPlacementVideosBtn {
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-purple) !important;
+  background: var(--bg-surface) !important;
+}
+.asm-finish-actions .asm-btn-ghost#asmPlacementVideosBtn:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+
+/* Mola — checkbox */
+.asm-break-skip:hover { background: var(--brand-purple-06) !important; }
+.asm-break-skip:has(.asm-break-skip-input:checked) {
+  background: var(--brand-magenta-08) !important;
+  border-color: var(--brand-magenta-35) !important;
+}
+.asm-break-timer.is-skipped { color: var(--ink-dark-2) !important; }
+
+/* Sonuç boş / aksiyon */
+.asm-res-empty-text { color: var(--ink-dark-1) !important; }
+.asm-res-actions .asm-btn-ghost {
+  color: var(--brand-navy) !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+
+/* Onay modalı */
+.asm-confirm-hint { color: var(--ink-dark-1) !important; }
+
+/* Öğrenci bar — acil durum renkleri korunur */
+.asm-student-bar-val { color: var(--brand-navy) !important; }
+
+/* Placement soru sahnesi */
+.asm-question-stage {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-placement-exam-title { color: var(--brand-navy) !important; }
+
+/* ============================================================
+ * Tamamlayıcı — sonuç, şerit, kapı, placement kontrolleri
+ * ============================================================ */
+
+.asm-res-score-val,
+.asm-exam-done-score-val,
+.asm-finish-score-val {
+  background: linear-gradient(135deg, var(--brand-magenta), var(--brand-purple)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-family: var(--font-mono) !important;
+}
+.asm-res-att-val,
+.asm-res-split-val {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-mono) !important;
+}
+.asm-res-split-val small { color: var(--ink-dark-2) !important; }
+.asm-res-split-contrib { color: #9a6808 !important; }
+.asm-res-att-lbl,
+.asm-res-split-label { color: var(--asm-text-label) !important; }
+.asm-res-td-num.is-good { color: #248f58 !important; }
+.asm-res-td-num.is-bad  { color: var(--brand-magenta) !important; }
+.asm-res-td-num.is-net  { color: var(--brand-purple) !important; font-family: var(--font-mono) !important; }
+
+.asm-finish-hints-title {
+  color: var(--brand-navy) !important;
+  font-family: var(--font-sans) !important;
+}
+
+.asm-student-bar {
+  background: var(--bg-surface) !important;
+  border-bottom: 1px solid var(--brand-purple-14) !important;
+}
+.asm-student-bar-label { color: var(--asm-text-label) !important; }
+.asm-student-bar-back {
+  color: var(--brand-purple) !important;
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+}
+.asm-student-bar-back:hover {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+
+.asm-gate-overlay {
+  background: var(--brand-navy-45) !important;
+}
+.asm-gate-panel,
+.asm-modal-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--brand-purple-18) !important;
+  box-shadow: var(--shadow-lg) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-modal-eyebrow,
+.asm-modal-foot { color: var(--ink-dark-1) !important; }
+
+.asm-info-box,
+.asm-warn-box {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--brand-purple-14) !important;
+  color: var(--ink-dark-1) !important;
+}
+.asm-info-box p,
+.asm-warn-box p { color: var(--ink-dark-1) !important; }
+.asm-info-box strong,
+.asm-warn-box strong { color: #9a6808 !important; }
+
+.asm-placement-controls {
+  background: var(--bg-surface) !important;
+  border-bottom-color: var(--brand-purple-14) !important;
+}
+.asm-placement-controls label,
+.asm-placement-unit-label { color: var(--asm-text-label) !important; }
+.asm-placement-controls select,
+.asm-placement-unit-title { color: var(--brand-navy) !important; }
+.asm-placement-progress-heading { color: var(--brand-navy) !important; }
+
+.asm-phase-step.is-locked {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-10) !important;
+  opacity: 0.72 !important;
+}
+.asm-phase-step.is-locked .asm-phase-step-label { color: var(--ink-dark-2) !important; }
+
+.asm-letter.is-mark-blocked {
+  background: var(--bg-subtle) !important;
+  border-color: var(--brand-purple-10) !important;
+  color: var(--ink-dark-2) !important;
+  opacity: 0.55 !important;
+}
+
+.asm-phase-transition-card,
+.asm-exam-done-card {
+  color: var(--brand-navy) !important;
+}
+
+.asm-hw-board-meta,
+.asm-hw-board-meta-label { color: var(--asm-text-label) !important; }
+.asm-hw-board-meta-val   { color: var(--brand-navy) !important; }
+
+.asm-btn-done,
+.asm-btn-completed {
+  background: rgba(46, 168, 106, 0.12) !important;
+  border-color: rgba(46, 168, 106, 0.38) !important;
+  color: #248f58 !important;
+}
+.asm-exam-card.is-done {
+  border-color: rgba(46, 168, 106, 0.35) !important;
+  background: rgba(46, 168, 106, 0.06) !important;
+}

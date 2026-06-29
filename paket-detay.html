@@ -1,0 +1,1645 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>LGS Hızlandırma — Bilenyum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/trial-modal.css">
+<link rel="stylesheet" href="assets/robot-fab.css">
+<style>
+  body { background: #fafaff; }
+
+  /* ---------- Sections (page-specific title) ---------- */
+  .sec-title {
+    font-size: 32px; font-weight: 800; color: var(--ink-dark-0);
+    letter-spacing: -0.015em; line-height: 1.15;
+    margin: 0 0 12px;
+  }
+
+  /* ---------- Package Hero ---------- */
+  .pkg-hero {
+    background: linear-gradient(180deg, #fcfaff 0%, #f4eeff 100%);
+    position: relative;
+    z-index: 2;
+    overflow: visible;
+  }
+  .pkg-highlights {
+    list-style: none; padding: 0; margin: 0 0 24px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .pkg-highlights li {
+    font-size: 14.5px; color: var(--ink-dark-1);
+    display: flex; align-items: center; gap: 10px;
+    line-height: 1.5;
+  }
+  .pkg-highlights li::before {
+    content: "✓"; color: var(--p-purple); font-weight: 800;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: rgba(62,58,142,0.14);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .pkg-highlights li strong { color: var(--ink-dark-0); font-weight: 700; }
+
+  /* Light Space Divider */
+  .space-divider-light {
+    position: relative;
+    height: 160px;
+    background: linear-gradient(180deg, #f4eeff 0%, #ebe2ff 100%);
+    overflow: hidden;
+    z-index: 1;
+  }
+  .space-wave-light {
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    width: 100%; height: 100%;
+    display: block;
+    z-index: 3;
+  }
+  .geo-circle-light {
+    position: absolute;
+    width: 60px; height: 60px;
+    top: 28%; left: 42%;
+    border: 1.5px solid rgba(62,58,142,0.45);
+    border-radius: 50%;
+    z-index: 2;
+    transform: rotate(-18deg) scaleY(0.4);
+  }
+  .geo-dot-light {
+    position: absolute;
+    border-radius: 50%;
+    z-index: 2;
+  }
+  .geo-dot-light.d1 {
+    width: 10px; height: 10px;
+    top: 32%; left: 14%;
+    background: var(--p-purple);
+  }
+  .geo-dot-light.d2 {
+    width: 6px; height: 6px;
+    top: 20%; right: 24%;
+    background: var(--p-aqua);
+  }
+  .geo-line-light {
+    position: absolute;
+    width: 90px; height: 1px;
+    top: 42%; right: 8%;
+    background: linear-gradient(to right, transparent, rgba(62,58,142,0.6), transparent);
+    transform: rotate(-14deg);
+    z-index: 2;
+  }
+  .geo-tri-light {
+    position: absolute;
+    width: 0; height: 0;
+    top: 16%; left: 68%;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 12px solid rgba(255,122,184,0.65);
+    transform: rotate(18deg);
+    filter: drop-shadow(0 0 8px rgba(255,122,184,0.45));
+    z-index: 2;
+  }
+  .pkg-hero-inner { max-width: var(--maxw); margin: 0 auto; padding: 48px 32px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+  .pkg-image-wrap {
+    position: relative; aspect-ratio: 1/1;
+    border-radius: var(--r-xl);
+    background: linear-gradient(135deg, rgba(62,58,142,0.14), rgba(74,214,255,0.08));
+    border: 1px solid rgba(62,58,142,0.18);
+    overflow: hidden;
+    display: flex; align-items: flex-end; justify-content: center;
+    box-shadow: 0 30px 80px -30px rgba(62,58,142,0.40);
+    padding: 0 0 18%;
+  }
+  .pkg-image-wrap::after {
+    /* shelf/desk surface line */
+    content: ""; position: absolute;
+    bottom: 16%; left: 12%; right: 12%; height: 6px;
+    background: linear-gradient(180deg, rgba(20,22,50,0.10), transparent);
+    border-radius: 2px 2px 0 0;
+    pointer-events: none;
+  }
+  .pkg-books {
+    position: relative; z-index: 1;
+    display: flex; gap: 14px; align-items: flex-end;
+    filter: drop-shadow(0 16px 24px rgba(20,22,50,0.20));
+  }
+  .pkg-book {
+    width: 70px;
+    border-radius: 4px 10px 10px 4px;
+    color: white; font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 0 0 18px;
+    writing-mode: vertical-rl;
+    transform-origin: bottom center;
+    position: relative;
+    box-shadow: inset -3px 0 0 rgba(255,255,255,0.18), inset 3px 0 0 rgba(0,0,0,0.15);
+  }
+  .pkg-book::before {
+    /* spine line */
+    content: ""; position: absolute;
+    top: 12px; bottom: 12px; left: 8px;
+    width: 2px;
+    background: rgba(255,255,255,0.30);
+    border-radius: 2px;
+  }
+  .pkg-book.b1 { height: 230px; background: linear-gradient(180deg, #6964c4, #28265a); transform: rotate(-5deg); z-index: 3; }
+  .pkg-book.b2 { height: 270px; background: linear-gradient(180deg, #ff7ab8, #c43f8e); z-index: 2; }
+  .pkg-book.b3 { height: 220px; background: linear-gradient(180deg, #4ad6ff, #1a7ba8); transform: rotate(4deg); z-index: 1; }
+  .pkg-book.b4 { height: 250px; background: linear-gradient(180deg, #ffb547, #c97a0e); transform: rotate(-2deg); z-index: 2; }
+  .pkg-info .pkg-eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--p-purple); letter-spacing: 0.12em; text-transform: uppercase;
+    background: rgba(62,58,142,0.10); padding: 6px 12px; border-radius: 999px;
+    margin-bottom: 16px; font-weight: 700;
+  }
+  .pkg-info h1 { font-size: 44px; font-weight: 800; line-height: 1.08; margin: 0 0 16px; letter-spacing: -0.02em; color: var(--ink-dark-0); }
+  /* Eğitim Seti başlığının altında eğitim dönemi tarih kartı */
+  .pkg-dates {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 12px 16px;
+    background: rgba(62,58,142,0.06);
+    border: 1px solid rgba(62,58,142,0.16);
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+  .pkg-dates-icon {
+    flex-shrink: 0;
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 18px -8px rgba(62,58,142,0.45);
+  }
+  .pkg-dates-icon svg { width: 20px; height: 20px; }
+  .pkg-dates-text { display: flex; flex-direction: column; gap: 2px; }
+  .pkg-dates-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px; font-weight: 700;
+    color: var(--p-purple);
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+  }
+  .pkg-dates-range { font-size: 14.5px; color: var(--ink-dark-1); font-weight: 500; }
+  .pkg-dates-range strong { color: var(--ink-dark-0); font-weight: 800; }
+  .pkg-info .pkg-lead { font-size: 18px; color: var(--ink-dark-1); margin: 0 0 24px; line-height: 1.55; }
+  .pkg-price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .pkg-price { font-size: 40px; font-weight: 800; color: var(--ink-dark-0); letter-spacing: -0.02em; }
+  .pkg-price-per { font-size: 16px; color: var(--ink-dark-2); }
+  .pkg-price-meta { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--ink-dark-2); margin-bottom: 28px; }
+  .pkg-price-meta strong { color: var(--ink-dark-0); }
+  .pkg-price-installment { display: inline-flex; align-items: center; gap: 6px; color: var(--p-purple); font-weight: 600; }
+  .pkg-price-installment svg { width: 14px; height: 14px; }
+  .pkg-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  /* ---------- Features Grid ---------- */
+  .features-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .feature-card { padding: 22px 18px; background: white; border: 1px solid rgba(20,22,50,0.08); border-radius: 16px; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .feature-card:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -16px rgba(62,58,142,0.30); }
+  .feature-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: linear-gradient(160deg, #ffffff 0%, #f0eaff 60%, #d8c8ff 100%);
+    border: 1px solid rgba(62,58,142,0.18);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.95), inset 0 -2px 4px rgba(62,58,142,0.10), 0 6px 14px -4px rgba(62,58,142,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    margin-bottom: 14px;
+  }
+  .feature-card h3 { font-size: 14px; font-weight: 700; color: var(--ink-dark-0); margin: 0 0 4px; line-height: 1.3; }
+  .feature-card p { font-size: 13px; color: var(--ink-dark-1); margin: 0; line-height: 1.45; }
+
+  /* ---------- Sample Video ---------- */
+  .sec-video { background: var(--bg-3); }
+  .video-frame {
+    aspect-ratio: 16/9;
+    border-radius: var(--r-l);
+    background: linear-gradient(180deg, #1a1f3d, #0a0d24);
+    position: relative; overflow: hidden;
+    box-shadow: 0 30px 80px -30px rgba(20,22,50,0.30);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .video-frame img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+  .video-play-big {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 96px; height: 96px; border-radius: 50%;
+    background: rgba(255,255,255,0.95); border: none; cursor: pointer;
+    color: var(--p-purple);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 12px rgba(255,255,255,0.18), 0 20px 40px rgba(0,0,0,0.4);
+    transition: transform 0.2s ease;
+  }
+  .video-play-big:hover { transform: translate(-50%, -50%) scale(1.06); }
+  .video-play-big svg { width: 36px; height: 36px; margin-left: 4px; }
+  .video-meta-row {
+    display: flex; gap: 24px; margin-top: 16px; flex-wrap: wrap;
+    color: var(--ink-dark-1); font-size: 14px;
+  }
+  .video-meta-row span { display: inline-flex; align-items: center; gap: 8px; }
+  .video-meta-row svg { width: 16px; height: 16px; color: var(--p-purple); }
+
+  /* ---------- Curriculum ---------- */
+  .curriculum-list { display: flex; flex-direction: column; gap: 10px; }
+  .curriculum-week {
+    padding: 18px 22px; border: 1px solid rgba(20,22,50,0.08); border-radius: 14px;
+    background: white; display: flex; align-items: center; gap: 18px;
+    transition: border-color 0.2s ease;
+  }
+  .curriculum-week:hover { border-color: rgba(62,58,142,0.30); }
+  .curriculum-week-num {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: rgba(62,58,142,0.12); color: var(--p-purple);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .curriculum-week-info { flex: 1; }
+  .curriculum-week-title { font-weight: 700; color: var(--ink-dark-0); font-size: 15px; margin-bottom: 2px; }
+  .curriculum-week-meta { font-size: 13px; color: var(--ink-dark-2); }
+  .curriculum-week-count {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--ink-dark-2); background: rgba(20,22,50,0.04);
+    padding: 4px 10px; border-radius: 999px;
+  }
+
+  /* ---------- Schedule (Haftalık Ders Programı) ---------- */
+  .sec-schedule { background: #fafaff; }
+  .sec-schedule .sec-inner { padding-bottom: 96px; }
+  /* Curriculum (Hangi Konular İşleniyor) — swap */
+  .sec-curriculum { background: white; }
+
+  /* Klan selector (light tabs — birden fazla program seçeneği) */
+  .sch-klan-tabs {
+    display: flex; gap: 8px;
+    margin: 0 0 22px;
+    flex-wrap: wrap;
+  }
+  .sch-klan-tab {
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: white;
+    border: 1px solid rgba(20,22,50,0.12);
+    color: var(--ink-dark-1);
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .sch-klan-tab:hover { background: rgba(62,58,142,0.05); color: var(--p-deep); }
+  .sch-klan-tab.is-active {
+    background: linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 8px 20px -10px rgba(62,58,142,0.50);
+  }
+  .sch-klan-tab .sch-klan-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: currentColor;
+    opacity: 0.5;
+  }
+  .sch-klan-tab.is-active .sch-klan-dot { opacity: 1; background: var(--p-aqua); }
+
+  /* Dark app-preview panel */
+  /* Light tema panel: site rengiyle uyumlu solid beyaz */
+  .sch-panel {
+    background: white;
+    border: 1px solid rgba(62,58,142,0.12);
+    border-radius: 24px;
+    padding: 28px 24px;
+    box-shadow: 0 20px 50px -28px rgba(40,38,90,0.20);
+    position: relative; overflow: hidden;
+  }
+  .sch-panel:not(.is-active) { display: none; }
+
+  /* Schedule header (calendar + title) */
+  .sch-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(20,22,50,0.10);
+    position: relative; z-index: 2;
+  }
+  .sch-cal-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--p-brand), var(--p-brand-deep));
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 10px 22px -8px rgba(229,4,123,0.40);
+  }
+  .sch-cal-icon svg { width: 22px; height: 22px; }
+  .sch-title {
+    font-size: 20px; font-weight: 800;
+    color: var(--ink-dark-0);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  /* 7-gün grid */
+  .sch-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px;
+    position: relative; z-index: 2;
+  }
+  .sch-day {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 14px;
+    padding: 14px 10px;
+    display: flex; flex-direction: column; gap: 12px;
+    min-height: 220px;
+  }
+  .sch-day-head {
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(20,22,50,0.08);
+  }
+  .sch-day-head strong {
+    display: block;
+    font-size: 13.5px; font-weight: 700;
+    color: var(--ink-dark-0);
+    margin-bottom: 2px;
+  }
+  .sch-day-head small {
+    font-size: 11.5px;
+    color: var(--ink-dark-2);
+    font-weight: 500;
+  }
+
+  .sch-day-body {
+    display: flex; flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+
+  /* Lesson card — solid lavender, dark name + brand pink time */
+  .sch-lesson {
+    background: #f4eeff;
+    border: 1px solid rgba(62,58,142,0.14);
+    border-radius: 10px;
+    padding: 10px 11px;
+    display: flex; flex-direction: column; gap: 5px;
+    transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.2s ease;
+  }
+  .sch-lesson:hover {
+    background: #ece4ff;
+    border-color: rgba(62,58,142,0.30);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px -10px rgba(40,38,90,0.20);
+  }
+  .sch-lesson-time {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px; font-weight: 700;
+    color: var(--p-brand);
+    align-self: flex-start;
+    white-space: nowrap;
+  }
+  .sch-lesson-time svg { width: 11px; height: 11px; flex-shrink: 0; }
+  .sch-lesson-name {
+    font-size: 14px; font-weight: 700;
+    color: var(--ink-dark-0);
+    line-height: 1.3;
+    margin: 0;
+  }
+  .sch-lesson-meta {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px;
+    color: var(--ink-dark-2);
+  }
+  .sch-lesson-meta svg { width: 11px; height: 11px; flex-shrink: 0; opacity: 0.7; }
+  /* Empty day (Pazar / tatil) */
+  .sch-day-empty {
+    font-size: 12px;
+    color: var(--ink-dark-2);
+    text-align: center;
+    padding: 32px 8px;
+    line-height: 1.5;
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Schedule legend (alt bilgi — multi-item) */
+  .sch-legend {
+    margin-top: 20px;
+    padding: 14px 18px;
+    background: rgba(62,58,142,0.05);
+    border: none;
+    border-radius: 12px;
+    display: flex; align-items: center;
+    gap: 12px 28px;
+    flex-wrap: wrap;
+    position: relative; z-index: 2;
+  }
+  .sch-legend-item {
+    display: inline-flex; align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--ink-dark-1);
+    line-height: 1.4;
+  }
+  .sch-legend-item svg {
+    width: 14px; height: 14px;
+    flex-shrink: 0;
+  }
+  /* Her info icon farklı renk — semantik ayrım */
+  .sch-legend-item:nth-child(1) svg { color: #1c8fb5; }       /* canlı ders — aqua/teal */
+  .sch-legend-item:nth-child(2) svg { color: #2a8a5a; }       /* PDR — yeşil (care/people) */
+  .sch-legend-item:nth-child(3) svg { color: var(--p-brand); }/* LGS deneme — brand pink (önemli tarih) */
+  .sch-legend-item strong { color: var(--ink-dark-0); font-weight: 700; }
+
+  /* ---------- Purchase Section ---------- */
+  .sec-purchase { background: #fafaff; }
+  .purchase-card {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 48px;
+    align-items: center;
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+  }
+  .purchase-info { }
+  .purchase-eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--p-purple); letter-spacing: 0.12em; text-transform: uppercase;
+    background: rgba(62,58,142,0.10); padding: 6px 12px; border-radius: 999px;
+    margin-bottom: 16px; font-weight: 700;
+  }
+  .purchase-info h2 { font-size: 32px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.015em; line-height: 1.15; color: var(--ink-dark-0); }
+  .purchase-info > p { font-size: 15px; color: var(--ink-dark-1); margin: 0 0 24px; }
+  .purchase-stats-card {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .purchase-stat {
+    display: flex; align-items: center; gap: 12px;
+    background: white;
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 6px 16px -10px rgba(20,22,50,0.12);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .purchase-stat:hover { transform: translateY(-2px); border-color: rgba(62,58,142,0.30); }
+  .purchase-stat-icon {
+    width: 40px; height: 40px;
+    border-radius: 11px;
+    background: linear-gradient(160deg, #ffffff 0%, #f0eaff 100%);
+    border: 1px solid rgba(62,58,142,0.20);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 4px 10px -4px rgba(62,58,142,0.30);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .purchase-stat .num {
+    font-size: 22px; font-weight: 800;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .purchase-stat .lbl {
+    font-size: 11px; color: var(--ink-dark-2);
+    margin-top: 3px;
+    font-family: 'JetBrains Mono', monospace; letter-spacing: 0.04em;
+  }
+  .purchase-trust { display: flex; gap: 22px; flex-wrap: wrap; }
+  .trust-tag {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-dark-1);
+  }
+  .trust-tag svg { width: 14px; height: 14px; color: var(--p-purple); }
+  .purchase-box {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.10);
+    border-radius: var(--r-l); padding: 28px;
+    box-shadow: 0 22px 50px -20px rgba(62,58,142,0.20), 0 4px 14px -8px rgba(20,22,50,0.10);
+  }
+  .purchase-box-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--p-purple); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; font-weight: 700; }
+  .purchase-price { font-size: 36px; font-weight: 800; color: var(--ink-dark-0); line-height: 1; }
+  .purchase-price-per { font-size: 14px; color: var(--ink-dark-2); margin-left: 4px; }
+  .purchase-price-total { font-size: 13px; color: var(--ink-dark-1); margin-top: 6px; }
+  .purchase-price-total strong { color: var(--ink-dark-0); }
+  .purchase-installment { display: inline-flex; align-items: center; gap: 6px; color: var(--p-purple); font-size: 13px; font-weight: 600; margin: 12px 0 24px; }
+  .purchase-installment svg { width: 14px; height: 14px; }
+  .purchase-actions { display: flex; flex-direction: column; gap: 10px; }
+
+  /* Robot FAB & chatbot styles loaded from assets/robot-fab.css */
+
+  /* ---------- Sticky Bottom Bar ---------- */
+  .sticky-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border-top: 1px solid rgba(20,22,50,0.10);
+    z-index: 90;
+    color: var(--ink-dark-0);
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 -10px 40px -10px rgba(20,22,50,0.18);
+  }
+  .sticky-bar.show { transform: translateY(0); }
+  .sticky-bar-inner {
+    max-width: var(--maxw); margin: 0 auto;
+    padding: 18px 32px;
+    display: grid; grid-template-columns: 1fr auto auto;
+    gap: 28px; align-items: center;
+  }
+  .sticky-bar-info { display: flex; align-items: center; gap: 16px; min-width: 0; }
+  .sticky-bar-thumb {
+    width: 64px; height: 64px; border-radius: 14px;
+    background: linear-gradient(160deg, #6964c4, #28265a);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+    box-shadow: 0 8px 20px -6px rgba(62,58,142,0.45);
+  }
+  .sticky-bar-text { min-width: 0; }
+  .sticky-bar-eyebrow {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    color: var(--p-purple); letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 700; margin-bottom: 4px;
+  }
+  .sticky-bar-title {
+    font-weight: 800; font-size: 17px; line-height: 1.2;
+    color: var(--ink-dark-0); letter-spacing: -0.005em;
+  }
+  .sticky-bar-meta { font-size: 13px; color: var(--ink-dark-1); margin-top: 3px; }
+  .sticky-bar-stats {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    margin-top: 8px; font-size: 12px; color: var(--ink-dark-2);
+  }
+  .sticky-bar-stats span {
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .sticky-bar-stats strong {
+    color: var(--ink-dark-0); font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .sticky-bar-price { text-align: right; }
+  .sticky-bar-num {
+    font-size: 26px; font-weight: 800;
+    color: var(--ink-dark-0);
+    line-height: 1; letter-spacing: -0.01em;
+  }
+  .sticky-bar-num .per { font-size: 14px; color: var(--ink-dark-2); font-weight: 600; margin-left: 2px; }
+  .sticky-bar-per { font-size: 12px; color: var(--ink-dark-2); margin-top: 6px; }
+  .sticky-bar-actions { display: flex; gap: 8px; }
+  @media (max-width: 980px) {
+    .sticky-bar-stats { display: none; }
+  }
+  @media (max-width: 760px) {
+    .sticky-bar-inner { grid-template-columns: 1fr auto; gap: 12px; padding: 12px 16px; }
+    .sticky-bar-text { display: none; }
+    .sticky-bar-price { text-align: left; }
+    .sticky-bar-actions .btn-ghost { display: none; }
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1180px) {
+    .sch-grid { grid-template-columns: repeat(4, 1fr); }
+    .sch-day:nth-child(n+5) { /* Cuma sonrası alt satıra */ }
+  }
+  @media (max-width: 980px) {
+    .pkg-hero-inner { grid-template-columns: 1fr; gap: 40px; }
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    .purchase-card { grid-template-columns: 1fr; padding: 32px; }
+    .pkg-info h1 { font-size: 32px; }
+    .sch-grid { grid-template-columns: repeat(3, 1fr); }
+    .sch-panel { padding: 22px 18px; }
+    .sch-title { font-size: 17px; }
+  }
+  @media (max-width: 760px) {
+    .sch-grid { grid-template-columns: repeat(2, 1fr); }
+    .sch-day { min-height: auto; }
+  }
+  @media (max-width: 640px) {
+    .features-grid { grid-template-columns: 1fr; }
+    .pkg-info h1 { font-size: 26px; }
+    .sec-title { font-size: 24px; }
+    .sch-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-contact">
+      <a href="https://wa.me/905551234567" class="wa-link" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.9L4 20l4.2-1.1A7.93 7.93 0 0 0 12.05 20h.01a7.95 7.95 0 0 0 5.55-13.68zM12.06 18.5h-.01a6.59 6.59 0 0 1-3.36-.92l-.24-.14-2.5.65.67-2.43-.16-.25a6.6 6.6 0 1 1 12.24-3.46 6.6 6.6 0 0 1-6.64 6.55z"/></svg>
+        <span>+90 555 123 45 67</span>
+      </a>
+      <a href="tel:+908501234567">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 0 0-1.02.24l-2.2 2.2a15.07 15.07 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 4c0-.55-.45-1-1-1H4a1 1 0 0 0-1 1 17 17 0 0 0 17 17c.55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+        <span class="topbar-phone-text">0850 123 45 67</span>
+      </a>
+      <a href="mailto:info@bilenyum.com" class="mail-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <span class="topbar-mail-text">info@bilenyum.com</span>
+      </a>
+    </div>
+    <div class="topbar-social">
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.39A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.73 1.46 1.39 2.13a5.88 5.88 0 0 0 2.13 1.39c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.39 5.88 5.88 0 0 0 1.39-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.39-2.13A5.88 5.88 0 0 0 19.86.63C19.1.33 18.22.13 16.95.07 15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/></svg></a>
+      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.13C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.52A3.02 3.02 0 0 0 .5 6.2C0 8.07 0 12 0 12s0 3.93.5 5.8a3.02 3.02 0 0 0 2.12 2.13c1.88.52 9.38.52 9.38.52s7.5 0 9.38-.52a3.02 3.02 0 0 0 2.12-2.13C24 15.93 24 12 24 12s0-3.93-.5-5.8zM9.6 15.6V8.4L15.84 12 9.6 15.6z"/></svg></a>
+      <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.66H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.26 2.37 4.26 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<!-- Header Nav -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html"><img src="assets/bilenyum-logo.svg" alt="Bilenyum" class="logo-img" /></a>
+    <div class="nav-links">
+      <a href="egitim-setleri.html">Eğitim Setleri</a>
+      <a href="ornek-videolar.html">Örnek Videolar</a>
+      <a href="kadromuz.html">Ekibimiz</a>
+      <a href="neden-biz.html">Neden Biz?</a>
+      <a href="iletisim.html">İletişim</a>
+    </div>
+    <div class="nav-cta">
+      <a href="giris.html" class="btn btn-secondary btn-sm">Giriş Yap</a>
+      <button class="btn btn-primary btn-sm" data-trial-open type="button">Ücretsiz Deneme Dersi</button>
+    </div>
+  </div>
+</header>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+  <a href="index.html">Anasayfa</a>
+  <span class="sep">›</span>
+  <a href="index.html#pricing">Eğitim Setleri</a>
+  <span class="sep">›</span>
+  <span class="current">LGS Hızlandırma</span>
+</div>
+
+<!-- Package Hero -->
+<section class="pkg-hero">
+  <div class="pkg-hero-inner">
+    <div class="pkg-image-wrap" aria-hidden="true">
+      <div class="pkg-books">
+        <div class="pkg-book b1">Mat</div>
+        <div class="pkg-book b2">Türkçe</div>
+        <div class="pkg-book b3">Fen</div>
+        <div class="pkg-book b4">Sosyal</div>
+      </div>
+    </div>
+    <div class="pkg-info">
+      <span class="pkg-eyebrow">8. Sınıf (LGS)</span>
+      <h1>LGS Hızlandırma</h1>
+      <div class="pkg-dates">
+        <span class="pkg-dates-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </span>
+        <div class="pkg-dates-text">
+          <span class="pkg-dates-label">Eğitim Dönemi</span>
+          <span class="pkg-dates-range"><strong>1 Eylül 2026</strong> — <strong>30 Haziran 2027</strong></span>
+        </div>
+      </div>
+      <p class="pkg-lead">
+        Sınava yakın dönem yoğun LGS tekrarı, branş bazlı mini denemeler ve
+        eksik kapanış önerileri. 320 öğrencinin hızlanma için tercih ettiği eğitim seti.
+      </p>
+      <ul class="pkg-highlights">
+        <li><span><strong>Yoğun LGS tekrar</strong> · sınava yakın dönem pekiştirme</span></li>
+        <li><span><strong>Günlük canlı ders</strong> · kayıttan da izleme imkânı</span></li>
+        <li><span><strong>Branş bazlı mini deneme</strong> + eksik kapanış önerileri</span></li>
+        <li><span><strong>7 gün ücretsiz</strong> dene, kart bilgisi gerekmez</span></li>
+      </ul>
+      <div class="pkg-price-row">
+        <span class="pkg-price">₺ 1.490</span>
+        <span class="pkg-price-per">/ ay</span>
+      </div>
+      <div class="pkg-price-meta">
+        <span>Toplam <strong>₺ 17.880</strong></span>
+        <span class="pkg-price-installment">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          12 taksit imkanı
+        </span>
+      </div>
+      <div class="pkg-cta">
+        <a href="checkout.html?paket=superstar" class="btn btn-primary">Hemen Satın Al →</a>
+        <button class="btn btn-ghost" data-trial-open type="button">Ücretsiz Deneme Dersi</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Light Space Divider -->
+<div class="space-divider-light">
+  <div class="geo-circle-light"></div>
+  <div class="geo-dot-light d1"></div>
+  <div class="geo-dot-light d2"></div>
+  <div class="geo-line-light"></div>
+  <div class="geo-tri-light"></div>
+  <svg class="space-wave-light" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,120 C320,160 640,90 960,140 C1180,175 1320,115 1440,150 L1440,200 L0,200 Z" fill="rgba(62,58,142,0.10)"/>
+    <path d="M0,150 C260,195 540,115 820,165 C1080,210 1300,140 1440,175 L1440,200 L0,200 Z" fill="rgba(62,58,142,0.20)"/>
+    <path d="M0,175 C200,215 460,145 720,178 C960,208 1180,148 1440,178 L1440,200 L0,200 Z" fill="#fafaff"/>
+  </svg>
+</div>
+
+<!-- ============ HAFTALIK DERS PROGRAMI ============ -->
+<section class="sec-schedule">
+  <div class="sec-inner">
+    <h2 class="sec-title">Haftalık Ders Programları</h2>
+    <p class="sec-lead">Bu eğitim setinde birden fazla klan (grup) seçeneği bulunur. Sınıfının uygunluk durumuna ve günlük rutinine göre sabah veya öğleden sonra grubunu seçebilirsin.</p>
+
+    <!-- Program seçeneği selector (light tabs) -->
+    <div class="sch-klan-tabs" role="tablist" aria-label="Program seçeneği">
+      <button class="sch-klan-tab is-active" type="button" data-klan="opt1" role="tab" aria-selected="true">
+        <span class="sch-klan-dot"></span> Hafta İçi Erken
+      </button>
+      <button class="sch-klan-tab" type="button" data-klan="opt2" role="tab" aria-selected="false">
+        <span class="sch-klan-dot"></span> Hafta İçi Geç
+      </button>
+      <button class="sch-klan-tab" type="button" data-klan="opt3" role="tab" aria-selected="false">
+        <span class="sch-klan-dot"></span> Hafta Sonu Erken
+      </button>
+      <button class="sch-klan-tab" type="button" data-klan="opt4" role="tab" aria-selected="false">
+        <span class="sch-klan-dot"></span> Hafta Sonu Geç
+      </button>
+    </div>
+
+    <!-- SEÇENEK 1 PANEL -->
+    <div class="sch-panel is-active" data-klan="opt1">
+      <div class="sch-header">
+        <span class="sch-cal-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </span>
+        <h3 class="sch-title">Hafta İçi Erken · Haftalık Ders Programı</h3>
+      </div>
+
+      <!-- 7-day grid -->
+      <div class="sch-grid">
+        <!-- Pazartesi -->
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 10:00 - 11:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Matematik</h4>
+            </div>
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 13:00 - 14:00</span>
+              <h4 class="sch-lesson-name">Soru Çözümü</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Salı -->
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Salı</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="fen">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 11:00 - 12:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Fen Bilimleri</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Çarşamba — BUGÜN -->
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Çarşamba</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="trk">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 10:00 - 11:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Türkçe</h4>
+            </div>
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 20:00 - 21:00</span>
+              <h4 class="sch-lesson-name">PDR Görüşmesi</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Perşembe -->
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Perşembe</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ink">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 14:00 - 16:00</span>
+              <h4 class="sch-lesson-name">İnkılap Tarihi (Görev)</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 9 8.5 12 2"/></svg> Sistem Ataması</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cuma -->
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cuma</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ing">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 15:00 - 16:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf İngilizce</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cumartesi -->
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cumartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 10:00 - 12:15</span>
+              <h4 class="sch-lesson-name">LGS Türkiye Geneli Denemesi</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Sınav Modülü</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pazar -->
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazar</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-day-empty">Tatil / Bireysel<br>Tekrar Günü</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sch-legend">
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Haftalık <strong>6 canlı ders</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>PDR görüşmesi: <strong>15 günde 1</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>LGS Türkiye Geneli denemesi: <strong>Her ayın 2. Cumartesi</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇENEK 2 PANEL -->
+    <div class="sch-panel" data-klan="opt2">
+      <div class="sch-header">
+        <span class="sch-cal-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </span>
+        <h3 class="sch-title">Hafta İçi Geç · Haftalık Ders Programı</h3>
+      </div>
+
+      <div class="sch-grid">
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 14:00 - 15:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Matematik</h4>
+            </div>
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:00 - 18:00</span>
+              <h4 class="sch-lesson-name">Soru Çözümü</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Salı</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="fen">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 15:00 - 16:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Fen Bilimleri</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Çarşamba</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="trk">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 14:00 - 15:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Türkçe</h4>
+            </div>
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 19:30 - 20:30</span>
+              <h4 class="sch-lesson-name">PDR Görüşmesi</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Perşembe</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ink">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:00 - 18:30</span>
+              <h4 class="sch-lesson-name">İnkılap Tarihi (Görev)</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 9 8.5 12 2"/></svg> Sistem Ataması</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cuma</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ing">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 18:00 - 19:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf İngilizce</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cumartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 14:00 - 16:15</span>
+              <h4 class="sch-lesson-name">LGS Türkiye Geneli Denemesi</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Sınav Modülü</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazar</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-day-empty">Tatil / Bireysel<br>Tekrar Günü</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sch-legend">
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Haftalık <strong>6 canlı ders</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>PDR görüşmesi: <strong>15 günde 1</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>LGS Türkiye Geneli denemesi: <strong>Her ayın 2. Cumartesi</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇENEK 3 PANEL (akşam) -->
+    <div class="sch-panel" data-klan="opt3">
+      <div class="sch-header">
+        <span class="sch-cal-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </span>
+        <h3 class="sch-title">Hafta Sonu Erken · Haftalık Ders Programı</h3>
+      </div>
+
+      <div class="sch-grid">
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:00 - 18:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Matematik</h4>
+            </div>
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 19:30 - 20:30</span>
+              <h4 class="sch-lesson-name">Soru Çözümü</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Salı</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="fen">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 18:00 - 19:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Fen Bilimleri</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Çarşamba</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="trk">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:00 - 18:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Türkçe</h4>
+            </div>
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 20:00 - 21:00</span>
+              <h4 class="sch-lesson-name">PDR Görüşmesi</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Perşembe</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ink">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 18:30 - 20:00</span>
+              <h4 class="sch-lesson-name">İnkılap Tarihi (Görev)</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 9 8.5 12 2"/></svg> Sistem Ataması</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cuma</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ing">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:30 - 19:00</span>
+              <h4 class="sch-lesson-name">8. Sınıf İngilizce</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cumartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:00 - 19:15</span>
+              <h4 class="sch-lesson-name">LGS Türkiye Geneli Denemesi</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Sınav Modülü</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazar</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-day-empty">Tatil / Bireysel<br>Tekrar Günü</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sch-legend">
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Haftalık <strong>6 canlı ders</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>PDR görüşmesi: <strong>15 günde 1</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>LGS Türkiye Geneli denemesi: <strong>Her ayın 2. Cumartesi</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- HAFTA SONU GEÇ PANEL (opt4) -->
+    <div class="sch-panel" data-klan="opt4">
+      <div class="sch-header">
+        <span class="sch-cal-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </span>
+        <h3 class="sch-title">Hafta Sonu Geç · Haftalık Ders Programı</h3>
+      </div>
+
+      <div class="sch-grid">
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 19:00 - 20:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Matematik</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Salı</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="fen">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 20:00 - 21:30</span>
+              <h4 class="sch-lesson-name">8. Sınıf Fen Bilimleri</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Çarşamba</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="trk">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 19:30 - 21:00</span>
+              <h4 class="sch-lesson-name">8. Sınıf Türkçe</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Perşembe</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ink">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 20:00 - 21:30</span>
+              <h4 class="sch-lesson-name">İnkılap Tarihi (Görev)</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 9 8.5 12 2"/></svg> Sistem Ataması</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cuma</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="ing">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 19:30 - 21:00</span>
+              <h4 class="sch-lesson-name">8. Sınıf İngilizce</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Cumartesi</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="mat">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 16:00 - 17:30</span>
+              <h4 class="sch-lesson-name">Soru Çözümü</h4>
+            </div>
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 18:00 - 20:15</span>
+              <h4 class="sch-lesson-name">LGS Türkiye Geneli Denemesi</h4>
+              <span class="sch-lesson-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Sınav Modülü</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sch-day">
+          <div class="sch-day-head"><strong>Pazar</strong></div>
+          <div class="sch-day-body">
+            <div class="sch-lesson" data-subject="reh">
+              <span class="sch-lesson-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 17:00 - 18:00</span>
+              <h4 class="sch-lesson-name">PDR Görüşmesi</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sch-legend">
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Haftalık <strong>6 canlı ders</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>PDR görüşmesi: <strong>15 günde 1</strong></span>
+        </div>
+        <div class="sch-legend-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>LGS Türkiye Geneli denemesi: <strong>Her ayın 2. Cumartesi</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Curriculum (12 Aylık Müfredat) -->
+<section class="sec-curriculum">
+  <div class="sec-inner">
+    <h2 class="sec-title">Bu Eğitim Setinde Hangi Konular İşleniyor?</h2>
+    <p class="sec-lead">12 aylık detaylı ders programı — hafta hafta neyi, hangi öğretmenle çalışacaksın.</p>
+    <div class="curriculum-list">
+      <div class="curriculum-week">
+        <div class="curriculum-week-num">01</div>
+        <div class="curriculum-week-info">
+          <div class="curriculum-week-title">Tanışma Haftası &amp; Seviye Tespiti</div>
+          <div class="curriculum-week-meta">Her branştan 1 oturum + öğretmenle tanışma</div>
+        </div>
+        <div class="curriculum-week-count">4 ders</div>
+      </div>
+      <div class="curriculum-week">
+        <div class="curriculum-week-num">02</div>
+        <div class="curriculum-week-info">
+          <div class="curriculum-week-title">Türkçe — Sözcük Yapısı &amp; Anlatım Bozuklukları</div>
+          <div class="curriculum-week-meta">Mat: Üslü Sayılar · Fen: Basınç · Sosyal: İnkılap Tarihi</div>
+        </div>
+        <div class="curriculum-week-count">4 ders</div>
+      </div>
+      <div class="curriculum-week">
+        <div class="curriculum-week-num">03</div>
+        <div class="curriculum-week-info">
+          <div class="curriculum-week-title">Matematik — Köklü Sayılar &amp; Cebirsel İfadeler</div>
+          <div class="curriculum-week-meta">Türkçe: Cümlede Anlam · Fen: Madde Döngüleri · Sosyal: Atatürk Dönemi</div>
+        </div>
+        <div class="curriculum-week-count">4 ders</div>
+      </div>
+      <div class="curriculum-week">
+        <div class="curriculum-week-num">04</div>
+        <div class="curriculum-week-info">
+          <div class="curriculum-week-title">Fen Bilimleri — DNA &amp; Genetik Kavramlar</div>
+          <div class="curriculum-week-meta">Mat: Eşitsizlikler · Türkçe: Paragraf · Sosyal: 2. Dünya Savaşı</div>
+        </div>
+        <div class="curriculum-week-count">4 ders</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Package Contents -->
+<section class="sec-features">
+  <div class="sec-inner">
+    <h2 class="sec-title">Eğitim Setinin İçinde Neler Var?</h2>
+    <p class="sec-lead">LGS Hızlandırma ile sınava giden son metreyi en verimli şekilde tamamlamak için ihtiyacın olan her şey tek eğitim setinde.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎓</div>
+        <h3>Haftada 4 Canlı Ders</h3>
+        <p>Her hafta 4 farklı branşta 45 dakikalık canlı ders.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📚</div>
+        <h3>4 Ana Branş</h3>
+        <p>Matematik, Türkçe, Fen Bilimleri ve Sosyal Bilgiler.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👨‍🏫</div>
+        <h3>Birebir Öğretmen</h3>
+        <p>Aylık 1 birebir öğretmen görüşmesi (45 dakika).</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Veli Kontrol Merkezi</h3>
+        <p>Canlı katılım takibi, haftalık gelişim grafiği.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <h3>Telafi Hakkı</h3>
+        <p>Ayda 2 telafi dersi, kaçırdığın dersi yeniden al.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>WhatsApp Destek</h3>
+        <p>Sorularına 24 saat içinde yanıt, doğrudan öğretmenden.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏆</div>
+        <h3>Rozet Sistemi</h3>
+        <p>Seri ders rozetleri, sertifikalar ve liderlik tablosu.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📼</div>
+        <h3>Sınırsız Kayıt</h3>
+        <p>Tüm derslerin kaydı, istediğin zaman tekrar izle.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sample Video -->
+<section class="sec-video">
+  <div class="sec-inner">
+    <h2 class="sec-title">Örnek Bir Ders Videosu İzle</h2>
+    <p class="sec-lead">Bu eğitim setinden Murat Yılmaz'ın "Türkçe · Sözcük Yapısı" dersinden örnek bir bölüm.</p>
+    <div class="video-frame">
+      <img src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=1600&q=80" alt="Örnek ders" />
+      <button class="video-play-big" aria-label="Videoyu oynat">
+        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5"/></svg>
+      </button>
+    </div>
+    <div class="video-meta-row">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 12:34 dakika</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7L4 7"/><path d="M20 12L4 12"/><path d="M20 17L4 17"/></svg> Türkçe · 8. sınıf seviyesi</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Murat Yılmaz · Türkçe Öğretmeni</span>
+    </div>
+  </div>
+</section>
+
+<!-- Light Space Divider -->
+<div class="space-divider-light">
+  <div class="geo-circle-light"></div>
+  <div class="geo-dot-light d1"></div>
+  <div class="geo-dot-light d2"></div>
+  <div class="geo-line-light"></div>
+  <div class="geo-tri-light"></div>
+  <svg class="space-wave-light" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,120 C320,160 640,90 960,140 C1180,175 1320,115 1440,150 L1440,200 L0,200 Z" fill="rgba(62,58,142,0.10)"/>
+    <path d="M0,150 C260,195 540,115 820,165 C1080,210 1300,140 1440,175 L1440,200 L0,200 Z" fill="rgba(62,58,142,0.20)"/>
+    <path d="M0,175 C200,215 460,145 720,178 C960,208 1180,148 1440,178 L1440,200 L0,200 Z" fill="#ffffff"/>
+  </svg>
+</div>
+
+<!-- Purchase Section -->
+<section class="sec-purchase">
+  <div class="sec-inner">
+    <div class="purchase-card">
+      <div class="purchase-info">
+        <span class="purchase-eyebrow">Eğitim Seti Özeti</span>
+        <h2>LGS Hızlandırma</h2>
+        <p>8. Sınıf · LGS hazırlık · 12 ay süreli</p>
+        <div class="purchase-stats-card">
+          <div class="purchase-stat">
+            <div class="purchase-stat-icon">📚</div>
+            <div>
+              <div class="num">4</div>
+              <div class="lbl">Ana branş</div>
+            </div>
+          </div>
+          <div class="purchase-stat">
+            <div class="purchase-stat-icon">🎓</div>
+            <div>
+              <div class="num">192</div>
+              <div class="lbl">Ders</div>
+            </div>
+          </div>
+          <div class="purchase-stat">
+            <div class="purchase-stat-icon">👥</div>
+            <div>
+              <div class="num">320</div>
+              <div class="lbl">Öğrenci</div>
+            </div>
+          </div>
+        </div>
+        <div class="purchase-trust">
+          <span class="trust-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 7 gün ücretsiz</span>
+          <span class="trust-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Kart gerekmez</span>
+          <span class="trust-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> KVKK güvenli</span>
+        </div>
+      </div>
+      <div class="purchase-box">
+        <div class="purchase-box-label">Aylık Tutar</div>
+        <div><span class="purchase-price">₺ 1.490</span><span class="purchase-price-per">/ ay</span></div>
+        <div class="purchase-price-total">12 ay toplam: <strong>₺ 17.880</strong></div>
+        <div class="purchase-installment">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          9 ay taksit imkânı
+        </div>
+        <div class="purchase-actions">
+          <a href="checkout.html?paket=superstar" class="btn btn-primary btn-block">Hemen Satın Al →</a>
+          <button class="btn btn-ghost btn-block">Sepete Ekle</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sticky Bottom Bar -->
+<div class="sticky-bar" id="stickyBar" aria-hidden="true">
+  <div class="sticky-bar-inner">
+    <div class="sticky-bar-info">
+      <div class="sticky-bar-thumb">📚</div>
+      <div class="sticky-bar-text">
+        <div class="sticky-bar-title">LGS Hızlandırma</div>
+        <div class="sticky-bar-meta">8. Sınıf · LGS hazırlık · Bitiş 30 Haziran 2027</div>
+        <div class="sticky-bar-stats">
+          <span><strong>4</strong> ana branş</span>
+          <span><strong>192</strong> ders</span>
+        </div>
+      </div>
+    </div>
+    <div class="sticky-bar-price">
+      <div class="sticky-bar-num">₺ 1.490 <span class="per">/ ay</span></div>
+      <div class="sticky-bar-per">Toplam ₺ 17.880 · 12 taksit imkânı</div>
+    </div>
+    <div class="sticky-bar-actions">
+      <a href="checkout.html?paket=superstar" class="btn btn-primary btn-sm">Hemen Satın Al →</a>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer id="site-footer"></footer>
+
+<!-- Robot Chatbot FAB -->
+<button class="robot-fab" id="robotFab" aria-label="Yumi · Bilenyum Asistanı" type="button">
+  <svg class="robot-svg" viewBox="0 0 64 64" aria-hidden="true">
+    <line class="robot-antenna" x1="32" y1="6" x2="32" y2="14"/>
+    <circle class="robot-antenna-bulb" cx="32" cy="5" r="3"/>
+    <rect class="robot-head" x="10" y="14" width="44" height="38" rx="14"/>
+    <circle class="robot-eye" cx="22" cy="30" r="4"/>
+    <circle class="robot-eye" cx="42" cy="30" r="4"/>
+    <circle class="robot-cheek" cx="16" cy="38" r="2.2"/>
+    <circle class="robot-cheek" cx="48" cy="38" r="2.2"/>
+    <rect class="robot-mouth" x="24" y="40" width="16" height="3.5" rx="1.75"/>
+  </svg>
+</button>
+
+<div class="chatbot" id="chatbot" role="dialog" aria-labelledby="chatbotName" aria-hidden="true">
+  <div class="chatbot-header">
+    <div class="chatbot-avatar" aria-hidden="true">
+      <svg viewBox="0 0 64 64">
+        <line x1="32" y1="8" x2="32" y2="14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="32" cy="6" r="2.5" fill="currentColor"/>
+        <rect x="12" y="14" width="40" height="36" rx="12" fill="currentColor"/>
+        <circle cx="24" cy="30" r="3.5" fill="white"/>
+        <circle cx="40" cy="30" r="3.5" fill="white"/>
+        <rect x="26" y="40" width="12" height="3" rx="1.5" fill="white"/>
+      </svg>
+    </div>
+    <div class="chatbot-title">
+      <div class="chatbot-name" id="chatbotName">Yumi</div>
+      <div class="chatbot-status">Çevrimiçi</div>
+    </div>
+    <button class="chatbot-close" id="chatbotClose" aria-label="Kapat" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="chatbot-body" id="chatbotBody">
+    <div class="chat-msg bot">
+      <div class="chat-bubble">Merhaba! Bilenyum'a hoş geldin. Sana nasıl yardım edebilirim?</div>
+    </div>
+    <div class="chat-msg bot">
+      <div class="chat-bubble">Aşağıdan hızlı bir konu seçebilir veya direkt sorunu yazabilirsin.</div>
+    </div>
+    <div class="chat-actions">
+      <button class="chat-action" type="button">Bana eğitim seti öner</button>
+      <button class="chat-action" type="button">Deneme dersi</button>
+      <button class="chat-action" type="button">Öğretmen kadrosu</button>
+      <button class="chat-action" type="button">Fiyat bilgisi</button>
+    </div>
+  </div>
+  <form class="chatbot-input" id="chatbotForm" autocomplete="off">
+    <input type="text" placeholder="Sorunu yaz…" aria-label="Mesajınız" />
+    <button type="submit" aria-label="Gönder">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </form>
+</div>
+
+<script>
+  // Sticky bottom bar — show after hero leaves viewport, hide when purchase section visible
+  (function() {
+    const bar = document.getElementById('stickyBar');
+    const heroEl = document.querySelector('.pkg-hero');
+    const purchaseEl = document.querySelector('.sec-purchase');
+    if (!bar || !heroEl || !purchaseEl) return;
+
+    let heroOut = false, purchaseIn = false;
+    const update = () => {
+      const shouldShow = heroOut && !purchaseIn;
+      bar.classList.toggle('show', shouldShow);
+      bar.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+    };
+
+    const heroObs = new IntersectionObserver(([entry]) => {
+      heroOut = !entry.isIntersecting;
+      update();
+    }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
+    heroObs.observe(heroEl);
+
+    const purchaseObs = new IntersectionObserver(([entry]) => {
+      purchaseIn = entry.isIntersecting;
+      update();
+    }, { threshold: 0.15 });
+    purchaseObs.observe(purchaseEl);
+  })();
+
+</script>
+
+<!-- ============ TRIAL MODAL (Ücretsiz Deneme Dersi) ============ -->
+<!-- CSS: assets/trial-modal.css -->
+
+<div class="trial-modal" id="trialModal" aria-hidden="true">
+  <div class="trial-modal-overlay" data-trial-close></div>
+  <div class="trial-modal-card" role="dialog" aria-modal="true" aria-labelledby="trialModalTitle">
+    <!-- Visual header banner (placeholder) -->
+    <div class="trial-modal-image" aria-hidden="true">[Banner Görseli]</div>
+    <button class="trial-modal-close" data-trial-close aria-label="Kapat" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="trial-modal-body">
+      <div class="trial-modal-head">
+        <span class="trial-modal-eyebrow">Ücretsiz Deneme Dersi</span>
+        <h2 class="trial-modal-title" id="trialModalTitle">Hadi tanışalım</h2>
+        <p class="trial-modal-sub">Çocuğunun seviyesi ve hedefine en uygun deneme dersini birlikte planlayalım.</p>
+      </div>
+      <!-- Step 1: Öğrenci -->
+      <form class="trial-step-form active" id="trialStep1" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-s-name">Öğrenci adı</label>
+            <input type="text" id="trial-s-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-s-surname">Öğrenci soyadı</label>
+            <input type="text" id="trial-s-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-grade">Sınıf seviyesi</label>
+          <select id="trial-s-grade" required>
+            <option value="" disabled selected>Sınıf seç</option>
+            <option value="5">5. Sınıf</option>
+            <option value="6">6. Sınıf</option>
+            <option value="7">7. Sınıf</option>
+            <option value="8">8. Sınıf (LGS)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-subject">Deneme dersi istenen alan</label>
+          <select id="trial-s-subject" required>
+            <option value="" disabled selected>Alan seç</option>
+            <option value="mat">Matematik</option>
+            <option value="fen">Fen Bilimleri</option>
+            <option value="trk">Türkçe</option>
+            <option value="ing">İngilizce</option>
+            <option value="sos">Sosyal Bilgiler</option>
+            <option value="all">Genel (tüm dersler)</option>
+          </select>
+        </div>
+        <div class="trial-actions">
+          <button type="submit" class="btn-modal btn-modal-primary">
+            İleri
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </form>
+      <!-- Step 2: Veli -->
+      <form class="trial-step-form" id="trialStep2" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-p-name">Veli adı</label>
+            <input type="text" id="trial-p-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-p-surname">Veli soyadı</label>
+            <input type="text" id="trial-p-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-p-email">E-posta</label>
+          <input type="email" id="trial-p-email" required placeholder="ornek@email.com" autocomplete="email" data-rule="email" maxlength="120" />
+        </div>
+        <div class="form-field">
+          <label for="trial-p-phone">Telefon</label>
+          <input type="tel" id="trial-p-phone" required placeholder="+90 5XX XXX XX XX" inputmode="numeric" autocomplete="tel" maxlength="17" data-rule="phone-tr" />
+        </div>
+        <div class="trial-actions">
+          <button type="button" class="btn-modal btn-modal-ghost" id="trialBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Geri
+          </button>
+          <button type="submit" class="btn-modal btn-modal-primary">
+            Talebi Gönder
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      </form>
+      <!-- Success -->
+      <div class="trial-success" id="trialSuccess">
+        <div class="trial-success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>Talebin alındı!</h3>
+        <p>1 iş günü içinde belirttiğin telefon numarasından sana ulaşacağız. Tanışmak için sabırsızlanıyoruz!</p>
+        <button type="button" class="btn-modal" data-trial-close>Tamam</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TRIAL MODAL END ============ -->
+
+<script>
+  // Yumi chatbot — sayfa-özel cevap kuralları
+  window.BilenyumChatbot = {
+    replies: function (text) {
+      text = text.toLowerCase();
+      if (text.includes('paket') || text.includes('öner'))     return 'Sınıfını ve hedefini söyler misin? Sana en uygun eğitim setini önerebilirim.';
+      if (text.includes('deneme') || text.includes('katıl'))   return 'Harika! Deneme dersine katılmak için adın, sınıfın ve veli telefonun yeterli.';
+      if (text.includes('öğretmen') || text.includes('kadro')) return 'Branşında uzman, MEB sertifikalı öğretmenlerimizden hangisinin profilini görmek istersin?';
+      if (text.includes('fiyat') || text.includes('ücret'))    return 'Bu eğitim seti ₺2.490/ay\'dan başlıyor. 12 taksit imkânımız var.';
+      if (text.includes('merhaba') || text.includes('selam'))  return 'Merhaba! Bilenyum hakkında merak ettiğin her şeyi sorabilirsin.';
+      return null;
+    }
+  };
+</script>
+<script src="assets/dom.js"></script>
+<script src="assets/robot-fab.js"></script>
+<script src="assets/trial-modal.js"></script>
+<script src="assets/input-rules.js"></script>
+<script src="assets/footer.js"></script>
+
+<!-- Haftalık Ders Programı: program seçeneği tab switch -->
+<script>
+  (function () {
+    'use strict';
+    document.querySelectorAll('.sch-klan-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var klan = tab.getAttribute('data-klan');
+        document.querySelectorAll('.sch-klan-tab').forEach(function (t) {
+          var isActive = (t === tab);
+          t.classList.toggle('is-active', isActive);
+          t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+        document.querySelectorAll('.sch-panel').forEach(function (p) {
+          p.classList.toggle('is-active', p.getAttribute('data-klan') === klan);
+        });
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

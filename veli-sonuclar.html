@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Sonuçlar · Veli Kontrol Merkezi · Bilenyum</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="description" content="Bilenyum Veli Kontrol Merkezi — öðrenci sýnav sonuçlarý ve deneme performansý." />
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
+<link rel="stylesheet" href="assets/veli-shell.css">
+<link rel="stylesheet" href="assets/dashboard-sn-perf.css">
+<link rel="stylesheet" href="assets/sinavlar-page.css">
+<script src="assets/dashboard-switcher.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<style>
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  background: var(--bg-page);
+  color: var(--ink-dark-0);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+button, a { font-family: inherit; cursor: pointer; }
+a { text-decoration: none; color: inherit; }
+
+.pvd-shell {
+  position: relative; z-index: 5;
+  padding: 10px 22px 14px;
+  height: calc(100vh - 88px);
+  max-height: calc(100vh - 88px);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: "nav main";
+  gap: 12px;
+}
+.pvd-nav { grid-area: nav; align-self: start; }
+.pvd-nav .nav-rail { height: auto; }
+.pvd-nav .nav-item { padding: 10px 4px 8px; gap: 4px; }
+.pvd-nav .nav-item svg { width: 22px; height: 22px; }
+.pvd-nav .nav-item-label { font-size: 9px; letter-spacing: 0.08em; }
+.pvd-main {
+  grid-area: main;
+  min-width: 0; min-height: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.pvd-wrap {
+  flex: 1; min-height: 0; min-width: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.pvd-wrap .sn-page { padding: 6px 2px 10px; }
+
+@media (max-width: 900px) {
+  body { overflow-y: auto; }
+  .pvd-shell {
+    height: auto; max-height: none;
+    grid-template-columns: 1fr;
+    grid-template-areas: "main";
+    padding-bottom: 40px;
+  }
+  .pvd-nav { display: none; }
+  .sn-perf-grid, .sn-anal-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body class="is-veli-parent">
+
+<header class="hud pv-hud" role="banner">
+  <a class="hud-brand" href="index.html" aria-label="Bilenyum anasayfa">
+    <img src="assets/bilenyum-logo.svg" alt="Bilenyum" />
+  </a>
+  <div class="pv-hud-student" aria-label="Takip edilen öðrenci">
+    <button type="button" class="pv-hud-student-btn" id="ctxSwitchBtn" aria-haspopup="dialog" aria-expanded="false" aria-label="Öðrenci deðiþtir">
+      <span class="pv-ava pv-ava--sm pv-ava--student" id="ctxAva" aria-hidden="true">F</span>
+      <span class="pv-hud-student-text">
+        <span class="pv-hud-student-name" id="ctxName">—</span>
+        <span class="pv-hud-student-meta">
+          <span id="ctxClan">—</span>
+          <span class="pv-hud-student-sep" aria-hidden="true">·</span>
+          <span id="ctxProgram">—</span>
+        </span>
+      </span>
+      <svg class="pv-hud-student-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+  </div>
+  <div class="hud-stats pv-actions">
+    <div class="pv-notif-wrap">
+      <button type="button" class="stat-icon-btn is-notif" id="notifBtn"
+              aria-haspopup="dialog" aria-expanded="false" aria-label="Bildirimler">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="pv-badge is-hidden" id="notifBadge">0</span>
+      </button>
+    </div>
+    <div class="hud-profile pv-profile-wrap" id="profileWrap">
+      <button type="button" class="pv-trigger pv-profile-trigger" id="parentProfileBtn"
+              aria-haspopup="true" aria-expanded="false" aria-label="Veli profili menüsü">
+        <span class="pv-ava pv-ava--sm pv-ava--parent" id="parentAva" aria-hidden="true">AÇ</span>
+        <span class="pv-trigger-text">
+          <span class="pv-trigger-name" id="parentName">—</span>
+        </span>
+        <svg class="pv-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="hud-menu" id="parentProfileMenu" role="menu">
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profilim
+        </button>
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Hesap ayarlarý
+        </button>
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Bildirim tercihleri
+        </button>
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Yardým
+        </button>
+        <div class="hud-menu-divider"></div>
+        <button type="button" class="hud-menu-item is-danger" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Çýkýþ yap
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="pv-modal" id="studentModal" aria-hidden="true">
+  <div class="pv-modal-overlay" data-pv-modal-close></div>
+  <div class="pv-modal-card" role="dialog" aria-modal="true" aria-labelledby="pvModalTitle">
+    <button type="button" class="pv-modal-close" data-pv-modal-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="pv-modal-head">
+      <span class="pv-modal-eyebrow">Veli Kontrol Merkezi</span>
+      <h2 class="pv-modal-title" id="pvModalTitle">Öðrenci Seç</h2>
+      <p class="pv-modal-desc">Takip etmek istediðin öðrenciyi seç veya yeni öðrenci ekle.</p>
+    </div>
+    <div class="pv-profiles" id="profileGrid" role="listbox" aria-label="Öðrenciler"></div>
+    <div class="pv-modal-foot">
+      <button type="button" class="pv-add-btn" id="addStudentBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Öðrenci Ekle
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="pv-drawer" id="pvNotifDrawer" aria-hidden="true">
+  <div class="pv-drawer-overlay" data-pv-drawer-close></div>
+  <aside class="pv-drawer-panel" role="dialog" aria-labelledby="pvNotifTitle" aria-modal="true">
+    <header class="pv-drawer-head">
+      <h3 class="pv-drawer-title" id="pvNotifTitle">Bildirimler</h3>
+      <button type="button" class="pv-drawer-close" data-pv-drawer-close aria-label="Kapat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </header>
+    <div class="pv-drawer-body" id="pvNotifBody"></div>
+  </aside>
+</div>
+
+<main class="pvd-shell">
+  <div class="pvd-nav">
+    <aside class="nav-rail" aria-label="Veli menüsü">
+      <a class="nav-item" href="veli-dashboard.html" title="Merkez">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-item-label">Merkez</span>
+      </a>
+      <a class="nav-item" href="veli-ogrenci-detay.html" title="Öðrenci Detay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-item-label">Öðrenci Detay</span>
+      </a>
+      <a class="nav-item" href="veli-program.html" title="Öðrenci Ders Programý">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="nav-item-label">Ders Programý</span>
+      </a>
+      <a class="nav-item" href="veli-seminerler.html" title="Seminerler">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <span class="nav-item-label">Seminerler</span>
+      </a>
+      <a class="nav-item is-active" href="veli-sonuclar.html" title="Sonuçlar" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 14 11 16 15 12"/></svg>
+        <span class="nav-item-label">Sonuçlar</span>
+      </a>
+      <a class="nav-item" href="veli-performans.html" title="Performans">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span class="nav-item-label">Performans</span>
+      </a>
+    </aside>
+  </div>
+
+  <div class="pvd-main">
+    <div class="pvd-wrap">
+  <section class="sn-page" id="snPage">
+
+    <!-- HEAD: baþlýk + filtre chip'leri -->
+    <div class="sn-head">
+      <header class="sn-pagehead">
+        <h1 class="sn-pagehead-title">Sonuçlar</h1>
+        <span class="sn-section-line" aria-hidden="true"></span>
+      </header>
+    </div>
+
+    <!-- YAKLAÞAN SINAV — HERO -->
+    <article class="sn-upcoming" id="snUpcoming" aria-labelledby="snUpcomingTitle">
+      <div class="sn-upcoming-glow" aria-hidden="true"></div>
+      <div class="sn-upcoming-grid">
+        <div class="sn-upcoming-visual" aria-hidden="true">
+          <img class="sn-upcoming-visual-img" src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=400&h=533&fit=crop&q=80" alt="" width="168" height="224" loading="lazy" decoding="async" />
+        </div>
+        <div class="sn-upcoming-left">
+          <h2 class="sn-upcoming-title" id="snUpcomingTitle">Bilenyum Genel Deneme · 12</h2>
+          <p class="sn-upcoming-desc">LGS formatýnda 80 soruluk genel deneme. Tüm dersleri kapsar, sonuçlar 24 saat içinde yayýnda.</p>
+          <div class="sn-upcoming-meta">
+            <div class="sn-upcoming-meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span><strong>14 Haziran 2026</strong> · Cumartesi</span>
+            </div>
+            <div class="sn-upcoming-meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span><strong>10:00</strong> · 135 dk</span>
+            </div>
+            <div class="sn-upcoming-meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span><strong>80 soru</strong> · 5 ders</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sn-upcoming-right">
+          <div class="sn-countdown" aria-label="Sýnava kalan süre">
+            <div class="sn-countdown-eyebrow">Sýnava Kalan</div>
+            <div class="sn-countdown-units">
+              <div class="sn-countdown-unit"><strong id="snCdDay">07</strong><span>gün</span></div>
+              <div class="sn-countdown-sep">:</div>
+              <div class="sn-countdown-unit"><strong id="snCdHour">12</strong><span>saat</span></div>
+              <div class="sn-countdown-sep">:</div>
+              <div class="sn-countdown-unit"><strong id="snCdMin">34</strong><span>dk</span></div>
+              <div class="sn-countdown-sep">:</div>
+              <div class="sn-countdown-unit"><strong id="snCdSec">21</strong><span>sn</span></div>
+            </div>
+          </div>
+          <button type="button" class="sn-upcoming-remind" id="snRemindBtn">
+            <span class="sn-upcoming-remind-default">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span>Hatýrlatma Kur</span>
+            </span>
+            <span class="sn-upcoming-remind-done">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Hatýrlatma Kuruldu</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </article>
+
+    <!-- GEÇMÝÞ DENEME SINAVLARI -->
+    <section class="sn-section" aria-labelledby="snListTitle">
+      <header class="sn-section-head">
+        <h3 class="sn-section-title" id="snListTitle">Geçmiþ Deneme Sýnavlarý</h3>
+        <span class="sn-section-line"></span>
+
+        <div class="sn-dropdown" id="snDateDropdown">
+          <button type="button" class="sn-dropdown-btn" id="snDateBtn" aria-haspopup="true" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span id="snDateLabel">—</span>
+            <svg class="sn-dropdown-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="sn-dropdown-menu sn-dropdown-menu--months" id="snDateMenu" role="menu">
+            <button type="button" class="sn-dropdown-item" data-range="all" role="menuitem">Tümü</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="sn-list" id="snList">
+        <!-- JS ile dolduruluyor -->
+      </div>
+
+      <!-- Pagination -->
+      <nav class="sn-pager" id="snPager" aria-label="Sayfa gezintisi" hidden>
+        <button type="button" class="sn-pager-btn sn-pager-nav" id="snPagerPrev" aria-label="Önceki sayfa" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="sn-pager-pages" id="snPagerPages">
+          <!-- JS ile dolduruluyor -->
+        </div>
+        <button type="button" class="sn-pager-btn sn-pager-nav" id="snPagerNext" aria-label="Sonraki sayfa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <span class="sn-pager-info" id="snPagerInfo">1-5 / 11</span>
+      </nav>
+
+      <!-- Boþ state -->
+      <div class="sn-empty" id="snListEmpty" hidden>
+        <div class="sn-empty-glow" aria-hidden="true"></div>
+        <div class="sn-empty-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="8" y1="13" x2="16" y2="13"/>
+            <line x1="8" y1="17" x2="13" y2="17"/>
+          </svg>
+        </div>
+        <h3 class="sn-empty-title">Bu filtrede sýnav yok</h3>
+        <p class="sn-empty-text">Seçtiðiniz tarih aralýðýnda deneme sýnavý bulunmuyor. Farklý bir dönem seçin veya tüm sýnavlarý görüntüleyin.</p>
+      </div>
+    </section>
+    <!-- PERFORMANS DASHBOARD — Net Trend + Stats -->
+    <section class="sn-section" aria-labelledby="snPerfTitle">
+      <header class="sn-section-head">
+        <h3 class="sn-section-title" id="snPerfTitle">Öðrenci Deneme Sýnavý Performansý</h3>
+        <span class="sn-section-line"></span>
+      </header>
+
+      <div class="sn-perf-grid">
+        <!-- Sol: Deneme sýnavlarý net ortalamasý -->
+        <div class="sn-card sn-chart-card">
+          <div class="sn-card-head">
+            <div>
+              <h4 class="sn-card-title">Öðrenci Deneme Net Grafiði</h4>
+              <p class="sn-card-sub">Öðrencinin son 10 deneme sýnavýnda elde ettiði toplam netleri bu grafikte görebilirsiniz</p>
+            </div>
+            <div class="sn-chart-legend">
+              <span class="sn-chart-legend-item"><span class="sn-chart-legend-dot"></span>Net</span>
+            </div>
+          </div>
+          <div class="sn-chart-wrap" id="snChartWrap">
+            <!-- SVG chart JS ile dolduruluyor -->
+            <svg id="snChart" aria-label="Öðrenci deneme sýnavlarý net grafiði"></svg>
+          </div>
+        </div>
+
+        <!-- Sað: Stats kartlarý -->
+        <div class="sn-stats-grid">
+          <div class="sn-stat-card sn-stat-total" data-tip="Öðrencinin þimdiye kadar girdiði toplam deneme sýnavý sayýsý.">
+            <div class="sn-stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 14 11 16 15 12"/></svg>
+            </div>
+            <div class="sn-stat-body">
+              <div class="sn-stat-value">11</div>
+              <div class="sn-stat-label">Toplam Deneme</div>
+            </div>
+          </div>
+
+          <div class="sn-stat-card sn-stat-avg" data-tip="Tüm denemelerdeki net ortalamasý. Net hesabý: doðru - (yanlýþ ÷ 3).">
+            <div class="sn-stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="sn-stat-body">
+              <div class="sn-stat-value">76,4</div>
+              <div class="sn-stat-label">Ortalama Net</div>
+            </div>
+            <div class="sn-stat-trend is-up">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+              <span>+4,2</span>
+            </div>
+          </div>
+
+          <div class="sn-stat-card sn-stat-best" data-tip="Öðrencinin tek bir denemede ulaþtýðý en yüksek net deðeri.">
+            <div class="sn-stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><polyline points="8.21 13.89 7 22 12 19 17 22 15.79 13.88"/></svg>
+            </div>
+            <div class="sn-stat-body">
+              <div class="sn-stat-value">92</div>
+              <div class="sn-stat-label">Rekor Net</div>
+            </div>
+          </div>
+
+          <div class="sn-stat-card sn-stat-rank" data-tip="Öðrencinin Bilenyum'daki tüm öðrenciler arasýndaki güncel sýralamasý.">
+            <div class="sn-stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6"/><path d="M19 8v6"/></svg>
+            </div>
+            <div class="sn-stat-body">
+              <div class="sn-stat-value">#24</div>
+              <div class="sn-stat-label">Genel Sýralama</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DERS BAZLI NET — tam geniþlik -->
+    <section class="sn-section" aria-labelledby="snAnalTitle">
+      <header class="sn-section-head">
+        <h3 class="sn-section-title" id="snAnalTitle">Öðrencinin Ders Bazlý Net Ortalamasý</h3>
+        <span class="sn-section-line"></span>
+      </header>
+
+      <div class="sn-anal-grid sn-anal-grid--full">
+        <div class="sn-card sn-subj-card">
+          <div class="sn-card-head">
+            <div>
+              <p class="sn-card-sub">Derslere göre ortalama net performansýný karþýlaþtýrabilirsiniz</p>
+            </div>
+
+            <div class="sn-dropdown" id="snSubjDropdown">
+              <button type="button" class="sn-dropdown-btn" id="snSubjBtn" aria-haspopup="true" aria-expanded="false">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span id="snSubjLabel">—</span>
+                <svg class="sn-dropdown-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="sn-dropdown-menu sn-dropdown-menu--months" id="snSubjMenu" role="menu">
+                <button type="button" class="sn-dropdown-item" data-range="all" role="menuitem">Tüm Zamanlar</button>
+              </div>
+            </div>
+          </div>
+          <div class="sn-subj-list" id="snSubjList">
+            <!-- JS ile dolduruluyor -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+    </div>
+  </div>
+</main>
+
+<!-- ====== CEVAP ANAHTARI DRAWER ====== -->
+<div class="sn-key-drawer" id="snKeyDrawer" aria-hidden="true">
+  <div class="sn-key-overlay" data-key-close></div>
+  <aside class="sn-key-panel" role="dialog" aria-labelledby="snKeyTitle" aria-modal="true">
+
+    <button type="button" class="sn-key-back" id="snKeyBack" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Sonuç Detayýna Dön</span>
+    </button>
+
+    <button type="button" class="sn-key-close" data-key-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <header class="sn-key-head">
+      <span class="sn-key-eyebrow">CEVAP ANAHTARI</span>
+      <h3 class="sn-key-title" id="snKeyTitle">—</h3>
+      <div class="sn-key-meta">
+        <span class="sn-key-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="snKeyDate">—</span>
+        </span>
+        <span class="sn-key-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span id="snKeyTotal">— soru</span>
+        </span>
+        <span class="sn-key-meta-item sn-key-meta-net">
+          <span class="sn-key-meta-label">NET</span>
+          <strong id="snKeyNet">—</strong>
+        </span>
+      </div>
+</header>
+
+    <div class="sn-key-body">
+      <!-- Renk lejantý: öðrencinin cevaplarý -->
+      <div class="sn-key-legend">
+        <span class="sn-key-legend-item">
+          <span class="sn-key-legend-dot is-correct"></span>
+          <span>Doðru cevapladýðý</span>
+        </span>
+        <span class="sn-key-legend-item">
+          <span class="sn-key-legend-dot is-wrong"></span>
+          <span>Yanlýþ cevapladýðý</span>
+        </span>
+        <span class="sn-key-legend-item">
+          <span class="sn-key-legend-dot is-blank"></span>
+          <span>Boþ býraktýðý</span>
+        </span>
+      </div>
+
+      <!-- Cevap grid JS ile dolduruluyor -->
+      <div class="sn-key-grid" id="snKeyGrid"></div>
+    </div>
+
+    <footer class="sn-key-foot">
+      <button type="button" class="sn-key-download" id="snKeyDownload">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Cevap Anahtarýný PDF Olarak Ýndir</span>
+      </button>
+    </footer>
+  </aside>
+</div>
+
+<!-- ====== SINAV DETAY DRAWER (sonuç raporu) ====== -->
+<div class="sn-detail-drawer" id="snDetailDrawer" aria-hidden="true">
+  <div class="sn-detail-overlay" data-detail-close></div>
+  <aside class="sn-detail-panel" role="dialog" aria-labelledby="snDetailTitle" aria-modal="true">
+
+    <button type="button" class="sn-detail-close" data-detail-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <header class="sn-detail-head">
+      <span class="sn-detail-eyebrow">SINAV SONUCU</span>
+      <h3 class="sn-detail-title" id="snDetailTitle">—</h3>
+      <div class="sn-detail-rank-row">
+        <div class="sn-detail-rank-chip">
+          <span class="sn-detail-rank-label">Öðrencinin Sýralamasý</span>
+          <strong id="snDetailRank">—</strong>
+        </div>
+        <div class="sn-detail-rank-chip">
+          <span class="sn-detail-rank-label">Yüzdelik Dilimi</span>
+          <strong id="snDetailPercentile">—</strong>
+        </div>
+      </div>
+      <div class="sn-detail-meta">
+        <span class="sn-detail-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="snDetailDate">—</span>
+        </span>
+        <span class="sn-detail-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span id="snDetailTotal">— soru</span>
+        </span>
+        <span class="sn-detail-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="snDetailDur">— dk</span>
+        </span>
+      </div>
+    </header>
+
+    <div class="sn-detail-body">
+      <div class="sn-detail-summary">
+        <div class="sn-detail-stat is-net">
+          <span class="sn-detail-stat-label">Toplam Net</span>
+          <span class="sn-detail-stat-value" id="snDetailNet">—</span>
+        </div>
+        <div class="sn-detail-stat is-d">
+          <span class="sn-detail-stat-label">Doðru</span>
+          <span class="sn-detail-stat-value" id="snDetailDogru">—</span>
+        </div>
+        <div class="sn-detail-stat is-y">
+          <span class="sn-detail-stat-label">Yanlýþ</span>
+          <span class="sn-detail-stat-value" id="snDetailYanlis">—</span>
+        </div>
+        <div class="sn-detail-stat is-b">
+          <span class="sn-detail-stat-label">Boþ</span>
+          <span class="sn-detail-stat-value" id="snDetailBos">—</span>
+        </div>
+      </div>
+
+      <h4 class="sn-detail-section-title">Derslere Göre Sonuçlarýn</h4>
+      <div class="sn-detail-table-wrap">
+        <table class="sn-detail-table">
+          <thead>
+            <tr>
+              <th>Ders</th>
+              <th>Doðru</th>
+              <th>Yanlýþ</th>
+              <th>Boþ</th>
+              <th>Net</th>
+            </tr>
+          </thead>
+          <tbody id="snDetailTableBody"></tbody>
+          <tfoot id="snDetailTableFoot"></tfoot>
+        </table>
+      </div>
+
+      <div class="sn-detail-xp">
+        <span class="sn-detail-xp-label">Bu sýnavdan kazandýðýn toplam XP</span>
+        <span class="sn-detail-xp-value" id="snDetailXp">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span id="snDetailXpVal">—</span>
+        </span>
+      </div>
+    </div>
+
+    <footer class="sn-detail-foot">
+      <button type="button" class="sn-detail-pdf" id="snDetailPdf">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        <span>Sýnav Deðerlendirme Karnemi PDF olarak indir</span>
+      </button>
+      <div class="sn-detail-foot-actions">
+        <button type="button" class="sn-detail-key" id="snDetailKey">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 13"/></svg>
+          <span>Cevap Anahtarýný Görüntüle</span>
+        </button>
+</div>
+    </footer>
+  </aside>
+</div>
+
+<!-- Inbox + Chat drawers — assets/inbox.js otomatik enjekte eder -->
+
+</div>
+
+<!-- ====== HATIRLATMA MODAL ====== -->
+<div class="sn-remind-modal" id="snRemindModal" hidden role="dialog" aria-modal="true" aria-labelledby="snRemindModalTitle">
+  <div class="sn-remind-modal-backdrop" data-remind-close></div>
+  <div class="sn-remind-modal-card">
+    <button type="button" class="sn-remind-modal-close" data-remind-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h3 class="sn-remind-modal-title" id="snRemindModalTitle">Hatýrlatma Kur</h3>
+    <p class="sn-remind-modal-sub" id="snRemindModalSub">Takvimden hatýrlatma gününü seç, saati ayarla ve onayla.</p>
+
+    <div class="sn-remind-picker">
+      <div class="sn-remind-cal" aria-label="Hatýrlatma takvimi">
+        <div class="sn-remind-cal-nav">
+          <button type="button" class="sn-remind-cal-nav-btn" id="snRemindCalPrev" aria-label="Önceki ay">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <span class="sn-remind-cal-label" id="snRemindCalLabel">—</span>
+          <button type="button" class="sn-remind-cal-nav-btn" id="snRemindCalNext" aria-label="Sonraki ay">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+        <div class="sn-remind-cal-weekdays" aria-hidden="true">
+          <span>Pt</span><span>Sa</span><span>Ça</span><span>Pe</span><span>Cu</span><span>Ct</span><span>Pz</span>
+        </div>
+        <div class="sn-remind-cal-grid" id="snRemindCalGrid"></div>
+      </div>
+
+      <div class="sn-remind-time-row">
+        <span class="sn-remind-time-label">Saat</span>
+        <div class="sn-remind-time-fields">
+          <select class="sn-remind-time-select" id="snRemindHour" aria-label="Saat"></select>
+          <span class="sn-remind-time-sep" aria-hidden="true">:</span>
+          <select class="sn-remind-time-select" id="snRemindMin" aria-label="Dakika"></select>
+        </div>
+      </div>
+
+      <label class="sn-remind-before-check">
+        <input type="checkbox" id="snRemindBeforeCheck">
+        <span>Sýnavdan 1 saat önce</span>
+      </label>
+
+      <p class="sn-remind-preview" id="snRemindPreview">Takvimden bir gün seç</p>
+    </div>
+
+    <div class="sn-remind-actions">
+      <button type="button" class="sn-remind-btn sn-remind-btn--danger" id="snRemindRemove" hidden>Hatýrlatýcýyý Kaldýr</button>
+      <button type="button" class="sn-remind-btn sn-remind-btn--ghost" data-remind-close>Vazgeç</button>
+      <button type="button" class="sn-remind-btn sn-remind-btn--primary" id="snRemindConfirm">Onayla</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SINAVLAR TOAST ====== -->
+<div class="sn-toast" id="snToast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="snToastText">Ýþlem tamamlandý</span>
+</div>
+
+<script src="assets/veli-parent.js"></script>
+<script src="assets/sinavlar-page.js"></script>
+<script>
+(function () {
+  function init() { VeliParent.init(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>
+

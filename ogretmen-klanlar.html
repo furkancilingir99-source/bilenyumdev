@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Klanlarım · Bilenyum</title>
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-d3-mega.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
+<link rel="stylesheet" href="assets/dashboard-polish.css">
+<link rel="stylesheet" href="assets/teacher-dashboard.css">
+<script src="assets/dashboard-switcher.js" defer></script>
+<script src="assets/teacher-shell.js" defer></script>
+<script src="assets/shell.js" defer></script>
+</head>
+<body data-teacher-active="klanlar">
+
+<div class="scene" aria-hidden="true">
+  <div class="scene-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
+<header class="hud" data-teacher-hud></header>
+
+<main class="stage thw-stage">
+  <div class="stage-nav" data-teacher-nav></div>
+
+  <div class="thw-main-col" id="tkgMain">
+    <nav class="tkg-breadcrumb thw-breadcrumb" id="tkgBreadcrumb" hidden></nav>
+
+    <div class="thw-context-panel" id="tkgContextPanel">
+      <div class="thw-page-head">
+        <h1 class="thw-page-title" id="tkgPageTitle">Klanlarım</h1>
+        <p class="thw-page-subtitle" id="tkgPageSubtitle">Matematik dersi verdiğiniz klanları ve sıradaki derslerini görüntüleyin.</p>
+      </div>
+
+      <nav class="tkg-tabs" id="tkgTabs" role="tablist" aria-label="Liste türü">
+        <button type="button" class="tkg-tab is-active" data-tkg-tab="clans" role="tab" aria-selected="true">Klanlarım</button>
+        <button type="button" class="tkg-tab" data-tkg-tab="birebir" role="tab" aria-selected="false">Birebir Öğrenciler</button>
+      </nav>
+    </div>
+
+    <div id="tkgLoading" class="td-state">
+      <div class="td-skeleton"><div class="td-skeleton-bar"></div><div class="td-skeleton-bar"></div></div>
+      Liste yükleniyor...
+    </div>
+    <p id="tkgError" class="td-state is-error" hidden>Liste yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>
+    <p id="tkgEmpty" class="td-state" hidden></p>
+    <div id="tkgContent" hidden></div>
+  </div>
+</main>
+
+<script src="assets/teacher-avatars.js"></script>
+<script src="assets/teacher-groups-mock.js"></script>
+<script src="assets/teacher-groups.js"></script>
+</body>
+</html>

@@ -1,0 +1,993 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Eğitim Modelimiz — Bilenyum</title>
+<meta name="description" content="Bilenyum'un eğitim modeli: canlı ders türleri, eğitim materyalleri, psikolojik destek ve gamification öğeleriyle bütünsel öğrenme deneyimi." />
+<link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%233e3a8e'/%3E%3Ctext x='50' y='65' text-anchor='middle' font-family='Inter,system-ui,sans-serif' font-size='62' font-weight='900' fill='white' letter-spacing='-3'%3Eb%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/trial-modal.css">
+<style>
+  body { background: var(--bg-3); color: var(--ink-dark-0); }
+
+  /* ============ HERO ============ */
+  .em-hero {
+    background:
+      radial-gradient(900px 380px at 90% 10%, rgba(229,4,123,0.10), transparent 60%),
+      radial-gradient(800px 360px at 8% 30%, rgba(74,214,255,0.10), transparent 60%),
+      linear-gradient(180deg, #fcfaff 0%, #f4eeff 100%);
+    position: relative; z-index: 2; overflow: hidden;
+  }
+  .em-hero-inner {
+    position: relative; z-index: 2;
+    max-width: 880px; margin: 0 auto;
+    padding: 24px 32px 64px;
+    text-align: center;
+  }
+  .em-hero h1 {
+    font-size: 50px; font-weight: 800;
+    line-height: 1.08; margin: 0 0 18px;
+    letter-spacing: -0.02em;
+    color: var(--ink-dark-0);
+    text-wrap: balance;
+  }
+  .hero-accent {
+    background: linear-gradient(120deg, var(--p-brand) 0%, var(--p-brand-deep) 50%, var(--p-purple) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .em-hero .lead {
+    font-size: 18px; color: var(--ink-dark-1);
+    line-height: 1.6; margin: 0 auto;
+    max-width: 660px;
+  }
+
+  /* ============ SECTION BASE OVERRIDES ============ */
+  .em-sec-title {
+    font-size: 32px; font-weight: 800;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+  .em-sec-lead {
+    font-size: 16px; color: var(--ink-dark-1);
+    line-height: 1.6;
+    margin: 0 0 40px;
+    max-width: 680px;
+  }
+  .em-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px; font-weight: 700;
+    color: var(--p-purple);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .em-eyebrow::before {
+    content: ''; width: 22px; height: 1.5px; background: var(--p-purple);
+  }
+
+  /* ============ 1. CANLI DERS TÜRLERİ ============ */
+  .sec-live { background: white; }
+  .live-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+    margin-bottom: 36px;
+  }
+  .live-card {
+    background: linear-gradient(180deg, #fcfaff 0%, #f4eeff 100%);
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 20px;
+    padding: 28px 24px 26px;
+    position: relative;
+    transition: transform 0.18s ease, box-shadow 0.2s ease;
+  }
+  .live-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 48px -24px rgba(40,38,90,0.30);
+  }
+  .live-card-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: white;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 24px -10px rgba(62,58,142,0.45);
+  }
+  .live-card[data-tone="purple"] .live-card-icon { background: linear-gradient(135deg, var(--p-purple), var(--p-deep)); }
+  .live-card[data-tone="brand"]  .live-card-icon { background: linear-gradient(135deg, var(--p-brand), var(--p-brand-deep)); }
+  .live-card[data-tone="aqua"]   .live-card-icon { background: linear-gradient(135deg, #4ad6ff, #1c8fb5); }
+  .live-card-icon svg { width: 26px; height: 26px; }
+  .live-card h3 {
+    font-size: 18px; font-weight: 800;
+    color: var(--ink-dark-0);
+    margin: 0 0 8px;
+    letter-spacing: -0.005em;
+  }
+  .live-card p {
+    font-size: 14px; line-height: 1.6;
+    color: var(--ink-dark-1);
+    margin: 0;
+  }
+  .live-card ul {
+    list-style: none; padding: 0; margin: 12px 0 0;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .live-card li {
+    font-size: 13px; color: var(--ink-dark-1);
+    line-height: 1.55;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .live-card li::before {
+    content: '✓'; color: var(--p-purple); font-weight: 800;
+    flex-shrink: 0;
+  }
+  /* Benefits split (öğrenci / veli) */
+  .benefits-split {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+  }
+  .benefit-block {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.10);
+    border-left: 4px solid var(--accent, var(--p-purple));
+    border-radius: 14px;
+    padding: 22px 22px 20px;
+  }
+  .benefit-block.for-student { --accent: var(--p-purple); }
+  .benefit-block.for-parent  { --accent: var(--p-brand); }
+  .benefit-block h4 {
+    font-size: 14px; font-weight: 800;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 12px;
+  }
+  .benefit-block ul {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .benefit-block li {
+    font-size: 14px; color: var(--ink-dark-1);
+    line-height: 1.55;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .benefit-block li::before {
+    content: '→'; color: var(--accent); font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ============ 2. EĞİTİM MATERYALLERİ ============ */
+  .sec-materials { background: linear-gradient(180deg, var(--bg-3) 0%, #ece8ff 100%); }
+  .mat-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px;
+  }
+  .mat-card {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 18px;
+    padding: 24px 24px 22px;
+    display: flex; gap: 18px;
+    align-items: flex-start;
+    transition: transform 0.18s ease, box-shadow 0.2s ease;
+  }
+  .mat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 38px -22px rgba(40,38,90,0.28);
+  }
+  .mat-icon {
+    flex-shrink: 0;
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #ffffff 0%, #f0eaff 100%);
+    border: 1px solid rgba(62,58,142,0.18);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.95),
+                inset 0 -2px 4px rgba(62,58,142,0.10),
+                0 6px 14px -4px rgba(62,58,142,0.25);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--p-purple);
+  }
+  .mat-icon svg { width: 26px; height: 26px; }
+  .mat-card[data-tone="brand"] .mat-icon { color: var(--p-brand); border-color: rgba(229,4,123,0.20); box-shadow: inset 0 2px 0 rgba(255,255,255,0.95), inset 0 -2px 4px rgba(229,4,123,0.10), 0 6px 14px -4px rgba(229,4,123,0.25); }
+  .mat-card[data-tone="aqua"]  .mat-icon { color: #1c8fb5;       border-color: rgba(74,214,255,0.30); box-shadow: inset 0 2px 0 rgba(255,255,255,0.95), inset 0 -2px 4px rgba(74,214,255,0.12), 0 6px 14px -4px rgba(74,214,255,0.30); }
+  .mat-card[data-tone="green"] .mat-icon { color: #2a8a5a;       border-color: rgba(109,212,158,0.30); box-shadow: inset 0 2px 0 rgba(255,255,255,0.95), inset 0 -2px 4px rgba(109,212,158,0.12), 0 6px 14px -4px rgba(109,212,158,0.30); }
+  .mat-card[data-tone="sun"]   .mat-icon { color: #b07712;       border-color: rgba(255,181,71,0.30); box-shadow: inset 0 2px 0 rgba(255,255,255,0.95), inset 0 -2px 4px rgba(255,181,71,0.12), 0 6px 14px -4px rgba(255,181,71,0.30); }
+  .mat-body { flex: 1; min-width: 0; }
+  .mat-body h3 {
+    font-size: 17px; font-weight: 800;
+    color: var(--ink-dark-0);
+    margin: 0 0 6px;
+  }
+  .mat-body p {
+    font-size: 14px; line-height: 1.6;
+    color: var(--ink-dark-1);
+    margin: 0;
+  }
+  .mat-body p + p { margin-top: 8px; }
+  .mat-body strong { color: var(--ink-dark-0); font-weight: 700; }
+
+  /* Synergy note (how materials work together) */
+  .mat-synergy {
+    margin-top: 32px;
+    background: linear-gradient(135deg, var(--p-deep) 0%, var(--p-purple) 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 28px 32px;
+    display: flex; gap: 22px;
+    align-items: center;
+    box-shadow: 0 22px 50px -22px rgba(40,38,90,0.45);
+    position: relative; overflow: hidden;
+  }
+  .mat-synergy::before {
+    content: '';
+    position: absolute; top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(229,4,123,0.35), transparent 70%);
+    pointer-events: none;
+  }
+  .mat-synergy-icon {
+    flex-shrink: 0;
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.12);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--p-aqua, #4ad6ff);
+    position: relative;
+  }
+  .mat-synergy-icon svg { width: 28px; height: 28px; }
+  .mat-synergy-text { position: relative; }
+  .mat-synergy-text h4 {
+    font-size: 17px; font-weight: 800;
+    margin: 0 0 6px;
+    color: white;
+  }
+  .mat-synergy-text p {
+    font-size: 14.5px; line-height: 1.6;
+    color: var(--ink-1);
+    margin: 0;
+  }
+  .mat-synergy-text strong { color: white; font-weight: 700; }
+
+  /* ============ 3. PSİKOLOJİK & PDR DESTEK ============ */
+  .sec-pdr { background: white; }
+  .pdr-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 22px;
+  }
+  .pdr-card {
+    background: linear-gradient(160deg, #fcfaff 0%, #f4eeff 100%);
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 20px;
+    padding: 32px 28px 28px;
+    position: relative; overflow: hidden;
+  }
+  .pdr-card::after {
+    content: '';
+    position: absolute; top: -50px; right: -50px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--haze, rgba(62,58,142,0.10)), transparent 70%);
+    pointer-events: none;
+  }
+  .pdr-card.veli  { --haze: rgba(229,4,123,0.10); }
+  .pdr-card.ogrenci { --haze: rgba(74,214,255,0.10); }
+  .pdr-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: white;
+    margin-bottom: 16px;
+    box-shadow: 0 12px 28px -10px rgba(62,58,142,0.45);
+  }
+  .pdr-card.veli .pdr-icon { background: linear-gradient(135deg, var(--p-brand), var(--p-brand-deep)); box-shadow: 0 12px 28px -10px rgba(229,4,123,0.50); }
+  .pdr-card.ogrenci .pdr-icon { background: linear-gradient(135deg, #4ad6ff, #1c8fb5); box-shadow: 0 12px 28px -10px rgba(74,214,255,0.50); }
+  .pdr-icon svg { width: 28px; height: 28px; }
+  .pdr-card h3 {
+    font-size: 20px; font-weight: 800;
+    color: var(--ink-dark-0);
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .pdr-meta {
+    display: inline-block;
+    font-size: 11.5px; font-weight: 700;
+    color: var(--p-purple);
+    background: rgba(62,58,142,0.10);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .pdr-card p {
+    font-size: 14.5px; line-height: 1.6;
+    color: var(--ink-dark-1);
+    margin: 0 0 14px;
+  }
+  .pdr-card p:last-child { margin-bottom: 0; }
+  .pdr-card strong { color: var(--ink-dark-0); font-weight: 700; }
+  .pdr-features {
+    list-style: none; padding: 0; margin: 14px 0 0;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .pdr-features li {
+    font-size: 14px; color: var(--ink-dark-1);
+    line-height: 1.5;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .pdr-features li::before {
+    content: '✓'; color: var(--p-brand); font-weight: 800;
+    flex-shrink: 0;
+  }
+  .pdr-card.ogrenci .pdr-features li::before { color: #1c8fb5; }
+
+  /* Bottom impact summary */
+  .pdr-impact {
+    margin-top: 28px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  }
+  .pdr-stat {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 14px;
+    padding: 18px 18px 16px;
+    text-align: center;
+  }
+  .pdr-stat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(120deg, var(--p-brand) 0%, var(--p-purple) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .pdr-stat-label {
+    font-size: 12.5px; font-weight: 600;
+    color: var(--ink-dark-1);
+  }
+
+  /* ============ 4. GAMIFICATION ============ */
+  .sec-gamify { background: linear-gradient(180deg, #fff 0%, #f4eeff 100%); }
+  .gm-header { text-align: center; margin-bottom: 36px; }
+  .gm-header h2 { margin-left: auto; margin-right: auto; }
+  .gm-header .em-sec-lead { margin-left: auto; margin-right: auto; }
+  .gm-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    margin-bottom: 32px;
+  }
+  .gm-tile {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 18px;
+    padding: 22px 20px 22px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.22s ease;
+  }
+  .gm-tile:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 48px -22px rgba(40,38,90,0.30);
+  }
+  .gm-emoji {
+    font-size: 36px;
+    line-height: 1;
+    margin-bottom: 14px;
+    display: block;
+  }
+  .gm-tile h3 {
+    font-size: 15px; font-weight: 800;
+    color: var(--ink-dark-0);
+    margin: 0 0 6px;
+  }
+  .gm-tile p {
+    font-size: 13px; color: var(--ink-dark-1);
+    line-height: 1.5;
+    margin: 0;
+  }
+  /* Why it works */
+  .gm-why {
+    background: linear-gradient(135deg, var(--p-deep) 0%, #1a1842 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 32px 36px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 24px 56px -24px rgba(40,38,90,0.50);
+  }
+  .gm-why::before {
+    content: '';
+    position: absolute; top: -80px; left: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,181,71,0.25), transparent 70%);
+    pointer-events: none;
+  }
+  .gm-why::after {
+    content: '';
+    position: absolute; bottom: -60px; right: -40px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(229,4,123,0.30), transparent 70%);
+    pointer-events: none;
+  }
+  .gm-why-block { position: relative; }
+  .gm-why-block h4 {
+    font-size: 13px; font-weight: 800;
+    color: var(--p-sun, #ffb547);
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    margin: 0 0 12px;
+  }
+  .gm-why-block.parent h4 { color: var(--p-pink, #ff7ab8); }
+  .gm-why-block ul {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .gm-why-block li {
+    font-size: 14.5px; line-height: 1.55;
+    color: var(--ink-1);
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .gm-why-block li::before {
+    content: '★'; color: var(--p-sun, #ffb547);
+    flex-shrink: 0;
+  }
+  .gm-why-block.parent li::before { color: var(--p-pink, #ff7ab8); }
+  .gm-why-block li strong { color: white; font-weight: 700; }
+
+  /* ============ CTA ============ */
+  .sec-cta-em {
+    background: linear-gradient(135deg, var(--p-deep) 0%, var(--p-purple) 50%, #1a1842 100%);
+    color: white;
+    position: relative; overflow: hidden;
+  }
+  .sec-cta-em::before {
+    content: ''; position: absolute;
+    top: -120px; right: -80px;
+    width: 360px; height: 360px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(229,4,123,0.40), transparent 70%);
+    pointer-events: none;
+  }
+  .sec-cta-em::after {
+    content: ''; position: absolute;
+    bottom: -100px; left: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(74,214,255,0.30), transparent 70%);
+    pointer-events: none;
+  }
+  .cta-em-inner {
+    max-width: var(--maxw); margin: 0 auto;
+    padding: 64px 32px;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+    position: relative; z-index: 2;
+  }
+  .cta-em-inner h2 {
+    font-size: 36px; font-weight: 800;
+    margin: 0 0 12px;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    max-width: 760px;
+  }
+  .cta-em-inner p {
+    font-size: 16px;
+    color: var(--ink-1);
+    max-width: 560px;
+    margin: 0 0 26px;
+  }
+  .cta-em-buttons {
+    display: flex; gap: 12px;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .cta-em-buttons .btn-ghost {
+    background: rgba(255,255,255,0.10);
+    border-color: rgba(255,255,255,0.20);
+    color: white;
+    backdrop-filter: blur(8px);
+  }
+  .cta-em-buttons .btn-ghost:hover { background: rgba(255,255,255,0.18); }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1080px) {
+    .live-grid { grid-template-columns: 1fr; }
+    .mat-grid { grid-template-columns: 1fr; }
+    .pdr-grid { grid-template-columns: 1fr; }
+    .pdr-impact { grid-template-columns: repeat(3, 1fr); }
+    .gm-grid { grid-template-columns: repeat(2, 1fr); }
+    .gm-why { grid-template-columns: 1fr; gap: 24px; }
+  }
+  @media (max-width: 760px) {
+    .em-hero h1 { font-size: 32px; }
+    .em-hero .lead { font-size: 15px; }
+    .em-sec-title { font-size: 24px; }
+    .benefits-split { grid-template-columns: 1fr; }
+    .mat-synergy { padding: 22px 22px; flex-direction: column; align-items: flex-start; gap: 14px; }
+    .pdr-impact { grid-template-columns: 1fr; }
+    .gm-why { padding: 24px 22px; }
+    .cta-em-inner h2 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-contact">
+      <a href="https://wa.me/905551234567" class="wa-link" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.9L4 20l4.2-1.1A7.93 7.93 0 0 0 12.05 20h.01a7.95 7.95 0 0 0 5.55-13.68z"/></svg>
+        <span>+90 555 123 45 67</span>
+      </a>
+      <a href="tel:+908501234567">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 0 0-1.02.24l-2.2 2.2a15.07 15.07 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 4c0-.55-.45-1-1-1H4a1 1 0 0 0-1 1 17 17 0 0 0 17 17c.55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+        <span class="topbar-phone-text">0850 123 45 67</span>
+      </a>
+      <a href="mailto:info@bilenyum.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <span class="topbar-mail-text">info@bilenyum.com</span>
+      </a>
+    </div>
+    <div class="topbar-social">
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.39A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.73 1.46 1.39 2.13a5.88 5.88 0 0 0 2.13 1.39c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.39 5.88 5.88 0 0 0 1.39-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.39-2.13A5.88 5.88 0 0 0 19.86.63C19.1.33 18.22.13 16.95.07 15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/></svg></a>
+      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.13C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.52A3.02 3.02 0 0 0 .5 6.2C0 8.07 0 12 0 12s0 3.93.5 5.8a3.02 3.02 0 0 0 2.12 2.13c1.88.52 9.38.52 9.38.52s7.5 0 9.38-.52a3.02 3.02 0 0 0 2.12-2.13C24 15.93 24 12 24 12s0-3.93-.5-5.8zM9.6 15.6V8.4L15.84 12 9.6 15.6z"/></svg></a>
+      <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.66H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.26 2.37 4.26 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html"><img src="assets/bilenyum-logo.svg" alt="Bilenyum" class="logo-img" /></a>
+    <div class="nav-links">
+      <a href="egitim-setleri.html">Eğitim Setleri</a>
+      <a href="ornek-videolar.html">Örnek Videolar</a>
+      <a href="kadromuz.html">Ekibimiz</a>
+      <a href="neden-biz.html">Neden Biz?</a>
+      <a href="iletisim.html">İletişim</a>
+    </div>
+    <div class="nav-cta">
+      <a href="giris.html" class="btn btn-secondary btn-sm">Giriş Yap</a>
+      <button class="btn btn-primary btn-sm" data-trial-open type="button">Ücretsiz Deneme Dersi</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="sec em-hero">
+  <nav class="breadcrumb" aria-label="Sayfa konumu">
+    <a href="index.html">Anasayfa</a>
+    <span class="sep">›</span>
+    <span class="current">Eğitim Modelimiz</span>
+  </nav>
+  <div class="em-hero-inner">
+    <h1>Çocuğu merkeze alan, <span class="hero-accent">bütünsel</span> bir eğitim modeli.</h1>
+    <p class="lead">
+      Bilenyum eğitim modeli; canlı dersler, dijital içerikler, psikolojik destek ve gamification öğelerini bir araya getirir. Öğrencinin bilişsel gelişimini, motivasyonunu ve sınav başarısını aynı potada güçlendirir.
+    </p>
+  </div>
+</section>
+
+<!-- =================== 1. CANLI DERS TÜRLERİ =================== -->
+<section class="sec sec-live">
+  <div class="sec-inner">
+    <h2 class="em-sec-title">Üç farklı canlı ders formatı, tek bir başarı yolculuğu.</h2>
+    <p class="em-sec-lead">Her çocuğun öğrenme hızı farklıdır. Bilenyum'da konuyu birlikte keşfettiğimiz grup dersleri, eksik kapatan soru çözüm seansları ve birebir destek dersleri bir arada yürür.</p>
+
+    <div class="live-grid">
+      <article class="live-card" data-tone="purple">
+        <span class="live-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </span>
+        <h3>Konu Anlatım Dersleri</h3>
+        <p>Maksimum 8 öğrencilik küçük gruplarda, müfredata uyumlu ve etkileşimli işlenir. Öğretmen tahtada, çocuk kamera açık; soru sormak teşvik edilir.</p>
+        <ul>
+          <li>Her hafta planlı konu akışı</li>
+          <li>Anlık örnek + alıştırma</li>
+          <li>Kayıttan tekrar izleyebilme</li>
+        </ul>
+      </article>
+
+      <article class="live-card" data-tone="brand">
+        <span class="live-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </span>
+        <h3>Soru Çözüm Seansları</h3>
+        <p>Konu sonrası gelen "ben anlamadım" anlarına bire bir cevap. Branş öğretmeni canlı tahtada, öğrencinin takıldığı soruyu farklı çözüm yollarıyla işler.</p>
+        <ul>
+          <li>Branş bazlı haftalık seanslar</li>
+          <li>Çoklu çözüm yöntemi</li>
+          <li>Akran katılımıyla pekiştirme</li>
+        </ul>
+      </article>
+
+      <article class="live-card" data-tone="aqua">
+        <span class="live-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </span>
+        <h3>Birebir Destek Dersleri</h3>
+        <p>Zayıf konularda yalnızca öğrenci ile öğretmen. Veriyle tespit edilen eksikler, kişisel tempoda ve özel materyallerle kapatılır. Aile bilgilendirme raporuyla takip eder.</p>
+        <ul>
+          <li>Veriye dayalı eksik tespiti</li>
+          <li>Kişisel hedef takvimi</li>
+          <li>Veliye haftalık ilerleme raporu</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="benefits-split">
+      <div class="benefit-block for-student">
+        <h4>Öğrenciye Katkısı</h4>
+        <ul>
+          <li>Konuyu tek seferde değil, üç farklı katmanda pekiştirir.</li>
+          <li>Soru sormaya, hata yapmaya açık güvenli bir ortam bulur.</li>
+          <li>Kendi öğrenme hızını tanır; zorlandığında "yalnız değilim" hisseder.</li>
+          <li>Akran etkileşimi sayesinde motivasyon ve aidiyet kazanır.</li>
+        </ul>
+      </div>
+      <div class="benefit-block for-parent">
+        <h4>Veliye Katkısı</h4>
+        <ul>
+          <li>Çocuğun her ders türünde nasıl ilerlediğini şeffaf görür.</li>
+          <li>Eksik konularda hangi desteğin verildiğini bilir, sürece dahil olur.</li>
+          <li>Birebir destekle ek dershane masrafından kurtulur.</li>
+          <li>Haftalık özet raporlarla planlama yapması kolaylaşır.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== 2. EĞİTİM MATERYALLERİ =================== -->
+<section class="sec sec-materials" id="materyaller">
+  <div class="sec-inner">
+    <h2 class="em-sec-title">Birbirini tamamlayan dijital ve basılı içerik ekosistemi.</h2>
+    <p class="em-sec-lead">Her materyal kendi başına anlamlıdır, ama asıl güçlerini birlikte kullanıldığında gösterirler. Bilenyum'da öğrenci konuyu önce video ile keşfeder, soru bankasında uygular, deneme sınavlarında ölçer.</p>
+
+    <div class="mat-grid">
+      <div class="mat-card" data-tone="purple">
+        <span class="mat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        </span>
+        <div class="mat-body">
+          <h3>Konu Anlatım Videoları</h3>
+          <p>Her konu için <strong>kısa, odaklı, ortalama 8-12 dakika</strong> mikro video. Çocuk istediği zaman, istediği hızda izleyebilir; geri sarabilir.</p>
+          <p>Soru çözmeye geçmeden önce konunun temelini kavraması için ilk basamaktır.</p>
+        </div>
+      </div>
+
+      <div class="mat-card" data-tone="brand">
+        <span class="mat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </span>
+        <div class="mat-body">
+          <h3>Akıllı Soru Bankası</h3>
+          <p><strong>50.000+ soru</strong>, MEB müfredatı ve LGS odaklı. Yapay zeka, öğrencinin çözdüğü her soruyu analiz eder; <strong>kişisel zorluk seviyesine</strong> göre bir sonrakini önerir.</p>
+          <p>Konu videosunun ardından uygulama aşaması — bilgi pekişir.</p>
+        </div>
+      </div>
+
+      <div class="mat-card" data-tone="aqua">
+        <span class="mat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </span>
+        <div class="mat-body">
+          <h3>Deneme Sınavları</h3>
+          <p>Bilenyum'a özel haftalık ve aylık denemeler. Gerçek sınav şartlarında hazırlanmış; <strong>net analizi, branş ve kazanım raporu</strong> ile teslim edilir.</p>
+          <p>Soru bankasında çözülenlerin "büyük resimde" nasıl durduğunu gösterir; eksikleri görünür kılar.</p>
+        </div>
+      </div>
+
+      <div class="mat-card" data-tone="green">
+        <span class="mat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </span>
+        <div class="mat-body">
+          <h3>Dijital Çalışma Defterleri</h3>
+          <p>Konu özetleri, görsel haritalar, akıl kartları. <strong>İndirilebilir PDF</strong> formatında; çocuk hem ekrandan hem yazıcıdan kullanabilir.</p>
+          <p>Tekrar aşamasında, ince ayar için ideal.</p>
+        </div>
+      </div>
+
+      <div class="mat-card" data-tone="sun">
+        <span class="mat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1.4" fill="currentColor"/></svg>
+        </span>
+        <div class="mat-body">
+          <h3>Yumi AI Asistanı</h3>
+          <p>Aklında kalan bir soru için <strong>7/24</strong> ulaşılabilen Türkçe yapay zeka asistanı. Doğrudan cevap vermez; yönlendirici sorularla çocuğa düşünmeyi öğretir.</p>
+          <p>Her materyalin yanında, akıl danışmanı gibi durur.</p>
+        </div>
+      </div>
+
+      <div class="mat-card" data-tone="purple">
+        <span class="mat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><polyline points="9 13 7 22 12 19 17 22 15 13"/></svg>
+        </span>
+        <div class="mat-body">
+          <h3>İlerleme Karneleri</h3>
+          <p>Haftalık ve aylık kişisel karneler. <strong>Hangi kazanım sağlandı, hangi konu zayıf</strong> — sayılarla ve grafiklerle açık. Aile ile birlikte gözden geçirilir.</p>
+          <p>Tüm materyallerden gelen veriler burada birleşir.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mat-synergy">
+      <span class="mat-synergy-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </span>
+      <div class="mat-synergy-text">
+        <h4>Materyaller birbirini nasıl destekler?</h4>
+        <p>Video <strong>tanıtır</strong>, soru bankası <strong>uygulatır</strong>, deneme <strong>ölçer</strong>, çalışma defteri <strong>özetler</strong>, Yumi <strong>destekler</strong>, karne <strong>gösterir</strong>. Her materyal bir önceki üzerine inşa edilir; öğrenci konuyu üç farklı bakış açısından sindirir, ezber yerine kavrama yaşar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== 3. PSİKOLOJİK & PDR DESTEK =================== -->
+<section class="sec sec-pdr" id="pdr">
+  <div class="sec-inner">
+    <h2 class="em-sec-title">Akademik başarının yanında, çocuğun ve ailenin yanında.</h2>
+    <p class="em-sec-lead">Sınav baskısı yalnızca çocuğun değil, tüm ailenin meselesidir. Bilenyum'da Eğitim Psikoloğu ve PDR ekibi; veli seminerleri ve birebir öğrenci görüşmeleriyle bu yolculuğu birlikte taşır.</p>
+
+    <div class="pdr-grid">
+      <article class="pdr-card veli">
+        <span class="pdr-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </span>
+        <span class="pdr-meta">Aylık · Çevrimiçi grup</span>
+        <h3>Veli Seminerleri</h3>
+        <p>Her ay, eğitim psikoloğu ve PDR uzmanlarının liderliğinde canlı yayın seminerler. Sınav kaygısı, ergenlik dönemi iletişimi, sağlıklı çalışma alışkanlıkları, ekran kullanımı gibi gündemlerle aileleri bilinçlendirir.</p>
+        <p><strong>Hedef</strong>: anne-babanın çocuğunun yaşadığı süreci "içeriden" anlamasını sağlamak; evdeki desteği güçlendirmek.</p>
+        <ul class="pdr-features">
+          <li>Canlı soru-cevap bölümleri</li>
+          <li>Sınava hazırlık dönemi özel oturumlar</li>
+          <li>Kayıttan dilediğin zaman izleme</li>
+          <li>Aile için pratik uygulanabilir öneriler</li>
+        </ul>
+      </article>
+
+      <article class="pdr-card ogrenci">
+        <span class="pdr-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </span>
+        <span class="pdr-meta">Birebir · Gizli görüşme</span>
+        <h3>Öğrenci Danışman Görüşmeleri</h3>
+        <p>Her öğrenciye atanmış, uzman bir PDR danışmanı. Düzenli birebir görüşmelerle çocuğun motivasyonu, sınav kaygısı, çalışma planı ve duygu dünyası takip edilir.</p>
+        <p><strong>Gizlilik esastır</strong>: çocuğun anlattıkları aile ile ancak çocuğun rızasıyla paylaşılır. Güvenli bir konuşma alanı oluşturulur.</p>
+        <ul class="pdr-features">
+          <li>Aylık düzenli görüşme (gerektiğinde ek seans)</li>
+          <li>Sınav kaygısı atölyeleri</li>
+          <li>Çalışma planı ve hedef belirleme</li>
+          <li>Akran ilişkileri ve sosyal beceri desteği</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="pdr-impact">
+      <div class="pdr-stat">
+        <div class="pdr-stat-num">%84</div>
+        <div class="pdr-stat-label">Sınav kaygısında azalma <small>(3 ay sonunda)</small></div>
+      </div>
+      <div class="pdr-stat">
+        <div class="pdr-stat-num">%92</div>
+        <div class="pdr-stat-label">Veli memnuniyeti <small>seminer sonrası</small></div>
+      </div>
+      <div class="pdr-stat">
+        <div class="pdr-stat-num">200+</div>
+        <div class="pdr-stat-label">Birebir görüşme <small>aylık ortalama</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== 4. GAMIFICATION =================== -->
+<section class="sec sec-gamify">
+  <div class="sec-inner">
+    <div class="gm-header">
+      <h2 class="em-sec-title" style="text-align:center;">Öğrenmeyi oyuna dönüştüren tasarım.</h2>
+      <p class="em-sec-lead" style="text-align:center;">Çocuk ders çalıştığını hissetmeden ilerler; başarısı görünür olur, motivasyonu artar. Tüm oyun öğeleri eğitim psikolojisi temel alınarak tasarlanmıştır.</p>
+    </div>
+
+    <div class="gm-grid">
+      <div class="gm-tile">
+        <span class="gm-emoji" aria-hidden="true">⭐</span>
+        <h3>Bilenyum Puanı</h3>
+        <p>Her ders, her soru çözümü, her video tamamlama puan kazandırır. Birikim ödüllere dönüşür.</p>
+      </div>
+      <div class="gm-tile">
+        <span class="gm-emoji" aria-hidden="true">🏆</span>
+        <h3>Başarı Rozetleri</h3>
+        <p>"Matematik Kahramanı", "5 Gün Üst Üste", "Hatasız Deneme" gibi onlarca rozet kazanılır.</p>
+      </div>
+      <div class="gm-tile">
+        <span class="gm-emoji" aria-hidden="true">📈</span>
+        <h3>Seviye Atlama</h3>
+        <p>Konu ustası oldukça yeni seviyelere ulaşır. Her seviye yeni avatarlar, yeni özellikler açar.</p>
+      </div>
+      <div class="gm-tile">
+        <span class="gm-emoji" aria-hidden="true">🔥</span>
+        <h3>Çalışma Serisi</h3>
+        <p>Üst üste çalışılan günler "streak" olarak görünür. Alışkanlık inşası için en güçlü mekanizma.</p>
+      </div>
+      <div class="gm-tile">
+        <span class="gm-emoji" aria-hidden="true">🎯</span>
+        <h3>Haftalık Görevler</h3>
+        <p>Pazartesi başlayan hafifçe zorlayıcı görevler. Pazar günü kazanılan bonus ödüller.</p>
+      </div>
+      <div class="gm-tile">
+        <span class="gm-emoji" aria-hidden="true">👥</span>
+        <h3>Sınıf Yarışmaları</h3>
+        <p>Akran etkileşimi için haftalık branş bazlı yarışmalar. Liderlik tablosunda yer almak için motive eder.</p>
+      </div>
+      <div class="gm-tile">
+        <span class="gm-emoji" aria-hidden="true">🌌</span>
+        <h3>Yörünge Haritası</h3>
+        <p>Çocuğun gelişim yolculuğunu uzay haritası gibi gösterir. Geçilen gezegenler, açılan rotalar görsel olarak takip edilir.</p>
+      </div>
+      <div class="gm-tile">
+        <span class="gm-emoji" aria-hidden="true">🎁</span>
+        <h3>Gerçek Ödüller</h3>
+        <p>Puanlar; kitap, oyuncak, kırtasiye gibi gerçek ödüllerle Bilenyum mağazasında karşılığını bulur.</p>
+      </div>
+    </div>
+
+    <div class="gm-why">
+      <div class="gm-why-block">
+        <h4>Öğrenciye Faydası</h4>
+        <ul>
+          <li><strong>Dopamin döngüsü</strong> ile her küçük başarı kalıcı motivasyon yaratır.</li>
+          <li>Sınav kaygısı yerine <strong>başarı sevinci</strong> baskın gelir.</li>
+          <li>Kendi gelişimini görmek, <strong>öz-yeterlilik duygusunu</strong> güçlendirir.</li>
+          <li>Akranlarla sağlıklı yarışma, dersi <strong>sıkıcı bir görev olmaktan çıkarır</strong>.</li>
+          <li>Sürekli geri bildirim, alışkanlık halinde çalışmaya dönüşür.</li>
+        </ul>
+      </div>
+      <div class="gm-why-block parent">
+        <h4>Veliye Faydası</h4>
+        <ul>
+          <li><strong>"Ders çalış" demek zorunda kalmazsın</strong> — çocuk kendi içsel motivasyonuyla gelir.</li>
+          <li>Çocuğun kazandığı rozet ve seviyeleri <strong>aile olarak kutlama fırsatı</strong> doğar.</li>
+          <li>Ekran karşısında geçirilen süre <strong>verimli ve ölçülebilir</strong> hale gelir.</li>
+          <li>Çocuğun ilgisinin uzun süre canlı kalması, <strong>uzun vadeli başarıyı</strong> mümkün kılar.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== CTA =================== -->
+<section class="sec sec-cta-em">
+  <div class="cta-em-inner">
+    <h2>Bu modeli en iyi tanıyacağın yer; bir derste.</h2>
+    <p>Ücretsiz deneme dersinde canlı sınıfa gir, Yumi ile tanış, ders sonunda raporunu al. Sonra karar ver.</p>
+    <div class="cta-em-buttons">
+      <button class="btn btn-primary" data-trial-open type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Ücretsiz Deneme Dersi
+      </button>
+      <a href="egitim-setleri.html" class="btn btn-ghost">
+        Eğitim Setlerini Gör
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="site-footer"></footer>
+
+<!-- ============ TRIAL MODAL (Ücretsiz Deneme Dersi) ============ -->
+<!-- CSS: assets/trial-modal.css -->
+
+<div class="trial-modal" id="trialModal" aria-hidden="true">
+  <div class="trial-modal-overlay" data-trial-close></div>
+  <div class="trial-modal-card" role="dialog" aria-modal="true" aria-labelledby="trialModalTitle">
+    <div class="trial-modal-image" aria-hidden="true">[Banner Görseli]</div>
+    <button class="trial-modal-close" data-trial-close aria-label="Kapat" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="trial-modal-body">
+      <div class="trial-modal-head">
+        <span class="trial-modal-eyebrow">Ücretsiz Deneme Dersi</span>
+        <h2 class="trial-modal-title" id="trialModalTitle">Hadi tanışalım</h2>
+        <p class="trial-modal-sub">Çocuğunun seviyesi ve hedefine en uygun deneme dersini birlikte planlayalım.</p>
+      </div>
+      <form class="trial-step-form active" id="trialStep1" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-s-name">Öğrenci adı</label>
+            <input type="text" id="trial-s-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-s-surname">Öğrenci soyadı</label>
+            <input type="text" id="trial-s-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-grade">Sınıf seviyesi</label>
+          <select id="trial-s-grade" required>
+            <option value="" disabled selected>Sınıf seç</option>
+            <option value="5">5. Sınıf</option>
+            <option value="6">6. Sınıf</option>
+            <option value="7">7. Sınıf</option>
+            <option value="8">8. Sınıf (LGS)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-subject">Deneme dersi istenen alan</label>
+          <select id="trial-s-subject" required>
+            <option value="" disabled selected>Alan seç</option>
+            <option value="mat">Matematik</option>
+            <option value="fen">Fen Bilimleri</option>
+            <option value="trk">Türkçe</option>
+            <option value="ing">İngilizce</option>
+            <option value="sos">Sosyal Bilgiler</option>
+            <option value="all">Genel (tüm dersler)</option>
+          </select>
+        </div>
+        <div class="trial-actions">
+          <button type="submit" class="btn-modal btn-modal-primary">
+            İleri
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </form>
+      <form class="trial-step-form" id="trialStep2" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-p-name">Veli adı</label>
+            <input type="text" id="trial-p-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-p-surname">Veli soyadı</label>
+            <input type="text" id="trial-p-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-p-email">E-posta</label>
+          <input type="email" id="trial-p-email" required placeholder="ornek@email.com" autocomplete="email" data-rule="email" maxlength="120" />
+        </div>
+        <div class="form-field">
+          <label for="trial-p-phone">Telefon</label>
+          <input type="tel" id="trial-p-phone" required placeholder="+90 5XX XXX XX XX" inputmode="numeric" autocomplete="tel" maxlength="17" data-rule="phone-tr" />
+        </div>
+        <div class="trial-actions">
+          <button type="button" class="btn-modal btn-modal-ghost" id="trialBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Geri
+          </button>
+          <button type="submit" class="btn-modal btn-modal-primary">
+            Talebi Gönder
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      </form>
+      <div class="trial-success" id="trialSuccess">
+        <div class="trial-success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>Talebin alındı!</h3>
+        <p>1 iş günü içinde belirttiğin telefon numarasından sana ulaşacağız. Tanışmak için sabırsızlanıyoruz!</p>
+        <button type="button" class="btn-modal" data-trial-close>Tamam</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TRIAL MODAL END ============ -->
+
+<script src="assets/dom.js"></script>
+<script src="assets/trial-modal.js"></script>
+<script src="assets/input-rules.js"></script>
+
+<script src="assets/footer.js"></script>
+</body>
+</html>

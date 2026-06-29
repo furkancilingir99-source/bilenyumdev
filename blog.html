@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Blog — Bilenyum</title>
+<meta name="description" content="Bilenyum Blog: eğitimden ipuçları, veli seminer notları, uygulama yenilikleri ve çocuğun başarı yolculuğuna dair içgörüler." />
+<link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%233e3a8e'/%3E%3Ctext x='50' y='65' text-anchor='middle' font-family='Inter,system-ui,sans-serif' font-size='62' font-weight='900' fill='white' letter-spacing='-3'%3Eb%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/trial-modal.css">
+<style>
+  body { background: var(--bg-3); color: var(--ink-dark-0); }
+
+  /* ============ HERO ============ */
+  .blog-hero {
+    background:
+      radial-gradient(900px 380px at 88% 12%, rgba(229,4,123,0.10), transparent 60%),
+      radial-gradient(800px 360px at 6% 30%, rgba(74,214,255,0.10), transparent 60%),
+      linear-gradient(180deg, #fcfaff 0%, #f4eeff 100%);
+    position: relative; z-index: 2; overflow: hidden;
+  }
+  .blog-hero-inner {
+    position: relative; z-index: 2;
+    max-width: 880px; margin: 0 auto;
+    padding: 28px 32px 0;
+    text-align: center;
+  }
+  .blog-hero h1 {
+    font-size: 48px; font-weight: 800;
+    line-height: 1.08; margin: 14px 0 16px;
+    letter-spacing: -0.02em;
+    color: var(--ink-dark-0);
+    text-wrap: balance;
+  }
+  .hero-accent {
+    background: linear-gradient(120deg, var(--p-brand) 0%, var(--p-brand-deep) 50%, var(--p-purple) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .blog-hero .lead {
+    font-size: 18px; color: var(--ink-dark-1);
+    line-height: 1.6; margin: 0 auto 24px;
+    max-width: 640px;
+  }
+  .blog-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px; font-weight: 700;
+    color: var(--p-purple);
+    letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .blog-eyebrow::before {
+    content: ''; width: 22px; height: 1.5px; background: var(--p-purple);
+  }
+
+  /* ============ SEARCH ============ */
+  .blog-search {
+    max-width: 520px; margin: 0 auto;
+    position: relative;
+  }
+  .blog-search input {
+    width: 100%;
+    height: 52px;
+    padding: 0 18px 0 48px;
+    border-radius: 14px;
+    border: 1px solid rgba(20,22,50,0.12);
+    background: white;
+    font-family: inherit; font-size: 15px;
+    color: var(--ink-dark-0);
+    box-shadow: 0 8px 24px -16px rgba(40,38,90,0.30);
+    transition: border-color 0.18s ease, box-shadow 0.2s ease;
+  }
+  .blog-search input::placeholder { color: var(--ink-dark-2); }
+  .blog-search input:focus {
+    outline: none;
+    border-color: var(--p-purple);
+    box-shadow: 0 12px 28px -12px rgba(62,58,142,0.30);
+  }
+  .blog-search-icon {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    color: var(--ink-dark-2);
+    pointer-events: none;
+  }
+  .blog-search-icon svg { width: 18px; height: 18px; display: block; }
+
+  /* ============ SPACE DIVIDER (hero → content) — light theme ============ */
+  .blog-divider {
+    position: relative;
+    width: 100%; height: 160px;
+    background: linear-gradient(180deg, #f4eeff 0%, #efe7ff 100%);
+    overflow: hidden;
+  }
+  .blog-divider .bd-wave {
+    position: absolute;
+    bottom: -1px;
+    width: 130%; left: -15%;
+    height: 100%;
+    display: block;
+    z-index: 1;
+  }
+  .bd-shape { position: absolute; z-index: 2; pointer-events: none; }
+  .bd-circle {
+    width: 56px; height: 56px;
+    top: 26%; left: 42%;
+    border: 1.5px solid rgba(62,58,142,0.30);
+    border-radius: 50%;
+  }
+  .bd-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .bd-dot-1 { top: 22%; left: 14%; background: var(--p-purple); opacity: 0.60; }
+  .bd-dot-2 { top: 18%; left: 86%; background: var(--p-aqua); opacity: 0.70; }
+  .bd-line {
+    width: 36px; height: 2px;
+    top: 36%; left: 64%;
+    background: linear-gradient(90deg, transparent, rgba(229,4,123,0.55), transparent);
+    transform: rotate(-12deg);
+  }
+  .bd-tri {
+    width: 0; height: 0;
+    top: 32%; left: 22%;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 10px solid rgba(62,58,142,0.35);
+    transform: rotate(18deg);
+  }
+
+  /* ============ TABS (divider'ın altında) ============ */
+  .blog-tabs-wrap {
+    max-width: var(--maxw); margin: 0 auto;
+    padding: 24px 32px 8px;
+  }
+  .blog-tabs {
+    display: flex; gap: 8px;
+    justify-content: center;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding-bottom: 4px;
+  }
+  .blog-tabs::-webkit-scrollbar { height: 4px; }
+  .blog-tabs::-webkit-scrollbar-thumb { background: rgba(62,58,142,0.18); border-radius: 999px; }
+  .filter-pill {
+    flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: transparent;
+    border: 1px solid rgba(20,22,50,0.10);
+    color: var(--ink-dark-1);
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  }
+  .filter-pill:hover {
+    background: rgba(62,58,142,0.05);
+    color: var(--p-deep);
+  }
+  .filter-pill.active {
+    background: linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 8px 20px -10px rgba(62,58,142,0.50);
+  }
+  .filter-pill-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    opacity: 0.7;
+  }
+
+  /* ============ FEATURED POST ============ */
+  .blog-featured { background: var(--bg-3); }
+  .featured-card {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 24px;
+    overflow: hidden;
+    display: grid; grid-template-columns: 1.1fr 1fr;
+    box-shadow: 0 20px 50px -28px rgba(40,38,90,0.30);
+    transition: transform 0.2s ease, box-shadow 0.22s ease;
+  }
+  .featured-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 28px 56px -28px rgba(40,38,90,0.36);
+  }
+  .featured-cover {
+    position: relative;
+    min-height: 360px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #fcfaff, #f4eeff);
+  }
+  .post-cover {
+    position: relative;
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #fcfaff, #f4eeff);
+  }
+  .post-cover-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.45s ease;
+  }
+  .post-card:hover .post-cover-img,
+  .featured-card:hover .post-cover-img {
+    transform: scale(1.045);
+  }
+
+  .featured-body {
+    padding: 36px 36px 32px;
+    display: flex; flex-direction: column;
+    gap: 14px;
+    justify-content: center;
+  }
+  .featured-body .post-cat { margin-bottom: 0; }
+  .featured-body h2 {
+    font-size: 28px; font-weight: 800;
+    line-height: 1.18;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.015em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .featured-card { text-decoration: none; color: inherit; display: grid; }
+  .featured-card:hover .featured-body h2 { color: var(--p-purple); }
+  .featured-body h2 { transition: color 0.18s ease; }
+  .featured-body .post-excerpt {
+    font-size: 15px; line-height: 1.6;
+    color: var(--ink-dark-1);
+    margin: 0;
+  }
+  .featured-body .post-meta { margin-top: 4px; }
+  .featured-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    align-self: flex-start;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    background: linear-gradient(135deg, var(--p-brand), var(--p-purple));
+    color: white;
+    padding: 5px 11px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    box-shadow: 0 6px 16px -8px rgba(229,4,123,0.45);
+  }
+  .featured-pill svg { width: 12px; height: 12px; }
+
+  /* ============ POSTS GRID ============ */
+  .blog-grid-wrap { background: var(--bg-3); padding-top: 0; }
+  .blog-grid-wrap .sec-inner { padding-top: 40px; }
+  .blog-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px;
+  }
+  .post-card {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: transform 0.18s ease, box-shadow 0.2s ease;
+    text-decoration: none; color: inherit;
+  }
+  .post-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 50px -24px rgba(40,38,90,0.30);
+  }
+  .post-card .post-cover {
+    height: 200px;
+  }
+  .post-body {
+    padding: 22px 22px 22px;
+    display: flex; flex-direction: column;
+    gap: 10px;
+    flex: 1;
+  }
+  .post-cat {
+    display: inline-flex; align-items: center;
+    align-self: flex-start;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px; font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+  }
+  .post-cat[data-cat="haberler"]   { background: rgba(229,4,123,0.10); color: var(--p-brand-deep); }
+  .post-cat[data-cat="seminer"]    { background: rgba(74,214,255,0.14); color: #1c6b8b; }
+  .post-cat[data-cat="uygulama"]   { background: rgba(62,58,142,0.10); color: var(--p-purple); }
+  .post-cat[data-cat="sinav"]      { background: rgba(255,181,71,0.16); color: #8a5208; }
+  .post-cat[data-cat="psikoloji"]  { background: rgba(109,212,158,0.16); color: #1f6a44; }
+  .post-card h3 {
+    font-size: 18px; font-weight: 800;
+    line-height: 1.25;
+    color: var(--ink-dark-0);
+    margin: 0;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .post-excerpt {
+    font-size: 14px; line-height: 1.55;
+    color: var(--ink-dark-1);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .post-meta {
+    margin-top: auto;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12.5px; color: var(--ink-dark-2);
+    padding-top: 6px;
+  }
+  /* Hover'da meta satırının sağında "Devamını oku" text butonu */
+  .post-card .post-meta::after {
+    content: 'Devamını oku →';
+    margin-left: auto;
+    font-size: 13px; font-weight: 700;
+    color: var(--p-purple);
+    letter-spacing: 0.005em;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.22s ease, transform 0.22s ease, color 0.18s ease;
+    pointer-events: none;
+  }
+  .post-card:hover .post-meta::after {
+    opacity: 1;
+    transform: translateX(0);
+    color: var(--p-brand);
+  }
+  .post-meta .author-avatar {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .post-meta .author-name {
+    font-weight: 600; color: var(--ink-dark-1);
+  }
+  .post-meta .meta-sep { opacity: 0.5; }
+  .post-meta .meta-time {
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .post-meta .meta-time svg { width: 12px; height: 12px; }
+
+  /* ============ LOAD MORE ============ */
+  .blog-loadmore {
+    margin-top: 36px;
+    text-align: center;
+  }
+  .blog-loadmore .btn-ghost {
+    border-color: rgba(62,58,142,0.20);
+    color: var(--p-purple);
+    background: white;
+  }
+  .blog-empty {
+    text-align: center; padding: 56px 32px;
+    color: var(--ink-dark-2); font-size: 15px;
+    background: white; border-radius: 18px;
+    border: 1px dashed rgba(20,22,50,0.15);
+  }
+  .blog-empty strong { color: var(--ink-dark-0); display: block; margin-bottom: 4px; font-size: 16px; }
+
+  /* ============ NEWSLETTER CTA ============ */
+  .sec-newsletter {
+    background:
+      radial-gradient(700px 280px at 80% 0%, rgba(229,4,123,0.20), transparent 60%),
+      radial-gradient(800px 320px at 0% 100%, rgba(74,214,255,0.18), transparent 60%),
+      linear-gradient(135deg, var(--p-deep) 0%, var(--p-purple) 60%, #1a1842 100%);
+    color: white;
+    position: relative; overflow: hidden;
+  }
+  .newsletter-inner {
+    max-width: 760px; margin: 0 auto;
+    padding: 64px 32px;
+    text-align: center;
+    position: relative; z-index: 2;
+  }
+  .newsletter-inner h2 {
+    font-size: 32px; font-weight: 800;
+    margin: 0 0 12px;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+  .newsletter-inner p {
+    font-size: 15.5px;
+    color: var(--ink-1);
+    margin: 0 0 24px;
+    max-width: 540px;
+    margin-left: auto; margin-right: auto;
+  }
+  .newsletter-form {
+    display: flex; gap: 10px;
+    max-width: 480px; margin: 0 auto;
+    flex-wrap: wrap;
+  }
+  .newsletter-form input {
+    flex: 1; min-width: 220px;
+    height: 52px;
+    padding: 0 18px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.20);
+    background: rgba(255,255,255,0.08);
+    color: white;
+    font-family: inherit; font-size: 15px;
+    backdrop-filter: blur(8px);
+    transition: border-color 0.18s ease, background 0.18s ease;
+  }
+  .newsletter-form input::placeholder { color: rgba(255,255,255,0.55); }
+  .newsletter-form input:focus {
+    outline: none;
+    border-color: rgba(255,255,255,0.50);
+    background: rgba(255,255,255,0.14);
+  }
+  .newsletter-form .btn-primary {
+    height: 52px;
+    flex-shrink: 0;
+  }
+  .newsletter-note {
+    margin-top: 14px;
+    font-size: 12.5px;
+    color: var(--ink-2);
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1080px) {
+    .blog-grid { grid-template-columns: repeat(2, 1fr); }
+    .featured-card { grid-template-columns: 1fr; }
+    .featured-cover { min-height: 240px; }
+  }
+  @media (max-width: 760px) {
+    .blog-hero h1 { font-size: 32px; }
+    .blog-hero .lead { font-size: 15px; }
+    .blog-grid { grid-template-columns: 1fr; }
+    .featured-body { padding: 24px 22px; }
+    .featured-body h2 { font-size: 22px; }
+    .newsletter-inner h2 { font-size: 26px; }
+    .newsletter-inner { padding: 48px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-contact">
+      <a href="https://wa.me/905551234567" class="wa-link" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.9L4 20l4.2-1.1A7.93 7.93 0 0 0 12.05 20h.01a7.95 7.95 0 0 0 5.55-13.68z"/></svg>
+        <span>+90 555 123 45 67</span>
+      </a>
+      <a href="tel:+908501234567">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 0 0-1.02.24l-2.2 2.2a15.07 15.07 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 4c0-.55-.45-1-1-1H4a1 1 0 0 0-1 1 17 17 0 0 0 17 17c.55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+        <span class="topbar-phone-text">0850 123 45 67</span>
+      </a>
+      <a href="mailto:info@bilenyum.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <span class="topbar-mail-text">info@bilenyum.com</span>
+      </a>
+    </div>
+    <div class="topbar-social">
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.39A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.73 1.46 1.39 2.13a5.88 5.88 0 0 0 2.13 1.39c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.39 5.88 5.88 0 0 0 1.39-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.39-2.13A5.88 5.88 0 0 0 19.86.63C19.1.33 18.22.13 16.95.07 15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/></svg></a>
+      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.13C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.52A3.02 3.02 0 0 0 .5 6.2C0 8.07 0 12 0 12s0 3.93.5 5.8a3.02 3.02 0 0 0 2.12 2.13c1.88.52 9.38.52 9.38.52s7.5 0 9.38-.52a3.02 3.02 0 0 0 2.12-2.13C24 15.93 24 12 24 12s0-3.93-.5-5.8zM9.6 15.6V8.4L15.84 12 9.6 15.6z"/></svg></a>
+      <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.66H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.26 2.37 4.26 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html"><img src="assets/bilenyum-logo.svg" alt="Bilenyum" class="logo-img" /></a>
+    <div class="nav-links">
+      <a href="egitim-setleri.html">Eğitim Setleri</a>
+      <a href="ornek-videolar.html">Örnek Videolar</a>
+      <a href="kadromuz.html">Ekibimiz</a>
+      <a href="neden-biz.html">Neden Biz?</a>
+      <a href="iletisim.html">İletişim</a>
+    </div>
+    <div class="nav-cta">
+      <a href="giris.html" class="btn btn-secondary btn-sm">Giriş Yap</a>
+      <button class="btn btn-primary btn-sm" data-trial-open type="button">Ücretsiz Deneme Dersi</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="sec blog-hero">
+  <nav class="breadcrumb" aria-label="Sayfa konumu">
+    <a href="index.html">Anasayfa</a>
+    <span class="sep">›</span>
+    <span class="current">Blog</span>
+  </nav>
+  <div class="blog-hero-inner">
+    <h1>Bilenyum'dan en güncel <span class="hero-accent">haberler, duyurular ve yenilikler.</span></h1>
+    <p class="lead">
+      Aylık veli seminerlerimizin detaylarından en yeni ürün ve platform güncellemelerimize; başarı yolculuğumuzun her adımını paylaştığımız köşemiz.
+    </p>
+    <div class="blog-search">
+      <span class="blog-search-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </span>
+      <input type="search" id="blogSearch" placeholder="Yazılarda ara…" autocomplete="off" />
+    </div>
+  </div>
+</section>
+
+<!-- SPACE DIVIDER -->
+<div class="blog-divider" aria-hidden="true">
+  <span class="bd-shape bd-circle"></span>
+  <span class="bd-shape bd-dot bd-dot-1"></span>
+  <span class="bd-shape bd-dot bd-dot-2"></span>
+  <span class="bd-shape bd-line"></span>
+  <span class="bd-shape bd-tri"></span>
+  <svg class="bd-wave" viewBox="0 0 1440 200" preserveAspectRatio="none">
+    <path d="M0,120 C320,160 640,90 960,140 C1180,175 1320,115 1440,150 L1440,200 L0,200 Z" fill="rgba(229,4,123,0.08)"/>
+    <path d="M0,150 C260,195 540,115 820,165 C1080,210 1300,140 1440,175 L1440,200 L0,200 Z" fill="rgba(168,164,240,0.22)"/>
+    <path d="M0,175 C200,215 460,145 720,178 C960,208 1180,148 1440,178 L1440,200 L0,200 Z" fill="#f3f2ff"/>
+  </svg>
+</div>
+
+<!-- CATEGORY TABS -->
+<div class="blog-tabs-wrap">
+  <div class="blog-tabs" role="tablist" aria-label="Blog kategorileri">
+    <button class="filter-pill active" data-cat="all" role="tab" aria-selected="true" type="button">Tümü <span class="filter-pill-count">10</span></button>
+    <button class="filter-pill" data-cat="haberler" role="tab" aria-selected="false" type="button">Bilenyum'dan Haberler <span class="filter-pill-count">3</span></button>
+    <button class="filter-pill" data-cat="seminer" role="tab" aria-selected="false" type="button">Aylık Veli Seminerleri <span class="filter-pill-count">3</span></button>
+    <button class="filter-pill" data-cat="uygulama" role="tab" aria-selected="false" type="button">Uygulama Özelinde <span class="filter-pill-count">2</span></button>
+    <button class="filter-pill" data-cat="sinav" role="tab" aria-selected="false" type="button">Sınava Hazırlık <span class="filter-pill-count">1</span></button>
+    <button class="filter-pill" data-cat="psikoloji" role="tab" aria-selected="false" type="button">Çocuk Psikolojisi <span class="filter-pill-count">1</span></button>
+  </div>
+</div>
+
+<!-- FEATURED -->
+<section class="sec blog-featured" data-cat="haberler">
+  <div class="sec-inner" style="padding-top: 48px; padding-bottom: 24px;">
+    <a class="featured-card" href="blog-detay.html">
+      <div class="featured-cover">
+        <img class="post-cover-img" src="https://loremflickr.com/1200/720/robot,artificial-intelligence,3d-render?lock=1" alt="" loading="lazy" />
+      </div>
+      <div class="featured-body">
+        <span class="featured-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8.5 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 9 8.5 12 2"/></svg>
+          Öne Çıkan
+        </span>
+        <span class="post-cat" data-cat="haberler">Bilenyum'dan Haberler</span>
+        <h2>Yumi 2.0: Yapay zeka asistanımız artık çocuğunla sesli konuşuyor</h2>
+        <p class="post-excerpt">Türkiye'nin ilk eğitim odaklı sesli yapay zeka asistanı Yumi, yeni sürümüyle birlikte artık sadece yazarak değil; konuşarak da öğrencinin yanında. Doğal Türkçe diyalog, anlık geri bildirim ve sesli soru çözümü dahil her şeyi anlattık.</p>
+        <div class="post-meta">
+          <span>17 Mayıs 2026</span>
+          <span class="meta-sep">·</span>
+          <span class="meta-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 6 dk okuma</span>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- POSTS GRID -->
+<section class="sec blog-grid-wrap">
+  <div class="sec-inner">
+    <div class="blog-grid" id="blogGrid">
+
+      <!-- 1: Haberler · LGS Deneme -->
+      <a class="post-card" href="blog-detay.html" data-cat="haberler">
+        <div class="post-cover">
+          <img class="post-cover-img" src="https://loremflickr.com/800/500/exam,test,paper?lock=2" alt="" loading="lazy" />
+        </div>
+        <div class="post-body">
+          <span class="post-cat" data-cat="haberler">Bilenyum'dan Haberler</span>
+          <h3>Yeni LGS Deneme Setleri yayında: 2026 müfredatına %100 uyumlu</h3>
+          <p class="post-excerpt">Akademik ekibimizin 4 ay süren çalışmasının ardından, yeni nesil deneme setlerimiz tüm 8. sınıf öğrencilerinin erişimine açıldı. İçinde neler var?</p>
+          <div class="post-meta"><span>14 May 2026</span></div>
+        </div>
+      </a>
+
+      <!-- 2: Veli Semineri · Ergenlik İletişimi -->
+      <a class="post-card" href="blog-detay.html" data-cat="seminer">
+        <div class="post-cover">
+          <img class="post-cover-img" src="https://loremflickr.com/800/500/family,parenting?lock=3" alt="" loading="lazy" />
+        </div>
+        <div class="post-body">
+          <span class="post-cat" data-cat="seminer">Aylık Veli Semineri</span>
+          <h3>Mayıs 2026 Değerlendirmesi: Ergenlik döneminde sağlıklı iletişimin 7 kuralı</h3>
+          <p class="post-excerpt">Psikolog Dr. Selin Akın'ın liderliğindeki bu ayki seminerimizde, "anlamadığı için kızmak" yerine "anlamak için sormak" üzerine pratik öneriler konuştuk.</p>
+          <div class="post-meta"><span>10 May 2026</span></div>
+        </div>
+      </a>
+
+      <!-- 3: Uygulama · Akıllı Tekrar -->
+      <a class="post-card" href="blog-detay.html" data-cat="uygulama">
+        <div class="post-cover">
+          <img class="post-cover-img" src="https://loremflickr.com/800/500/study,books,school?lock=4" alt="" loading="lazy" />
+        </div>
+        <div class="post-body">
+          <span class="post-cat" data-cat="uygulama">Uygulama Özelinde</span>
+          <h3>Yeni Özellik: Akıllı Tekrar Sistemi nasıl çalışır?</h3>
+          <p class="post-excerpt">Yapay zeka destekli tekrar sistemimiz, çocuğun unutmaya başladığı kazanımları tam zamanında karşısına çıkarıyor. Spaced repetition'ın Bilenyum'a özel yorumu.</p>
+          <div class="post-meta"><span>8 May 2026</span></div>
+        </div>
+      </a>
+
+      <!-- 4: Sinav · 30 gün kala -->
+      <a class="post-card" href="blog-detay.html" data-cat="sinav">
+        <div class="post-cover">
+          <img class="post-cover-img" src="https://loremflickr.com/800/500/student,studying,desk?lock=5" alt="" loading="lazy" />
+        </div>
+        <div class="post-body">
+          <span class="post-cat" data-cat="sinav">Sınava Hazırlık</span>
+          <h3>LGS'ye 30 gün kala: günlük çalışma planı önerisi</h3>
+          <p class="post-excerpt">Son 30 günde net artırmak için bilimsel temelli bir takvim önerisi. Hangi gün hangi branş, kaç deneme, nasıl bir uyku düzeni?</p>
+          <div class="post-meta"><span>5 May 2026</span></div>
+        </div>
+      </a>
+
+      <!-- 5: Veli Semineri · Sınav stresi -->
+      <a class="post-card" href="blog-detay.html" data-cat="seminer">
+        <div class="post-cover">
+          <img class="post-cover-img" src="https://loremflickr.com/800/500/calm,meditation,nature?lock=6" alt="" loading="lazy" />
+        </div>
+        <div class="post-body">
+          <span class="post-cat" data-cat="seminer">Aylık Veli Semineri</span>
+          <h3>Nisan Semineri Notları: Sınav stresiyle başa çıkmak</h3>
+          <p class="post-excerpt">Sınav öncesi yaşanan kaygıyı çocuğa nasıl açıklarız? Velilerin en çok sorduğu 12 soruya pratik cevaplar.</p>
+          <div class="post-meta"><span>28 Nis 2026</span></div>
+        </div>
+      </a>
+
+      <!-- 6: Uygulama · Rapor ekranı -->
+      <a class="post-card" href="blog-detay.html" data-cat="uygulama">
+        <div class="post-cover">
+          <img class="post-cover-img" src="https://loremflickr.com/800/500/laptop,analytics,workspace?lock=7" alt="" loading="lazy" />
+        </div>
+        <div class="post-body">
+          <span class="post-cat" data-cat="uygulama">Uygulama Özelinde</span>
+          <h3>Veli Kontrol Merkezi'nde yeni rapor ekranı yayında</h3>
+          <p class="post-excerpt">Çocuğunuzun haftalık ilerlemesini tek bakışta görmenizi sağlayan yeni rapor ekranını tasarlarken hangi geri bildirimleri dinledik?</p>
+          <div class="post-meta"><span>25 Nis 2026</span></div>
+        </div>
+      </a>
+
+      <!-- 7: Psikoloji · Motivasyon -->
+      <a class="post-card" href="blog-detay.html" data-cat="psikoloji">
+        <div class="post-cover">
+          <img class="post-cover-img" src="https://loremflickr.com/800/500/child,success,smile?lock=8" alt="" loading="lazy" />
+        </div>
+        <div class="post-body">
+          <span class="post-cat" data-cat="psikoloji">Çocuk Psikolojisi</span>
+          <h3>Motivasyonu canlı tutmak: küçük başarıların büyük etkisi</h3>
+          <p class="post-excerpt">Çocuğun "yapamam" demesinin altında ne yatar? Davranışsal psikolojide öz-yeterlilik kavramı ve günlük hayatta uygulanabilir 5 küçük adım.</p>
+          <div class="post-meta"><span>22 Nis 2026</span></div>
+        </div>
+      </a>
+
+      <!-- 8: Haberler · 81 il -->
+      <a class="post-card" href="blog-detay.html" data-cat="haberler">
+        <div class="post-cover">
+          <img class="post-cover-img" src="https://loremflickr.com/800/500/turkey,istanbul,city?lock=9" alt="" loading="lazy" />
+        </div>
+        <div class="post-body">
+          <span class="post-cat" data-cat="haberler">Bilenyum'dan Haberler</span>
+          <h3>Bilenyum, Türkiye'nin 81 iline ulaştı</h3>
+          <p class="post-excerpt">Bir yılda 81 ilden öğrenci ailesi olduk. Bu büyüme yolculuğunu rakamlarla, hikayelerle, hayallerle anlattık.</p>
+          <div class="post-meta"><span>18 Nis 2026</span></div>
+        </div>
+      </a>
+
+      <!-- 9: Veli Semineri · Ekran kullanımı -->
+      <a class="post-card" href="blog-detay.html" data-cat="seminer">
+        <div class="post-cover">
+          <img class="post-cover-img" src="https://loremflickr.com/800/500/tablet,child,technology?lock=10" alt="" loading="lazy" />
+        </div>
+        <div class="post-body">
+          <span class="post-cat" data-cat="seminer">Aylık Veli Semineri</span>
+          <h3>Mart Semineri: Ekran kullanımı ve sağlıklı sınır koymak</h3>
+          <p class="post-excerpt">Telefon, tablet, oyun konsolu… "Kaç saat fazla?" sorusuna çocuğun yaşına göre nüanslı bir bakış ve 7 günlük deneyebileceğiniz bir aile sözleşmesi şablonu.</p>
+          <div class="post-meta"><span>14 Nis 2026</span></div>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="blog-empty" id="blogEmpty" style="display:none;">
+      <strong>Bu kategoride henüz yazı yok.</strong>
+      Diğer kategorileri inceleyebilirsin.
+    </div>
+
+    <div class="blog-loadmore">
+      <button class="btn btn-ghost" type="button">Daha Fazla Yazı Yükle</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="site-footer"></footer>
+
+<!-- ============ TRIAL MODAL ============ -->
+<div class="trial-modal" id="trialModal" aria-hidden="true">
+  <div class="trial-modal-overlay" data-trial-close></div>
+  <div class="trial-modal-card" role="dialog" aria-modal="true" aria-labelledby="trialModalTitle">
+    <div class="trial-modal-image" aria-hidden="true">[Banner Görseli]</div>
+    <button class="trial-modal-close" data-trial-close aria-label="Kapat" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="trial-modal-body">
+      <div class="trial-modal-head">
+        <span class="trial-modal-eyebrow">Ücretsiz Deneme Dersi</span>
+        <h2 class="trial-modal-title" id="trialModalTitle">Hadi tanışalım</h2>
+        <p class="trial-modal-sub">Çocuğunun seviyesi ve hedefine en uygun deneme dersini birlikte planlayalım.</p>
+      </div>
+      <form class="trial-step-form active" id="trialStep1" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-s-name">Öğrenci adı</label>
+            <input type="text" id="trial-s-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-s-surname">Öğrenci soyadı</label>
+            <input type="text" id="trial-s-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-grade">Sınıf seviyesi</label>
+          <select id="trial-s-grade" required>
+            <option value="" disabled selected>Sınıf seç</option>
+            <option value="5">5. Sınıf</option>
+            <option value="6">6. Sınıf</option>
+            <option value="7">7. Sınıf</option>
+            <option value="8">8. Sınıf (LGS)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-subject">Deneme dersi istenen alan</label>
+          <select id="trial-s-subject" required>
+            <option value="" disabled selected>Alan seç</option>
+            <option value="mat">Matematik</option>
+            <option value="fen">Fen Bilimleri</option>
+            <option value="trk">Türkçe</option>
+            <option value="ing">İngilizce</option>
+            <option value="sos">Sosyal Bilgiler</option>
+            <option value="all">Genel (tüm dersler)</option>
+          </select>
+        </div>
+        <div class="trial-actions">
+          <button type="submit" class="btn-modal btn-modal-primary">
+            İleri
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </form>
+      <form class="trial-step-form" id="trialStep2" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-p-name">Veli adı</label>
+            <input type="text" id="trial-p-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-p-surname">Veli soyadı</label>
+            <input type="text" id="trial-p-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-p-email">E-posta</label>
+          <input type="email" id="trial-p-email" required placeholder="ornek@email.com" autocomplete="email" data-rule="email" maxlength="120" />
+        </div>
+        <div class="form-field">
+          <label for="trial-p-phone">Telefon</label>
+          <input type="tel" id="trial-p-phone" required placeholder="+90 5XX XXX XX XX" inputmode="numeric" autocomplete="tel" maxlength="17" data-rule="phone-tr" />
+        </div>
+        <div class="trial-actions">
+          <button type="button" class="btn-modal btn-modal-ghost" id="trialBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Geri
+          </button>
+          <button type="submit" class="btn-modal btn-modal-primary">
+            Talebi Gönder
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      </form>
+      <div class="trial-success" id="trialSuccess">
+        <div class="trial-success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>Talebin alındı!</h3>
+        <p>1 iş günü içinde belirttiğin telefon numarasından sana ulaşacağız. Tanışmak için sabırsızlanıyoruz!</p>
+        <button type="button" class="btn-modal" data-trial-close>Tamam</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/dom.js"></script>
+<script src="assets/trial-modal.js"></script>
+<script src="assets/input-rules.js"></script>
+<script src="assets/footer.js"></script>
+
+<!-- Blog filter + search interactivity -->
+<script>
+  (function () {
+    'use strict';
+    var pills    = document.querySelectorAll('.filter-pill');
+    var cards    = document.querySelectorAll('.blog-grid .post-card');
+    var featured = document.querySelector('.blog-featured');
+    var empty    = document.getElementById('blogEmpty');
+    var search   = document.getElementById('blogSearch');
+
+    var activeCat = 'all';
+    var activeQuery = '';
+
+    function apply() {
+      var q = activeQuery.trim().toLowerCase();
+      // Hide featured if filtering or searching anything non-default
+      if (featured) {
+        var feaCat = featured.getAttribute('data-cat');
+        var feaTxt = (featured.textContent || '').toLowerCase();
+        var feaCatOk = (activeCat === 'all' || activeCat === feaCat);
+        var feaQryOk = (q === '' || feaTxt.indexOf(q) !== -1);
+        featured.style.display = (feaCatOk && feaQryOk) ? '' : 'none';
+      }
+      var shown = 0;
+      cards.forEach(function (card) {
+        var cat = card.getAttribute('data-cat');
+        var txt = (card.textContent || '').toLowerCase();
+        var catOk = (activeCat === 'all' || activeCat === cat);
+        var qryOk = (q === '' || txt.indexOf(q) !== -1);
+        var ok = catOk && qryOk;
+        card.style.display = ok ? '' : 'none';
+        if (ok) shown++;
+      });
+      if (empty) empty.style.display = (shown === 0) ? '' : 'none';
+    }
+
+    pills.forEach(function (p) {
+      p.addEventListener('click', function () {
+        pills.forEach(function (x) {
+          x.classList.remove('active');
+          x.setAttribute('aria-selected', 'false');
+        });
+        p.classList.add('active');
+        p.setAttribute('aria-selected', 'true');
+        activeCat = p.getAttribute('data-cat');
+        apply();
+      });
+    });
+
+    if (search) {
+      search.addEventListener('input', function () {
+        activeQuery = search.value;
+        apply();
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

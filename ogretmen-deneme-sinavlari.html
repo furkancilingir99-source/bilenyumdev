@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Deneme Sınavları · Bilenyum</title>
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-d3-mega.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
+<link rel="stylesheet" href="assets/dashboard-polish.css">
+<link rel="stylesheet" href="assets/teacher-dashboard.css">
+<link rel="stylesheet" href="assets/sinavlar-page.css">
+<link rel="stylesheet" href="assets/teacher-trial-exams.css">
+<script src="assets/dashboard-switcher.js" defer></script>
+<script src="assets/teacher-shell.js" defer></script>
+<script src="assets/shell.js" defer></script>
+</head>
+<body data-teacher-active="deneme" data-tkg-context="deneme">
+
+<div class="scene" aria-hidden="true">
+  <div class="scene-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
+<header class="hud" data-teacher-hud></header>
+
+<main class="stage thw-stage">
+  <div class="stage-nav" data-teacher-nav></div>
+
+  <div class="thw-main-col" id="tkgMain">
+    <nav class="tkg-breadcrumb thw-breadcrumb" id="tkgBreadcrumb" hidden></nav>
+
+    <div class="thw-context-panel" id="tkgContextPanel">
+      <div class="thw-page-head">
+        <h1 class="thw-page-title" id="tkgPageTitle">Deneme Sınavları</h1>
+        <p class="thw-page-subtitle" id="tkgPageSubtitle">Deneme sınavlarını klanlarınız ve birebir öğrencileriniz üzerinden atayın ve sonuçları takip edin.</p>
+      </div>
+
+      <nav class="tkg-tabs" id="tkgTabs" role="tablist" aria-label="Liste türü">
+        <button type="button" class="tkg-tab is-active" data-tkg-tab="clans" role="tab" aria-selected="true">Klanlarım</button>
+        <button type="button" class="tkg-tab" data-tkg-tab="birebir" role="tab" aria-selected="false">Birebir Ders Öğrencilerim</button>
+      </nav>
+    </div>
+
+    <div id="tkgLoading" class="td-state">
+      <div class="td-skeleton"><div class="td-skeleton-bar"></div><div class="td-skeleton-bar"></div></div>
+      Liste yükleniyor...
+    </div>
+    <p id="tkgError" class="td-state is-error" hidden>Liste yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>
+    <p id="tkgEmpty" class="td-state" hidden></p>
+    <div id="tkgContent" hidden></div>
+  </div>
+</main>
+
+<!-- Öğrenci deneme detay drawer -->
+<div class="sn-detail-drawer" id="tdsDetailDrawer" aria-hidden="true">
+  <div class="sn-detail-overlay" data-tds-detail-close></div>
+  <aside class="sn-detail-panel" role="dialog" aria-labelledby="tdsDetailTitle" aria-modal="true">
+    <button type="button" class="sn-detail-close" data-tds-detail-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <header class="sn-detail-head">
+      <span class="sn-detail-eyebrow">ÖĞRENCİ DENEME SONUCU</span>
+      <h3 class="sn-detail-title" id="tdsDetailTitle">—</h3>
+      <p class="tds-detail-student" id="tdsDetailStudent">—</p>
+      <div class="sn-detail-rank-row">
+        <div class="sn-detail-rank-chip">
+          <span class="sn-detail-rank-label">Sıralama</span>
+          <strong id="tdsDetailRank">—</strong>
+        </div>
+        <div class="sn-detail-rank-chip">
+          <span class="sn-detail-rank-label">Yüzdelik Dilim</span>
+          <strong id="tdsDetailPercentile">—</strong>
+        </div>
+      </div>
+      <div class="sn-detail-meta">
+        <span class="sn-detail-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="tdsDetailDate">—</span>
+        </span>
+        <span class="sn-detail-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span id="tdsDetailTotal">— soru</span>
+        </span>
+        <span class="sn-detail-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="tdsDetailDur">— dk</span>
+        </span>
+      </div>
+    </header>
+    <div class="sn-detail-body">
+      <div class="sn-detail-summary">
+        <div class="sn-detail-stat is-net">
+          <span class="sn-detail-stat-label">Toplam Net</span>
+          <span class="sn-detail-stat-value" id="tdsDetailNet">—</span>
+        </div>
+        <div class="sn-detail-stat is-d">
+          <span class="sn-detail-stat-label">Doğru</span>
+          <span class="sn-detail-stat-value" id="tdsDetailDogru">—</span>
+        </div>
+        <div class="sn-detail-stat is-y">
+          <span class="sn-detail-stat-label">Yanlış</span>
+          <span class="sn-detail-stat-value" id="tdsDetailYanlis">—</span>
+        </div>
+        <div class="sn-detail-stat is-b">
+          <span class="sn-detail-stat-label">Boş</span>
+          <span class="sn-detail-stat-value" id="tdsDetailBos">—</span>
+        </div>
+      </div>
+      <h4 class="sn-detail-section-title">Derslere Göre Sonuçlar</h4>
+      <div class="sn-detail-table-wrap">
+        <table class="sn-detail-table">
+          <thead>
+            <tr><th>Ders</th><th>Doğru</th><th>Yanlış</th><th>Boş</th><th>Net</th></tr>
+          </thead>
+          <tbody id="tdsDetailTableBody"></tbody>
+          <tfoot id="tdsDetailTableFoot"></tfoot>
+        </table>
+      </div>
+      <div class="sn-detail-xp">
+        <span class="sn-detail-xp-label">Kazanılan XP</span>
+        <span class="sn-detail-xp-value" id="tdsDetailXp"><span id="tdsDetailXpVal">—</span></span>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script src="assets/teacher-dashboard-mock.js"></script>
+<script src="assets/teacher-avatars.js"></script>
+<script src="assets/teacher-groups-mock.js"></script>
+<script src="assets/teacher-trial-exams-mock.js"></script>
+<script src="assets/teacher-trial-exams.js"></script>
+<script src="assets/teacher-groups.js"></script>
+</body>
+</html>

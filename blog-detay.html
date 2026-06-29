@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Yumi 2.0: Yapay zeka asistanımız artık sesli konuşuyor — Bilenyum Blog</title>
+<meta name="description" content="Türkiye'nin ilk eğitim odaklı sesli yapay zeka asistanı Yumi'nin yeni sürümü: doğal Türkçe diyalog, anlık geri bildirim ve sesli soru çözümü." />
+<link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%233e3a8e'/%3E%3Ctext x='50' y='65' text-anchor='middle' font-family='Inter,system-ui,sans-serif' font-size='62' font-weight='900' fill='white' letter-spacing='-3'%3Eb%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/trial-modal.css">
+<style>
+  body { background: var(--bg-3); color: var(--ink-dark-0); }
+
+  /* ============ ARTICLE HERO ============ */
+  .post-hero {
+    background:
+      radial-gradient(900px 380px at 88% 12%, rgba(229,4,123,0.08), transparent 60%),
+      radial-gradient(800px 360px at 6% 30%, rgba(74,214,255,0.08), transparent 60%),
+      linear-gradient(180deg, #fcfaff 0%, #f4eeff 100%);
+    position: relative; z-index: 2; overflow: hidden;
+  }
+  .post-hero-inner {
+    max-width: 760px; margin: 0 auto;
+    padding: 16px 32px 0;
+    position: relative; z-index: 2;
+  }
+  .post-cat-row {
+    margin: 12px 0 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .post-cat-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px; font-weight: 700;
+    background: rgba(229,4,123,0.10);
+    color: var(--p-brand-deep);
+    padding: 5px 12px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+  }
+  .post-title {
+    font-size: 44px; font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: var(--ink-dark-0);
+    margin: 0 0 22px;
+    text-wrap: balance;
+  }
+  .post-meta-row {
+    display: flex; align-items: center; gap: 14px;
+    flex-wrap: wrap;
+    padding-bottom: 28px;
+  }
+  .post-author-block {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .post-author-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .post-author-info { display: flex; flex-direction: column; }
+  .post-author-info strong { font-size: 14.5px; font-weight: 700; color: var(--ink-dark-0); }
+  .post-author-info small { font-size: 12.5px; color: var(--ink-dark-2); }
+  .post-meta-divider { width: 1px; height: 28px; background: rgba(20,22,50,0.12); }
+  .post-meta-item {
+    font-size: 13px; color: var(--ink-dark-1);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .post-meta-item svg { width: 14px; height: 14px; color: var(--ink-dark-2); }
+  .post-share-row { margin-left: auto; display: flex; gap: 6px; }
+  .share-btn {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    border: 1px solid rgba(20,22,50,0.10);
+    background: white;
+    color: var(--ink-dark-1);
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+  }
+  .share-btn:hover {
+    background: var(--p-purple);
+    color: white;
+    border-color: var(--p-purple);
+    transform: translateY(-1px);
+  }
+  .share-btn svg { width: 16px; height: 16px; }
+
+  /* ============ COVER IMAGE ============ */
+  .post-hero-cover {
+    max-width: 960px; margin: 0 auto;
+    padding: 0 32px 0;
+    position: relative; z-index: 2;
+  }
+  .post-cover-large {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    height: 420px;
+    background: linear-gradient(135deg, #fcfaff, #f4eeff);
+    box-shadow: 0 30px 60px -30px rgba(40,38,90,0.50);
+  }
+  .post-cover-large img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ============ ARTICLE BODY ============ */
+  .post-body-wrap { background: var(--bg-3); }
+  .post-body-inner {
+    max-width: 720px; margin: 0 auto;
+    padding: 56px 32px 32px;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 18px; line-height: 1.7;
+    color: var(--ink-dark-0);
+  }
+  .post-body-inner > * { font-family: inherit; }
+  .post-body-inner .post-lead {
+    font-size: 22px; line-height: 1.55;
+    color: var(--ink-dark-1);
+    font-weight: 400;
+    margin: 0 0 36px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid rgba(20,22,50,0.10);
+    font-style: italic;
+  }
+  .post-body-inner h2 {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 28px; font-weight: 800;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    margin: 48px 0 16px;
+    text-wrap: balance;
+  }
+  .post-body-inner h3 {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 21px; font-weight: 800;
+    color: var(--ink-dark-0);
+    line-height: 1.3;
+    margin: 36px 0 12px;
+  }
+  .post-body-inner p { margin: 0 0 22px; }
+  .post-body-inner p strong, .post-body-inner li strong {
+    color: var(--p-deep);
+    font-weight: 700;
+  }
+  .post-body-inner a {
+    color: var(--p-brand);
+    text-decoration: underline;
+    text-decoration-color: rgba(229,4,123,0.30);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.18s ease;
+  }
+  .post-body-inner a:hover { text-decoration-color: var(--p-brand); }
+  .post-body-inner ul, .post-body-inner ol {
+    margin: 0 0 24px;
+    padding-left: 22px;
+  }
+  .post-body-inner li { margin-bottom: 8px; }
+
+  /* Blockquote */
+  .post-body-inner blockquote {
+    margin: 36px 0;
+    padding: 26px 28px 24px;
+    background: linear-gradient(135deg, #fcfaff 0%, #f4eeff 100%);
+    border-left: 5px solid var(--p-brand);
+    border-radius: 4px 16px 16px 4px;
+    font-size: 19px; line-height: 1.55;
+    color: var(--ink-dark-0);
+    font-style: italic;
+    position: relative;
+  }
+  .post-body-inner blockquote::before {
+    content: '"';
+    position: absolute;
+    top: -8px; left: 14px;
+    font-family: Georgia, serif;
+    font-size: 64px; font-weight: 700;
+    color: rgba(229,4,123,0.35);
+    line-height: 1;
+  }
+  .post-body-inner blockquote p { margin: 0; }
+  .post-body-inner blockquote footer {
+    margin-top: 10px;
+    font-style: normal;
+    font-size: 13.5px;
+    color: var(--ink-dark-2);
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  /* Callout box */
+  .post-callout {
+    margin: 36px 0;
+    padding: 22px 24px;
+    background: white;
+    border: 1px solid rgba(62,58,142,0.15);
+    border-radius: 16px;
+    display: flex; gap: 16px; align-items: flex-start;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 15px; line-height: 1.6;
+    box-shadow: 0 6px 18px -10px rgba(40,38,90,0.20);
+  }
+  .post-callout-icon {
+    flex-shrink: 0;
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .post-callout-icon svg { width: 20px; height: 20px; }
+  .post-callout-body { flex: 1; }
+  .post-callout-body strong { color: var(--ink-dark-0); font-weight: 700; display: block; margin-bottom: 4px; }
+  .post-callout-body p { font-style: normal; color: var(--ink-dark-1); margin: 0; }
+
+  /* Inline image figure */
+  .post-figure {
+    margin: 36px 0;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 18px 38px -22px rgba(40,38,90,0.30);
+  }
+  .post-figure .figure-art {
+    height: 260px;
+    background: linear-gradient(135deg, #fcfaff, #f4eeff);
+    position: relative; overflow: hidden;
+  }
+  .post-figure .figure-art img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .post-figure figcaption {
+    background: white;
+    padding: 14px 20px;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 13.5px;
+    color: var(--ink-dark-2);
+    text-align: center;
+    font-style: italic;
+  }
+
+  /* Tags + share footer */
+  .post-tags {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin: 40px 0 24px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(20,22,50,0.10);
+  }
+  .post-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 600;
+    color: var(--p-purple);
+    background: rgba(62,58,142,0.08);
+    padding: 5px 12px;
+    border-radius: 999px;
+    text-decoration: none;
+  }
+  .post-tag:hover { background: rgba(62,58,142,0.14); color: var(--p-deep); }
+
+  /* ============ AUTHOR CARD ============ */
+  .post-author-card-wrap { background: var(--bg-3); }
+  .post-author-card-wrap .sec-inner { padding-top: 24px; padding-bottom: 24px; max-width: 720px; }
+  .author-card {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 20px;
+    padding: 28px 28px 26px;
+    display: flex; gap: 20px;
+    align-items: flex-start;
+    position: relative; overflow: hidden;
+    box-shadow: 0 14px 32px -20px rgba(40,38,90,0.20);
+  }
+  .author-card::after {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(229,4,123,0.10), transparent 70%);
+    pointer-events: none;
+  }
+  .author-card-avatar {
+    flex-shrink: 0;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--p-purple), var(--p-deep));
+    color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 800;
+    box-shadow: 0 10px 24px -10px rgba(62,58,142,0.45);
+  }
+  .author-card-body { flex: 1; min-width: 0; position: relative; }
+  .author-card-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    color: var(--p-purple);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .author-card h4 {
+    font-size: 20px; font-weight: 800;
+    color: var(--ink-dark-0);
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .author-card p {
+    font-size: 14.5px; line-height: 1.6;
+    color: var(--ink-dark-1);
+    margin: 0 0 14px;
+  }
+  .author-social { display: flex; gap: 6px; }
+  .author-social a {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: rgba(62,58,142,0.06);
+    color: var(--p-purple);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  }
+  .author-social a:hover {
+    background: var(--p-purple);
+    color: white;
+    transform: translateY(-1px);
+  }
+  .author-social svg { width: 16px; height: 16px; }
+
+  /* ============ RELATED POSTS ============ */
+  .sec-related { background: white; border-top: 1px solid rgba(20,22,50,0.06); }
+  .related-head {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 28px;
+    gap: 20px;
+  }
+  .related-head h2 {
+    font-size: 26px; font-weight: 800;
+    color: var(--ink-dark-0);
+    letter-spacing: -0.015em;
+    margin: 0;
+  }
+  .related-head a {
+    font-size: 14px; font-weight: 600;
+    color: var(--p-purple);
+    display: inline-flex; align-items: center; gap: 6px;
+    flex-shrink: 0;
+  }
+  .related-head a:hover { color: var(--p-brand); }
+  .related-head a svg { width: 14px; height: 14px; }
+  .related-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+  }
+  /* Re-use post-card patterns from blog.html for visual consistency */
+  .rel-card {
+    background: white;
+    border: 1px solid rgba(20,22,50,0.08);
+    border-radius: 18px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: transform 0.18s ease, box-shadow 0.2s ease;
+    text-decoration: none; color: inherit;
+  }
+  .rel-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 38px -22px rgba(40,38,90,0.30);
+  }
+  .rel-cover {
+    height: 140px;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #fcfaff, #f4eeff);
+  }
+  .rel-cover img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .rel-card:hover .rel-cover img { transform: scale(1.04); }
+  .rel-body {
+    padding: 16px 18px 18px;
+    display: flex; flex-direction: column;
+    gap: 8px;
+  }
+  .rel-cat {
+    display: inline-flex; align-self: flex-start;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px; font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+  }
+  .rel-cat[data-cat="haberler"]   { background: rgba(229,4,123,0.10); color: var(--p-brand-deep); }
+  .rel-cat[data-cat="seminer"]    { background: rgba(74,214,255,0.14); color: #1c6b8b; }
+  .rel-cat[data-cat="uygulama"]   { background: rgba(62,58,142,0.10); color: var(--p-purple); }
+  .rel-card h3 {
+    font-size: 15.5px; font-weight: 800;
+    line-height: 1.3;
+    color: var(--ink-dark-0);
+    margin: 0;
+    letter-spacing: -0.005em;
+  }
+
+  /* ============ CTA ============ */
+  .sec-post-cta {
+    background: linear-gradient(135deg, var(--p-deep) 0%, var(--p-purple) 50%, #1a1842 100%);
+    color: white;
+    position: relative; overflow: hidden;
+  }
+  .sec-post-cta::before {
+    content: ''; position: absolute;
+    top: -120px; right: -80px;
+    width: 360px; height: 360px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(229,4,123,0.40), transparent 70%);
+    pointer-events: none;
+  }
+  .post-cta-inner {
+    max-width: var(--maxw); margin: 0 auto;
+    padding: 56px 32px;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+    position: relative; z-index: 2;
+  }
+  .post-cta-inner h2 {
+    font-size: 30px; font-weight: 800;
+    margin: 0 0 10px;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    max-width: 700px;
+  }
+  .post-cta-inner p {
+    font-size: 15px;
+    color: var(--ink-1);
+    max-width: 540px;
+    margin: 0 0 22px;
+  }
+  .post-cta-buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .post-cta-buttons .btn-ghost {
+    background: rgba(255,255,255,0.10);
+    border-color: rgba(255,255,255,0.20);
+    color: white;
+    backdrop-filter: blur(8px);
+  }
+  .post-cta-buttons .btn-ghost:hover { background: rgba(255,255,255,0.18); }
+
+  /* ============ READING PROGRESS ============ */
+  .reading-progress {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 3px; z-index: 200;
+    pointer-events: none;
+  }
+  .reading-progress-bar {
+    width: 0%; height: 100%;
+    background: linear-gradient(90deg, var(--p-brand), var(--p-purple));
+    transition: width 0.08s linear;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1080px) {
+    .related-grid { grid-template-columns: repeat(2, 1fr); }
+    .post-cover-large { height: 320px; }
+    .post-cover-art { width: 120px; height: 120px; }
+  }
+  @media (max-width: 760px) {
+    .post-title { font-size: 30px; }
+    .post-body-inner { padding: 36px 20px 16px; font-size: 17px; }
+    .post-body-inner .post-lead { font-size: 18.5px; }
+    .post-body-inner h2 { font-size: 23px; }
+    .post-cover-large { height: 220px; }
+    .post-cover-art { width: 80px; height: 80px; }
+    .related-grid { grid-template-columns: 1fr; }
+    .author-card { flex-direction: column; align-items: center; text-align: center; }
+    .post-cta-inner h2 { font-size: 24px; }
+    .post-share-row { margin-left: 0; }
+    .post-meta-row { gap: 10px; }
+    .post-meta-divider { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Reading progress bar -->
+<div class="reading-progress" aria-hidden="true"><div class="reading-progress-bar" id="readingBar"></div></div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-contact">
+      <a href="https://wa.me/905551234567" class="wa-link" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.9L4 20l4.2-1.1A7.93 7.93 0 0 0 12.05 20h.01a7.95 7.95 0 0 0 5.55-13.68z"/></svg>
+        <span>+90 555 123 45 67</span>
+      </a>
+      <a href="tel:+908501234567">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 0 0-1.02.24l-2.2 2.2a15.07 15.07 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 4c0-.55-.45-1-1-1H4a1 1 0 0 0-1 1 17 17 0 0 0 17 17c.55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+        <span class="topbar-phone-text">0850 123 45 67</span>
+      </a>
+      <a href="mailto:info@bilenyum.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <span class="topbar-mail-text">info@bilenyum.com</span>
+      </a>
+    </div>
+    <div class="topbar-social">
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.39A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.73 1.46 1.39 2.13a5.88 5.88 0 0 0 2.13 1.39c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.39 5.88 5.88 0 0 0 1.39-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.39-2.13A5.88 5.88 0 0 0 19.86.63C19.1.33 18.22.13 16.95.07 15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/></svg></a>
+      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.13C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.52A3.02 3.02 0 0 0 .5 6.2C0 8.07 0 12 0 12s0 3.93.5 5.8a3.02 3.02 0 0 0 2.12 2.13c1.88.52 9.38.52 9.38.52s7.5 0 9.38-.52a3.02 3.02 0 0 0 2.12-2.13C24 15.93 24 12 24 12s0-3.93-.5-5.8zM9.6 15.6V8.4L15.84 12 9.6 15.6z"/></svg></a>
+      <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.66H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.26 2.37 4.26 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html"><img src="assets/bilenyum-logo.svg" alt="Bilenyum" class="logo-img" /></a>
+    <div class="nav-links">
+      <a href="egitim-setleri.html">Eğitim Setleri</a>
+      <a href="ornek-videolar.html">Örnek Videolar</a>
+      <a href="kadromuz.html">Ekibimiz</a>
+      <a href="neden-biz.html">Neden Biz?</a>
+      <a href="iletisim.html">İletişim</a>
+    </div>
+    <div class="nav-cta">
+      <a href="giris.html" class="btn btn-secondary btn-sm">Giriş Yap</a>
+      <button class="btn btn-primary btn-sm" data-trial-open type="button">Ücretsiz Deneme Dersi</button>
+    </div>
+  </div>
+</header>
+
+<!-- POST HERO -->
+<section class="sec post-hero">
+  <nav class="breadcrumb" aria-label="Sayfa konumu">
+    <a href="index.html">Anasayfa</a>
+    <span class="sep">›</span>
+    <a href="blog.html">Blog</a>
+    <span class="sep">›</span>
+    <span class="current">Yumi 2.0: Sesli Asistan</span>
+  </nav>
+  <div class="post-hero-inner">
+    <div class="post-cat-row">
+      <a href="blog.html" class="post-cat-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><polygon points="12 2 15 8.5 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 9 8.5 12 2"/></svg>
+        Bilenyum'dan Haberler
+      </a>
+    </div>
+    <h1 class="post-title">Yumi 2.0: Yapay zeka asistanımız artık çocuğunla sesli konuşuyor</h1>
+    <div class="post-meta-row">
+      <span class="post-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        17 Mayıs 2026
+      </span>
+      <span class="post-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        6 dk okuma
+      </span>
+      <div class="post-share-row">
+        <button class="share-btn" type="button" aria-label="X'te paylaş" title="X'te paylaş">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+        </button>
+        <button class="share-btn" type="button" aria-label="LinkedIn'de paylaş" title="LinkedIn'de paylaş">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.063 2.063 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </button>
+        <button class="share-btn" type="button" aria-label="WhatsApp'ta paylaş" title="WhatsApp'ta paylaş">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.9L4 20l4.2-1.1A7.93 7.93 0 0 0 12.05 20h.01a7.95 7.95 0 0 0 5.55-13.68z"/></svg>
+        </button>
+        <button class="share-btn" type="button" aria-label="Linki kopyala" title="Linki kopyala" id="copyLinkBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COVER IMAGE -->
+<div class="post-hero-cover">
+  <div class="post-cover-large">
+    <img src="https://loremflickr.com/1600/840/robot,artificial-intelligence,3d-render?lock=1" alt="" loading="lazy" />
+  </div>
+</div>
+
+<!-- ARTICLE BODY -->
+<article class="post-body-wrap">
+  <div class="post-body-inner">
+
+    <p class="post-lead">Bir yılı aşkın süredir Bilenyum öğrencilerinin "yazılı asistanı" olan Yumi, bugün <strong>2.0</strong> ile birlikte konuşmaya başladı. Çocuklar artık ev ödevi yaparken, soru çözerken, hatta otobüste giderken bile aklındaki soruları sesli olarak Yumi'ye sorabilir. İşte bu güncellemenin arkasındaki düşünce, nasıl çalıştığı ve sınıfta yarattığı etki.</p>
+
+    <h2>Yumi neden vardı, neden sesli oldu?</h2>
+    <p>Yumi'yi geçen yıl tasarlarken aklımızdaki tek soru şuydu: <strong>"Çocuk bir soruya takıldığında, etrafta öğretmen yoksa ne yapar?"</strong> Bu kişiyi ne tam bir öğretmen yapabiliriz ne de Google'la rekabet etmek istiyoruz. Aklımızda olan şey daha çok bir "büyük abla" gibi, sokrat metoduyla çocuğa düşündüren bir asistan oldu.</p>
+    <p>Birinci sürüm güzel çalıştı — ama bir engelimiz vardı: <strong>yazı yazma çabası</strong>. Özellikle küçük yaş gruplarında klavyeyle uzun cümle yazmak hem yavaşlatıyor hem motivasyonu düşürüyor. Velilerden gelen geri bildirimde en sık duyduğumuz cümle de buydu: <em>"Çocuğum sadece sesli sorabilse, çok daha rahat kullanır."</em></p>
+
+    <div class="post-callout">
+      <span class="post-callout-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      </span>
+      <div class="post-callout-body">
+        <strong>Tasarım prensibi</strong>
+        <p>Yumi cevabı vermez, soruyu doğru sormayı öğretir. Sesli sürüm de aynı pedagojik çizgide: çocuğa düşünme alanı bırakır, beklemeyi de bilir.</p>
+      </div>
+    </div>
+
+    <h2>Doğal Türkçe diyalog: tek satırlık komut değil, sohbet</h2>
+    <p>Yumi 2.0'ı tasarlarken en büyük zorluğumuz <strong>Türkçe konuşma dilinin nüanslarıydı</strong>. "Hocam bu soruyu yapamadım" cümlesindeki tonu, "Ya bir saniye, bunu nereden çıkardık?" gibi günlük ifadeleri anlayabilmesi gerekiyordu. Bunun için 3 ay boyunca, gerçek öğretmen-öğrenci ders kayıtlarından oluşan bir veri setiyle modeli eğittik.</p>
+    <p>Sonuç: Yumi artık <em>ardışık konuşmaları</em> takip ediyor. Yani çocuk "bunu da çözebilir miyim?" dediğinde, hangi soruyu kastettiğini önceki konuşmadan biliyor.</p>
+
+    <h3>Üç pratik kullanım senaryosu</h3>
+    <ul>
+      <li><strong>Soru çözümünde takıldığında:</strong> "Yumi, üçüncü adımı anlamadım" der, Yumi sadece o adımı farklı kelimelerle açıklar.</li>
+      <li><strong>Konu tekrarında:</strong> "Bana basıncı kısaca anlat" der, Yumi 30 saniyelik bir özet sunar; "anladım" veya "biraz daha açar mısın" diye devam edebilir.</li>
+      <li><strong>Çalışmaya başlarken:</strong> "Bugün ne çalışsam?" der, Yumi haftalık planına ve son denemesindeki eksiklere bakıp önerir.</li>
+    </ul>
+
+    <figure class="post-figure">
+      <div class="figure-art">
+        <img src="https://loremflickr.com/1400/520/microphone,studio,headphones?lock=11" alt="" loading="lazy" />
+      </div>
+      <figcaption>Yumi 2.0'ın yeni mikrofon arayüzü — uygulamanın her sayfasından tek dokunuşla erişilebilir.</figcaption>
+    </figure>
+
+    <h2>Anlık geri bildirim: sadece doğru/yanlış değil</h2>
+    <p>Yumi'nin en büyük farkı, cevabın <strong>nasıl</strong> verildiği. "Yanlış" demek yerine; "Bu adımda dikkat ettiğin şey güzel, ama bir önceki işlemde bir şey atladın gibi. Hadi tekrar bakalım?" gibi yapıcı, yönlendirici cümleler kullanıyor.</p>
+    <p>Bu yaklaşımın çocuk üzerindeki etkisini bizzat ölçtük: 6 hafta süren pilot kullanımda, beta'ya katılan 1.240 öğrenci arasında <strong>"yardım istemekten çekinme" oranı %62 azaldı</strong>. Bu sayı bizim için yıldız sayılarından çok daha değerli.</p>
+
+    <blockquote>
+      <p>"Yumi'yle konuştukça sanki gerçekten orada biri varmış gibi hissediyorum. Ders çalışırken yalnız değilim."</p>
+      <footer>— Mira, 7. sınıf, Bilenyum öğrencisi</footer>
+    </blockquote>
+
+    <h2>Gizlilik: her şey çocuğun sesi, çocuğun verisi</h2>
+    <p>Sesli özellik konusunda en sık aldığımız soru "kayıt ediliyor mu?" oldu. Cevap netti: <strong>ses kayıtları cihazdan çıkmıyor</strong>. Yumi konuşmayı önce cihazda metne çeviriyor (on-device speech recognition), sadece metin sorgu sunucuya gidiyor. Ses dosyaları hiçbir yere yüklenmiyor, depolanmıyor.</p>
+    <p>Veliler dilerse <strong>Veli Kontrol Merkezi</strong>'nden Yumi'yle yapılan konuşmaların özetini görebiliyor — ama bu yalnızca metin özeti, ses değil. Tüm bu altyapı KVKK ve çocuk verisinin işlenmesiyle ilgili özel hassasiyet gözetilerek kuruldu.</p>
+
+    <div class="post-callout">
+      <span class="post-callout-icon" style="background: linear-gradient(135deg, #2a8a5a, #6dd49e);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+      </span>
+      <div class="post-callout-body">
+        <strong>Veriler nerede tutuluyor?</strong>
+        <p>Tüm öğrenci verileri Türkiye'deki sunucularda, ISO 27001 sertifikalı veri merkezlerinde depolanıyor. Üçüncü partilerle paylaşılmıyor.</p>
+      </div>
+    </div>
+
+    <h2>Şimdi ne olacak?</h2>
+    <p>Yumi 2.0 bugün itibariyle <strong>tüm Bilenyum kullanıcıları</strong> için aktif. Mobil uygulamanın son sürümünü güncellediğinde, ana ekranda yeni mikrofon ikonunu göreceksin. İlk birkaç gün Yumi'yi çocukla birlikte denemeni, onunla nasıl konuşabileceğini birlikte keşfetmenizi öneririz.</p>
+    <p>Önümüzdeki ay için planımız ise: <strong>sesli not alma ve sesli özetleme</strong>. Çocuk bir konuyu kendi sesiyle özetlerken, Yumi de o özeti dinleyip nerelerde eksik kalındığını işaret edecek. Bu, aktif öğrenmenin en güçlü tekniklerinden biri — heyecan duyuyoruz.</p>
+    <p>Soru, geri bildirim, beğeniyi <a href="iletisim.html">iletişim sayfamızdan</a> bekliyoruz. Çocuğunuzun Yumi'yle tanışması iyi gelsin.</p>
+
+    <!-- Tags -->
+    <div class="post-tags">
+      <a href="#" class="post-tag">#yumi</a>
+      <a href="#" class="post-tag">#yapayzeka</a>
+      <a href="#" class="post-tag">#ürün</a>
+      <a href="#" class="post-tag">#sesli-asistan</a>
+      <a href="#" class="post-tag">#eğitim-teknolojisi</a>
+    </div>
+  </div>
+</article>
+
+<!-- RELATED -->
+<section class="sec sec-related">
+  <div class="sec-inner">
+    <div class="related-head">
+      <h2>İlgili yazılar</h2>
+      <a href="blog.html">
+        Tümünü gör
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+    <div class="related-grid">
+      <a class="rel-card" href="blog-detay.html">
+        <div class="rel-cover">
+          <img src="https://loremflickr.com/800/440/exam,test,paper?lock=2" alt="" loading="lazy" />
+        </div>
+        <div class="rel-body">
+          <span class="rel-cat" data-cat="haberler">Bilenyum'dan Haberler</span>
+          <h3>Yeni LGS Deneme Setleri yayında: 2026 müfredatına %100 uyumlu</h3>
+        </div>
+      </a>
+      <a class="rel-card" href="blog-detay.html">
+        <div class="rel-cover">
+          <img src="https://loremflickr.com/800/440/study,books,school?lock=4" alt="" loading="lazy" />
+        </div>
+        <div class="rel-body">
+          <span class="rel-cat" data-cat="uygulama">Uygulama Özelinde</span>
+          <h3>Yeni Özellik: Akıllı Tekrar Sistemi nasıl çalışır?</h3>
+        </div>
+      </a>
+      <a class="rel-card" href="blog-detay.html">
+        <div class="rel-cover">
+          <img src="https://loremflickr.com/800/440/family,parenting?lock=3" alt="" loading="lazy" />
+        </div>
+        <div class="rel-body">
+          <span class="rel-cat" data-cat="seminer">Aylık Veli Semineri</span>
+          <h3>Mayıs 2026 Değerlendirmesi: Ergenlik döneminde sağlıklı iletişimin 7 kuralı</h3>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="site-footer"></footer>
+
+<!-- ============ TRIAL MODAL ============ -->
+<div class="trial-modal" id="trialModal" aria-hidden="true">
+  <div class="trial-modal-overlay" data-trial-close></div>
+  <div class="trial-modal-card" role="dialog" aria-modal="true" aria-labelledby="trialModalTitle">
+    <div class="trial-modal-image" aria-hidden="true">[Banner Görseli]</div>
+    <button class="trial-modal-close" data-trial-close aria-label="Kapat" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="trial-modal-body">
+      <div class="trial-modal-head">
+        <span class="trial-modal-eyebrow">Ücretsiz Deneme Dersi</span>
+        <h2 class="trial-modal-title" id="trialModalTitle">Hadi tanışalım</h2>
+        <p class="trial-modal-sub">Çocuğunun seviyesi ve hedefine en uygun deneme dersini birlikte planlayalım.</p>
+      </div>
+      <form class="trial-step-form active" id="trialStep1" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-s-name">Öğrenci adı</label>
+            <input type="text" id="trial-s-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-s-surname">Öğrenci soyadı</label>
+            <input type="text" id="trial-s-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-grade">Sınıf seviyesi</label>
+          <select id="trial-s-grade" required>
+            <option value="" disabled selected>Sınıf seç</option>
+            <option value="5">5. Sınıf</option>
+            <option value="6">6. Sınıf</option>
+            <option value="7">7. Sınıf</option>
+            <option value="8">8. Sınıf (LGS)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="trial-s-subject">Deneme dersi istenen alan</label>
+          <select id="trial-s-subject" required>
+            <option value="" disabled selected>Alan seç</option>
+            <option value="mat">Matematik</option>
+            <option value="fen">Fen Bilimleri</option>
+            <option value="trk">Türkçe</option>
+            <option value="ing">İngilizce</option>
+            <option value="sos">Sosyal Bilgiler</option>
+            <option value="all">Genel (tüm dersler)</option>
+          </select>
+        </div>
+        <div class="trial-actions">
+          <button type="submit" class="btn-modal btn-modal-primary">
+            İleri
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </form>
+      <form class="trial-step-form" id="trialStep2" autocomplete="off">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="trial-p-name">Veli adı</label>
+            <input type="text" id="trial-p-name" required placeholder="Adı" autocomplete="given-name" data-rule="name" maxlength="40" />
+          </div>
+          <div class="form-field">
+            <label for="trial-p-surname">Veli soyadı</label>
+            <input type="text" id="trial-p-surname" required placeholder="Soyadı" autocomplete="family-name" data-rule="name" maxlength="40" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="trial-p-email">E-posta</label>
+          <input type="email" id="trial-p-email" required placeholder="ornek@email.com" autocomplete="email" data-rule="email" maxlength="120" />
+        </div>
+        <div class="form-field">
+          <label for="trial-p-phone">Telefon</label>
+          <input type="tel" id="trial-p-phone" required placeholder="+90 5XX XXX XX XX" inputmode="numeric" autocomplete="tel" maxlength="17" data-rule="phone-tr" />
+        </div>
+        <div class="trial-actions">
+          <button type="button" class="btn-modal btn-modal-ghost" id="trialBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Geri
+          </button>
+          <button type="submit" class="btn-modal btn-modal-primary">
+            Talebi Gönder
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+      </form>
+      <div class="trial-success" id="trialSuccess">
+        <div class="trial-success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>Talebin alındı!</h3>
+        <p>1 iş günü içinde belirttiğin telefon numarasından sana ulaşacağız. Tanışmak için sabırsızlanıyoruz!</p>
+        <button type="button" class="btn-modal" data-trial-close>Tamam</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/dom.js"></script>
+<script src="assets/trial-modal.js"></script>
+<script src="assets/input-rules.js"></script>
+<script src="assets/footer.js"></script>
+
+<!-- Reading progress + copy link -->
+<script>
+  (function () {
+    'use strict';
+    var bar     = document.getElementById('readingBar');
+    var article = document.querySelector('.post-body-wrap');
+    function updateProgress() {
+      if (!bar || !article) return;
+      var rect = article.getBoundingClientRect();
+      var total = rect.height - window.innerHeight + 200;
+      var scrolled = -rect.top + 100;
+      var pct = Math.max(0, Math.min(100, (scrolled / total) * 100));
+      bar.style.width = pct + '%';
+    }
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener('resize', updateProgress);
+    updateProgress();
+
+    var copyBtn = document.getElementById('copyLinkBtn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function () {
+        var url = window.location.href;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(function () {
+            var old = copyBtn.getAttribute('title');
+            copyBtn.setAttribute('title', 'Kopyalandı!');
+            setTimeout(function () { copyBtn.setAttribute('title', old); }, 1500);
+          });
+        }
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

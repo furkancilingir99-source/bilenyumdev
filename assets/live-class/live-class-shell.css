@@ -1,0 +1,125 @@
+/* LiveClass — Shared shell & component patterns */
+
+.lc-class-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--lc-class-background);
+  color: var(--lc-class-text-primary);
+  font-family: var(--lc-class-font-live, var(--lc-class-font));
+  -webkit-font-smoothing: antialiased;
+}
+
+.lc-class-topbar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--lc-class-top-h);
+  padding: 0 16px;
+  background: var(--lc-class-glass);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--lc-class-border);
+}
+
+.lc-class-status-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  min-height: 40px;
+  background: rgba(59, 130, 255, 0.06);
+  border-bottom: 1px solid var(--lc-class-border);
+  font-size: 0.75rem;
+}
+
+.lc-class-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr var(--lc-class-right-w);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.lc-class-bottombar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--lc-class-bottom-h);
+  padding: 8px 12px;
+  background: var(--lc-class-glass);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--lc-class-border);
+}
+
+/* Status badges — shared semantics */
+.lc-class-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--lc-class-radius-pill);
+  font-size: 0.68rem;
+  font-weight: 700;
+  border: 1px solid var(--lc-class-border);
+  background: var(--lc-class-surface-soft);
+  color: var(--lc-class-text-secondary);
+  white-space: nowrap;
+}
+
+.lc-class-badge--live { border-color: rgba(239, 68, 68, 0.4); color: #FCA5A5; }
+.lc-class-badge--mic-off { border-color: rgba(245, 158, 11, 0.35); color: var(--lc-class-warning); }
+.lc-class-badge--chat-off { border-color: rgba(107, 114, 128, 0.35); color: var(--lc-class-text-muted); }
+.lc-class-badge--quiz { border-color: rgba(250, 204, 21, 0.35); color: var(--lc-class-quiz); }
+.lc-class-badge--focus { border-color: rgba(168, 85, 247, 0.35); color: var(--lc-class-xp); }
+.lc-class-badge--wb { border-color: rgba(59, 130, 255, 0.35); color: var(--lc-class-whiteboard); }
+.lc-class-badge--hand { border-color: rgba(250, 204, 21, 0.35); color: var(--lc-class-raised-hand); }
+.lc-class-badge--conn { border-color: rgba(239, 68, 68, 0.35); color: #FCA5A5; }
+.lc-class-badge--success { border-color: rgba(34, 197, 94, 0.35); color: var(--lc-class-success); }
+
+/* Suggestion / signal cards — not "AI" styled */
+.lc-class-signal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--lc-class-radius-sm);
+  background: var(--lc-class-surface-soft);
+  border: 1px solid var(--lc-class-border);
+  font-size: 0.75rem;
+  transition: border-color var(--lc-class-motion-fast);
+}
+
+.lc-class-signal--attention { border-left: 3px solid var(--lc-class-warning); }
+.lc-class-signal--warning { border-left: 3px solid var(--lc-class-danger); }
+.lc-class-signal__title { font-weight: 700; color: var(--lc-class-text-primary); display: block; }
+.lc-class-signal__desc { color: var(--lc-class-text-muted); font-size: 0.68rem; }
+
+/* Shared buttons */
+.lc-class-btn {
+  padding: 8px 14px;
+  border-radius: var(--lc-class-radius-sm);
+  border: 1px solid var(--lc-class-border);
+  background: var(--lc-class-surface-soft);
+  color: var(--lc-class-text-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--lc-class-motion-fast), transform 90ms;
+}
+
+.lc-class-btn:active { transform: scale(0.98); }
+.lc-class-btn--primary { border-color: var(--lc-class-primary); background: var(--lc-class-primary-soft); color: var(--lc-class-primary); }
+.lc-class-btn--secondary { border-color: var(--lc-class-secondary); color: var(--lc-class-secondary); }
+.lc-class-btn--danger { border-color: var(--lc-class-danger); color: #FCA5A5; }
+.lc-class-btn--sm { padding: 4px 10px; font-size: 0.68rem; }
+
+/* Density modes */
+.lc-class-shell.lc-density--calm .lc-class-status-strip { opacity: 0.92; }
+.lc-class-shell.lc-density--incident .lc-class-status-strip { background: rgba(239, 68, 68, 0.06); }
+
+@media (max-width: 960px) {
+  .lc-class-main { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Seminerler · Veli Kontrol Merkezi · Bilenyum</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="description" content="Bilenyum Veli Kontrol Merkezi — velilere özel aylık seminer programı." />
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
+<link rel="stylesheet" href="assets/veli-shell.css">
+<link rel="stylesheet" href="assets/veli-seminar.css">
+<script src="assets/dashboard-switcher.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<style>
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  background: var(--bg-page);
+  color: var(--ink-dark-0);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+button, a { font-family: inherit; cursor: pointer; }
+a { text-decoration: none; color: inherit; }
+
+/* Shell */
+.pvd-shell {
+  position: relative; z-index: 5;
+  padding: 10px 22px 14px;
+  height: calc(100vh - 88px);
+  max-height: calc(100vh - 88px);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: "nav main";
+  gap: 12px;
+}
+.pvd-nav { grid-area: nav; align-self: start; }
+.pvd-nav .nav-rail { height: auto; }
+.pvd-nav .nav-item { padding: 10px 4px 8px; gap: 4px; }
+.pvd-nav .nav-item svg { width: 22px; height: 22px; }
+.pvd-nav .nav-item-label { font-size: 9px; letter-spacing: 0.08em; }
+
+/* Main content — program.html ile aynı sarmalayıcı yapı */
+.pvd-main {
+  grid-area: main;
+  min-width: 0; min-height: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.pvs-main { padding: 0; }
+.pvs-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.pvs-wrap .pv-sem { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.pvd-wrap {
+  flex: 1; min-height: 0; min-width: 0;
+  display: flex; flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+  padding: 6px 2px 18px;
+}
+
+/* Bölüm başlığı — kutunun dışında, prog-section-head ile aynı */
+.prog-section-head {
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+  padding: 4px 4px 0;
+}
+.prog-section-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 17px; font-weight: 800;
+  color: var(--brand-navy);
+  letter-spacing: -0.015em;
+  flex-shrink: 0;
+}
+.prog-section-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--brand-purple-18), transparent);
+}
+
+/* Özet istatistikler — başlık ile takvim kutusu arasında */
+.pvd-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  flex-shrink: 0;
+  padding: 0 4px;
+}
+.pvd-stat {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--brand-purple-06);
+  border: 1px solid var(--brand-purple-10);
+  display: flex; flex-direction: column; gap: 4px;
+  min-width: 0;
+}
+.pvd-stat.is-absent { background: rgba(220,38,38,0.05); border-color: rgba(220,38,38,0.18); }
+.pvd-stat.is-attend { background: rgba(46,168,106,0.06); border-color: rgba(46,168,106,0.20); }
+.pvd-stat-val {
+  font-family: var(--font-display);
+  font-size: 26px; font-weight: 900;
+  color: var(--brand-navy); letter-spacing: -0.03em; line-height: 1;
+}
+.pvd-stat.is-absent .pvd-stat-val { color: #b91c1c; }
+.pvd-stat.is-attend .pvd-stat-val { color: #2a8a5a; }
+.pvd-stat-label {
+  font-family: var(--font-sans);
+  font-size: 11px; font-weight: 500;
+  color: var(--ink-dark-2); line-height: 1.4;
+}
+
+/* Takvim kutusu — prog-page */
+.prog-page {
+  flex: 1; min-height: 0; min-width: 0;
+  display: flex; flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid var(--brand-purple-14);
+  border-radius: 20px;
+  padding: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.prog-toolbar {
+  display: flex; align-items: center;
+  gap: 16px; flex-wrap: wrap;
+  margin-bottom: 18px; flex-shrink: 0;
+}
+.prog-edu-nav {
+  display: flex; align-items: center; gap: 8px;
+  flex: 0 1 auto; min-width: 0;
+  position: relative;
+}
+.prog-edu-nav-btn {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  border: 1px solid var(--brand-purple-14);
+  background: var(--bg-subtle); color: var(--brand-navy);
+  display: inline-flex; align-items: center; justify-content: center; padding: 0;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+.prog-edu-nav-btn:hover:not(:disabled) {
+  background: var(--brand-purple-06); border-color: var(--brand-purple-28);
+  color: var(--brand-purple);
+}
+.prog-edu-nav-btn:disabled { opacity: 0.32; cursor: default; pointer-events: none; }
+.prog-edu-nav-btn svg { width: 14px; height: 14px; }
+.prog-edu-nav-label {
+  display: flex; flex-direction: column; gap: 2px;
+  min-width: 0; text-align: left;
+}
+.prog-edu-nav-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10.5px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--brand-magenta); line-height: 1.2;
+}
+.prog-edu-nav-range-row {
+  display: flex; align-items: center; gap: 8px;
+  justify-content: flex-start;
+}
+.prog-edu-nav-range {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 800;
+  color: var(--brand-navy); letter-spacing: -0.02em;
+  line-height: 1.2; white-space: nowrap;
+}
+.prog-edu-nav-cal-btn {
+  width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+  border: 1px solid var(--brand-purple-14);
+  background: var(--bg-subtle); color: var(--brand-purple);
+  display: inline-flex; align-items: center; justify-content: center; padding: 0;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+.prog-edu-nav-cal-btn:hover,
+.prog-edu-nav-cal-btn.is-open {
+  background: var(--brand-magenta-08); border-color: var(--brand-magenta-35);
+  color: var(--brand-magenta);
+}
+.prog-edu-nav-cal-btn svg { width: 15px; height: 15px; }
+.prog-edu-picker {
+  position: absolute; top: calc(100% + 8px); left: 36px;
+  z-index: 50; width: min(320px, calc(100vw - 48px));
+  background: var(--bg-surface);
+  border: 1px solid var(--brand-purple-18);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+.prog-edu-picker[hidden] { display: none !important; }
+.prog-edu-picker-head {
+  padding: 12px 14px;
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-dark-2);
+  border-bottom: 1px solid var(--brand-purple-10);
+}
+.prog-edu-picker-list {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 8px; max-height: 280px; overflow-y: auto;
+}
+.prog-edu-picker-item {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  width: 100%; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid transparent; background: transparent;
+  color: var(--brand-navy); font-family: var(--font-sans);
+  text-align: left; cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.prog-edu-picker-item:hover {
+  background: var(--brand-purple-06); border-color: var(--brand-purple-14);
+}
+.prog-edu-picker-item.is-active {
+  background: var(--brand-magenta-08); border-color: var(--brand-magenta-35);
+}
+.prog-edu-picker-item strong {
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 800; letter-spacing: -0.01em;
+}
+.prog-edu-picker-item span {
+  font-family: var(--font-sans);
+  font-size: 11.5px; font-weight: 500; color: var(--ink-dark-2);
+}
+.prog-edu-picker-item.is-active span { color: var(--ink-dark-1); }
+
+/* Ders detay drawer — program.html ile aynı yapı */
+.d3-drawer {
+  position: fixed; inset: 0; z-index: 1000;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.22s ease;
+}
+.d3-drawer.is-open { pointer-events: auto; opacity: 1; }
+.d3-drawer-overlay {
+  position: absolute; inset: 0;
+  background: var(--brand-navy-45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.d3-drawer-panel {
+  position: absolute; top: 0; right: 0; bottom: 0;
+  width: 440px; max-width: 92vw;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--brand-purple-14);
+  box-shadow: var(--shadow-lg);
+  padding: 28px;
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+  gap: 20px;
+  transform: translateX(100%);
+  transition: transform 0.30s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.d3-drawer.is-open .d3-drawer-panel { transform: translateX(0); }
+.d3-drawer-close {
+  position: absolute; top: 18px; right: 18px;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--bg-subtle);
+  border: 1px solid var(--brand-purple-14);
+  color: var(--brand-navy);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; z-index: 2;
+  transition: background 0.18s;
+}
+.d3-drawer-close:hover { background: var(--brand-purple-06); }
+.d3-drawer-close svg { width: 16px; height: 16px; }
+.d3-drawer-head {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 0 44px 16px 0; margin-bottom: 4px;
+  border-bottom: 1px dashed var(--brand-purple-14);
+}
+.d3-drawer-icon {
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; line-height: 1; flex-shrink: 0;
+}
+.d3-drawer[data-subject="mat"] .d3-drawer-icon { filter: drop-shadow(0 0 10px rgba(229,4,123,0.35)); }
+.d3-drawer[data-subject="fen"] .d3-drawer-icon { filter: drop-shadow(0 0 10px rgba(46,168,106,0.35)); }
+.d3-drawer[data-subject="trk"] .d3-drawer-icon { filter: drop-shadow(0 0 10px rgba(62,58,142,0.35)); }
+.d3-drawer[data-subject="ing"] .d3-drawer-icon { filter: drop-shadow(0 0 10px rgba(212,146,10,0.35)); }
+.d3-drawer[data-subject="sos"] .d3-drawer-icon { filter: drop-shadow(0 0 10px rgba(105,100,196,0.35)); }
+.d3-drawer-meta { flex: 1; min-width: 0; }
+.d3-drawer-eyebrow {
+  display: block;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--brand-purple); margin-bottom: 6px;
+}
+.d3-drawer-title {
+  font-family: var(--font-display); font-size: 22px; font-weight: 800;
+  color: var(--brand-navy); letter-spacing: -0.02em;
+  line-height: 1.2; margin: 0;
+}
+.d3-drawer-att-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 10px; padding: 5px 10px; border-radius: 999px;
+  font-family: var(--font-sans); font-size: 11px; font-weight: 700;
+}
+.d3-drawer-att-chip.is-attended { background: rgba(46,168,106,0.12); color: #2a8a5a; }
+.d3-drawer-att-chip.is-absent { background: rgba(220,38,38,0.10); color: #b91c1c; }
+.d3-drawer-att-chip.is-upcoming { background: var(--brand-purple-08); color: var(--brand-purple); }
+.d3-drawer-due {
+  display: flex; align-items: baseline; flex-wrap: wrap;
+  gap: 4px 8px; margin-top: 12px;
+}
+.d3-drawer-due-label {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-dark-2); flex-shrink: 0;
+}
+.d3-drawer-due-value {
+  display: inline-flex; align-items: baseline; gap: 8px;
+  font-size: 14px; font-weight: 700; color: var(--brand-navy);
+  min-width: 0;
+}
+.d3-drawer-due-sub {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+  color: #9a6808; letter-spacing: 0.03em; white-space: nowrap;
+}
+.d3-drawer-section { display: flex; flex-direction: column; gap: 8px; }
+.d3-drawer-label {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--brand-purple);
+}
+.d3-drawer-quote {
+  display: flex; flex-direction: column; gap: 0;
+  padding: 16px 18px 14px; border-radius: 14px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--brand-purple-14);
+}
+.d3-drawer-quote-text {
+  font-family: var(--font-sans); font-size: 14px; line-height: 1.6;
+  color: var(--ink-dark-1); margin: 0;
+  position: relative; padding-left: 20px;
+}
+.d3-drawer-quote-text::before {
+  content: '\201C';
+  position: absolute; left: -2px; top: -12px;
+  font-family: Georgia, serif; font-size: 40px; line-height: 1;
+  color: var(--brand-purple-18); pointer-events: none;
+}
+.d3-drawer-kazanim {
+  display: flex; flex-direction: column; gap: 6px;
+  padding-top: 12px; margin-top: 12px;
+  border-top: 1px dashed var(--brand-purple-14);
+}
+.d3-drawer-kazanim[hidden] { display: none; }
+.d3-drawer-kazanim-tag {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: #9a6808;
+}
+.d3-drawer-kazanim-text {
+  font-family: var(--font-sans); font-size: 14px; line-height: 1.55;
+  color: var(--ink-dark-1);
+}
+.d3-drawer-quote-header {
+  display: flex; align-items: center; gap: 11px;
+  padding-bottom: 0; border-bottom: none;
+}
+.d3-drawer-quote-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  object-fit: cover; border: 2px solid var(--brand-purple-28); flex-shrink: 0;
+}
+.d3-drawer-quote-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.d3-drawer-quote-name {
+  font-family: var(--font-display); font-size: 15px; font-weight: 800;
+  color: var(--brand-navy); line-height: 1.2;
+}
+.d3-drawer-quote-role {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-dark-2);
+}
+.d3-drawer-footer {
+  margin-top: auto; display: flex; flex-direction: column;
+  gap: 10px; padding-top: 4px;
+}
+.d3-drawer-cta {
+  width: 100%;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 10px; padding: 16px; border-radius: 14px;
+  font-family: inherit; font-size: 14px; font-weight: 700;
+  letter-spacing: -0.005em; cursor: default;
+  border: 1px solid transparent; margin-top: 0;
+  box-shadow: none; transform: none;
+}
+.d3-drawer-cta.is-waiting {
+  background: var(--bg-surface);
+  border-color: var(--brand-purple-18);
+  color: var(--ink-dark-1);
+}
+.d3-drawer-cta.is-past {
+  background: var(--bg-subtle);
+  border-color: var(--brand-purple-10);
+  color: var(--ink-dark-2);
+  cursor: not-allowed;
+}
+.d3-drawer-cta.is-live {
+  background: linear-gradient(135deg, var(--brand-magenta), var(--brand-purple));
+  border-color: transparent; color: #fff;
+}
+.d3-drawer-cta .cta-time {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 800;
+  letter-spacing: 0.04em; padding: 3px 9px; border-radius: 7px;
+  background: var(--brand-purple-08); border: 1px solid var(--brand-purple-14);
+}
+.d3-drawer-cta.is-past .cta-time,
+.d3-drawer-cta.is-waiting .cta-time:empty { display: none; }
+
+@media (max-width: 900px) {
+  body { overflow-y: auto; }
+  .pvd-shell { height: auto; max-height: none; grid-template-columns: 1fr; grid-template-areas: "main"; padding-bottom: 40px; }
+  .pvd-nav { display: none; }
+  .prog-toolbar { flex-wrap: wrap; }
+  .prog-legend { width: 100%; margin-left: 0; }
+  .prog-edu-picker { left: 0; width: 100%; }
+}
+@media (max-width: 520px) {
+  .pvd-stats { grid-template-columns: 1fr; }
+}
+</style>
+<link rel="stylesheet" href="assets/prog-lesson-cards.css">
+</head>
+<body>
+
+<header class="hud pv-hud" role="banner">
+  <a class="hud-brand" href="index.html" aria-label="Bilenyum anasayfa">
+    <img src="assets/bilenyum-logo.svg" alt="Bilenyum" />
+  </a>
+  <div class="pv-hud-student" aria-label="Takip edilen öğrenci">
+    <button type="button" class="pv-hud-student-btn" id="ctxSwitchBtn" aria-haspopup="dialog" aria-expanded="false" aria-label="Öğrenci değiştir">
+      <span class="pv-ava pv-ava--sm pv-ava--student" id="ctxAva" aria-hidden="true">F</span>
+      <span class="pv-hud-student-text">
+        <span class="pv-hud-student-name" id="ctxName">—</span>
+        <span class="pv-hud-student-meta">
+          <span id="ctxClan">—</span>
+          <span class="pv-hud-student-sep" aria-hidden="true">·</span>
+          <span id="ctxProgram">—</span>
+        </span>
+      </span>
+      <svg class="pv-hud-student-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+  </div>
+  <div class="hud-stats pv-actions">
+    <div class="pv-notif-wrap">
+      <button type="button" class="stat-icon-btn is-notif" id="notifBtn"
+              aria-haspopup="dialog" aria-expanded="false" aria-label="Bildirimler">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="pv-badge is-hidden" id="notifBadge">0</span>
+      </button>
+    </div>
+    <div class="hud-profile pv-profile-wrap" id="profileWrap">
+      <button type="button" class="pv-trigger pv-profile-trigger" id="parentProfileBtn"
+              aria-haspopup="true" aria-expanded="false" aria-label="Veli profili menüsü">
+        <span class="pv-ava pv-ava--sm pv-ava--parent" id="parentAva" aria-hidden="true">AÇ</span>
+        <span class="pv-trigger-text">
+          <span class="pv-trigger-name" id="parentName">—</span>
+        </span>
+        <svg class="pv-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="hud-menu" id="parentProfileMenu" role="menu">
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profilim
+        </button>
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Hesap ayarları
+        </button>
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Bildirim tercihleri
+        </button>
+        <button type="button" class="hud-menu-item" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Yardım
+        </button>
+        <div class="hud-menu-divider"></div>
+        <button type="button" class="hud-menu-item is-danger" role="menuitem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Çıkış yap
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="pv-modal" id="studentModal" aria-hidden="true">
+  <div class="pv-modal-overlay" data-pv-modal-close></div>
+  <div class="pv-modal-card" role="dialog" aria-modal="true" aria-labelledby="pvModalTitle">
+    <button type="button" class="pv-modal-close" data-pv-modal-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="pv-modal-head">
+      <span class="pv-modal-eyebrow">Veli Kontrol Merkezi</span>
+      <h2 class="pv-modal-title" id="pvModalTitle">Öğrenci Seç</h2>
+      <p class="pv-modal-desc">Takip etmek istediğin öğrenciyi seç veya yeni öğrenci ekle.</p>
+    </div>
+    <div class="pv-profiles" id="profileGrid" role="listbox" aria-label="Öğrenciler"></div>
+    <div class="pv-modal-foot">
+      <button type="button" class="pv-add-btn" id="addStudentBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Öğrenci Ekle
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="pv-drawer" id="pvNotifDrawer" aria-hidden="true">
+  <div class="pv-drawer-overlay" data-pv-drawer-close></div>
+  <aside class="pv-drawer-panel" role="dialog" aria-labelledby="pvNotifTitle" aria-modal="true">
+    <header class="pv-drawer-head">
+      <h3 class="pv-drawer-title" id="pvNotifTitle">Bildirimler</h3>
+      <button type="button" class="pv-drawer-close" data-pv-drawer-close aria-label="Kapat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </header>
+    <div class="pv-drawer-body" id="pvNotifBody"></div>
+  </aside>
+</div>
+
+<main class="pvd-shell">
+  <div class="pvd-nav">
+    <aside class="nav-rail" aria-label="Veli menüsü">
+      <a class="nav-item" href="veli-dashboard.html" title="Merkez">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-item-label">Merkez</span>
+      </a>
+      <a class="nav-item" href="veli-ogrenci-detay.html" title="Öğrenci Detay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-item-label">Öğrenci Detay</span>
+      </a>
+      <a class="nav-item" href="veli-program.html" title="Öğrenci Ders Programı">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="nav-item-label">Ders Programı</span>
+      </a>
+      <a class="nav-item is-active" href="veli-seminerler.html" title="Seminerler" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <span class="nav-item-label">Seminerler</span>
+      </a>
+      <a class="nav-item" href="veli-sonuclar.html" title="Sonuçlar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 14 11 16 15 12"/></svg>
+        <span class="nav-item-label">Sonuçlar</span>
+      </a>
+      <a class="nav-item" href="veli-performans.html" title="Performans">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span class="nav-item-label">Performans</span>
+      </a>
+    </aside>
+  </div>
+
+  <div class="pvd-main pvs-main">
+    <div class="pvs-wrap">
+      <!-- ====== VELİLER İÇİN AYLIK SEMİNERLER (Bugünün Akışı mega kart yapısı) ====== -->
+      <section class="pv-sem" aria-labelledby="pvSemTitle">
+        <article class="pv-sem-card">
+
+          <!-- Kart başlığı: sol başlık + sağ tarih -->
+          <div class="pv-sem-cardhead">
+            <span class="pv-sem-cardtitle" id="pvSemTitle">Aylık Seminerler</span>
+            <span class="pv-sem-carddate">Veliler İçin · Haziran 2026</span>
+          </div>
+
+          <!-- Üst yarı: öne çıkan canlı seminer -->
+          <div class="pv-sem-body">
+          <div class="pv-sem-stage">
+            <span class="pv-sem-live">CANLI</span>
+            <span class="pv-sem-viewers">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              38 katılımcı
+            </span>
+            <div class="pv-sem-overlay">
+              <span class="pv-sem-tag">Veli Semineri</span>
+              <span class="pv-sem-month">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Haziran 2026
+              </span>
+              <h3 class="pv-sem-title">Sınav Kaygısıyla Başa Çıkma: Velilere Düşen Roller</h3>
+              <div class="pv-sem-meta">
+                <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=80&h=80&fit=crop&crop=faces&q=80" alt="Dr. Elif Yıldız" loading="lazy" />
+                <strong>Dr. Elif Yıldız</strong>
+                <span class="pv-sem-meta-sep">·</span>
+                <span>Uzman Psikolog</span>
+                <span class="pv-sem-meta-sep">·</span>
+                <span>60 dk</span>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="pv-sem-join" id="semJoinBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Seminere Katıl
+          </button>
+          </div><!-- /pv-sem-body -->
+
+          <!-- Alt yarı: aylık seminer timeline'ı + footer -->
+          <div class="pv-sem-bottom">
+          <div class="pv-sem-tl">
+          <div class="pv-sem-tl-item" style="--sem-accent: var(--brand-purple);" data-sem-id="0">
+            <span class="pv-sem-tl-month">Tem</span>
+            <div class="pv-sem-tl-rail"><span class="pv-sem-tl-dot"></span></div>
+            <button type="button" class="pv-sem-tl-card">
+              <div class="pv-sem-tl-body">
+                <div class="pv-sem-tl-head">
+                  <span class="pv-sem-tl-cat">Murat Aslan · Eğitim Koçu</span>
+                  <span class="pv-sem-tl-date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>11 Tem · 45 dk</span>
+                </div>
+                <span class="pv-sem-tl-topic">Yaz Tatilinde Verimli Çalışma Düzeni</span>
+              </div>
+            </button>
+          </div>
+          <div class="pv-sem-tl-item" style="--sem-accent: #2ea86a;" data-sem-id="1">
+            <span class="pv-sem-tl-month">Ağu</span>
+            <div class="pv-sem-tl-rail"><span class="pv-sem-tl-dot"></span></div>
+            <button type="button" class="pv-sem-tl-card">
+              <div class="pv-sem-tl-body">
+                <div class="pv-sem-tl-head">
+                  <span class="pv-sem-tl-cat">Dr. Selin Kaya · Pedagog</span>
+                  <span class="pv-sem-tl-date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>8 Ağu · 50 dk</span>
+                </div>
+                <span class="pv-sem-tl-topic">Ekran Süresi ve Dijital Denge</span>
+              </div>
+            </button>
+          </div>
+          <div class="pv-sem-tl-item" style="--sem-accent: var(--brand-navy);" data-sem-id="2">
+            <span class="pv-sem-tl-month">Eyl</span>
+            <div class="pv-sem-tl-rail"><span class="pv-sem-tl-dot"></span></div>
+            <button type="button" class="pv-sem-tl-card">
+              <div class="pv-sem-tl-body">
+                <div class="pv-sem-tl-head">
+                  <span class="pv-sem-tl-cat">Ayça Demir · Rehber Öğretmen</span>
+                  <span class="pv-sem-tl-date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>12 Eyl · 45 dk</span>
+                </div>
+                <span class="pv-sem-tl-topic">Yeni Döneme Motivasyonla Başlamak</span>
+              </div>
+            </button>
+          </div>
+          <div class="pv-sem-tl-item" style="--sem-accent: var(--brand-magenta);" data-sem-id="3">
+            <span class="pv-sem-tl-month">Eki</span>
+            <div class="pv-sem-tl-rail"><span class="pv-sem-tl-dot"></span></div>
+            <button type="button" class="pv-sem-tl-card">
+              <div class="pv-sem-tl-body">
+                <div class="pv-sem-tl-head">
+                  <span class="pv-sem-tl-cat">Prof. Dr. Kemal Şahin · Aile Danışmanı</span>
+                  <span class="pv-sem-tl-date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>10 Eki · 60 dk</span>
+                </div>
+                <span class="pv-sem-tl-topic">Etkili Aile İçi İletişim</span>
+              </div>
+            </button>
+          </div>
+          </div>
+
+          <!-- Tüm seminerleri gör -->
+          <div class="pv-sem-foot">
+            <button type="button" class="pv-sem-allbtn" id="semAllBtn">
+              Tüm Seminerleri Gör
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+          </div><!-- /pv-sem-bottom -->
+        </article>
+      </section>
+    </div>
+  </div>
+</main>
+
+<div class="pv-sem-drawer" id="semAllDrawer" aria-hidden="true">
+  <div class="pv-sem-drawer-overlay" data-sem-all-close></div>
+  <aside class="pv-sem-drawer-panel pv-sem-all-panel" role="dialog" aria-modal="true" aria-labelledby="semAllTitle">
+    <button type="button" class="pv-sem-drawer-close" data-sem-all-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <header class="pv-sem-all-head">
+      <span class="pv-sem-drawer-eyebrow">VELİ SEMİNERLERİ</span>
+      <h2 class="pv-sem-drawer-title" id="semAllTitle">Tüm Seminerler</h2>
+    </header>
+    <p class="pv-sem-all-hint">Detaylı bilgi edinmek istediğiniz seminere tıklayarak daha detaylı bilgi alabilirsiniz.</p>
+    <div class="pv-sem-all-list" id="semAllList"></div>
+  </aside>
+</div>
+
+<div class="pv-sem-drawer" id="semDrawer" aria-hidden="true">
+  <div class="pv-sem-drawer-overlay" data-sem-close></div>
+  <aside class="pv-sem-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="semDrTitle">
+    <button type="button" class="pv-sem-drawer-back" id="semDrBack" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Tüm Seminerlere Dön</span>
+    </button>
+    <button type="button" class="pv-sem-drawer-close" data-sem-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="pv-sem-drawer-head">
+      <span class="pv-sem-drawer-ico" id="semDrIco" aria-hidden="true">🎓</span>
+      <div class="pv-sem-drawer-meta">
+        <span class="pv-sem-drawer-eyebrow" id="semDrEyebrow">VELİ SEMİNERİ</span>
+        <h2 class="pv-sem-drawer-title" id="semDrTitle">—</h2>
+        <div class="pv-sem-drawer-due">
+          <span class="pv-sem-drawer-due-label">Tarih &amp; Saat:</span>
+          <span class="pv-sem-drawer-due-value">
+            <strong id="semDrDate">—</strong>
+            <span class="pv-sem-drawer-due-sub" id="semDrTime">—</span>
+          </span>
+        </div>
+        <span class="pv-sem-drawer-month" id="semDrMonth">—</span>
+      </div>
+    </div>
+    <div class="pv-sem-drawer-section">
+      <span class="pv-sem-drawer-label">Seminer Konusu</span>
+      <div class="pv-sem-drawer-quote"><p class="pv-sem-drawer-text" id="semDrKonu">—</p></div>
+    </div>
+    <div class="pv-sem-drawer-section">
+      <span class="pv-sem-drawer-label">Seminer İçeriği</span>
+      <div class="pv-sem-drawer-quote"><p class="pv-sem-drawer-text" id="semDrContent">—</p></div>
+    </div>
+    <div class="pv-sem-drawer-section">
+      <span class="pv-sem-drawer-label">Uzman</span>
+      <div class="pv-sem-drawer-quote">
+        <div class="pv-sem-drawer-quote-header">
+          <img class="pv-sem-drawer-quote-avatar" id="semDrAvatar" alt="" loading="lazy" />
+          <div class="pv-sem-drawer-quote-meta">
+            <span class="pv-sem-drawer-quote-name" id="semDrName">—</span>
+            <span class="pv-sem-drawer-quote-role" id="semDrRole">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pv-sem-drawer-footer">
+      <button type="button" class="pv-sem-drawer-cta is-waiting" id="semDrCta" disabled>
+        <span class="cta-label" id="semDrCtaLabel">Seminere kalan süre</span>
+        <span class="cta-time" id="semDrCtaTime">—</span>
+      </button>
+    </div>
+  </aside>
+</div>
+
+<script src="assets/veli-parent.js"></script>
+<script src="assets/veli-seminar.js"></script>
+</body>
+</html>

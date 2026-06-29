@@ -1,0 +1,230 @@
+/* ---------------------------------------------------------------------------
+ * Bilenyum — paylaşılan tasarım token'ları (açık tema)
+ *
+ * Tüm HTML sayfaları bu dosyayı yükler:
+ *   <link rel="stylesheet" href="assets/tokens.css">
+ * ------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  /* ---- Marka renkleri (sabit palet) ---- */
+  --brand-magenta: #e6087b;
+  --brand-rose:    #e35c97;
+  --brand-purple:  #3e3a8e;
+  --brand-navy:    #28265a;
+
+  /* Opaklık türevleri */
+  --brand-magenta-08: rgba(230, 8, 123, 0.08);
+  --brand-magenta-12: rgba(230, 8, 123, 0.12);
+  --brand-magenta-18: rgba(230, 8, 123, 0.18);
+  --brand-magenta-35: rgba(230, 8, 123, 0.35);
+  --brand-rose-14:    rgba(227, 92, 151, 0.14);
+  --brand-purple-06:  rgba(62, 58, 142, 0.06);
+  --brand-purple-10:  rgba(62, 58, 142, 0.10);
+  --brand-purple-14:  rgba(62, 58, 142, 0.14);
+  --brand-purple-18:  rgba(62, 58, 142, 0.18);
+  --brand-purple-28:  rgba(62, 58, 142, 0.28);
+  --brand-purple-45:  rgba(62, 58, 142, 0.45);
+  --brand-navy-04:    rgba(40, 38, 90, 0.04);
+  --brand-navy-08:    rgba(40, 38, 90, 0.08);
+  --brand-navy-45:    rgba(40, 38, 90, 0.45);
+  --brand-navy-72:    rgba(40, 38, 90, 0.72);
+
+  /* ---- Website hero lila tonları ---- */
+  --lilac-50:  #fbfaff;
+  --lilac-100: #f5f4fc;
+  --lilac-200: #eceaf6;
+  --lilac-glow: #a8a4f0;
+  --lilac-deep: #9b97d4;
+
+  /* ---- Geriye dönük alias'lar (dashboard — marka paleti) ---- */
+  --p-deep:         var(--brand-navy);
+  --p-purple:       var(--brand-purple);
+  --p-purple-mid:   var(--brand-navy);
+  --p-purple-light: #6b67b8;
+  --p-brand:        var(--brand-magenta);
+  --p-brand-light:  var(--brand-rose);
+  --p-brand-deep:   #c0066a;
+  --p-sun:          #d4920a;
+  --p-aqua:         var(--brand-purple);
+  --p-pink:         var(--brand-rose);
+  --p-green:        #2ea86a;
+
+  /* ---- Yüzeyler (açık tema — lila hero uyumu) ---- */
+  --bg-page:    #f7f6fc;
+  --bg-subtle:  #f0eef8;
+  --bg-muted:   #e8e5f2;
+  --bg-surface: #ffffff;
+  --bg-0: var(--bg-page);
+  --bg-1: var(--bg-subtle);
+  --bg-2: var(--bg-muted);
+  --bg-3: #faf9fd;
+  --bg-4: var(--bg-surface);
+
+  /* ---- Metin ---- */
+  --ink-dark-0: var(--brand-navy);
+  --ink-dark-1: #4a4778;
+  --ink-dark-2: #7a769e;
+  --ink-0: var(--brand-navy);
+  --ink-1: var(--ink-dark-1);
+  --ink-2: var(--ink-dark-2);
+
+  /* ---- Çizgiler & gölgeler ---- */
+  --line:      var(--brand-purple-14);
+  --line-dark: var(--brand-navy-08);
+  --shadow-sm:  0 2px 8px var(--brand-navy-04);
+  --shadow-md:  0 8px 28px rgba(40, 38, 90, 0.10);
+  --shadow-lg:  0 16px 48px rgba(40, 38, 90, 0.12);
+  --shadow-brand: 0 8px 24px var(--brand-magenta-18);
+
+  /* ---- Seçili / aktif durum (mor–mavi marka) ---- */
+  --selected-bg:     var(--brand-purple-06);
+  --selected-border: var(--brand-purple-28);
+  --selected-text:   var(--brand-purple);
+  --selected-strong: var(--brand-navy);
+
+  /* ---- Tipografi ---- */
+  --font-sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Montserrat', 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ---- Sınav / assessment semantik ---- */
+  --asm-page-bg:           var(--bg-page);
+  --asm-page-text:         var(--brand-navy);
+  --asm-chrome-bg:         rgba(255, 255, 255, 0.94);
+  --asm-chrome-border:     var(--brand-purple-14);
+  --asm-surface-1:         var(--brand-purple-06);
+  --asm-surface-2:         var(--brand-navy-04);
+  --asm-surface-hover:     var(--brand-magenta-08);
+  --asm-text-primary:      var(--brand-navy);
+  --asm-text-secondary:    var(--brand-navy-72);
+  --asm-text-muted:        rgba(40, 38, 90, 0.52);
+  --asm-text-label:        rgba(62, 58, 142, 0.62);
+  --asm-overlay-bg:        var(--brand-navy-45);
+  --asm-modal-bg:          var(--bg-surface);
+  --asm-modal-border:      var(--brand-purple-18);
+  --asm-modal-shadow:      var(--shadow-lg);
+  --asm-board-bg:          #eef0f8;
+  --asm-board-meta-bg:     rgba(255, 255, 255, 0.92);
+  --asm-board-grid:        var(--brand-purple-10);
+  --asm-popover-bg:        var(--bg-surface);
+  --asm-accent-timer:      var(--brand-purple);
+  --asm-accent-success:    var(--p-green);
+  --asm-accent-info:       var(--brand-purple);
+
+  /* ---- Grafik (sınav / performans) ---- */
+  --sn-chart-line:         var(--brand-purple);
+  --sn-chart-line-glow:    var(--brand-purple-45);
+  --sn-chart-area-top:     rgba(62, 58, 142, 0.22);
+  --sn-chart-area-bottom:  rgba(62, 58, 142, 0);
+  --sn-chart-grid-line:    var(--brand-purple-10);
+  --sn-chart-grid-label:   var(--ink-dark-2);
+  --sn-chart-xlabel:       var(--ink-dark-1);
+  --sn-chart-baseline:     var(--brand-purple-14);
+  --sn-chart-point-fill:   var(--brand-purple);
+  --sn-chart-point-stroke: var(--bg-surface);
+
+  /* ---- Border radius ---- */
+  --r-s:  10px;
+  --r-m:  18px;
+  --r-l:  28px;
+  --r-xl: 40px;
+
+  /* ---- Layout ---- */
+  --maxw: 1200px;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-dark-0);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+  animation-timing-function: ease;
+}
+
+@keyframes bilFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.profile-banner {
+  opacity: 0;
+  animation: bilFadeUp 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) 0s forwards;
+}
+
+.stage-left > *,
+.stage-center > *,
+.stage-right > * {
+  opacity: 0;
+  animation: bilFadeUp 0.50s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+.stage-left > *:nth-child(1),
+.stage-center > *:nth-child(1),
+.stage-right > *:nth-child(1) { animation-delay: 0.08s; }
+.stage-left > *:nth-child(2),
+.stage-center > *:nth-child(2),
+.stage-right > *:nth-child(2) { animation-delay: 0.18s; }
+.stage-left > *:nth-child(3),
+.stage-center > *:nth-child(3),
+.stage-right > *:nth-child(3) { animation-delay: 0.28s; }
+.stage-left > *:nth-child(4),
+.stage-center > *:nth-child(4),
+.stage-right > *:nth-child(4) { animation-delay: 0.38s; }
+
+.ov-page > *,
+.prog-page > *,
+.tk-page > * {
+  opacity: 0;
+  animation: bilFadeUp 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+.ov-page > *:nth-child(1),
+.prog-page > *:nth-child(1),
+.tk-page > *:nth-child(1) { animation-delay: 0.00s; }
+.ov-page > *:nth-child(2),
+.prog-page > *:nth-child(2),
+.tk-page > *:nth-child(2) { animation-delay: 0.08s; }
+.ov-page > *:nth-child(3),
+.prog-page > *:nth-child(3),
+.tk-page > *:nth-child(3) { animation-delay: 0.16s; }
+.ov-page > *:nth-child(4),
+.prog-page > *:nth-child(4),
+.tk-page > *:nth-child(4) { animation-delay: 0.24s; }
+.ov-page > *:nth-child(5),
+.prog-page > *:nth-child(5),
+.tk-page > *:nth-child(5) { animation-delay: 0.32s; }
+.ov-page > *:nth-child(6),
+.prog-page > *:nth-child(6),
+.tk-page > *:nth-child(6) { animation-delay: 0.40s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-banner,
+  .stage-left > *,
+  .stage-center > *,
+  .stage-right > *,
+  .ov-page > *,
+  .prog-page > *,
+  .tk-page > *,
+  .sn-page > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

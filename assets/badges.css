@@ -1,0 +1,300 @@
+/* ============================================================
+ * Bilenyum — Rozetler (dashboard önizleme + rozetler sayfası)
+ * ============================================================ */
+
+.d3-badges-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 10px 2px 8px;
+}
+
+.d3-badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  cursor: default;
+}
+
+.d3-badge-emoji {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  line-height: 1;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255,255,255,0.50) 0%, rgba(255,255,255,0) 48%),
+    linear-gradient(145deg, var(--badge-color-light, #c8c4ff) 0%, var(--badge-color-dark, #5a52d4) 100%);
+  border: 1.5px solid var(--badge-border, rgba(255,255,255,0.35));
+  box-shadow:
+    inset 0 -3px 7px rgba(0,0,0,0.32),
+    inset 0 2px 4px rgba(255,255,255,0.34),
+    0 8px 18px -4px var(--badge-shadow, rgba(0,0,0,0.55)),
+    0 0 24px -4px var(--badge-glow, transparent);
+  transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s;
+}
+
+.d3-badge-emoji::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.22);
+  pointer-events: none;
+}
+
+.d3-badge-item:hover .d3-badge-emoji {
+  transform: translateY(-4px) scale(1.06) rotate(-3deg);
+}
+
+.d3-badge-item.is-locked .d3-badge-emoji {
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255,255,255,0.12) 0%, transparent 50%),
+    linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.30) 100%);
+  border-color: rgba(255,255,255,0.10);
+  filter: grayscale(1);
+  opacity: 0.50;
+}
+
+.d3-badge-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.72);
+  text-align: center;
+}
+
+.d3-badge-item.is-locked .d3-badge-name { color: rgba(255,255,255,0.32); }
+
+.d3-badge-item[data-badge="trophy"] { --badge-color-light: #ffe27d; --badge-color-dark: #c4951c; --badge-border: rgba(255,224,150,0.55); --badge-shadow: rgba(255,180,40,0.45); --badge-glow: rgba(255,200,74,0.55); }
+.d3-badge-item[data-badge="fire"] { --badge-color-light: #ffb070; --badge-color-dark: #d4421a; --badge-border: rgba(255,180,120,0.55); --badge-shadow: rgba(255,90,30,0.42); --badge-glow: rgba(255,138,58,0.55); }
+.d3-badge-item[data-badge="rocket"] { --badge-color-light: #c8a0ff; --badge-color-dark: #5a3ad4; --badge-border: rgba(190,160,255,0.55); --badge-shadow: rgba(120,80,220,0.45); --badge-glow: rgba(184,124,240,0.55); }
+.d3-badge-item[data-badge="diamond"] { --badge-color-light: #7fe5ff; --badge-color-dark: #1c8fb5; --badge-border: rgba(120,220,255,0.55); --badge-shadow: rgba(40,180,230,0.45); --badge-glow: rgba(74,214,255,0.55); }
+.d3-badge-item[data-badge="crown"] { --badge-color-light: #ff9dd6; --badge-color-dark: #b8035f; --badge-border: rgba(255,170,220,0.55); --badge-shadow: rgba(229,4,123,0.45); --badge-glow: rgba(255,109,198,0.55); }
+.d3-badge-item[data-badge="star"] { --badge-color-light: #fff0a8; --badge-color-dark: #c49a10; --badge-border: rgba(255,230,140,0.55); --badge-shadow: rgba(220,170,30,0.42); --badge-glow: rgba(255,210,80,0.50); }
+.d3-badge-item[data-badge="book"] { --badge-color-light: #a8d4ff; --badge-color-dark: #2a6eb5; --badge-border: rgba(140,200,255,0.55); --badge-shadow: rgba(50,130,220,0.42); --badge-glow: rgba(100,180,255,0.50); }
+.d3-badge-item[data-badge="target"] { --badge-color-light: #ffb8b8; --badge-color-dark: #c42a2a; --badge-border: rgba(255,160,160,0.55); --badge-shadow: rgba(220,60,60,0.42); --badge-glow: rgba(255,120,120,0.50); }
+.d3-badge-item[data-badge="lightning"] { --badge-color-light: #ffe680; --badge-color-dark: #b58a00; --badge-border: rgba(255,220,120,0.55); --badge-shadow: rgba(200,150,20,0.42); --badge-glow: rgba(255,200,60,0.50); }
+.d3-badge-item[data-badge="medal"] { --badge-color-light: #ffd0a0; --badge-color-dark: #b56a20; --badge-border: rgba(255,190,130,0.55); --badge-shadow: rgba(200,110,40,0.42); --badge-glow: rgba(255,160,80,0.50); }
+.d3-badge-item[data-badge="shield"] { --badge-color-light: #b8c8ff; --badge-color-dark: #3a52b5; --badge-border: rgba(160,180,255,0.55); --badge-shadow: rgba(60,90,200,0.42); --badge-glow: rgba(120,150,255,0.50); }
+.d3-badge-item[data-badge="compass"] { --badge-color-light: #90f0d0; --badge-color-dark: #1a9870; --badge-border: rgba(120,240,200,0.55); --badge-shadow: rgba(30,160,120,0.42); --badge-glow: rgba(80,220,170,0.50); }
+
+/* Dashboard önizleme — 4 rozet */
+.d3-badges-row.is-compact {
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 0;
+}
+
+.d3-badges-row.is-large {
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 14px;
+  margin-bottom: 0;
+  padding: 4px 2px;
+}
+
+.d3-badge-item.is-large {
+  gap: 10px;
+}
+
+.d3-badge-item.is-large .d3-badge-emoji {
+  width: 62px;
+  height: 62px;
+  font-size: 28px;
+}
+
+.d3-badge-item.is-large .d3-badge-name {
+  font-size: 10px;
+}
+
+.rbz-badge-desc {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.52);
+  text-align: center;
+  max-width: 140px;
+}
+
+.d3-badge-item.is-locked .rbz-badge-desc {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+/* Rozetler sayfası */
+.rbz-page {
+  grid-column: 2;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px 2px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.rbz-page > .rbz-pagehead,
+.rbz-page > .rbz-section {
+  flex-shrink: 0;
+}
+
+.rbz-page::-webkit-scrollbar { width: 6px; }
+.rbz-page::-webkit-scrollbar-thumb { background: rgba(168, 164, 240, 0.30); border-radius: 3px; }
+.rbz-page::-webkit-scrollbar-track { background: transparent; }
+
+.rbz-pagehead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 4px 4px 2px;
+}
+
+.rbz-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.58);
+  transition: color 0.15s;
+}
+
+.rbz-back:hover { color: #fff; }
+
+.rbz-title {
+  margin: 0 0 6px;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: #fff;
+}
+
+.rbz-sub {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.rbz-summary {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.rbz-summary-stat {
+  min-width: 88px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(168, 164, 240, 0.18);
+  background: linear-gradient(165deg, rgba(168,164,240,0.10) 0%, rgba(62,58,142,0.14) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.rbz-summary-stat.is-unlocked {
+  border-color: rgba(109, 212, 158, 0.28);
+  background: linear-gradient(165deg, rgba(109,212,158,0.12) 0%, rgba(168,164,240,0.10) 100%);
+}
+
+.rbz-summary-stat.is-locked {
+  border-color: rgba(255, 255, 255, 0.10);
+}
+
+.rbz-summary-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.rbz-summary-lbl {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.rbz-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(168, 164, 240, 0.26);
+  background: linear-gradient(165deg, rgba(168,164,240,0.12) 0%, rgba(62,58,142,0.16) 100%);
+  box-shadow: 0 10px 28px -14px rgba(20,18,52,0.55);
+}
+.rbz-section::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(168,164,240,0.55);
+  pointer-events: none;
+  opacity: 0.65;
+}
+.rbz-section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(168,164,240,0.16);
+  flex-shrink: 0;
+}
+.rbz-section-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--rbz-c, #a8a4f0);
+  flex-shrink: 0;
+}
+.rbz-section-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.005em;
+  color: rgba(255, 255, 255, 0.88);
+  flex-shrink: 0;
+}
+.rbz-section-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(168,164,240,0.35), transparent);
+  margin-left: 4px;
+}
+
+/* Kategori vurgu renkleri */
+.rbz-section--basari { --rbz-c: #ffd074; border-color: rgba(255,208,116,0.24); background: linear-gradient(165deg, rgba(255,208,116,0.10) 0%, rgba(168,164,240,0.12) 100%); }
+.rbz-section--seri { --rbz-c: #ff8a58; border-color: rgba(255,138,88,0.24); background: linear-gradient(165deg, rgba(255,138,88,0.10) 0%, rgba(168,164,240,0.12) 100%); }
+.rbz-section--baslangic { --rbz-c: #b87cf0; border-color: rgba(184,124,240,0.24); background: linear-gradient(165deg, rgba(184,124,240,0.10) 0%, rgba(168,164,240,0.12) 100%); }
+.rbz-section--xp { --rbz-c: #4ad6ff; border-color: rgba(74,214,255,0.24); background: linear-gradient(165deg, rgba(74,214,255,0.10) 0%, rgba(168,164,240,0.12) 100%); }
+.rbz-section--calisma { --rbz-c: #6eb5ff; border-color: rgba(110,181,255,0.24); background: linear-gradient(165deg, rgba(110,181,255,0.10) 0%, rgba(168,164,240,0.12) 100%); }
+.rbz-section--sinav { --rbz-c: #ff7a7a; border-color: rgba(255,122,122,0.24); background: linear-gradient(165deg, rgba(255,122,122,0.10) 0%, rgba(168,164,240,0.12) 100%); }
+.rbz-section--odev { --rbz-c: #ffd84a; border-color: rgba(255,216,74,0.24); background: linear-gradient(165deg, rgba(255,216,74,0.10) 0%, rgba(168,164,240,0.12) 100%); }
+.rbz-section--klan { --rbz-c: #8898ff; border-color: rgba(136,152,255,0.24); background: linear-gradient(165deg, rgba(136,152,255,0.10) 0%, rgba(168,164,240,0.12) 100%); }
+.rbz-section--kesif { --rbz-c: #6dd49e; border-color: rgba(109,212,158,0.24); background: linear-gradient(165deg, rgba(109,212,158,0.10) 0%, rgba(168,164,240,0.12) 100%); }
+.rbz-section--diger { --rbz-c: #a8a4f0; }
+
+@media (max-width: 900px) {
+  .rbz-page { grid-column: 1; padding-right: 0; }
+  .rbz-pagehead { flex-direction: column; }
+}
