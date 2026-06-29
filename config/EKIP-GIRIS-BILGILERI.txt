@@ -21,6 +21,9 @@ YENİ KİŞİ EKLEME:
 config/auth-users.txt dosyasına satır ekleyin:
    yeni@email.com:YeniSifre123!
 
+Aynı satırı config/auth-users.mjs içine de ekleyin (Vercel için gerekli):
+   { email: 'yeni@email.com', password: 'YeniSifre123!' },
+
 KİŞİ ÇIKARMA:
 -------------
 config/auth-users.txt içinden ilgili satırı silin.
