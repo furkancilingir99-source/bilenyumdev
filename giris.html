@@ -597,19 +597,51 @@
     });
   })();
 
-  // Form submit → demo loading state → dashboard'a yönlendir
+  // Form submit → sunucu doğrulaması → onboarding veya hedef sayfa
   (function() {
     const form = document.getElementById('loginForm');
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toastText');
     if (!form) return;
-    form.addEventListener('submit', (e) => {
+
+    const params = new URLSearchParams(window.location.search);
+    const redirectTo = params.get('from') || 'dashboard.html';
+
+    function showError(msg) {
+      if (!toast || !toastText) {
+        window.alert(msg);
+        return;
+      }
+      toastText.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 5000);
+    }
+
+    form.addEventListener('submit', function(e) {
       e.preventDefault();
       const submitBtn = form.querySelector('button[type="submit"]');
+      const email = document.getElementById('lf-email').value.trim();
+      const password = document.getElementById('lf-password').value;
       submitBtn.innerHTML = 'Giriş yapılıyor...';
       submitBtn.disabled = true;
-      // Simulate request, then redirect to dashboard
-      setTimeout(() => {
-        window.location.href = 'onboarding.html';
-      }, 900);
+
+      fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ email: email, password: password })
+      })
+        .then(function(res) {
+          return res.json().then(function(data) {
+            if (!res.ok) throw new Error(data.error || 'Giriş başarısız.');
+            window.location.href = redirectTo;
+          });
+        })
+        .catch(function(err) {
+          showError(err.message || 'Giriş yapılamadı.');
+          submitBtn.innerHTML = 'Giriş Yap<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+          submitBtn.disabled = false;
+        });
     });
   })();
 </script>

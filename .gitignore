@@ -22,3 +22,8 @@ npm-debug.log*
 node_modules/
 dist/
 build/
+
+# Secrets — asla commit etmeyin
+.env
+.env.local
+.env.*.local

@@ -6,11 +6,12 @@
 .pv-hud {
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px 18px;
 }
-.pv-hud .hud-brand { justify-self: start; min-width: 0; }
+.pv-hud .hud-left { justify-self: start; min-width: 0; max-width: 100%; }
+.pv-hud .hud-brand { min-width: 0; flex-shrink: 0; }
 .pv-hud .pv-actions { justify-self: end; }
 
 /* Header ortası — takip edilen öğrenci */
@@ -478,4 +479,18 @@
   .pv-hud-student-btn { padding-right: 8px; }
   .pv-modal-card { padding: 28px 20px 22px; }
   .pv-modal-title { font-size: 21px; }
+}
+
+/* Yumi — sol nav sütununun altında */
+.pv-nav,
+.pvd-nav {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  align-self: stretch;
+}
+.pv-nav .nav-rail,
+.pvd-nav .nav-rail {
+  flex-shrink: 0;
 }
