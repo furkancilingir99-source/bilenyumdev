@@ -1,5 +1,5 @@
 /**
- * Veli / Öğrenci / Öğretmen dashboard geçiş çubuğu
+ * Veli / Öğrenci / Öğretmen dashboard geçişi — HUD logosunun yanında
  * window.DashboardSwitcher.mount()
  */
 (function (global) {
@@ -26,9 +26,9 @@
     '</svg>';
 
   var ITEMS = [
-    { key: 'veli', href: 'veli-dashboard.html', label: 'Veli Dashboard', icon: ICON_VELI, cls: 'is-veli' },
-    { key: 'student', href: 'dashboard.html', label: 'Öğrenci Dashboard', icon: ICON_STUDENT, cls: 'is-student' },
-    { key: 'teacher', href: 'ogretmen-dashboard.html', label: 'Öğretmen Dashboard', icon: ICON_TEACHER, cls: 'is-teacher' }
+    { key: 'veli', href: 'veli-dashboard.html', label: 'Veli Dashboard', short: 'Veli', icon: ICON_VELI, cls: 'is-veli' },
+    { key: 'student', href: 'dashboard.html', label: 'Öğrenci Dashboard', short: 'Öğrenci', icon: ICON_STUDENT, cls: 'is-student' },
+    { key: 'teacher', href: 'ogretmen-dashboard.html', label: 'Öğretmen Dashboard', short: 'Öğretmen', icon: ICON_TEACHER, cls: 'is-teacher' }
   ];
 
   function pageName() {
@@ -46,7 +46,7 @@
     return 'student';
   }
 
-  function renderBar(activeKey) {
+  function renderSwitcher(activeKey) {
     var buttons = ITEMS.map(function (item) {
       var isActive = item.key === activeKey;
       return (
@@ -54,29 +54,77 @@
           (isActive ? ' aria-current="page"' : '') +
           ' title="' + item.label + '">' +
           item.icon +
-          '<span>' + item.label + '</span>' +
+          '<span class="db-switch-label">' + item.short + '</span>' +
         '</a>'
       );
     }).join('');
 
     return (
-      '<div class="db-switch-bar" role="navigation" aria-label="Dashboard geçişi">' +
+      '<nav class="db-switch" role="navigation" aria-label="Dashboard geçişi">' +
         '<div class="db-switch-inner">' + buttons + '</div>' +
-      '</div>'
+      '</nav>'
     );
   }
 
+  function ensureHudLeft(hud, brand) {
+    var left = hud.querySelector('.hud-left');
+    if (left) return left;
+
+    left = document.createElement('div');
+    left.className = 'hud-left';
+    hud.insertBefore(left, brand);
+    left.appendChild(brand);
+    return left;
+  }
+
+  var hudResizeObserver = null;
+
+  function syncHudHeight() {
+    var hud = document.querySelector('.hud');
+    if (!hud) return;
+
+    var height = Math.ceil(hud.getBoundingClientRect().height);
+    if (height < 1) height = 88;
+
+    document.documentElement.style.setProperty('--hud-height', height + 'px');
+  }
+
+  function watchHudHeight() {
+    var hud = document.querySelector('.hud');
+    if (!hud || hudResizeObserver) return;
+
+    syncHudHeight();
+
+    if (typeof global.ResizeObserver === 'function') {
+      hudResizeObserver = new global.ResizeObserver(syncHudHeight);
+      hudResizeObserver.observe(hud);
+    }
+
+    global.addEventListener('resize', syncHudHeight, { passive: true });
+    global.addEventListener('orientationchange', syncHudHeight, { passive: true });
+  }
+
   function mount() {
-    if (document.querySelector('.db-switch-bar')) return true;
+    if (document.querySelector('.db-switch')) {
+      syncHudHeight();
+      return true;
+    }
+
     var hud = document.querySelector('.hud');
     if (!hud) return false;
 
-    var wrap = document.createElement('div');
-    wrap.innerHTML = renderBar(detectPersona());
-    var bar = wrap.firstElementChild;
-    if (!bar) return false;
+    var brand = hud.querySelector('.hud-brand');
+    if (!brand) return false;
 
-    hud.parentNode.insertBefore(bar, hud);
+    var left = ensureHudLeft(hud, brand);
+
+    var wrap = document.createElement('div');
+    wrap.innerHTML = renderSwitcher(detectPersona());
+    var nav = wrap.firstElementChild;
+    if (!nav) return false;
+
+    left.appendChild(nav);
+    watchHudHeight();
     return true;
   }
 
@@ -89,11 +137,15 @@
     }, 50);
   }
 
-  global.DashboardSwitcher = { mount: mount, detectPersona: detectPersona };
+  global.DashboardSwitcher = { mount: mount, detectPersona: detectPersona, syncHudHeight: syncHudHeight };
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryMount);
+    document.addEventListener('DOMContentLoaded', function () {
+      tryMount();
+      watchHudHeight();
+    });
   } else {
     tryMount();
+    watchHudHeight();
   }
 })(typeof window !== 'undefined' ? window : this);

@@ -1,0 +1,7 @@
+# Bilenyum ekip giriş listesi
+# Her satır: email:şifre
+# Yeni kişi eklemek için yeni satır ekleyin, push edin — Vercel ayarı gerekmez.
+
+furkan@bilenyum.dev:BilenYum2026!
+ekip1@bilenyum.dev:Ekip1-2026!
+ekip2@bilenyum.dev:Ekip2-2026!

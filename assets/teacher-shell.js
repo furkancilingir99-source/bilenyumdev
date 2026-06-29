@@ -101,7 +101,10 @@
 
   function init() {
     mount();
-    if (global.DashboardSwitcher) global.DashboardSwitcher.mount();
+    if (global.DashboardSwitcher) {
+      global.DashboardSwitcher.mount();
+      if (global.DashboardSwitcher.syncHudHeight) global.DashboardSwitcher.syncHudHeight();
+    }
   }
 
   global.TeacherShell = {

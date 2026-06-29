@@ -1,3 +1,4 @@
+import { getAuthSecret } from '../lib/auth-config.mjs';
 import {
   cookieHeader,
   createSessionToken,
@@ -30,16 +31,10 @@ export default async function handler(req, res) {
     return;
   }
 
-  const secret = process.env.AUTH_SECRET;
-
-  if (!secret || secret.length < 16) {
-    res.statusCode = 503;
-    res.end(JSON.stringify({ ok: false, error: 'AUTH_SECRET yapılandırılmamış.' }));
-    return;
-  }
+  const secret = getAuthSecret();
   if (!loadAuthUsers().length) {
     res.statusCode = 503;
-    res.end(JSON.stringify({ ok: false, error: 'AUTH_USERS veya AUTH_PASSWORD yapılandırılmamış.' }));
+    res.end(JSON.stringify({ ok: false, error: 'Kullanıcı listesi boş. config/auth-users.txt dosyasını kontrol edin.' }));
     return;
   }
 

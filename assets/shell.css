@@ -57,12 +57,14 @@
 /* ============ TOPBAR (Game HUD) ============ */
 .hud {
   position: relative; z-index: 10;
-  height: 88px;
+  min-height: 88px;
+  height: auto;
   padding: 14px 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 22px;
+  flex-shrink: 0;
 }
 
 /* Bilenyum logo (sol) */
@@ -258,7 +260,8 @@
 }
 
 /* ============ SIDEBAR (nav rail + Yumi) ============ */
-.stage-nav { display: flex; flex-direction: column; min-height: 0; }
+.stage-nav { display: flex; flex-direction: column; min-height: 0; height: 100%; align-self: stretch; }
+.stage-nav .nav-rail { flex-shrink: 0; }
 
 .nav-rail {
   display: flex; flex-direction: column;
@@ -577,6 +580,12 @@
 
 /* ============ Mobile responsive (topbar wrap) ============ */
 @media (max-width: 760px) {
-  .hud { flex-wrap: wrap; gap: 8px; padding: 10px 12px; height: auto; }
+  .hud { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
   .player-text { display: none; }
+  body { overflow-y: auto; overflow-x: hidden; }
+  .stage {
+    height: auto !important;
+    max-height: none !important;
+    min-height: calc(100vh - var(--hud-height, 88px));
+  }
 }

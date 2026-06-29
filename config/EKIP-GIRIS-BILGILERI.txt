@@ -1,0 +1,34 @@
+BILENYUM EKİP GİRİŞ BİLGİLERİ
+=============================
+Bu dosyayı Cursor'da açarak ekibe dağıtabilirsiniz.
+Kullanıcı eklemek/çıkarmak: config/auth-users.txt dosyasını düzenleyin → GitHub'a push.
+
+Giriş adresi: https://devbilenyum.vercel.app/giris
+
+HESAPLAR:
+---------
+1) furkan@bilenyum.dev
+   Şifre: BilenYum2026!
+
+2) ekip1@bilenyum.dev
+   Şifre: Ekip1-2026!
+
+3) ekip2@bilenyum.dev
+   Şifre: Ekip2-2026!
+
+YENİ KİŞİ EKLEME:
+-----------------
+config/auth-users.txt dosyasına satır ekleyin:
+   yeni@email.com:YeniSifre123!
+
+KİŞİ ÇIKARMA:
+-------------
+config/auth-users.txt içinden ilgili satırı silin.
+
+Sonra terminalde:
+   git add config/auth-users.txt
+   git commit -m "Ekip listesi güncellendi"
+   git push
+
+Liste kontrol (tarayıcı):
+   https://devbilenyum.vercel.app/api/auth-users-status?key=bilenyum-ekip-2026

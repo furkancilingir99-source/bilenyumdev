@@ -134,6 +134,7 @@
 
   /* ---- Layout ---- */
   --maxw: 1200px;
+  --hud-height: 88px;
 }
 
 html, body {

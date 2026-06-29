@@ -35,8 +35,8 @@
 
   /* Geliştirme: false = sayfa yenilemede otomatik sıfırlama kapalı (canlı mod) */
   var DEV_RESET_ON_RELOAD = false;
-  /* Test kısayolu: ↺ Yeni öğrenci butonu (canlı modda da görünür) */
-  var DEV_RESET_SHORTCUT = true;
+  /* Test kısayolu: ↺ Yeni öğrenci butonu — yalnızca geliştirme */
+  var DEV_RESET_SHORTCUT = false;
 
   function devResetForTesting() {
     if (!DEV_RESET_ON_RELOAD) return;

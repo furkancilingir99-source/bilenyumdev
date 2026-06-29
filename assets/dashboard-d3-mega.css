@@ -449,7 +449,7 @@ a { text-decoration: none; color: inherit; }
 /* ============ MAIN STAGE — nav rail + 3 kolonlu grid ============ */
 .stage {
   position: relative; z-index: 5;
-  height: calc(100vh - 88px);
+  height: calc(100vh - var(--hud-height, 88px));
   padding: 16px 28px;
   display: grid;
   grid-template-columns: 92px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);

@@ -1,3 +1,4 @@
+import { getAuthSecret } from './lib/auth-config.mjs';
 import {
   isPublicPath,
   readCookie,
@@ -10,14 +11,7 @@ export default async function middleware(request) {
 
   if (isPublicPath(pathname)) return;
 
-  const secret = process.env.AUTH_SECRET;
-  if (!secret || secret.length < 16) {
-    return new Response(
-      'Site koruması yapılandırılmamış. Vercel ortam değişkenlerine AUTH_SECRET ekleyin.',
-      { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } }
-    );
-  }
-
+  const secret = getAuthSecret();
   const token = readCookie(request, 'bilenyum_session');
   const session = token ? await verifySessionToken(secret, token) : null;
 
