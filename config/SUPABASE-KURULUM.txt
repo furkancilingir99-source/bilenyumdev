@@ -64,11 +64,14 @@ Profil menüsü → Çıkış Yap
 veya: https://devbilenyum.vercel.app/api/logout
 
 
-OTURUM SÜRESİ (1 saat)
-----------------------
-Site oturumu 1 saat sonra sona erer; başka sayfaya gidince /giris'e yönlendirilir.
+OTURUM SÜRESİ
+-------------
+• Sekme kapatma: Son açık Bilenyum sekmesi kapanınca otomatik çıkış yapılır.
+• Tarayıcı oturum çerezi kullanılır; tarayıcı tamamen kapanınca da oturum düşer.
+• F5 / Ctrl+R ile yenilemede çıkış yapılmaz.
+• Supabase JWT süresi dolunca (≈1 saat) yine giriş gerekir.
 
-Supabase JWT süresini de 3600 saniye (1 saat) yapın:
+Supabase JWT süresini 3600 saniye (1 saat) yapın:
   Authentication → Settings → JWT expiry → 3600
 
 

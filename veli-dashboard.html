@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="assets/tokens.css">
 <link rel="stylesheet" href="assets/shell.css">
 <link rel="stylesheet" href="assets/veli-shell.css">
+<script src="assets/auth-tab-session.js"></script>
 <script src="assets/dashboard-switcher.js" defer></script>
 <script src="assets/shell.js" defer></script>
 <style>
@@ -309,7 +310,7 @@ a { text-decoration: none; color: inherit; }
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: rgba(91, 84, 201, 0.06);
+  background: #f0eff2;
   border-radius: 0 0 16px 16px;
 }
 .pv-abs-week-grid {
@@ -354,13 +355,13 @@ a { text-decoration: none; color: inherit; }
   background: var(--day-bg, rgba(255, 255, 255, 0.92));
   box-shadow: 0 4px 16px rgba(62, 58, 142, 0.12), inset 0 1px 0 rgba(255,255,255,0.6);
 }
-.pv-abs-day-group[data-day="0"] { --day-bg: rgba(91, 84, 201, 0.16); --day-border: rgba(91, 84, 201, 0.45); --day-hd: rgba(91, 84, 201, 0.28); }
-.pv-abs-day-group[data-day="1"] { --day-bg: rgba(43, 159, 212, 0.16); --day-border: rgba(43, 159, 212, 0.45); --day-hd: rgba(43, 159, 212, 0.28); }
-.pv-abs-day-group[data-day="2"] { --day-bg: rgba(230, 8, 123, 0.14); --day-border: rgba(230, 8, 123, 0.42); --day-hd: rgba(230, 8, 123, 0.26); }
-.pv-abs-day-group[data-day="3"] { --day-bg: rgba(46, 168, 106, 0.15); --day-border: rgba(46, 168, 106, 0.42); --day-hd: rgba(46, 168, 106, 0.27); }
-.pv-abs-day-group[data-day="4"] { --day-bg: rgba(245, 158, 11, 0.16); --day-border: rgba(245, 158, 11, 0.45); --day-hd: rgba(245, 158, 11, 0.28); }
-.pv-abs-day-group[data-day="5"] { --day-bg: rgba(139, 92, 246, 0.15); --day-border: rgba(139, 92, 246, 0.42); --day-hd: rgba(139, 92, 246, 0.27); }
-.pv-abs-day-group[data-day="6"] { --day-bg: rgba(14, 165, 233, 0.15); --day-border: rgba(14, 165, 233, 0.42); --day-hd: rgba(14, 165, 233, 0.27); }
+.pv-abs-day-group[data-day="0"] { --day-bg: #ebe9f0; --day-border: #c9c4d4; --day-hd: #ded9ea; }
+.pv-abs-day-group[data-day="1"] { --day-bg: #e6ecf0; --day-border: #bccbd6; --day-hd: #d4dfe8; }
+.pv-abs-day-group[data-day="2"] { --day-bg: #ece6ea; --day-border: #cfc4cc; --day-hd: #e0d6dc; }
+.pv-abs-day-group[data-day="3"] { --day-bg: #e6ebe8; --day-border: #bccfc4; --day-hd: #d4e2da; }
+.pv-abs-day-group[data-day="4"] { --day-bg: #eceae6; --day-border: #d4cec4; --day-hd: #e2dcd4; }
+.pv-abs-day-group[data-day="5"] { --day-bg: #eae8ec; --day-border: #ccc6d2; --day-hd: #ded8e4; }
+.pv-abs-day-group[data-day="6"] { --day-bg: #e6eaee; --day-border: #bcc6d0; --day-hd: #d4dce4; }
 .pv-abs-day-col-hd {
   font-family: var(--font-sans);
   font-size: 11px; font-weight: 800;
@@ -467,7 +468,7 @@ button.pv-abs-item {
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: 0;
-  padding: 7px 8px 6px;
+  padding: 6px 8px 6px;
   border-radius: 10px;
   scroll-snap-align: start;
   overflow: hidden;
@@ -479,23 +480,26 @@ button.pv-abs-item {
 }
 .pv-abs-item-subject {
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   color: var(--brand-purple);
   line-height: 1.1;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex-shrink: 0;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 2px;
 }
 .pv-abs-item-body {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 0;
-  padding: 3px 1px;
+  padding: 0 1px;
   text-align: center;
 }
 .pv-abs-item-topic {
@@ -510,14 +514,15 @@ button.pv-abs-item {
   -webkit-box-orient: vertical;
   overflow: hidden;
   word-break: break-word;
+  width: 100%;
 }
 .pv-abs-item-foot {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 4px;
   min-width: 0;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 .pv-abs-item-tags {
   display: flex;
@@ -525,17 +530,19 @@ button.pv-abs-item {
   gap: 4px;
   flex-wrap: wrap;
   min-width: 0;
-  flex: 1;
+  width: 100%;
 }
 .pv-abs-item-time {
   flex-shrink: 0;
-  align-self: flex-end;
+  justify-self: end;
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 800;
   color: var(--brand-navy);
   letter-spacing: 0.05em;
   line-height: 1;
+  opacity: 0.92;
+  padding-bottom: 1px;
 }
 .pv-abs-item-type {
   padding: 3px 7px;
@@ -561,9 +568,8 @@ button.pv-abs-item {
   box-shadow: 0 2px 8px rgba(43,159,212,0.15);
 }
 .pv-abs-item-chip {
-  flex-shrink: 1;
+  flex-shrink: 0;
   min-width: 0;
-  max-width: 100%;
   padding: 3px 6px;
   border-radius: 5px;
   font-family: var(--font-mono);
@@ -574,8 +580,6 @@ button.pv-abs-item {
   text-align: center;
   line-height: 1.1;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   border: 1.5px solid transparent;
 }
 .pv-abs-item.is-absent {
@@ -1675,23 +1679,31 @@ button.pv-abs-item {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
   padding: 10px 12px 12px;
   overflow: hidden;
+  background: #f0eff2;
 }
 .pv-hw-subject {
-  border: 1px solid var(--brand-purple-12);
+  border: 2px solid var(--subj-border, #ccc8d4);
   border-radius: 14px;
-  background: var(--brand-purple-04, rgba(62,58,142,0.04));
+  background: var(--subj-bg, #ebe9f0);
+  box-shadow: 0 3px 12px rgba(62, 58, 142, 0.08), inset 0 1px 0 rgba(255,255,255,0.65);
   display: flex; flex-direction: column;
   min-height: 0; min-width: 0;
   overflow: hidden;
 }
+.pv-hw-subject[data-subject="mat"] { --subj-bg: #ece6ea; --subj-border: #cfc4cc; --subj-hd: #e0d6dc; }
+.pv-hw-subject[data-subject="fen"] { --subj-bg: #e6ebe8; --subj-border: #bccfc4; --subj-hd: #d4e2da; }
+.pv-hw-subject[data-subject="trk"] { --subj-bg: #e6ecf0; --subj-border: #bccbd6; --subj-hd: #d4dfe8; }
+.pv-hw-subject[data-subject="sos"] { --subj-bg: #ebe9f0; --subj-border: #c9c4d4; --subj-hd: #ded9ea; }
+.pv-hw-subject[data-subject="din"] { --subj-bg: #e6eaee; --subj-border: #bcc6d0; --subj-hd: #d4dce4; }
+.pv-hw-subject[data-subject="ing"] { --subj-bg: #eceae6; --subj-border: #d4cec4; --subj-hd: #e2dcd4; }
 .pv-hw-subject-head {
   display: flex; align-items: center; gap: 8px;
   padding: 9px 11px;
-  border-bottom: 1px solid var(--brand-purple-14);
-  background: linear-gradient(180deg, var(--bg-surface) 0%, var(--brand-purple-04, rgba(62,58,142,0.04)) 100%);
+  border-bottom: 2px solid var(--subj-border, #ccc8d4);
+  background: var(--subj-hd, #ded9ea);
   flex-shrink: 0;
   min-height: 44px;
 }
@@ -1729,7 +1741,8 @@ button.pv-abs-item {
 .pv-hw-subject-carousel {
   flex: 1; min-height: 0;
   display: flex; align-items: center; gap: 4px;
-  padding: 0 4px 5px;
+  padding: 4px 4px 5px;
+  background: rgba(255, 255, 255, 0.50);
 }
 .pv-hw-subject-viewport { flex: 1; min-width: 0; min-height: 0; overflow: hidden; }
 .pv-hw-subject-list {
@@ -1782,8 +1795,9 @@ button.pv-abs-item {
   display: flex; flex-direction: row; align-items: stretch;
   gap: 8px; padding: 9px 10px 9px 8px;
   border-radius: 12px;
-  background: var(--brand-purple-06);
-  border: 1px solid var(--brand-purple-10);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px solid rgba(62, 58, 142, 0.12);
+  box-shadow: 0 2px 8px rgba(40, 38, 90, 0.07);
   text-align: left; cursor: pointer;
   transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, opacity 0.18s ease, filter 0.18s ease;
   position: relative;
@@ -3712,8 +3726,9 @@ button.pv-abs-item {
     var chipLabel = isPending ? 'BEKLEMEDE' : (attended ? 'KATILDI' : 'KATILMADI');
     el.setAttribute('data-lesson-format', fmt);
     el.innerHTML =
-      '<span class="pv-abs-item-subject">' + escapeText(lesson.name) + '</span>' +
+      '<span class="pv-abs-item-time">' + escapeText(lesson.time) + '</span>' +
       '<div class="pv-abs-item-body">' +
+        '<span class="pv-abs-item-subject">' + escapeText(lesson.name) + '</span>' +
         '<span class="pv-abs-item-topic">' + escapeText(lesson.topic || lesson.name) + '</span>' +
       '</div>' +
       '<div class="pv-abs-item-foot">' +
@@ -3721,7 +3736,6 @@ button.pv-abs-item {
           absLessonTypeBadge(lesson) +
           '<span class="pv-abs-item-chip">' + chipLabel + '</span>' +
         '</div>' +
-        '<span class="pv-abs-item-time">' + escapeText(lesson.time) + '</span>' +
       '</div>';
     return el;
   }
