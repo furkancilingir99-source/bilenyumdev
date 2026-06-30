@@ -101,10 +101,45 @@
 
   function init() {
     mount();
+    initTeacherProfileMenu();
     if (global.DashboardSwitcher) {
       global.DashboardSwitcher.mount();
       if (global.DashboardSwitcher.syncHudHeight) global.DashboardSwitcher.syncHudHeight();
     }
+  }
+
+  function initTeacherProfileMenu() {
+    var btn = document.getElementById('profileBtn');
+    var menu = document.getElementById('profileMenu');
+    if (!btn || !menu || btn.dataset.inited) return;
+    btn.dataset.inited = '1';
+    function close() {
+      menu.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var willOpen = !menu.classList.contains('is-open');
+      close();
+      if (willOpen) {
+        menu.classList.add('is-open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+    document.addEventListener('click', function (e) {
+      if (!btn.contains(e.target) && !menu.contains(e.target)) close();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
+    });
+    menu.addEventListener('click', function (e) {
+      var logoutBtn = e.target.closest('.hud-menu-item.is-danger');
+      if (!logoutBtn) return;
+      e.preventDefault();
+      logoutBtn.disabled = true;
+      fetch('/api/logout', { method: 'POST', credentials: 'same-origin' })
+        .finally(function () { window.location.href = '/giris'; });
+    });
   }
 
   global.TeacherShell = {

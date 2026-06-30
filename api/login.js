@@ -66,11 +66,12 @@ export default async function handler(req, res) {
   const { data, error } = await supabase.auth.signInWithPassword({ email: email, password: password });
 
   if (error || !data.session) {
+    var msg = 'Kullanıcı adı veya şifre hatalı.';
+    if (error && error.message && /confirm/i.test(error.message)) {
+      msg = 'E-posta onaylanmamış. Supabase panelinde kullanıcıyı Auto Confirm ile oluşturun.';
+    }
     res.statusCode = 401;
-    res.end(JSON.stringify({
-      ok: false,
-      error: 'Kullanıcı adı veya şifre hatalı.'
-    }));
+    res.end(JSON.stringify({ ok: false, error: msg }));
     return;
   }
 

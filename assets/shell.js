@@ -116,6 +116,14 @@
       if (!btn.contains(e.target) && !menu.contains(e.target)) close();
     });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    menu.addEventListener('click', function (e) {
+      var logoutBtn = e.target.closest('.hud-menu-item.is-danger');
+      if (!logoutBtn) return;
+      e.preventDefault();
+      logoutBtn.disabled = true;
+      fetch('/api/logout', { method: 'POST', credentials: 'same-origin' })
+        .finally(function () { window.location.href = '/giris'; });
+    });
   }
 
   function getYumiContext() {

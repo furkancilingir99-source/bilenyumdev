@@ -1,96 +1,73 @@
 BILENYUM — SUPABASE GİRİŞ SİSTEMİ KURULUMU
 ==========================================
 
-Gerçek kimlik doğrulama: şifreler hash'lenir, repoda/sitede görünmez.
-Tüm kullanıcıları Supabase panelinden sen yönetirsin.
+Kullanıcıları Supabase panelinden sen yönetirsin. Şifreler hash'lenir; repoda/sitede görünmez.
 
 
-ADIM 1 — Supabase hesabı (ücretsiz)
-------------------------------------
-1. https://supabase.com adresine git → Sign up
-2. "New project" → proje adı: bilenyum
-3. Database password belirle (kaydet)
-4. Region: Frankfurt (eu-central-1) — Türkiye'ye yakın
-5. Proje oluşmasını bekle (~2 dk)
+ADIM 1 — Supabase (tamamlandıysa atla)
+---------------------------------------
+1. https://supabase.com → proje: bilenyum
+2. Authentication → Users → Add user → Create new user
+3. ✓ Auto Confirm User (işaretle — zorunlu)
+4. E-posta + şifre belirle → Create user
 
 
-ADIM 2 — API anahtarlarını al
-------------------------------
+ADIM 2 — API anahtarlarını kopyala
+-----------------------------------
 Supabase Dashboard → Project Settings → API
 
-Şunları kopyala:
-  • Project URL          → SUPABASE_URL
-  • anon public key      → SUPABASE_ANON_KEY
-  • JWT Secret           → SUPABASE_JWT_SECRET
-    (Settings → API → JWT Settings → JWT Secret)
+  SUPABASE_URL        = Project URL  (https://xxxxx.supabase.co)
+  SUPABASE_ANON_KEY   = anon public key  (eyJhbG... ile başlar)
 
 
-ADIM 3 — Vercel ortam değişkenleri
------------------------------------
-https://vercel.com → bilenyumdev projesi → Settings → Environment Variables
+ADIM 3 — Vercel'e ekle (ZORUNLU — site bunu bekliyor)
+------------------------------------------------------
+https://vercel.com → bilenyumdev → Settings → Environment Variables
 
-Her birini Production için ekle:
+  Name: SUPABASE_URL        Value: (Project URL)
+  Name: SUPABASE_ANON_KEY   Value: (anon public key)
 
-  SUPABASE_URL         = https://xxxxx.supabase.co
-  SUPABASE_ANON_KEY    = eyJhbGciOi...
-  SUPABASE_JWT_SECRET  = super-secret-jwt-token-with-at-least-32-characters
+  Environment: Production ✓
+  Save
 
-Kaydet → Deployments → son deploy → Redeploy
-
-
-ADIM 4 — İlk kullanıcıyı oluştur (sen eklersin)
--------------------------------------------------
-Supabase Dashboard → Authentication → Users → Add user → Create new user
-
-  Email: furkan@bilenyum.dev
-  Password: (güçlü bir şifre)
-  ✓ Auto Confirm User (işaretle — e-posta onayı gerekmez)
-
-"Create user" → bu bilgilerle https://devbilenyum.vercel.app/giris adresinden giriş yap
+Sonra: Deployments → son deploy → ⋯ → Redeploy
 
 
-KULLANICI YÖNETİMİ (tamamen senin kontrolünde)
------------------------------------------------
+HIZLI YOL (terminal — Vercel girişi gerekir)
+---------------------------------------------
+PowerShell:
 
-Yeni kişi ekle:
-  Authentication → Users → Add user → Create new user
-  ✓ Auto Confirm User
-
-Kullanıcıyı iptal et / sil:
-  Users → kullanıcıyı seç → Delete user
-  (Anında giriş yapamaz)
-
-Şifre sıfırla:
-  Users → kullanıcı → Send password recovery (e-posta gider)
-  veya Delete + yeniden Create user (yeni şifre ver)
-
-Oturumu kapat (tüm cihazlar):
-  Users → kullanıcı → Sign out user
-
-Ban (geçici engel):
-  Users → kullayıcı → Ban user
+  cd "C:\Users\Furkan\Downloads\webnew-main (4)\webnew-main"
+  .\scripts\set-vercel-env.ps1 -SupabaseUrl "https://xxxxx.supabase.co" -AnonKey "eyJhbG..."
 
 
-OTURUM SÜRESİ (isteğe bağlı)
------------------------------
-Varsayılan access token ~1 saat. Ekip içi site için uzatmak istersen:
-
-  Authentication → Settings → JWT expiry
-  Önerilen ekip içi: 604800 (7 gün)
-
-
-GİRİŞ ADRESİ
-------------
+ADIM 4 — Giriş testi
+---------------------
 https://devbilenyum.vercel.app/giris
 
-Çıkış: https://devbilenyum.vercel.app/api/logout
+Supabase'de oluşturduğun e-posta + şifre ile giriş yap.
 
 
-GÜVENLİK NOTLARI
-----------------
-• Şifreler repoda YOK — sadece Supabase'de hash'li
-• /config/ ve /lib/ web'den erişilemez
-• SUPABASE_JWT_SECRET ve anon key'i kimseyle paylaşma
-• Service Role Key'i siteye EKLEME (sadece sunucu admin işleri için)
+KULLANICI YÖNETİMİ (Supabase Dashboard)
+----------------------------------------
+https://supabase.com/dashboard → Authentication → Users
+
+  Yeni ekle:     Add user → Create new user → ✓ Auto Confirm User
+  İptal / sil:   Delete user
+  Şifre sıfırla: Send password recovery
+  Oturum kapat:  Sign out user
+
+
+ÇIKIŞ
+-----
+Profil menüsü → Çıkış Yap
+veya: https://devbilenyum.vercel.app/api/logout
+
+
+SORUN GİDERME
+-------------
+• Site 503 gösteriyor → Vercel env eksik, ADIM 3
+• "E-posta onaylanmamış" → Supabase'de Auto Confirm ile yeniden oluştur
+• "Şifre hatalı" → Supabase'deki e-posta/şifre ile aynı mı kontrol et
 
 Supabase panel: https://supabase.com/dashboard

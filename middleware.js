@@ -1,8 +1,11 @@
+import { next } from '@vercel/functions';
 import { isBlockedPath, isPublicPath, readCookie } from './lib/auth-public.mjs';
 import {
   ACCESS_COOKIE,
-  getJwtSecret,
+  REFRESH_COOKIE,
+  buildSessionCookies,
   isAuthConfigured,
+  refreshSession,
   verifyAccessToken
 } from './lib/supabase-session.mjs';
 
@@ -18,15 +21,35 @@ export default async function middleware(request) {
 
   if (!isAuthConfigured()) {
     return new Response(
-      'Giriş sistemi yapılandırılmamış. Vercel ortam değişkenlerine SUPABASE_URL, SUPABASE_ANON_KEY ve SUPABASE_JWT_SECRET ekleyin. Kurulum: config/SUPABASE-KURULUM.txt',
+      'Giriş sistemi yapılandırılmamış. Vercel → Settings → Environment Variables:\nSUPABASE_URL ve SUPABASE_ANON_KEY ekleyin, sonra Redeploy.\n\nKurulum: config/SUPABASE-KURULUM.txt',
       { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } }
     );
   }
 
-  const token = readCookie(request, ACCESS_COOKIE);
-  const session = token ? await verifyAccessToken(token, getJwtSecret()) : null;
+  const accessToken = readCookie(request, ACCESS_COOKIE);
+  let session = accessToken ? await verifyAccessToken(accessToken) : null;
+  let renewed = null;
 
-  if (session) return;
+  if (!session) {
+    const refreshToken = readCookie(request, REFRESH_COOKIE);
+    if (refreshToken) {
+      renewed = await refreshSession(refreshToken);
+      if (renewed && renewed.access_token) {
+        session = await verifyAccessToken(renewed.access_token);
+      }
+    }
+  }
+
+  if (session) {
+    if (renewed) {
+      const response = next({ request });
+      buildSessionCookies(renewed).forEach(function (c) {
+        response.headers.append('Set-Cookie', c);
+      });
+      return response;
+    }
+    return;
+  }
 
   const loginUrl = new URL('/giris', url.origin);
   if (pathname && pathname !== '/') {
