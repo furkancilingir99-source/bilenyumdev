@@ -4191,6 +4191,96 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   .ov-hero-row { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* Hero carousel — gecikmis odevler */
+.ov-hero-carousel {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ov-hero-viewport {
+  overflow: hidden;
+  border-radius: 22px;
+  min-width: 0;
+}
+.ov-hero-track {
+  display: flex;
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.ov-hero-track .ov-hero {
+  flex: 0 0 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.ov-hero-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(168,164,240,0.55);
+  background: rgba(20,18,52,0.88);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  transition: background 0.18s, border-color 0.18s, transform 0.18s, opacity 0.18s;
+}
+.ov-hero-nav svg { width: 16px; height: 16px; pointer-events: none; }
+.ov-hero-nav.is-prev { left: -10px; }
+.ov-hero-nav.is-next { right: -10px; }
+.ov-hero-nav:hover:not(:disabled) {
+  background: rgba(168,164,240,0.28);
+  border-color: rgba(168,164,240,0.85);
+  transform: translateY(-50%) scale(1.06);
+}
+.ov-hero-nav:disabled { opacity: 0.22; cursor: default; pointer-events: none; }
+.ov-hero-carousel-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 22px;
+}
+.ov-hero-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.ov-hero-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: none;
+  padding: 0;
+  background: rgba(168,164,240,0.28);
+  cursor: pointer;
+  transition: width 0.22s ease, background 0.22s ease;
+}
+.ov-hero-dot.is-active {
+  width: 22px;
+  background: rgba(255,122,74,0.85);
+}
+.ov-hero-carousel-count {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+.ov-hero-carousel.is-single .ov-hero-nav,
+.ov-hero-carousel.is-single .ov-hero-carousel-meta { display: none; }
+@media (max-width: 1100px) {
+  .ov-hero-nav.is-prev { left: 6px; }
+  .ov-hero-nav.is-next { right: 6px; }
+}
+
 /* HERO — large focus card */
 .ov-hero {
   position: relative;
@@ -6736,51 +6826,22 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     <!-- HERO + STATS ROW -->
     <div class="ov-hero-row" id="ovHeroRow">
 
-      <!-- HERO: Sıradaki ödev (büyük odak kartı) -->
-      <article class="ov-hero" id="ovHero" data-subject="mat">
-        <div class="ov-hero-glow" aria-hidden="true"></div>
-        <div class="ov-hero-pattern" aria-hidden="true"></div>
-        <div class="ov-hero-body">
-          <header class="ov-hero-head">
-            <span class="ov-hero-eyebrow" id="ovHeroEyebrow">
-              <span class="ov-hero-pulse"></span>
-              Sıradaki Ödev · Bugün son gün
-            </span>
-            <span class="ov-hero-subject" id="ovHeroSubject">
-              <span class="ov-hero-subject-icon" id="ovHeroSubjectIcon">📐</span>
-              <span id="ovHeroSubjectName">Matematik</span>
-            </span>
-          </header>
-
-          <h2 class="ov-hero-title" id="ovHeroTitle">—</h2>
-          <p class="ov-hero-desc" id="ovHeroDesc">—</p>
-
-          <div class="ov-hero-meta">
-            <div class="ov-hero-teacher" id="ovHeroTeacher">
-              <span class="ov-hero-teacher-ava"><img id="ovHeroTeacherAva" src="" alt="" /></span>
-              <span class="ov-hero-teacher-text">
-                <span class="ov-hero-teacher-label">Öğretmen</span>
-                <strong id="ovHeroTeacherName">—</strong>
-              </span>
-            </div>
-            <div class="ov-hero-countdown">
-              <span class="ov-hero-countdown-label">Teslim için kalan</span>
-              <strong class="ov-hero-countdown-val" id="ovHeroCountdown">—</strong>
-            </div>
-          </div>
-
-          <footer class="ov-hero-foot">
-            <span class="ov-hero-xp">
-              <svg viewBox="0 0 256 256" fill="currentColor"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17Z"/></svg>
-              <span>+<strong id="ovHeroXp">0</strong> XP ödülü</span>
-            </span>
-            <button type="button" class="ov-hero-cta" id="ovHeroCta">
-              <span>Ödevi Yap</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
-          </footer>
+      <!-- HERO: Geciken ödevler carousel / sıradaki ödev -->
+      <div class="ov-hero-carousel" id="ovHeroCarousel">
+        <button type="button" class="ov-hero-nav is-prev" id="ovHeroPrev" aria-label="Önceki gecikmiş ödev">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="ov-hero-viewport">
+          <div class="ov-hero-track" id="ovHeroTrack"></div>
         </div>
-      </article>
+        <button type="button" class="ov-hero-nav is-next" id="ovHeroNext" aria-label="Sonraki gecikmiş ödev">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="ov-hero-carousel-meta" id="ovHeroCarouselMeta">
+          <div class="ov-hero-dots" id="ovHeroDots" role="tablist" aria-label="Gecikmiş ödevler"></div>
+          <span class="ov-hero-carousel-count" id="ovHeroCarouselCount"></span>
+        </div>
+      </div>
 
       <!-- STATS: 4 dikey mini kart sidebar -->
       <aside class="ov-stats">
@@ -7738,6 +7799,16 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       desc:'Cebirsel ifadelerin sadeleştirilmesi ve özdeşlikler üzerinden 20 soru. Hala teslim edebilirsin ama puan düşüşü olur — bir an önce tamamla.' },
     { id: 5, subject:'sos', topic:'Atatürk İlkeleri Çalışma Kağıdı', teacher:'Ali T.', due:'2026-05-22 23:59', status:'overdue', xp:50,
       desc:'Atatürk\'ün altı ilkesi için kısa açıklama ve günümüzden örnekler yaz. Tablonun her satırını eksiksiz doldur.' },
+    { id: 18, subject:'trk', topic:'Yazım Kuralları · 14 Soru', teacher:'Zeynep K.', due:'2026-05-20 18:00', status:'overdue', xp:55,
+      desc:'Büyük harf, birleşik kelime ve kısaltmalarda yazım kuralları üzerine 14 soru. Süresi geçti; yine de tamamlayabilirsin.' },
+    { id: 19, subject:'fen', topic:'Enerji Dönüşümleri · Deney Raporu', teacher:'Ayşe D.', due:'2026-05-19 23:59', status:'overdue', xp:65,
+      desc:'Potansiyel ve kinetik enerji dönüşümünü gözlemleyen mini deney raporu. Gözlem tablosunu eksiksiz doldur.' },
+    { id: 20, subject:'ing', topic:'Present Perfect · 10 Questions', teacher:'Sarah J.', due:'2026-05-18 17:00', status:'overdue', xp:40,
+      desc:'Present perfect tense kullanımı üzerine 10 soruluk alıştırma. Örnek cümleleri dikkatle incele.' },
+    { id: 21, subject:'din', topic:'Ahlaki Değerler Sunumu', teacher:'Ömer A.', due:'2026-05-17 23:59', status:'overdue', xp:45,
+      desc:'Dürüstlük, yardımseverlik ve sorumluluk değerlerini günlük hayattan örneklerle anlatan kısa sunum hazırla.' },
+    { id: 22, subject:'mat', topic:'Üslü İfadeler · 12 Soru', teacher:'Mehmet Y.', due:'2026-05-16 23:59', status:'overdue', xp:70,
+      desc:'Üslü ifadelerde çarpma, bölme ve sadeleştirme kuralları. 12 sorunun tamamını çözüp teslim et.' },
     // TAMAMLANAN
     { id: 6,  subject:'trk', hwId:'trk-paragraf', eduWeek:10, topic:'Paragraf Anlamı · 8 Soru',     teacher:'Zeynep K.', due:'2026-05-22 18:00', status:'done', xp:50, score:95, doneAt:'2026-05-22 14:30',
       desc:'Paragrafın ana fikri, yardımcı fikir ve anlam bütünlüğü üzerine 8 soruluk ödev. Metinleri dikkatle okuyup şıkları işaretle.' },
@@ -7941,8 +8012,12 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   // ====== Render: Ödev liste — Hero + Smart Sections ======
   var sectionsEl = document.getElementById('ovSections');
   var emptyEl = document.getElementById('odevListEmpty');
-  var heroEl = document.getElementById('ovHero');
-  var heroSubjEl = document.getElementById('ovHeroSubject');
+  var heroCarouselEl = document.getElementById('ovHeroCarousel');
+  var heroTrackEl = document.getElementById('ovHeroTrack');
+  var heroPrevEl = document.getElementById('ovHeroPrev');
+  var heroNextEl = document.getElementById('ovHeroNext');
+  var heroDotsEl = document.getElementById('ovHeroDots');
+  var heroCarouselCountEl = document.getElementById('ovHeroCarouselCount');
   var SUBJECT_ORDER = ['mat','fen','trk','ing','sos','din'];
 
   // SVG'ler (string olarak kullanılacak)
@@ -8035,107 +8110,229 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   // ====== HERO render ======
   var heroCountdownTick = null;
   var heroActiveHw = null;
+  var heroCarouselHwIds = [];
+  var heroCarouselItems = [];
+  var heroCarouselIndex = 0;
 
-  // Hero için en uygun ödev: önce overdue, sonra en yakın aktif
-  function pickHeroHomework(filterSubject) {
-    if (pageView === 'overdue') {
-      var overduePool = HOMEWORKS.filter(function(h){
-        if (h.status !== 'overdue') return false;
-        if (filterSubject !== 'all' && h.subject !== filterSubject) return false;
-        return true;
-      });
-      if (!overduePool.length) return null;
-      overduePool.sort(function(a,b){ return parseISO(b.due) - parseISO(a.due); });
-      return overduePool[0];
-    }
-    var pool = HOMEWORKS.filter(function(h){
+  function getOverdueHeroPool() {
+    return HOMEWORKS.filter(function(h) {
+      if (h.status !== 'overdue') return false;
+      if (pageView !== 'overdue' && !inSelectedEduWeek(h)) return false;
+      if (currentSubject !== 'all' && h.subject !== currentSubject) return false;
+      return true;
+    }).sort(function(a, b) { return parseISO(b.due) - parseISO(a.due); });
+  }
+
+  function pickActiveHeroHomework() {
+    var pool = HOMEWORKS.filter(function(h) {
       if (!inSelectedEduWeek(h)) return false;
-      if (filterSubject !== 'all' && h.subject !== filterSubject) return false;
-      return h.status === 'active' || h.status === 'overdue';
+      if (currentSubject !== 'all' && h.subject !== currentSubject) return false;
+      return h.status === 'active';
     });
     if (!pool.length) return null;
-    // Önce overdue (en yakın geçmiş tarih), sonra aktif (en yakın gelecek)
-    var overdue = pool.filter(function(h){ return h.status === 'overdue'; });
-    if (overdue.length) {
-      overdue.sort(function(a,b){ return parseISO(b.due) - parseISO(a.due); }); // en son geçen
-      return overdue[0];
+    pool.sort(function(a, b) { return parseISO(a.due) - parseISO(b.due); });
+    return pool[0];
+  }
+
+  function heroEyebrowText(h) {
+    if (h.status === 'overdue') return 'Geciken Ödev · Hemen tamamla';
+    var due = parseISO(h.due);
+    if (isSameDay(due, demoNow())) return 'Sıradaki Ödev · Bugün son gün';
+    return 'Sıradaki Ödev · ' + fmtDueShort(due);
+  }
+
+  function buildHeroSlideHtml(h) {
+    var subjectName = SUBJECT_NAMES[h.subject] || h.subject;
+    var t = TEACHERS[h.teacher] || { full: h.teacher, avatar: '' };
+    var isOverdue = h.status === 'overdue';
+    var eyebrowText = heroEyebrowText(h);
+    return ''
+      + '<article class="ov-hero' + (isOverdue ? ' is-overdue' : '') + '" data-subject="' + h.subject + '" data-hw-id="' + h.id + '">'
+      + '<div class="ov-hero-glow" aria-hidden="true"></div>'
+      + '<div class="ov-hero-pattern" aria-hidden="true"></div>'
+      + '<div class="ov-hero-body">'
+        + '<header class="ov-hero-head">'
+          + '<span class="ov-hero-eyebrow"><span class="ov-hero-pulse"></span>' + eyebrowText + '</span>'
+          + '<span class="ov-hero-subject">'
+            + '<span class="ov-hero-subject-icon">' + (SUBJECT_ICONS[h.subject] || '📚') + '</span>'
+            + '<span>' + subjectName + '</span>'
+          + '</span>'
+        + '</header>'
+        + '<h2 class="ov-hero-title">' + h.topic + '</h2>'
+        + '<p class="ov-hero-desc">' + (h.desc || 'Detay yakında eklenecek.') + '</p>'
+        + '<div class="ov-hero-meta">'
+          + '<div class="ov-hero-teacher">'
+            + '<span class="ov-hero-teacher-ava"><img src="' + (t.avatar || '') + '" alt="' + t.full + '" /></span>'
+            + '<span class="ov-hero-teacher-text">'
+              + '<span class="ov-hero-teacher-label">Öğretmen</span>'
+              + '<strong>' + t.full + '</strong>'
+            + '</span>'
+          + '</div>'
+          + '<div class="ov-hero-countdown">'
+            + '<span class="ov-hero-countdown-label">Teslim için kalan</span>'
+            + '<strong class="ov-hero-countdown-val">—</strong>'
+          + '</div>'
+        + '</div>'
+        + '<footer class="ov-hero-foot">'
+          + '<span class="ov-hero-xp">'
+            + SVG_BOLT
+            + '<span>+<strong>' + h.xp + '</strong> XP ödülü</span>'
+          + '</span>'
+          + '<button type="button" class="ov-hero-cta">'
+            + '<span>Ödevi Yap</span>'
+            + SVG_ARROW
+          + '</button>'
+        + '</footer>'
+      + '</div>'
+      + '</article>';
+  }
+
+  function buildHeroEmptyHtml() {
+    var isOverdueView = pageView === 'overdue';
+    return ''
+      + '<article class="ov-hero is-empty" data-subject="trk">'
+      + '<div class="ov-hero-body">'
+        + '<header class="ov-hero-head">'
+          + '<span class="ov-hero-eyebrow"><span class="ov-hero-pulse"></span>'
+            + (isOverdueView ? 'Gecikmiş ödev yok' : 'Şu an aktif ödev yok')
+          + '</span>'
+        + '</header>'
+        + '<h2 class="ov-hero-title">'
+          + (isOverdueView ? 'Tüm ödevlerini zamanında teslim etmişsin 🎉' : 'Tüm ödevlerini tamamladın 🎉')
+        + '</h2>'
+        + '<p class="ov-hero-desc">'
+          + (isOverdueView
+            ? 'Gecikmiş ödev bulunmuyor. Aktif ödevlerin için haftalık listeye dönebilirsin.'
+            : 'Bu hafta için aktif ödev kalmadı. Takvimden başka bir eğitim haftası seçebilirsin.')
+        + '</p>'
+      + '</div>'
+      + '</article>';
+  }
+
+  function syncHeroCountdowns(items) {
+    items.forEach(function(h) {
+      var slide = heroTrackEl.querySelector('[data-hw-id="' + h.id + '"]');
+      if (!slide) return;
+      var el = slide.querySelector('.ov-hero-countdown-val');
+      if (!el) return;
+      var ms = parseISO(h.due) - demoNow();
+      el.textContent = ms <= 0 ? 'Süresi geçti' : fmtCountdown(ms);
+    });
+  }
+
+  function setHeroCarouselIndex(index) {
+    if (!heroCarouselItems.length) return;
+    heroCarouselIndex = Math.max(0, Math.min(heroCarouselItems.length - 1, index));
+    heroTrackEl.style.transform = 'translateX(-' + (heroCarouselIndex * 100) + '%)';
+    heroActiveHw = heroCarouselItems[heroCarouselIndex] || null;
+    if (heroDotsEl) {
+      Array.prototype.forEach.call(heroDotsEl.querySelectorAll('.ov-hero-dot'), function(dot, i) {
+        dot.classList.toggle('is-active', i === heroCarouselIndex);
+        dot.setAttribute('aria-selected', i === heroCarouselIndex ? 'true' : 'false');
+      });
     }
-    var active = pool.filter(function(h){ return h.status === 'active'; });
-    active.sort(function(a,b){ return parseISO(a.due) - parseISO(b.due); });
-    return active[0];
+    if (heroCarouselCountEl && heroCarouselItems.length > 1) {
+      heroCarouselCountEl.textContent = (heroCarouselIndex + 1) + ' / ' + heroCarouselItems.length;
+    }
+    if (heroPrevEl) heroPrevEl.disabled = heroCarouselIndex <= 0;
+    if (heroNextEl) heroNextEl.disabled = heroCarouselIndex >= heroCarouselItems.length - 1;
+  }
+
+  function initHeroCarouselNav() {
+    if (!heroCarouselEl || heroCarouselEl.dataset.bound === '1') return;
+    heroCarouselEl.dataset.bound = '1';
+    if (heroPrevEl) {
+      heroPrevEl.addEventListener('click', function(e) {
+        e.stopPropagation();
+        setHeroCarouselIndex(heroCarouselIndex - 1);
+      });
+    }
+    if (heroNextEl) {
+      heroNextEl.addEventListener('click', function(e) {
+        e.stopPropagation();
+        setHeroCarouselIndex(heroCarouselIndex + 1);
+      });
+    }
+    if (heroDotsEl) {
+      heroDotsEl.addEventListener('click', function(e) {
+        var dot = e.target.closest('.ov-hero-dot');
+        if (!dot) return;
+        e.stopPropagation();
+        setHeroCarouselIndex(parseInt(dot.getAttribute('data-index'), 10) || 0);
+      });
+    }
+    heroCarouselEl.addEventListener('click', function(ev) {
+      if (ev.target.closest('.ov-hero-nav') || ev.target.closest('.ov-hero-dot')) return;
+      var slide = ev.target.closest('.ov-hero[data-hw-id]');
+      if (!slide || slide.classList.contains('is-empty')) return;
+      var id = parseInt(slide.getAttribute('data-hw-id'), 10);
+      if (ev.target.closest('.ov-hero-cta')) {
+        ev.stopPropagation();
+        openDrawer(id);
+        return;
+      }
+      openDrawer(id);
+    });
+  }
+
+  function renderHeroSlides(items) {
+    heroCarouselItems = items.slice();
+    heroCarouselHwIds = items.map(function(h) { return h.id; });
+    heroTrackEl.style.transform = 'translateX(0)';
+    heroCarouselIndex = 0;
+
+    if (!items.length) {
+      heroCarouselItems = [];
+      heroCarouselHwIds = [];
+      heroActiveHw = null;
+      heroTrackEl.innerHTML = buildHeroEmptyHtml();
+      if (heroCarouselEl) heroCarouselEl.classList.add('is-single');
+      if (heroDotsEl) heroDotsEl.innerHTML = '';
+      if (heroCarouselCountEl) heroCarouselCountEl.textContent = '';
+      return;
+    }
+
+    heroTrackEl.innerHTML = items.map(buildHeroSlideHtml).join('');
+    if (heroCarouselEl) heroCarouselEl.classList.toggle('is-single', items.length <= 1);
+
+    if (heroDotsEl) {
+      heroDotsEl.innerHTML = items.length > 1
+        ? items.map(function(h, i) {
+            return '<button type="button" class="ov-hero-dot' + (i === 0 ? ' is-active' : '') + '" data-index="' + i + '" role="tab" aria-label="Gecikmiş ödev ' + (i + 1) + '" aria-selected="' + (i === 0 ? 'true' : 'false') + '"></button>';
+          }).join('')
+        : '';
+    }
+
+    setHeroCarouselIndex(0);
+    syncHeroCountdowns(items);
+    if (heroCountdownTick) clearInterval(heroCountdownTick);
+    heroCountdownTick = setInterval(function() { syncHeroCountdowns(items); }, 1000);
   }
 
   function renderHero() {
     if (heroCountdownTick) { clearInterval(heroCountdownTick); heroCountdownTick = null; }
-    var h = pickHeroHomework(currentSubject);
-    heroActiveHw = h;
-    var hero = heroEl;
+    initHeroCarouselNav();
 
-    if (!h) {
-      hero.dataset.subject = 'trk';
-      hero.classList.add('is-empty');
-      hero.classList.remove('is-overdue');
-      if (pageView === 'overdue') {
-        document.getElementById('ovHeroEyebrow').innerHTML = '<span class="ov-hero-pulse"></span>Gecikmiş ödev yok';
-        document.getElementById('ovHeroTitle').textContent = 'Tüm ödevlerini zamanında teslim etmişsin 🎉';
-        document.getElementById('ovHeroDesc').textContent = 'Gecikmiş ödev bulunmuyor. Aktif ödevlerin için haftalık listeye dönebilirsin.';
-      } else {
-        document.getElementById('ovHeroEyebrow').innerHTML = '<span class="ov-hero-pulse"></span>Şu an aktif ödev yok';
-        document.getElementById('ovHeroTitle').textContent = 'Tüm ödevlerini tamamladın 🎉';
-        document.getElementById('ovHeroDesc').textContent = 'Bu hafta için aktif ödev kalmadı. Takvimden başka bir eğitim haftası seçebilirsin.';
-      }
-      document.getElementById('ovHeroSubject').style.display = 'none';
-      document.getElementById('ovHeroTeacher').style.display = 'none';
-      document.getElementById('ovHeroCountdown').textContent = '—';
-      document.getElementById('ovHeroXp').textContent = '0';
-      var cta = document.getElementById('ovHeroCta');
-      cta.style.display = 'none';
-      hero.style.cursor = 'default';
+    var overduePool = getOverdueHeroPool();
+    if (overduePool.length) {
+      renderHeroSlides(overduePool);
       return;
     }
 
-    hero.classList.remove('is-empty');
-    hero.classList.toggle('is-overdue', h.status === 'overdue');
-    hero.dataset.subject = h.subject;
-    hero.style.cursor = 'pointer';
-    document.getElementById('ovHeroCta').style.display = '';
-    document.getElementById('ovHeroSubject').style.display = '';
-    document.getElementById('ovHeroTeacher').style.display = '';
-
-    var subjectName = SUBJECT_NAMES[h.subject] || h.subject;
-    var due = parseISO(h.due);
-    var isToday = isSameDay(due, demoNow());
-    var eyebrowText;
-    if (h.status === 'overdue') {
-      eyebrowText = 'Geciken Ödev · Hemen tamamla';
-    } else if (isToday) {
-      eyebrowText = 'Sıradaki Ödev · Bugün son gün';
-    } else {
-      eyebrowText = 'Sıradaki Ödev · ' + fmtDueShort(due);
+    var active = pickActiveHeroHomework();
+    if (active) {
+      heroCarouselHwIds = [active.id];
+      renderHeroSlides([active]);
+      return;
     }
-    document.getElementById('ovHeroEyebrow').innerHTML = '<span class="ov-hero-pulse"></span>' + eyebrowText;
-    document.getElementById('ovHeroSubjectIcon').textContent = SUBJECT_ICONS[h.subject] || '📚';
-    document.getElementById('ovHeroSubjectName').textContent = subjectName;
-    document.getElementById('ovHeroTitle').textContent = h.topic;
-    document.getElementById('ovHeroDesc').textContent = h.desc || 'Detay yakında eklenecek.';
 
-    var t = TEACHERS[h.teacher] || { full: h.teacher, avatar: '' };
-    document.getElementById('ovHeroTeacherAva').src = t.avatar || '';
-    document.getElementById('ovHeroTeacherAva').alt = t.full;
-    document.getElementById('ovHeroTeacherName').textContent = t.full;
-    document.getElementById('ovHeroXp').textContent = h.xp;
+    heroCarouselHwIds = [];
+    renderHeroSlides([]);
+  }
 
-    function tickCountdown() {
-      var ms = parseISO(h.due) - demoNow();
-      var el = document.getElementById('ovHeroCountdown');
-      if (ms <= 0) {
-        el.textContent = 'Süresi geçti';
-      } else {
-        el.textContent = fmtCountdown(ms);
-      }
-    }
-    tickCountdown();
-    heroCountdownTick = setInterval(tickCountdown, 1000);
+  function heroExcludeIds() {
+    if (heroCarouselHwIds.length) return heroCarouselHwIds.slice();
+    return heroActiveHw ? [heroActiveHw.id] : [];
   }
 
   // ====== SMART SECTIONS render ======
@@ -8147,10 +8344,10 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
         return true;
       });
       overdueItems.sort(function(a,b){ return parseISO(b.due) - parseISO(a.due); });
-      var heroId = heroActiveHw ? heroActiveHw.id : null;
-      overdueItems = overdueItems.filter(function(h){ return h.id !== heroId; });
+      var excludeIds = heroExcludeIds();
+      overdueItems = overdueItems.filter(function(h){ return excludeIds.indexOf(h.id) === -1; });
 
-      if (!overdueItems.length && !heroActiveHw) {
+      if (!overdueItems.length && !heroCarouselItems.length) {
         sectionsEl.innerHTML = '';
         emptyEl.hidden = false;
         emptyEl.querySelector('.ov-empty-text').textContent = 'Gecikmiş ödevin yok';
@@ -8191,9 +8388,9 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     }
     emptyEl.hidden = true;
 
-    // Hero için seçilen ödevi smart-section'lardan çıkar (duplicate gösterme)
-    var heroId = heroActiveHw ? heroActiveHw.id : null;
-    var rest = pool.filter(function(h){ return h.id !== heroId; });
+    // Hero carousel'deki ödevleri smart-section'lardan çıkar (duplicate gösterme)
+    var excludeIds = heroExcludeIds();
+    var rest = pool.filter(function(h){ return excludeIds.indexOf(h.id) === -1; });
 
     var now = demoNow();
     var bucket = { today: [], week: [], overdue: [], done: [] };
@@ -8431,16 +8628,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     });
   })();
 
-  // ====== Hero CTA → drawer aç ======
-  document.getElementById('ovHeroCta').addEventListener('click', function(ev){
-    ev.stopPropagation();
-    if (heroActiveHw) openDrawer(heroActiveHw.id);
-  });
-  heroEl.addEventListener('click', function(ev){
-    // CTA içindeki tıklamada zaten yukarıdaki handler çalışacak
-    if (ev.target.closest('.ov-hero-cta')) return;
-    if (heroActiveHw) openDrawer(heroActiveHw.id);
-  });
+  // ====== Hero CTA → drawer aç (carousel delegation initHeroCarouselNav içinde) ======
 
   // ====== DRAWER (ödev için adapte) ======
   var drawerEl = document.getElementById('progDrawer');
