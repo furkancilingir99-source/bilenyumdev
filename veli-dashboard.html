@@ -434,19 +434,114 @@ button.pv-abs-item {
   flex: 1 1 auto; width: 100%;
   min-height: 0;
   min-width: 0;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas:
-    "subject subject"
-    "topic topic"
-    "time foot";
-  gap: 2px 4px;
-  padding: 6px 7px 5px;
-  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 10px 8px;
+  border-radius: 12px;
   scroll-snap-align: start;
   overflow: hidden;
   box-sizing: border-box;
   transition: background 0.18s, transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+}
+.pv-abs-item-hero {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+.pv-abs-item-time {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--brand-navy);
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+.pv-abs-item-topic {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--brand-navy);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pv-abs-item-subject {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink-dark-2);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.9;
+}
+.pv-abs-item-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+.pv-abs-item-type {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+.pv-abs-item-type.is-kid {
+  background: rgba(91,84,201,0.22);
+  border: 2px solid rgba(91,84,201,0.55);
+  color: #3730a3;
+  box-shadow: 0 2px 8px rgba(91,84,201,0.15);
+}
+.pv-abs-item-type.is-rud {
+  background: rgba(43,159,212,0.22);
+  border: 2px solid rgba(43,159,212,0.55);
+  color: #0369a1;
+  box-shadow: 0 2px 8px rgba(43,159,212,0.15);
+}
+.pv-abs-item-chip {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 2px solid transparent;
+}
+.is-absent .pv-abs-item-chip {
+  background: rgba(220,38,38,0.18);
+  border-color: rgba(220,38,38,0.45);
+  color: #991b1b;
+  box-shadow: 0 2px 8px rgba(220,38,38,0.12);
+}
+.is-attended .pv-abs-item-chip {
+  background: rgba(46,168,106,0.20);
+  border-color: rgba(46,168,106,0.48);
+  color: #166534;
+  box-shadow: 0 2px 8px rgba(46,168,106,0.12);
 }
 .pv-abs-item.is-absent {
   background: linear-gradient(165deg, rgba(220,38,38,0.05) 0%, rgba(220,38,38,0.02) 100%);
@@ -468,59 +563,6 @@ button.pv-abs-item {
   background: rgba(46,168,106,0.10);
   transform: translateY(-1px);
 }
-.pv-abs-item-subject {
-  grid-area: subject;
-  font-family: var(--font-display);
-  font-size: 11px; font-weight: 800;
-  color: var(--brand-navy);
-  line-height: 1.15; letter-spacing: -0.015em;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  min-width: 0;
-}
-.pv-abs-item-topic {
-  grid-area: topic;
-  font-size: 9.5px; font-weight: 600;
-  color: var(--ink-dark-2);
-  line-height: 1.2;
-  display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
-  overflow: hidden;
-  min-width: 0;
-}
-.pv-abs-item-foot {
-  grid-area: foot;
-  display: flex; align-items: center; justify-content: flex-end;
-  gap: 3px; margin-top: 0; padding-top: 0;
-  flex-wrap: nowrap;
-  min-width: 0;
-}
-.pv-abs-item-type {
-  padding: 2px 6px; border-radius: 6px;
-  font-family: var(--font-mono); font-size: 9px; font-weight: 800;
-  letter-spacing: 0.08em; line-height: 1.2;
-  flex-shrink: 0;
-}
-.pv-abs-item-type.is-kid {
-  background: rgba(91,84,201,0.16); border: 1.5px solid rgba(91,84,201,0.42); color: #4338ca;
-}
-.pv-abs-item-type.is-rud {
-  background: rgba(43,159,212,0.16); border: 1.5px solid rgba(43,159,212,0.42); color: #0369a1;
-}
-.pv-abs-item-chip {
-  flex-shrink: 1;
-  min-width: 0;
-  padding: 2px 5px; border-radius: 999px;
-  font-family: var(--font-mono); font-size: 7px; font-weight: 700;
-  letter-spacing: 0.03em; text-transform: uppercase;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.is-absent .pv-abs-item-chip {
-  background: rgba(220,38,38,0.10); color: #b91c1c;
-}
-.is-attended .pv-abs-item-chip {
-  background: rgba(46,168,106,0.10); color: #15803d;
-}
 .pv-abs-item.is-pending {
   cursor: not-allowed;
   background: linear-gradient(165deg, rgba(100,116,139,0.06) 0%, rgba(100,116,139,0.02) 100%);
@@ -534,15 +576,10 @@ button.pv-abs-item {
   background: linear-gradient(165deg, rgba(100,116,139,0.08) 0%, rgba(100,116,139,0.03) 100%);
 }
 .is-pending .pv-abs-item-chip {
-  background: rgba(100,116,139,0.12); color: #475569;
-}
-.pv-abs-item-time {
-  grid-area: time;
-  align-self: center;
-  font-family: var(--font-mono); font-size: 9px; font-weight: 600;
-  color: var(--ink-dark-2); letter-spacing: 0.02em;
-  flex-shrink: 0;
-  white-space: nowrap;
+  background: rgba(100,116,139,0.16);
+  border: 2px solid rgba(100,116,139,0.38);
+  color: #475569;
+  box-shadow: none;
 }
 .pv-abs-nav-btn {
   position: static; flex-shrink: 0;
@@ -3629,13 +3666,15 @@ button.pv-abs-item {
       el.setAttribute('data-tip', ABS_LESSON_TIP);
       el.setAttribute('aria-label', lesson.name + ' — ' + lesson.dayName + ' — ' + (fmt === 'kid' ? 'KİD' : 'RUD') + ' — ' + (attended ? 'Katıldı' : 'Katılmadı'));
     }
-    var chipLabel = isPending ? 'Tamamlanmamış' : (attended ? 'Katıldı' : 'Katılmadı');
+    var chipLabel = isPending ? 'BEKLEMEDE' : (attended ? 'KATILDI' : 'KATILMADI');
     el.setAttribute('data-lesson-format', fmt);
     el.innerHTML =
+      '<div class="pv-abs-item-hero">' +
+        '<span class="pv-abs-item-time">' + escapeText(lesson.time) + '</span>' +
+        '<span class="pv-abs-item-topic">' + escapeText(lesson.topic || lesson.name) + '</span>' +
+      '</div>' +
       '<span class="pv-abs-item-subject">' + escapeText(lesson.name) + '</span>' +
-      '<span class="pv-abs-item-topic">' + escapeText(lesson.topic || '') + '</span>' +
-      '<span class="pv-abs-item-time">' + escapeText(lesson.time) + '</span>' +
-      '<div class="pv-abs-item-foot">' +
+      '<div class="pv-abs-item-tags">' +
         absLessonTypeBadge(lesson) +
         '<span class="pv-abs-item-chip">' + chipLabel + '</span>' +
       '</div>';
@@ -3764,7 +3803,7 @@ button.pv-abs-item {
         carousel.classList.toggle('has-multiple', hasMore);
         var peekRatio = hasMore ? ABS_CARD_PEEK : 1;
         var w = Math.floor(viewport.clientWidth * peekRatio);
-        w = Math.max(w, 72);
+        w = Math.max(w, 118);
         Array.prototype.forEach.call(cards, function (card) {
           card.style.flex = '0 0 ' + w + 'px';
           card.style.width = w + 'px';
