@@ -1,8 +1,8 @@
-import { clearCookieHeader } from '../lib/auth-token.mjs';
+import { clearSessionCookieHeaders } from '../lib/supabase-session.mjs';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  res.setHeader('Set-Cookie', clearCookieHeader());
+  res.setHeader('Set-Cookie', clearSessionCookieHeaders());
 
   if (req.method !== 'POST' && req.method !== 'GET') {
     res.statusCode = 405;

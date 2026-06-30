@@ -1,10 +1,8 @@
-import { getAuthSecret } from '../lib/auth-config.mjs';
 import {
-  cookieHeader,
-  createSessionToken,
-  SESSION_MAX_AGE
-} from '../lib/auth-token.mjs';
-import { displayEmail, loadAuthUsers, matchAuthUser } from '../lib/auth-users.mjs';
+  buildSessionCookies,
+  createSupabaseClient,
+  isAuthConfigured
+} from '../lib/supabase-session.mjs';
 
 function readBody(req) {
   return new Promise(function (resolve, reject) {
@@ -31,10 +29,12 @@ export default async function handler(req, res) {
     return;
   }
 
-  const secret = getAuthSecret();
-  if (!loadAuthUsers().length) {
+  if (!isAuthConfigured()) {
     res.statusCode = 503;
-    res.end(JSON.stringify({ ok: false, error: 'Kullanıcı listesi boş. config/auth-users.txt dosyasını kontrol edin.' }));
+    res.end(JSON.stringify({
+      ok: false,
+      error: 'Supabase yapılandırılmamış. config/SUPABASE-KURULUM.txt dosyasına bakın.'
+    }));
     return;
   }
 
@@ -47,17 +47,34 @@ export default async function handler(req, res) {
     return;
   }
 
-  const email = displayEmail(body.username || body.email || '');
+  const email = String(body.username || body.email || '').trim().toLowerCase();
   const password = String(body.password || '');
 
-  if (!matchAuthUser(email, password)) {
-    res.statusCode = 401;
-    res.end(JSON.stringify({ ok: false, error: 'Kullanıcı adı veya şifre hatalı.' }));
+  if (!email || !password) {
+    res.statusCode = 400;
+    res.end(JSON.stringify({ ok: false, error: 'E-posta ve şifre gerekli.' }));
     return;
   }
 
-  const token = await createSessionToken(secret, email, SESSION_MAX_AGE);
-  res.setHeader('Set-Cookie', cookieHeader(token, SESSION_MAX_AGE));
+  const supabase = createSupabaseClient();
+  if (!supabase) {
+    res.statusCode = 503;
+    res.end(JSON.stringify({ ok: false, error: 'Supabase istemcisi oluşturulamadı.' }));
+    return;
+  }
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email: email, password: password });
+
+  if (error || !data.session) {
+    res.statusCode = 401;
+    res.end(JSON.stringify({
+      ok: false,
+      error: 'Kullanıcı adı veya şifre hatalı.'
+    }));
+    return;
+  }
+
+  res.setHeader('Set-Cookie', buildSessionCookies(data.session));
   res.statusCode = 200;
-  res.end(JSON.stringify({ ok: true, username: email }));
+  res.end(JSON.stringify({ ok: true, email: data.user?.email || email }));
 }

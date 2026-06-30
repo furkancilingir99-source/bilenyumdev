@@ -1,19 +1,30 @@
-import { getAuthSecret } from './lib/auth-config.mjs';
+import { isBlockedPath, isPublicPath, readCookie } from './lib/auth-public.mjs';
 import {
-  isPublicPath,
-  readCookie,
-  verifySessionToken
-} from './lib/auth-token.mjs';
+  ACCESS_COOKIE,
+  getJwtSecret,
+  isAuthConfigured,
+  verifyAccessToken
+} from './lib/supabase-session.mjs';
 
 export default async function middleware(request) {
   const url = new URL(request.url);
   const pathname = url.pathname;
 
+  if (isBlockedPath(pathname)) {
+    return new Response('Not Found', { status: 404 });
+  }
+
   if (isPublicPath(pathname)) return;
 
-  const secret = getAuthSecret();
-  const token = readCookie(request, 'bilenyum_session');
-  const session = token ? await verifySessionToken(secret, token) : null;
+  if (!isAuthConfigured()) {
+    return new Response(
+      'Giriş sistemi yapılandırılmamış. Vercel ortam değişkenlerine SUPABASE_URL, SUPABASE_ANON_KEY ve SUPABASE_JWT_SECRET ekleyin. Kurulum: config/SUPABASE-KURULUM.txt',
+      { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } }
+    );
+  }
+
+  const token = readCookie(request, ACCESS_COOKIE);
+  const session = token ? await verifyAccessToken(token, getJwtSecret()) : null;
 
   if (session) return;
 
