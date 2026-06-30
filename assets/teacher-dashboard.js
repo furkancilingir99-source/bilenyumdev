@@ -784,13 +784,12 @@
   function buildWeekCalDayColumn(dayIdx, weekStart, lessons) {
     var dateISO = weekDateISO(weekStart, dayIdx);
     var dayLessons = lessons.filter(function (l) { return l.date === dateISO; }).sort(api.sortByTime);
-    var d = new Date(dateISO + 'T12:00:00');
     var body = dayLessons.length
       ? buildWeekCalDayCarousel(dayLessons)
       : '<div class="td-wcal-day-cards"><span class="td-wcal-day-empty">—</span></div>';
     return (
       '<div class="td-wcal-day-group" data-date="' + dateISO + '">' +
-        '<span class="td-wcal-day-hd">' + escapeHtml(WEEK_DAY_NAMES[dayIdx]) + '<span class="td-wcal-day-num">' + d.getDate() + '</span></span>' +
+        '<span class="td-wcal-day-hd">' + escapeHtml(WEEK_DAY_NAMES[dayIdx]) + '</span>' +
         body +
       '</div>'
     );
@@ -880,12 +879,31 @@
     var birebir = lessons.filter(function (l) { return l.type === 'one_to_one'; }).length;
     var trial = lessons.filter(function (l) { return l.type === 'free_trial'; }).length;
     var total = lessons.length;
+    var filterNote = weekFiltersActive()
+      ? ' Üstteki filtreler uygulanmış haliyle gösterilir.'
+      : '';
     els.weekSummary.innerHTML =
-      '<div class="td-week-chip"><span class="td-week-chip-val">' + completed + ' / ' + total + '</span><span class="td-week-chip-label">Tamamlanan Dersler</span></div>' +
-      '<div class="td-week-chip is-upcoming"><span class="td-week-chip-val">' + upcoming + '</span><span class="td-week-chip-label">Gelecek Dersler</span></div>' +
-      '<div class="td-week-chip is-birebir"><span class="td-week-chip-val">' + birebir + '</span><span class="td-week-chip-label">Birebir Ders</span></div>' +
-      '<div class="td-week-chip is-trial"><span class="td-week-chip-val">' + trial + '</span><span class="td-week-chip-label">Ücretsiz Deneme</span></div>' +
-      '<div class="td-week-chip is-total"><span class="td-week-chip-val">' + total + '</span><span class="td-week-chip-label">Toplam Ders</span></div>';
+      '<div class="td-week-chip" data-tip="Bu eğitim haftasında girdiğiniz ve tamamladığınız ders sayısı. Toplam planlı derslerinize göre ilerlemenizi gösterir.' + filterNote + '">' +
+        '<span class="td-week-chip-val">' + completed + ' / ' + total + '</span>' +
+        '<span class="td-week-chip-label">Tamamlanan Dersler</span>' +
+      '</div>' +
+      '<div class="td-week-chip is-upcoming" data-tip="Henüz başlamamış veya tamamlanmamış dersleriniz. Takviminizde sizi bekleyen canlı oturumlar.' + filterNote + '">' +
+        '<span class="td-week-chip-val">' + upcoming + '</span>' +
+        '<span class="td-week-chip-label">Gelecek Dersler</span>' +
+      '</div>' +
+      '<div class="td-week-chip is-birebir" data-tip="Bu hafta size atanmış birebir öğrenci dersleri. Klan ve deneme derslerinden ayrı sayılır.' + filterNote + '">' +
+        '<span class="td-week-chip-val">' + birebir + '</span>' +
+        '<span class="td-week-chip-label">Birebir Ders</span>' +
+      '</div>' +
+      '<div class="td-week-chip is-trial" data-tip="Yeni aday öğrencilerle yapacağınız ücretsiz tanışma dersleri.' + filterNote + '">' +
+        '<span class="td-week-chip-val">' + trial + '</span>' +
+        '<span class="td-week-chip-label">Ücretsiz Deneme</span>' +
+      '</div>' +
+      '<div class="td-week-chip is-total" data-tip="Seçili eğitim haftasındaki tüm planlı dersleriniz (tamamlanan + gelecek).' + filterNote + '">' +
+        '<span class="td-week-chip-val">' + total + '</span>' +
+        '<span class="td-week-chip-label">Toplam Ders</span>' +
+      '</div>';
+    refreshFloatingTooltips();
   }
 
   function renderWeekCalendar() {
@@ -1100,11 +1118,53 @@
     });
   }
 
+  var tipBinder = null;
+
+  function placeFloattip(el, tipEl, gap) {
+    var r = el.getBoundingClientRect();
+    var g = gap || 8;
+    tipEl.style.left = Math.round(r.left + r.width / 2) + 'px';
+    tipEl.style.top = Math.round(r.top - g) + 'px';
+  }
+
+  function refreshFloatingTooltips() {
+    if (!tipBinder) return;
+    document.querySelectorAll('.td-week-chip[data-tip]').forEach(tipBinder);
+  }
+
+  function initFloatingTooltips() {
+    var tip = document.createElement('div');
+    tip.className = 'td-floattip';
+    tip.setAttribute('role', 'tooltip');
+    tip.hidden = true;
+    document.body.appendChild(tip);
+
+    tipBinder = function (el) {
+      if (el.getAttribute('data-tip-bound')) return;
+      var text = el.getAttribute('data-tip');
+      if (!text) return;
+      el.setAttribute('data-tip-bound', '1');
+      el.addEventListener('mouseenter', function () {
+        tip.textContent = text;
+        tip.hidden = false;
+        tip.classList.add('is-visible');
+        placeFloattip(el, tip, 8);
+      });
+      el.addEventListener('mousemove', function () { placeFloattip(el, tip, 8); });
+      el.addEventListener('mouseleave', function () {
+        tip.classList.remove('is-visible');
+        tip.hidden = true;
+      });
+    };
+    refreshFloatingTooltips();
+  }
+
   function init() {
     bindEls();
     initDrawer();
     initWeekFilters();
     initWeekEduNav();
+    initFloatingTooltips();
 
     loadToday();
     loadWeekByEduWeek(api.findEduWeekForDate(api.DEMO_TODAY));

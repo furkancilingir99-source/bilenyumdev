@@ -679,6 +679,12 @@
   background: rgba(61,166,110,0.10);
   border: 1px solid rgba(61,166,110,0.28);
 }
+.td-week-chip[data-tip] {
+  cursor: help;
+}
+.td-week-chip[data-tip]:hover {
+  filter: brightness(0.98);
+}
 .td-week-chip.is-upcoming {
   background: rgba(74,214,255,0.08);
   border-color: rgba(74,214,255,0.28);
@@ -712,6 +718,36 @@
   margin-top: 3px;
   line-height: 1.3;
 }
+
+/* Floating tooltip — veli dashboard pv-floattip ile uyumlu */
+[data-tip]::after,
+[data-tip]::before {
+  display: none !important;
+  content: none !important;
+}
+.td-floattip {
+  position: fixed;
+  z-index: 10002;
+  max-width: 260px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--brand-navy, #28265a);
+  color: #fff;
+  font-family: var(--font-sans, inherit);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  white-space: normal;
+  pointer-events: none;
+  box-shadow: 0 10px 28px rgba(40, 38, 90, 0.22);
+  opacity: 0;
+  transform: translate(-50%, calc(-100% - 8px));
+  transition: opacity 0.16s ease;
+}
+.td-floattip.is-visible { opacity: 1; }
+.td-floattip[hidden] { display: none !important; }
+
 .td-wcal-wrap {
   flex: 1;
   min-height: 180px;
@@ -758,10 +794,7 @@
   box-shadow: 0 1px 4px rgba(62, 58, 142, 0.06);
 }
 .td-wcal-day-hd {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 4px;
+  display: block;
   font-family: var(--font-sans, inherit);
   font-size: 11px;
   font-weight: 800;
@@ -773,13 +806,11 @@
   background: var(--brand-purple-08, rgba(168,164,240,0.08));
   border-bottom: 1px solid var(--brand-purple-14, rgba(168,164,240,0.14));
   flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.td-wcal-day-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  font-weight: 800;
-  opacity: 0.85;
-}
+.td-wcal-day-num { display: none; }
 .td-wcal-day-cards {
   display: flex;
   flex-direction: column;
