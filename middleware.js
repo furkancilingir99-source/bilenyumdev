@@ -1,13 +1,25 @@
-import { next } from '@vercel/functions';
 import { isBlockedPath, isPublicPath, readCookie } from './lib/auth-public.mjs';
 import {
   ACCESS_COOKIE,
-  REFRESH_COOKIE,
-  buildSessionCookies,
+  clearSessionCookieHeaders,
   isAuthConfigured,
-  refreshSession,
   verifyAccessToken
 } from './lib/supabase-session.mjs';
+
+function redirectToLogin(url, pathname, clearCookies) {
+  const loginUrl = new URL('/giris', url.origin);
+  if (clearCookies) loginUrl.searchParams.set('expired', '1');
+  if (pathname && pathname !== '/') {
+    loginUrl.searchParams.set('from', pathname + url.search);
+  }
+  const response = Response.redirect(loginUrl.toString(), 302);
+  if (clearCookies) {
+    clearSessionCookieHeaders().forEach(function (c) {
+      response.headers.append('Set-Cookie', c);
+    });
+  }
+  return response;
+}
 
 export default async function middleware(request) {
   const url = new URL(request.url);
@@ -27,35 +39,11 @@ export default async function middleware(request) {
   }
 
   const accessToken = readCookie(request, ACCESS_COOKIE);
-  let session = accessToken ? await verifyAccessToken(accessToken) : null;
-  let renewed = null;
+  const session = accessToken ? await verifyAccessToken(accessToken) : null;
 
-  if (!session) {
-    const refreshToken = readCookie(request, REFRESH_COOKIE);
-    if (refreshToken) {
-      renewed = await refreshSession(refreshToken);
-      if (renewed && renewed.access_token) {
-        session = await verifyAccessToken(renewed.access_token);
-      }
-    }
-  }
+  if (session) return;
 
-  if (session) {
-    if (renewed) {
-      const response = next({ request });
-      buildSessionCookies(renewed).forEach(function (c) {
-        response.headers.append('Set-Cookie', c);
-      });
-      return response;
-    }
-    return;
-  }
-
-  const loginUrl = new URL('/giris', url.origin);
-  if (pathname && pathname !== '/') {
-    loginUrl.searchParams.set('from', pathname + url.search);
-  }
-  return Response.redirect(loginUrl.toString(), 302);
+  return redirectToLogin(url, pathname, !!accessToken);
 }
 
 export const config = {

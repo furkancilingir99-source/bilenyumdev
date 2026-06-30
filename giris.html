@@ -607,6 +607,10 @@
     const params = new URLSearchParams(window.location.search);
     const redirectTo = params.get('from') || 'dashboard.html';
 
+    if (params.get('expired') === '1') {
+      showError('Oturumunuz sona erdi. Lütfen tekrar giriş yapın.');
+    }
+
     function showError(msg) {
       if (!toast || !toastText) {
         window.alert(msg);
