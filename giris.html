@@ -638,6 +638,15 @@
         .then(function(res) {
           return res.json().then(function(data) {
             if (!res.ok) throw new Error(data.error || 'Giriş başarısız.');
+            if (window.BilenyumBrowserSession && window.BilenyumBrowserSession.markLoggedIn) {
+              window.BilenyumBrowserSession.markLoggedIn();
+            } else {
+              try {
+                var sid = 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+                localStorage.setItem('bilenyum.browserSession', sid);
+                sessionStorage.setItem('bilenyum.tabSession', sid);
+              } catch (e) {}
+            }
             window.location.href = redirectTo;
           });
         })
@@ -650,6 +659,7 @@
   })();
 </script>
 
+<script src="assets/auth-tab-session.js"></script>
 <script src="assets/input-rules.js"></script>
 <script src="assets/code-guard.js"></script>
 </body>

@@ -137,6 +137,14 @@
       if (!logoutBtn) return;
       e.preventDefault();
       logoutBtn.disabled = true;
+      if (window.BilenyumBrowserSession && window.BilenyumBrowserSession.clear) {
+        window.BilenyumBrowserSession.clear();
+      } else {
+        try {
+          localStorage.removeItem('bilenyum.browserSession');
+          sessionStorage.removeItem('bilenyum.tabSession');
+        } catch (e) {}
+      }
       fetch('/api/logout', { method: 'POST', credentials: 'same-origin' })
         .finally(function () { window.location.href = '/giris'; });
     });

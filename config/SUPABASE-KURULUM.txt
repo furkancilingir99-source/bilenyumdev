@@ -66,10 +66,13 @@ veya: https://devbilenyum.vercel.app/api/logout
 
 OTURUM SÜRESİ
 -------------
-• Sekme kapatma: Son açık Bilenyum sekmesi kapanınca otomatik çıkış yapılır.
-• Tarayıcı oturum çerezi kullanılır; tarayıcı tamamen kapanınca da oturum düşer.
-• F5 / Ctrl+R ile yenilemede çıkış yapılmaz.
+• Giriş yaptıktan sonra tarayıcı oturum işareti (localStorage) oluşturulur.
+• Tarayıcı tamamen kapatılıp yeniden açılınca işaret yoksa eski çerez silinir → tekrar giriş gerekir.
+• Son açık sekme kapanırken de çıkış yapılır.
+• F5 / Ctrl+R yenilemede oturum korunur.
 • Supabase JWT süresi dolunca (≈1 saat) yine giriş gerekir.
+
+Not: Eski oturumdan kalan çerez varsa ilk ziyarette otomatik temizlenir; bir kez tekrar giriş yapmanız yeterli.
 
 Supabase JWT süresini 3600 saniye (1 saat) yapın:
   Authentication → Settings → JWT expiry → 3600
