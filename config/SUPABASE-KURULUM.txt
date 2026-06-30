@@ -64,6 +64,14 @@ Profil menüsü → Çıkış Yap
 veya: https://devbilenyum.vercel.app/api/logout
 
 
+OTURUM SÜRESİ (1 saat)
+----------------------
+Site oturumu 1 saat sonra sona erer; başka sayfaya gidince /giris'e yönlendirilir.
+
+Supabase JWT süresini de 3600 saniye (1 saat) yapın:
+  Authentication → Settings → JWT expiry → 3600
+
+
 SORUN GİDERME
 -------------
 • Site 503 gösteriyor → Vercel env eksik, ADIM 3
