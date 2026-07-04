@@ -110,4 +110,23 @@
   } else {
     inject();
   }
+
+  function loadDashboardSwitcher() {
+    if (!document.querySelector('header.nav .nav-inner, nav.nav .nav-inner')) return;
+    if (document.querySelector('.db-switch')) return;
+    if (document.querySelector('script[src*="dashboard-switcher.js"]')) return;
+
+    var script = document.createElement('script');
+    script.src = 'assets/dashboard-switcher.js';
+    script.onload = function () {
+      if (window.DashboardSwitcher) window.DashboardSwitcher.mount();
+    };
+    document.body.appendChild(script);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadDashboardSwitcher);
+  } else {
+    loadDashboardSwitcher();
+  }
 })();

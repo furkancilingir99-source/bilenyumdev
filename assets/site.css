@@ -16,6 +16,8 @@
  * override eder (cascade burayı sonradan yener).
  * ==================================================================== */
 
+@import url('dashboard-switcher.css');
+
 /* ---------- Universal reset ---------- */
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }

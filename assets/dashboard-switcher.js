@@ -1,9 +1,16 @@
 /**
- * Veli / Öğrenci / Öğretmen dashboard geçişi — HUD logosunun yanında
+ * Website / Veli / Öğrenci / Öğretmen geçişi — HUD veya marketing nav içinde
  * window.DashboardSwitcher.mount()
  */
 (function (global) {
   'use strict';
+
+  var ICON_WEBSITE =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<circle cx="12" cy="12" r="10"/>' +
+      '<line x1="2" y1="12" x2="22" y2="12"/>' +
+      '<path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>' +
+    '</svg>';
 
   var ICON_VELI =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
@@ -25,7 +32,25 @@
       '<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>' +
     '</svg>';
 
+  var WEBSITE_PAGES = {
+    '': true,
+    'index.html': true,
+    'egitim-setleri.html': true,
+    'ornek-videolar.html': true,
+    'kadromuz.html': true,
+    'kadromuz-detay.html': true,
+    'neden-biz.html': true,
+    'iletisim.html': true,
+    'blog.html': true,
+    'blog-detay.html': true,
+    'kariyer.html': true,
+    'paket-detay.html': true,
+    'egitim-modeli.html': true,
+    'sss.html': true
+  };
+
   var ITEMS = [
+    { key: 'website', href: '/', label: 'Website', short: 'Website', icon: ICON_WEBSITE, cls: 'is-website' },
     { key: 'veli', href: 'veli-dashboard.html', label: 'Veli Dashboard', short: 'Veli', icon: ICON_VELI, cls: 'is-veli' },
     { key: 'student', href: 'dashboard.html', label: 'Öğrenci Dashboard', short: 'Öğrenci', icon: ICON_STUDENT, cls: 'is-student' },
     { key: 'teacher', href: 'ogretmen-dashboard.html', label: 'Öğretmen Dashboard', short: 'Öğretmen', icon: ICON_TEACHER, cls: 'is-teacher' }
@@ -37,10 +62,18 @@
     return parts[parts.length - 1] || '';
   }
 
-  function detectPersona() {
+  function isWebsitePage() {
     var file = pageName().toLowerCase();
+    var path = (global.location && global.location.pathname) || '';
+    if (path === '/' || path === '/index') return true;
+    return !!WEBSITE_PAGES[file];
+  }
+
+  function detectPersona() {
+    if (isWebsitePage()) return 'website';
     if (document.body && document.body.getAttribute('data-teacher-active') !== null) return 'teacher';
     if (document.body && document.body.classList.contains('is-veli-parent')) return 'veli';
+    var file = pageName().toLowerCase();
     if (/^ogretmen-/.test(file)) return 'teacher';
     if (/^veli-/.test(file)) return 'veli';
     return 'student';
@@ -60,7 +93,7 @@
     }).join('');
 
     return (
-      '<nav class="db-switch" role="navigation" aria-label="Dashboard geçişi">' +
+      '<nav class="db-switch" role="navigation" aria-label="Bölüm geçişi">' +
         '<div class="db-switch-inner">' + buttons + '</div>' +
       '</nav>'
     );
@@ -74,6 +107,20 @@
     left.className = 'hud-left';
     hud.insertBefore(left, brand);
     left.appendChild(brand);
+    return left;
+  }
+
+  function ensureNavBrandLeft(navInner) {
+    var logo = navInner.querySelector('.logo');
+    if (!logo) return null;
+
+    var left = navInner.querySelector('.nav-brand-left');
+    if (left) return left;
+
+    left = document.createElement('div');
+    left.className = 'nav-brand-left';
+    navInner.insertBefore(left, logo);
+    left.appendChild(logo);
     return left;
   }
 
@@ -104,12 +151,7 @@
     global.addEventListener('orientationchange', syncHudHeight, { passive: true });
   }
 
-  function mount() {
-    if (document.querySelector('.db-switch')) {
-      syncHudHeight();
-      return true;
-    }
-
+  function mountOnHud() {
     var hud = document.querySelector('.hud');
     if (!hud) return false;
 
@@ -117,6 +159,10 @@
     if (!brand) return false;
 
     var left = ensureHudLeft(hud, brand);
+    if (left.querySelector('.db-switch')) {
+      syncHudHeight();
+      return true;
+    }
 
     var wrap = document.createElement('div');
     wrap.innerHTML = renderSwitcher(detectPersona());
@@ -126,6 +172,34 @@
     left.appendChild(nav);
     watchHudHeight();
     return true;
+  }
+
+  function mountOnNav() {
+    var navInner = document.querySelector('header.nav .nav-inner, nav.nav .nav-inner');
+    if (!navInner) return false;
+
+    if (navInner.querySelector('.db-switch')) return true;
+
+    var left = ensureNavBrandLeft(navInner);
+    if (!left) return false;
+
+    var wrap = document.createElement('div');
+    wrap.innerHTML = renderSwitcher(detectPersona());
+    var switcher = wrap.firstElementChild;
+    if (!switcher) return false;
+
+    left.appendChild(switcher);
+    return true;
+  }
+
+  function mount() {
+    if (document.querySelector('.db-switch')) {
+      syncHudHeight();
+      return true;
+    }
+
+    if (mountOnHud()) return true;
+    return mountOnNav();
   }
 
   function tryMount() {

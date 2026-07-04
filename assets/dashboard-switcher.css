@@ -6,7 +6,7 @@
   align-items: center;
   gap: 12px;
   min-width: 0;
-  max-width: min(100%, 420px);
+  max-width: min(100%, 520px);
 }
 
 .db-switch {
@@ -82,9 +82,40 @@
   border-color: rgba(14, 165, 183, 0.35);
 }
 
+.db-switch-btn.is-website.is-active {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
 .db-switch-btn.is-veli:not(.is-active):hover { color: var(--brand-magenta, #e6087b); }
 .db-switch-btn.is-student:not(.is-active):hover { color: var(--brand-purple, #3e3a8e); }
 .db-switch-btn.is-teacher:not(.is-active):hover { color: #0284c7; }
+.db-switch-btn.is-website:not(.is-active):hover { color: #d97706; }
+
+/* Marketing nav — logo yanında */
+.nav-brand-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+header.nav .nav-inner,
+nav.nav .nav-inner {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 1100px) {
+  .nav-brand-left { gap: 10px; }
+}
+
+@media (max-width: 900px) {
+  .nav-brand-left {
+    flex: 1 1 100%;
+    order: -1;
+  }
+}
 
 .pv-hud .hud-left {
   justify-self: start;
@@ -102,7 +133,7 @@
 @media (max-width: 1100px) {
   .db-switch-label { display: none; }
   .db-switch-btn { padding: 6px 8px; }
-  .hud-left { max-width: min(100%, 320px); }
+  .hud-left { max-width: min(100%, 380px); }
 }
 
 @media (max-width: 900px) {
