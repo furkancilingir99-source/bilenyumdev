@@ -2898,7 +2898,7 @@ body.asm-has-banner .stage {
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  width: 156px;
+  width: 172px;
   padding: 8px 8px 10px;
   border: 1px solid rgba(26, 21, 56, 0.1);
   border-right: 1px solid rgba(26, 21, 56, 0.1);
@@ -2912,15 +2912,62 @@ body.asm-has-banner .stage {
 }
 .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
-  flex-direction: unset;
+  gap: 5px;
+  width: 100%;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-zoom {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--draw {
+  grid-template-columns: 1fr 1fr;
+}
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--clear {
+  grid-template-columns: 1fr;
+}
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--history,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--zoom {
+  grid-template-columns: 1fr 1fr;
+}
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--zoom {
   margin-top: auto;
 }
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary {
+  min-height: 62px;
+  padding: 8px 4px 6px;
+  gap: 5px;
+}
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary svg {
+  width: 26px;
+  height: 26px;
+}
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary span:not(.asm-hw-pen-swatch) {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact {
+  min-height: 42px;
+  padding: 6px 4px;
+  gap: 3px;
+}
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact svg {
+  width: 18px;
+  height: 18px;
+}
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact span:not(.asm-hw-pen-swatch) {
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact.asm-hw-tool-hint {
+  min-height: 32px;
+  grid-column: 1 / -1;
+}
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact.asm-hw-tool-hint svg {
+  width: 16px;
+  height: 16px;
+}
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact.asm-hw-tool-hint span {
+  display: none;
+}
 .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool {
-  min-height: 48px;
   width: auto;
 }
 .asm-hw-board-toolbar--float.is-dragging {
@@ -3032,19 +3079,27 @@ body.asm-has-banner .stage {
 .asm-hw-board-toolbar--float .asm-hw-eraser-wrap {
   min-width: 0;
 }
-.asm-hw-board-toolbar--float .asm-hw-tool[data-tool="pen"] .asm-hw-pen-swatch {
-  top: 4px;
-  right: 4px;
+.asm-hw-board-toolbar--float .asm-hw-tool[data-tool="pen"] .asm-hw-pen-swatch,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary[data-tool="pen"] .asm-hw-pen-swatch {
+  top: 6px;
+  right: 6px;
+  width: 9px;
+  height: 9px;
 }
 .asm-hw-board-toolbar--float .asm-hw-toolbar-zoom .asm-hw-zoom-label,
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-zoom .asm-hw-zoom-label {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--zoom .asm-hw-zoom-label {
   grid-column: 1 / -1;
   width: 100%;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  padding: 4px 6px;
 }
 .asm-hw-board-toolbar--float .asm-hw-tool-hint,
 .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool-hint {
   grid-column: 1 / -1;
-  min-height: 36px;
 }
 .asm-homework-page .asm-hw-layout {
   flex-direction: column;
@@ -3068,8 +3123,8 @@ body.asm-has-banner .stage {
   transform: translateX(-50%);
 }
 .asm-homework-page .asm-hw-sheet {
-  width: min(900px, calc(100vw - 40px));
-  max-width: 900px;
+  width: calc(100vw - 20px);
+  max-width: none;
   background: #fff;
   border: 1px solid rgba(26, 21, 56, 0.1);
   box-shadow: 0 4px 20px rgba(26, 21, 56, 0.05);
@@ -3120,9 +3175,12 @@ body.asm-has-banner .stage {
   font-size: 13px;
   color: rgba(26, 21, 56, 0.62);
 }
-.asm-homework-page .asm-hw-board-toolbar--float .asm-hw-tool {
-  min-height: 48px;
-  font-size: 9px;
+.asm-homework-page .asm-hw-board-toolbar--float .asm-hw-tool--primary {
+  min-height: 58px;
+}
+.asm-homework-page .asm-hw-board-toolbar--float .asm-hw-tool--primary svg {
+  width: 24px;
+  height: 24px;
 }
 .asm-hw-footer-nav {
   display: grid;
@@ -3980,15 +4038,22 @@ body.asm-has-banner .stage {
     left: 50%;
     transform: translateX(-50%);
   }
-  .asm-homework-page .asm-hw-sheet { width: min(calc(100vw - 32px), 900px); }
-  .asm-hw-board-viewport { min-height: 280px; }
-  .asm-hw-board-toolbar--float { width: 112px; padding: 6px 6px 8px; left: 8px; }
-  .asm-hw-board-toolbar--float .asm-hw-tool {
-    min-height: 40px;
-    padding: 5px 2px;
+  .asm-homework-page .asm-hw-sheet { width: calc(100vw - 16px); }
+  .asm-hw-board-toolbar--float { width: 136px; padding: 6px 6px 8px; left: 8px; }
+  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary {
+    min-height: 50px;
+    padding: 6px 2px 4px;
   }
-  .asm-hw-board-toolbar--float .asm-hw-tool span:not(.asm-hw-pen-swatch) { display: none; }
-  .asm-hw-board-toolbar--float .asm-hw-zoom-label { font-size: 9px; min-width: 0; }
+  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary svg {
+    width: 22px;
+    height: 22px;
+  }
+  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary span:not(.asm-hw-pen-swatch) { display: none; }
+  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact span:not(.asm-hw-pen-swatch) { display: none; }
+  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact {
+    min-height: 38px;
+  }
+  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--zoom .asm-hw-zoom-label { font-size: 9px; min-width: 0; }
   .asm-homework-page .asm-hw-sheet-options { max-width: 100%; grid-template-columns: 1fr 1fr; }
   .asm-hw-block-figure svg { max-width: 280px; }
   .asm-hw-footer-nav {

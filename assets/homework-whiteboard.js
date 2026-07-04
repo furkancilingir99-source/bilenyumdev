@@ -32,15 +32,15 @@
   ];
 
   var TOOL_ICONS = {
-    pan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3l-1 9 7-4 4 10 2-12-12 3z"/></svg>',
-    pen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>',
-    shape: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8"/><circle cx="17" cy="7" r="4"/><line x1="3" y1="19" x2="21" y2="19"/></svg>',
-    eraser: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16l11-11 7 7-5 5z"/><path d="M6.5 17.5l4-4"/></svg>',
-    clear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>',
-    undo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>',
-    redo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.13-9.36L23 10"/></svg>',
-    zoomIn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>',
-    zoomOut: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>'
+    pan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11.5V9a2 2 0 0 0-4 0v3"/><path d="M14 10V5a2 2 0 0 0-4 0v8"/><path d="M10 9.5V4a2 2 0 0 0-4 0v12"/><path d="M18 11.5a2 2 0 0 1 4 0V12a6 6 0 0 1-6 6h-2a5 5 0 0 1-5-5v-2"/></svg>',
+    pen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
+    shape: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="12" r="3"/></svg>',
+    eraser: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 12 5 5"/></svg>',
+    clear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>',
+    undo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h10a5 5 0 0 1 5 5v0a5 5 0 0 1-5 5H5"/><path d="M3 10l4-4"/><path d="M3 10l4 4"/></svg>',
+    redo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10H11a5 5 0 0 0-5 5v0a5 5 0 0 0 5 5h8"/><path d="M21 10l-4-4"/><path d="M21 10l-4 4"/></svg>',
+    zoomIn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>',
+    zoomOut: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>'
   };
 
   function mount(root, opts) {
@@ -820,10 +820,10 @@
         '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/></svg>' +
       '</button>' +
       '<div class="asm-hw-toolbar-rail">' +
-        '<div class="asm-hw-toolbar-group">' +
-          '<button type="button" class="asm-hw-tool" data-tool="pan" title="Kaydır (açık el)">' + TOOL_ICONS.pan + '<span>Kaydır</span></button>' +
+        '<div class="asm-hw-toolbar-group asm-hw-toolbar-group--draw">' +
+          '<button type="button" class="asm-hw-tool asm-hw-tool--primary" data-tool="pan" title="Kaydır" aria-label="Kaydır">' + TOOL_ICONS.pan + '<span>Kaydır</span></button>' +
           '<div class="asm-hw-pen-wrap" id="hwPenWrap">' +
-            '<button type="button" class="asm-hw-tool is-active" data-tool="pen" id="hwPenBtn" title="Kalem">' +
+            '<button type="button" class="asm-hw-tool asm-hw-tool--primary is-active" data-tool="pen" id="hwPenBtn" title="Kalem" aria-label="Kalem">' +
               TOOL_ICONS.pen +
               '<span>Kalem</span>' +
               '<span class="asm-hw-pen-swatch" id="hwPenSwatch" aria-hidden="true"></span>' +
@@ -831,31 +831,33 @@
             buildPenPopover() +
           '</div>' +
           '<div class="asm-hw-shape-wrap" id="hwShapeWrap">' +
-            '<button type="button" class="asm-hw-tool" data-tool="shape" id="hwShapeBtn" title="Şekil">' +
+            '<button type="button" class="asm-hw-tool asm-hw-tool--primary" data-tool="shape" id="hwShapeBtn" title="Şekil" aria-label="Şekil">' +
               TOOL_ICONS.shape + '<span>Şekil</span>' +
             '</button>' +
             buildShapePopover() +
           '</div>' +
           '<div class="asm-hw-eraser-wrap" id="hwEraserWrap">' +
-            '<button type="button" class="asm-hw-tool" data-tool="eraser" id="hwEraserBtn" title="Silgi">' +
+            '<button type="button" class="asm-hw-tool asm-hw-tool--primary" data-tool="eraser" id="hwEraserBtn" title="Silgi" aria-label="Silgi">' +
               TOOL_ICONS.eraser + '<span>Silgi</span>' +
             '</button>' +
             buildEraserPopover() +
           '</div>' +
         '</div>' +
         '<div class="asm-hw-toolbar-divider" aria-hidden="true"></div>' +
-        '<div class="asm-hw-toolbar-group">' +
-          '<button type="button" class="asm-hw-tool" data-action="clear" title="Temizle">' + TOOL_ICONS.clear + '<span>Temizle</span></button>' +
-          '<button type="button" class="asm-hw-tool" data-action="undo" title="Geri Al" disabled>' + TOOL_ICONS.undo + '<span>Geri Al</span></button>' +
-          '<button type="button" class="asm-hw-tool" data-action="redo" title="İleri Al" disabled>' + TOOL_ICONS.redo + '<span>İleri Al</span></button>' +
+        '<div class="asm-hw-toolbar-group asm-hw-toolbar-group--clear">' +
+          '<button type="button" class="asm-hw-tool asm-hw-tool--compact" data-action="clear" title="Temizle" aria-label="Temizle">' + TOOL_ICONS.clear + '<span>Temizle</span></button>' +
+        '</div>' +
+        '<div class="asm-hw-toolbar-group asm-hw-toolbar-group--history">' +
+          '<button type="button" class="asm-hw-tool asm-hw-tool--compact" data-action="undo" title="Geri Al" aria-label="Geri Al" disabled>' + TOOL_ICONS.undo + '<span>Geri Al</span></button>' +
+          '<button type="button" class="asm-hw-tool asm-hw-tool--compact" data-action="redo" title="İleri Al" aria-label="İleri Al" disabled>' + TOOL_ICONS.redo + '<span>İleri Al</span></button>' +
         '</div>' +
         '<div class="asm-hw-toolbar-divider" aria-hidden="true"></div>' +
-        '<div class="asm-hw-toolbar-group asm-hw-toolbar-zoom">' +
-          '<button type="button" class="asm-hw-tool" data-action="zoom-out" title="Uzaklaştır">' + TOOL_ICONS.zoomOut + '<span>Uzaklaştır</span></button>' +
+        '<div class="asm-hw-toolbar-group asm-hw-toolbar-group--zoom">' +
+          '<button type="button" class="asm-hw-tool asm-hw-tool--compact" data-action="zoom-out" title="Uzaklaştır" aria-label="Uzaklaştır">' + TOOL_ICONS.zoomOut + '<span>Uzaklaştır</span></button>' +
+          '<button type="button" class="asm-hw-tool asm-hw-tool--compact" data-action="zoom-in" title="Yakınlaştır" aria-label="Yakınlaştır">' + TOOL_ICONS.zoomIn + '<span>Yakınlaştır</span></button>' +
           '<span class="asm-hw-zoom-label" id="hwZoomLabel" aria-live="polite">100%</span>' +
-          '<button type="button" class="asm-hw-tool" data-action="zoom-in" title="Yakınlaştır">' + TOOL_ICONS.zoomIn + '<span>Yakınlaştır</span></button>' +
-          '<button type="button" class="asm-hw-tool asm-hw-tool-hint" title="Soru görselinin ve çözüm alanının üzerine çizebilir, tahtayı kaydırabilir ve yakınlaştırabilirsin." aria-label="Tahta ipucu">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="10" x2="12" y2="16"/><line x1="12" y1="7" x2="12.01" y2="7"/></svg>' +
+          '<button type="button" class="asm-hw-tool asm-hw-tool-hint asm-hw-tool--compact" title="Soru görselinin ve çözüm alanının üzerine çizebilir, tahtayı kaydırabilir ve yakınlaştırabilirsin." aria-label="Tahta ipucu">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="10" x2="12" y2="16"/><line x1="12" y1="7" x2="12.01" y2="7"/></svg>' +
           '</button>' +
         '</div>' +
       '</div>';
