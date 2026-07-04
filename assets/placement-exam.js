@@ -250,6 +250,8 @@
     var skipBreakCheckbox = root.querySelector('#asmBreakSkip');
     var breakTimerEl = root.querySelector('#asmBreakTimer');
     var transitionHint = root.querySelector('#asmTransitionHint');
+    var qCurrentEl = root.querySelector('#asmPlacementQCurrent');
+    var qTotalEl = root.querySelector('#asmPlacementQTotal');
     var studentBar = global.BilenyumExamStudentBar
       ? global.BilenyumExamStudentBar.mount(root, { hideSection: true, hideDeadline: true })
       : null;
@@ -380,7 +382,7 @@
         var ans = answers[entry.globalIndex];
         var cls = 'asm-q-pill';
         if (i === li) cls += ' is-current';
-        if (ans != null) cls += ' is-answered';
+        if (ans != null) cls += ' is-marked';
         return '<button type="button" class="' + cls + '" data-qidx="' + i + '">' + (i + 1) + '</button>';
       }).join('');
     }
@@ -627,6 +629,9 @@
       }, 0);
 
       if (progressFill) progressFill.style.width = (phaseList ? (phaseAnswered / phaseList * 100) : 0) + '%';
+
+      if (qCurrentEl) qCurrentEl.textContent = String(li + 1);
+      if (qTotalEl) qTotalEl.textContent = '/ ' + list.length;
 
       var isVisualQ = q.type === 'visual' && (q.blocks || q.visual);
       root.classList.toggle('is-visual-question', !!isVisualQ);
