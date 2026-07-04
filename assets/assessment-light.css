@@ -1003,6 +1003,14 @@
   color: var(--brand-navy) !important;
 }
 .asm-placement-exam-title { color: var(--brand-navy) !important; }
+.asm-hw-type-badge.is-placement {
+  background: rgba(229, 4, 123, 0.1) !important;
+  border-color: rgba(229, 4, 123, 0.32) !important;
+  color: var(--brand-magenta) !important;
+}
+.asm-placement-page.asm-homework-page .asm-hw-topic.asm-placement-topic {
+  color: var(--ink-dark-2) !important;
+}
 
 /* ============================================================
  * Tamamlayıcı — sonuç, şerit, kapı, placement kontrolleri

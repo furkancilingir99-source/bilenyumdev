@@ -1635,7 +1635,95 @@ body.asm-has-banner .stage {
   display: none !important;
 }
 
-/* Soru navigasyon okları */
+/* Seviye belirleme — ödev ekranı ile aynı iskelet (yalnızca görünüm) */
+.asm-placement-page.asm-homework-page .asm-placement-exam-title {
+  position: static;
+  left: auto;
+  top: auto;
+  transform: none;
+  width: auto;
+  max-width: none;
+  pointer-events: auto;
+  font-size: 18px;
+}
+.asm-placement-page .asm-placement-topic {
+  margin-top: 4px;
+}
+.asm-hw-type-badge.is-placement {
+  background: rgba(229, 4, 123, 0.12);
+  border: 1.5px solid rgba(229, 4, 123, 0.35);
+  color: var(--brand-magenta, #e6087b);
+}
+.asm-placement-page .asm-placement-controls {
+  padding: 10px 20px;
+  margin: 0;
+  border-bottom: 1px solid var(--asm-chrome-border);
+  background: #fff;
+  box-shadow: none;
+}
+.asm-placement-page .asm-placement-layout {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+}
+.asm-placement-page .asm-hw-workspace {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.asm-placement-page .asm-hw-board-wrap {
+  flex: 1;
+  min-height: 0;
+  border: none;
+  border-radius: 0;
+  background: #fff;
+}
+.asm-placement-page .asm-hw-board-viewport {
+  background: #fff;
+}
+.asm-placement-page .asm-hw-nav-outside {
+  display: none !important;
+}
+.asm-placement-page .asm-hw-board-meta {
+  display: none !important;
+}
+.asm-placement-qnav {
+  flex: 0 0 108px;
+  width: 108px;
+}
+.asm-placement-page .asm-hw-qnav-track {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.asm-placement-page .asm-hw-qnav-track .asm-q-pill {
+  height: 34px;
+  min-height: 34px;
+  font-size: 12px;
+  border-radius: 9px;
+}
+.asm-placement-footer-center {
+  grid-column: 2;
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 320px;
+}
+.asm-placement-footer-center .asm-btn-finish-exam {
+  width: 100%;
+  max-width: 280px;
+}
+.asm-placement-page .asm-hw-footer-nav .asm-btn-finish-phase {
+  max-width: 280px;
+}
+.asm-placement-page.is-break .asm-placement-controls,
+.asm-placement-page.is-break .asm-placement-layout,
+.asm-placement-page.is-break .asm-hw-footer-nav {
+  display: none !important;
+}
+
 .asm-question-stage {
   grid-column: 1;
   display: flex;

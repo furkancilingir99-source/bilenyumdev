@@ -353,8 +353,8 @@
           '<div class="asm-exam-grid">' +
             '<div class="asm-exam-card" id="asmCardPlacement">' +
               '<span class="asm-exam-card-icon">📊</span>' +
-              '<h3 class="asm-exam-card-title">Seviye Belirleme Sınavı</h3>' +
-              '<p class="asm-exam-card-desc">Seviyene uygun klana yerleşmen için zorunlu.</p>' +
+              '<h3 class="asm-exam-card-title">Deneme Sınavı</h3>' +
+              '<p class="asm-exam-card-desc">Seviye belirleme sınavı — klana yerleşmen için zorunlu.</p>' +
               '<a href="seviye-belirleme.html" class="asm-btn asm-btn-primary" id="asmModalPlacementBtn">Sınava Gir ' + ICON_ARROW + '</a>' +
             '</div>' +
             '<div class="asm-exam-card" id="asmCardAttention">' +
@@ -479,11 +479,11 @@
     var partialPlacement = sayisalDone && !pDone;
     var onBreak = lsGet('placementBreakEndAt') && lsGet('placementSozelStarted') !== '1';
 
-    var statusText = 'Seviye belirleme ve dikkat testi tamamlanmadan klana yerleşemezsin.';
+    var statusText = 'Deneme sınavı (seviye belirleme) ve dikkat testi tamamlanmadan klana yerleşemezsin.';
     if (onBreak) statusText = 'Moladasın — mola bitince sözel sınava başlayabilirsin.';
     else if (partialPlacement) statusText = 'Sayısal bitti — molayı tamamla ve sözel bölüme geç.';
-    else if (pDone && !aDone) statusText = 'Seviye belirleme tamam — dikkat testini tamamla.';
-    else if (aDone && !pDone) statusText = 'Dikkat testi tamam — seviye belirlemeyi tamamla.';
+    else if (pDone && !aDone) statusText = 'Deneme sınavın tamam — dikkat testini tamamla.';
+    else if (aDone && !pDone) statusText = 'Dikkat testi tamam — deneme sınavını tamamla.';
 
     bannerEl.style.display = '';
     bannerEl.innerHTML =
@@ -535,9 +535,12 @@
   function gatePlacementButton() {
     if (isPlacementDone()) {
       return '<a href="sinav-sonuclari.html?view=placement" class="asm-btn asm-btn-completed">' +
-        ICON_CHECK + ' Seviye Belirleme Sınavını Tamamladın ' + ICON_ARROW + '</a>';
+        ICON_CHECK + ' Deneme Sınavını Tamamladın ' + ICON_ARROW + '</a>';
     }
-    return '<a href="seviye-belirleme.html" class="asm-btn asm-btn-primary">Seviye Belirleme Sınavına Gir ' + ICON_ARROW + '</a>';
+    var label = currentPage() === 'sinavlar.html'
+      ? 'Deneme Sınavına Gir'
+      : 'Seviye Belirleme Sınavına Gir';
+    return '<a href="seviye-belirleme.html" class="asm-btn asm-btn-primary">' + label + ' ' + ICON_ARROW + '</a>';
   }
 
   function gateAttentionButton() {
@@ -551,11 +554,11 @@
   function gateMessageHTML() {
     var pDone = isPlacementDone();
     var aDone = isAttentionDone();
-    var gateText = 'Bu bölümleri görebilmek için deneme sınavı ve dikkat testini tamamlamalısın.';
+    var gateText = 'Bu bölümleri görebilmek için deneme sınavını (seviye belirleme) ve dikkat testini tamamlamalısın.';
     if (pDone && !aDone) {
-      gateText = 'Seviye belirleme tamamlandı. Dikkat testini tamamladığında tüm özellikler açılacak.';
+      gateText = 'Deneme sınavın tamamlandı. Dikkat testini tamamladığında tüm özellikler açılacak.';
     } else if (aDone && !pDone) {
-      gateText = 'Dikkat testi tamamlandı. Seviye belirleme sınavını tamamladığında tüm özellikler açılacak.';
+      gateText = 'Dikkat testi tamamlandı. Deneme sınavını (seviye belirleme) tamamladığında tüm özellikler açılacak.';
     }
 
     return (
