@@ -166,6 +166,19 @@
     }));
   }
 
+  function ensureInitialStudentProfile() {
+    if (lsGet(KEYS.isNew) === '1') return;
+    if (isAllDone() || lsGet('assessmentGraduated') === '1') return;
+    if (hasPartialExamProgress()) return;
+    if (!lsGet(KEYS.placement) && !lsGet(KEYS.attention)) {
+      resetToExistingStudent();
+    }
+  }
+
+  function hasPartialExamProgress() {
+    return IN_PROGRESS_KEYS.some(function (k) { return lsGet(k); });
+  }
+
   function resetToExistingStudent(options) {
     options = options || {};
     IN_PROGRESS_KEYS.forEach(lsRemove);
@@ -178,6 +191,9 @@
     lsSet(KEYS.attention, '1');
     lsSet(KEYS.dismissed, '1');
     lsRemove(KEYS.isNew);
+    lsRemove(KEYS.started);
+    lsRemove(KEYS.deadline);
+    lsRemove('placementPassedBlank');
     lsSet('assessmentGraduated', '1');
     seedExistingStudentResults();
   }
@@ -185,6 +201,8 @@
   function resetToNewStudent(options) {
     options = options || {};
     PROGRESS_KEYS.forEach(lsRemove);
+    lsRemove('assessmentGraduated');
+    lsRemove('placementPassedBlank');
     if (!lsGet(KEYS.studentName)) lsSet(KEYS.studentName, 'Mira Yılmaz');
     if (!lsGet(KEYS.studentGrade)) lsSet(KEYS.studentGrade, '8');
     if (options.name) lsSet(KEYS.studentName, options.name);
@@ -202,8 +220,8 @@
         return true;
       }
       history.replaceState(null, '', location.pathname);
-      refresh();
-      return false;
+      location.reload();
+      return true;
     }
     if (reset !== 'new-student' && reset !== '1') return false;
     resetToNewStudent();
@@ -229,10 +247,14 @@
     return page === 'ogrenci-dashboard.html' || page === 'ogrenci-dashboard' || page === 'dashboard.html' || page === 'dashboard';
   }
 
-  function finishDevReset() {
+  function finishDevReset(mode) {
     var page = currentPage();
     if (STUDENT_PAGES.indexOf(page) === -1) {
       location.href = 'ogrenci-dashboard.html';
+      return;
+    }
+    if (mode === 'existing') {
+      location.reload();
       return;
     }
     refresh();
@@ -256,7 +278,7 @@
     existingBtn.addEventListener('click', function () {
       if (!confirm('Eski öğrenci moduna geçilsin mi? Sınavlar tamamlanmış sayılır ve platformun tüm bölümleri açılır.')) return;
       resetToExistingStudent();
-      finishDevReset();
+      finishDevReset('existing');
     });
 
     var newBtn = document.createElement('button');
@@ -268,7 +290,7 @@
     newBtn.addEventListener('click', function () {
       if (!confirm('Sınav ilerlemesi silinsin ve ilk giriş moduna dönülsün mü?')) return;
       resetToNewStudent();
-      finishDevReset();
+      finishDevReset('new');
     });
 
     wrap.appendChild(existingBtn);
@@ -524,13 +546,64 @@
 
   /* ---------- Content gates ---------- */
   var PAGE_SELECTORS = {
-    'ogrenci-dashboard.html': '.d3-card, .d3-stack',
+    'ogrenci-dashboard.html': '.stage > .d3-card, .stage > .d3-stack',
     'program.html':   '.prog-page',
     'odevler.html':   '.ov-page:not(.tk-page)',
     'tekrarlar.html': '.tk-page',
     'deneme-sinavlari.html':  '.sn-page > .sn-section',
     'performans.html': '.perf-page'
   };
+
+  function clearAssessmentUI() {
+    document.querySelectorAll('.asm-gate-overlay').forEach(function (ov) {
+      ov.remove();
+    });
+    document.querySelectorAll('.asm-gate-wrap').forEach(function (el) {
+      el.classList.remove('is-locked');
+      el.classList.remove('asm-gate-wrap');
+    });
+    Object.keys(PAGE_SELECTORS).forEach(function (page) {
+      document.querySelectorAll(PAGE_SELECTORS[page]).forEach(function (el) {
+        el.classList.remove('is-locked');
+        el.classList.remove('asm-gate-wrap');
+      });
+    });
+    document.body.classList.remove('asm-has-banner');
+    document.body.style.overflow = '';
+    if (bannerEl) bannerEl.style.display = 'none';
+    closeModal(false);
+  }
+
+  function applyUnlockedState() {
+    clearAssessmentUI();
+    if (isAllDone() || lsGet('assessmentGraduated') === '1') {
+      graduateNewStudent();
+      lsSet(KEYS.dismissed, '1');
+    }
+    restoreUnlockedClanUI();
+  }
+
+  function restoreUnlockedClanUI() {
+    var clanName = lsGet('assignedClan') || 'Alfa Klanı';
+    var clanEmoji = lsGet('assignedClanEmoji') || '⚡';
+    document.querySelectorAll('.player-clan').forEach(function (el) {
+      el.textContent = clanName;
+      el.classList.remove('is-pending');
+    });
+    document.querySelectorAll('.d3-profile-clan').forEach(function (el) {
+      el.textContent = clanEmoji + ' ' + clanName;
+      el.classList.remove('is-pending');
+    });
+    document.querySelectorAll('.d3-profile-cta').forEach(function (el) {
+      el.classList.remove('is-disabled');
+      el.removeAttribute('title');
+    });
+    document.querySelectorAll('.prog-eyebrow').forEach(function (el) {
+      if (/Klan atanmadı/i.test(el.textContent)) {
+        el.textContent = clanName.replace(/ Klanı$/, '') + ' Klanı Programı';
+      }
+    });
+  }
 
   function gatePlacementButton() {
     if (isPlacementDone()) {
@@ -577,11 +650,7 @@
 
   function applyGates() {
     if (!needsGate()) {
-      document.querySelectorAll('.asm-gate-wrap.is-locked').forEach(function (el) {
-        el.classList.remove('is-locked');
-        var ov = el.querySelector('.asm-gate-overlay');
-        if (ov) ov.remove();
-      });
+      clearAssessmentUI();
       return;
     }
 
@@ -591,9 +660,10 @@
 
     document.querySelectorAll(sel).forEach(function (el) {
       if (el.closest('.stage-nav')) return;
+      if (el.closest('.asm-gate-wrap.is-locked') && !el.classList.contains('asm-gate-wrap')) return;
       if (!el.classList.contains('asm-gate-wrap')) el.classList.add('asm-gate-wrap');
 
-      var existing = el.querySelector('.asm-gate-overlay');
+      var existing = el.querySelector(':scope > .asm-gate-overlay');
       if (existing) {
         existing.innerHTML = gateMessageHTML();
         var detailBtn = existing.querySelector('[data-asm-open-gate]');
@@ -602,7 +672,6 @@
         return;
       }
 
-      if (el.classList.contains('is-locked')) return;
       el.classList.add('is-locked');
 
       var overlay = document.createElement('div');
@@ -650,39 +719,8 @@
   }
 
   function unlockDashboardFeatures() {
-    if (!isAllDone()) return;
-
-    graduateNewStudent();
-    document.body.classList.remove('asm-has-banner');
-    lsSet(KEYS.dismissed, '1');
-    closeModal(false);
-    if (bannerEl) bannerEl.style.display = 'none';
-
-    document.querySelectorAll('.asm-gate-wrap.is-locked').forEach(function (el) {
-      el.classList.remove('is-locked');
-      var ov = el.querySelector('.asm-gate-overlay');
-      if (ov) ov.remove();
-    });
-
-    var clanName = lsGet('assignedClan') || 'Alfa Klanı';
-    var clanEmoji = lsGet('assignedClanEmoji') || '⚡';
-    document.querySelectorAll('.player-clan').forEach(function (el) {
-      el.textContent = clanName;
-      el.classList.remove('is-pending');
-    });
-    document.querySelectorAll('.d3-profile-clan').forEach(function (el) {
-      el.textContent = clanEmoji + ' ' + clanName;
-      el.classList.remove('is-pending');
-    });
-    document.querySelectorAll('.d3-profile-cta').forEach(function (el) {
-      el.classList.remove('is-disabled');
-      el.removeAttribute('title');
-    });
-    document.querySelectorAll('.prog-eyebrow').forEach(function (el) {
-      if (/Klan atanmadı/i.test(el.textContent)) {
-        el.textContent = clanName.replace(/ Klanı$/, '') + ' Klanı Programı';
-      }
-    });
+    if (!isAllDone() && lsGet('assessmentGraduated') !== '1') return;
+    applyUnlockedState();
   }
 
   function patchStudentNavLabels() {
@@ -697,11 +735,11 @@
 
   function refresh() {
     patchStudentNavLabels();
-    if (isAllDone()) {
-      unlockDashboardFeatures();
+    if (!needsGate()) {
+      applyUnlockedState();
       return;
     }
-    if (!isNewStudent()) return;
+    clearAssessmentUI();
     insertBanner();
     renderBanner();
     applyGates();
@@ -926,6 +964,7 @@
       } else if (page === 'sinav-sonuclari.html') {
         if (global.BilenyumExamHeader) global.BilenyumExamHeader.mount();
       } else if (STUDENT_PAGES.indexOf(page) !== -1) {
+        ensureInitialStudentProfile();
         bindModalEvents();
         refresh();
         initDashboardGate();
