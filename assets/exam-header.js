@@ -16,8 +16,10 @@
       brand.className = 'asm-exam-brand';
       brand.href = 'ogrenci-dashboard.html';
       brand.setAttribute('aria-label', 'Bilenyum anasayfa');
-      brand.innerHTML = '<img src="assets/bilenyum-logo.svg" alt="Bilenyum" width="120" height="24" />';
-      topbar.insertBefore(brand, topbar.firstChild);
+      brand.innerHTML = '<img src="assets/bilenyum-logo.svg" alt="Bilenyum" class="asm-exam-brand-logo" />';
+
+      var anchor = topbar.querySelector('.asm-homework-topbar-left') || topbar;
+      anchor.insertBefore(brand, anchor.firstChild);
     });
   }
 

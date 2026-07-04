@@ -296,10 +296,24 @@
   background: var(--bg-surface) !important;
   border-color: var(--brand-purple-14) !important;
   box-shadow: none !important;
-  width: 148px;
+  width: 56px;
 }
+.asm-homework-page .asm-hw-board-meta--nav {
+  background: linear-gradient(180deg, var(--bg-subtle) 0%, #fff 52%) !important;
+  border-bottom-color: var(--brand-purple-14) !important;
+}
+.asm-hw-nav-progress {
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple-14) !important;
+}
+.asm-hw-nav-palette {
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple-10) !important;
+}
+.asm-hw-nav-progress-count { color: var(--brand-navy) !important; }
+.asm-hw-nav-progress-bar { background: var(--brand-purple-10) !important; }
 @media (max-width: 960px) {
-  .asm-hw-board-toolbar--docked { width: 124px !important; flex-basis: 124px !important; }
+  .asm-hw-board-toolbar--docked { width: 52px !important; flex-basis: 52px !important; }
 }
 .asm-hw-rail-grip {
   background: var(--bg-subtle) !important;
@@ -323,16 +337,18 @@
   border-color: var(--brand-purple-18) !important;
 }
 .asm-homework-page .asm-hw-sheet-options {
-  max-width: 560px;
+  max-width: none !important;
 }
 .asm-homework-page .asm-hw-sheet-options .asm-option {
-  padding: 8px 10px !important;
-  font-size: 13px !important;
+  padding: 12px 14px !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  border-width: 2px !important;
 }
 .asm-homework-page .asm-hw-sheet-options .asm-option-letter {
-  width: 24px !important;
-  height: 24px !important;
-  font-size: 11px !important;
+  width: 28px !important;
+  height: 28px !important;
+  font-size: 12px !important;
 }
 .asm-homework-page .asm-hw-block-prompt {
   font-size: 16px !important;

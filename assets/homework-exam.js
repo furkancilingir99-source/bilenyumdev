@@ -110,6 +110,19 @@
     var questionSheet = root.querySelector('#hwQuestionSheet');
     if (!body) return;
 
+    var optionsRow = root.querySelector('.asm-hw-options-row');
+    var confirm = root.querySelector('#hwConfirmAnswer');
+    var drawRegion = root.querySelector('#hwDrawRegion');
+    if (drawRegion) {
+      if (optionsRow && optionsRow.parentNode === body) {
+        drawRegion.insertBefore(optionsRow, body.nextSibling);
+      }
+      if (confirm && confirm.parentNode === body) {
+        var after = optionsRow && optionsRow.parentNode === drawRegion ? optionsRow : body;
+        drawRegion.insertBefore(confirm, after.nextSibling);
+      }
+    }
+
     var isVisual = q.type === 'visual' && (q.blocks || q.visual);
     if (questionSheet) {
       questionSheet.classList.toggle('is-visual', isVisual);
@@ -166,6 +179,28 @@
     body.innerHTML = parts.join('');
   }
 
+  function mountQuestionChrome(root) {
+    var body = root.querySelector('#hwSheetBody');
+    var optionsRow = root.querySelector('.asm-hw-options-row');
+    var confirm = root.querySelector('#hwConfirmAnswer');
+    if (!body || !optionsRow) return;
+
+    var anchor = body.querySelector('.asm-hw-block-prompt:last-of-type');
+    if (!anchor) {
+      anchor = body.querySelector('.asm-hw-block-text:last-of-type, .asm-hw-block-lead:last-of-type, .asm-hw-block-figure:last-of-type');
+    }
+    if (!anchor) anchor = body.lastElementChild;
+
+    if (anchor) {
+      anchor.insertAdjacentElement('afterend', optionsRow);
+    } else {
+      body.appendChild(optionsRow);
+    }
+    if (confirm) {
+      optionsRow.insertAdjacentElement('afterend', confirm);
+    }
+  }
+
   function init(root) {
     if (!root) return;
 
@@ -184,6 +219,8 @@
     function optionsEl() { return root.querySelector('#hwSheetOptions'); }
     var paletteEl = root.querySelector('#asmQPalette');
     var progressFill = root.querySelector('.asm-exam-progress-fill');
+    var progressBar = root.querySelector('#hwProgressBar');
+    var progressCount = root.querySelector('#hwProgressCount');
     var questionSheet = root.querySelector('#hwQuestionSheet');
     var prevBtn = root.querySelector('[data-asm-prev]');
     var nextBtn = root.querySelector('[data-asm-next]');
@@ -425,8 +462,17 @@
 
     function updateProgress() {
       var done = questionResolved.filter(function (ok) { return ok; }).length;
+      var total = questions.length;
+      var pct = total ? Math.round(done / total * 100) : 0;
       if (progressFill) {
-        progressFill.style.width = (questions.length ? (done / questions.length * 100) : 0) + '%';
+        progressFill.style.width = pct + '%';
+      }
+      if (progressCount) {
+        progressCount.textContent = done + ' / ' + total;
+      }
+      if (progressBar) {
+        progressBar.setAttribute('aria-valuenow', String(pct));
+        progressBar.setAttribute('aria-valuetext', done + ' soru tamamlandı, ' + total + ' sorudan');
       }
     }
 
@@ -684,6 +730,7 @@
     function renderVisual(q, qi, reframeView) {
       renderSheetHead(root, set, q, qi != null ? qi : idx, questions.length);
       renderSheetBlocks(root, q, qi != null ? qi : idx);
+      mountQuestionChrome(root);
 
       if (board) {
         requestAnimationFrame(function () {
@@ -726,8 +773,12 @@
         if (questionResolved[i]) cls += ' is-answered';
         else if (deferredLater[i]) cls += ' is-deferred';
         else if (pendingSelection[i] != null || wrongAttempts[i] > 0) cls += ' is-draft';
-        return '<button type="button" class="' + cls + '" data-qidx="' + i + '">' + (i + 1) + '</button>';
+        return '<button type="button" class="' + cls + '" data-qidx="' + i + '" aria-label="Soru ' + (i + 1) + '">' + (i + 1) + '</button>';
       }).join('');
+      var currentPill = paletteEl.querySelector('.asm-q-pill.is-current');
+      if (currentPill && typeof currentPill.scrollIntoView === 'function') {
+        currentPill.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+      }
     }
 
     function goToQuestion(nextIdx, opts) {

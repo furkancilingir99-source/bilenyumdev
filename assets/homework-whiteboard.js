@@ -367,15 +367,14 @@
     }
 
     function syncLayout() {
-      var region = root.querySelector('#hwDrawRegion');
-      if (!region || !canvas) return;
+      var solveZone = root.querySelector('#hwSolveZone');
+      if (!solveZone || !canvas) return;
 
-      var pos = offsetWithin(region, layer);
+      var pos = offsetWithin(solveZone, layer);
       if (!pos) return;
 
-      var sheet = root.querySelector('#hwQuestionSheet');
-      var regionW = (sheet && sheet.offsetWidth) || region.offsetWidth || SOLVE_W;
-      var regionH = Math.max(SOLVE_H + 120, region.offsetHeight || SOLVE_H + 120);
+      var regionW = solveZone.offsetWidth || SOLVE_W;
+      var regionH = Math.max(SOLVE_H, solveZone.offsetHeight || SOLVE_H);
       var ox = pos.x;
       var oy = pos.y;
 
