@@ -6,30 +6,50 @@ import {
   verifyAccessToken
 } from './lib/supabase-auth-common.mjs';
 
-function redirectToLogin(url, pathname, clearCookies) {
-  const loginUrl = new URL('/giris', url.origin);
-  if (clearCookies) loginUrl.searchParams.set('expired', '1');
-  const safePath = pathname || '/';
-  loginUrl.searchParams.set('from', safePath + url.search);
-  const response = Response.redirect(loginUrl.toString(), 302);
+function safeLoginUrl(origin, pathname, search, expired) {
+  try {
+    const loginUrl = new URL('/giris', origin || 'https://localhost');
+    if (expired) loginUrl.searchParams.set('expired', '1');
+    const fromPath = pathname && pathname !== '/giris' ? pathname : '/';
+    loginUrl.searchParams.set('from', fromPath + (search || ''));
+    return loginUrl.toString();
+  } catch {
+    return '/giris?expired=1';
+  }
+}
+
+function redirectToLogin(origin, pathname, search, clearCookies) {
+  const target = safeLoginUrl(origin, pathname, search, clearCookies);
+  const headers = new Headers({ Location: target });
   if (clearCookies) {
     clearSessionCookieHeaders().forEach(function (c) {
-      response.headers.append('Set-Cookie', c);
+      headers.append('Set-Cookie', c);
     });
   }
-  return response;
+  return new Response(null, { status: 302, headers });
 }
 
 export default async function middleware(request) {
-  try {
-    const url = new URL(request.url);
-    const pathname = url.pathname;
+  let url;
+  let pathname = '/';
+  let origin = 'https://localhost';
 
+  try {
+    url = new URL(request.url);
+    pathname = url.pathname || '/';
+    origin = url.origin;
+  } catch {
+    return redirectToLogin(origin, pathname, '', true);
+  }
+
+  try {
     if (isBlockedPath(pathname)) {
       return new Response('Not Found', { status: 404 });
     }
 
-    if (isPublicPath(pathname)) return;
+    if (isPublicPath(pathname)) {
+      return;
+    }
 
     if (!isAuthConfigured()) {
       return new Response(
@@ -39,14 +59,24 @@ export default async function middleware(request) {
     }
 
     const accessToken = readCookie(request, ACCESS_COOKIE);
-    const session = accessToken ? await verifyAccessToken(accessToken) : null;
+    let session = null;
 
-    if (session) return;
+    if (accessToken) {
+      try {
+        session = await verifyAccessToken(accessToken);
+      } catch {
+        session = null;
+      }
+    }
 
-    return redirectToLogin(url, pathname, !!accessToken);
+    if (session) {
+      return;
+    }
+
+    return redirectToLogin(origin, pathname, url.search, !!accessToken);
   } catch (err) {
     console.error('[middleware]', err);
-    return redirectToLogin(new URL(request.url), new URL(request.url).pathname, true);
+    return redirectToLogin(origin, pathname, url.search || '', true);
   }
 }
 

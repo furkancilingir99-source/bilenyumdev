@@ -1,6 +1,7 @@
 /**
- * Website / Veli / Öğrenci / Öğretmen geçişi — HUD veya marketing nav içinde
- * window.DashboardSwitcher.mount()
+ * Website / Veli / Öğrenci / Öğretmen geçişi
+ * - Dashboard: HUD header içinde yatay switcher
+ * - Website: sol sabit dikey menü (header'ı bozmaz)
  */
 (function (global) {
   'use strict';
@@ -79,7 +80,7 @@
     return 'student';
   }
 
-  function renderSwitcher(activeKey) {
+  function renderHudSwitcher(activeKey) {
     var buttons = ITEMS.map(function (item) {
       var isActive = item.key === activeKey;
       return (
@@ -99,6 +100,44 @@
     );
   }
 
+  function renderSiteRail(activeKey) {
+    var buttons = ITEMS.map(function (item) {
+      var isActive = item.key === activeKey;
+      return (
+        '<a href="' + item.href + '" class="site-rail-btn ' + item.cls + (isActive ? ' is-active' : '') + '"' +
+          (isActive ? ' aria-current="page"' : '') +
+          ' title="' + item.label + '">' +
+          item.icon +
+          '<span class="site-rail-label">' + item.short + '</span>' +
+        '</a>'
+      );
+    }).join('');
+
+    return (
+      '<aside class="site-persona-rail" aria-label="Bölüm geçişi">' +
+        '<p class="site-rail-title">Bölümler</p>' +
+        '<nav class="site-rail-nav">' + buttons + '</nav>' +
+      '</aside>'
+    );
+  }
+
+  function cleanupNavHeaderSwitcher() {
+    var navInner = document.querySelector('header.nav .nav-inner, nav.nav .nav-inner');
+    if (!navInner) return;
+
+    var left = navInner.querySelector('.nav-brand-left');
+    if (!left) return;
+
+    var logo = left.querySelector('.logo');
+    var switcher = left.querySelector('.db-switch');
+    if (switcher) switcher.remove();
+
+    if (logo) {
+      navInner.insertBefore(logo, navInner.firstChild);
+    }
+    left.remove();
+  }
+
   function ensureHudLeft(hud, brand) {
     var left = hud.querySelector('.hud-left');
     if (left) return left;
@@ -107,20 +146,6 @@
     left.className = 'hud-left';
     hud.insertBefore(left, brand);
     left.appendChild(brand);
-    return left;
-  }
-
-  function ensureNavBrandLeft(navInner) {
-    var logo = navInner.querySelector('.logo');
-    if (!logo) return null;
-
-    var left = navInner.querySelector('.nav-brand-left');
-    if (left) return left;
-
-    left = document.createElement('div');
-    left.className = 'nav-brand-left';
-    navInner.insertBefore(left, logo);
-    left.appendChild(logo);
     return left;
   }
 
@@ -165,7 +190,7 @@
     }
 
     var wrap = document.createElement('div');
-    wrap.innerHTML = renderSwitcher(detectPersona());
+    wrap.innerHTML = renderHudSwitcher(detectPersona());
     var nav = wrap.firstElementChild;
     if (!nav) return false;
 
@@ -174,32 +199,40 @@
     return true;
   }
 
-  function mountOnNav() {
-    var navInner = document.querySelector('header.nav .nav-inner, nav.nav .nav-inner');
-    if (!navInner) return false;
+  function mountSiteRail() {
+    if (!isWebsitePage()) return false;
 
-    if (navInner.querySelector('.db-switch')) return true;
+    cleanupNavHeaderSwitcher();
 
-    var left = ensureNavBrandLeft(navInner);
-    if (!left) return false;
+    if (document.querySelector('.site-persona-rail')) {
+      document.body.classList.add('has-persona-rail');
+      return true;
+    }
 
     var wrap = document.createElement('div');
-    wrap.innerHTML = renderSwitcher(detectPersona());
-    var switcher = wrap.firstElementChild;
-    if (!switcher) return false;
+    wrap.innerHTML = renderSiteRail(detectPersona());
+    var rail = wrap.firstElementChild;
+    if (!rail) return false;
 
-    left.appendChild(switcher);
+    document.body.appendChild(rail);
+    document.body.classList.add('has-persona-rail');
     return true;
   }
 
   function mount() {
-    if (document.querySelector('.db-switch')) {
-      syncHudHeight();
-      return true;
+    if (document.querySelector('.hud')) {
+      if (document.querySelector('.db-switch')) {
+        syncHudHeight();
+        return true;
+      }
+      return mountOnHud();
     }
 
-    if (mountOnHud()) return true;
-    return mountOnNav();
+    if (isWebsitePage()) {
+      return mountSiteRail();
+    }
+
+    return false;
   }
 
   function tryMount() {

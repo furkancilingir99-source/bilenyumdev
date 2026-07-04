@@ -609,7 +609,7 @@
     const redirectTo = (fromParam.charAt(0) === '/' && fromParam.charAt(1) !== '/') ? fromParam : '/';
 
     if (params.get('expired') === '1') {
-      showError('Oturumunuz sona erdi. Lütfen tekrar giriş yapın.');
+      showError('Oturumunuz sona erdi veya geçersiz hale geldi. Devam etmek için lütfen yeniden giriş yapın.');
     }
 
     function showError(msg) {
