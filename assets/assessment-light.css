@@ -292,14 +292,14 @@
 .asm-homework-page .asm-hw-board-viewport {
   background: #fff !important;
 }
-.asm-hw-board-toolbar--float {
+.asm-hw-board-toolbar--docked {
   background: var(--bg-surface) !important;
   border-color: var(--brand-purple-14) !important;
-  box-shadow: var(--shadow-lg) !important;
-  width: 172px;
+  box-shadow: none !important;
+  width: 148px;
 }
 @media (max-width: 960px) {
-  .asm-hw-board-toolbar--float { width: 136px !important; }
+  .asm-hw-board-toolbar--docked { width: 124px !important; flex-basis: 124px !important; }
 }
 .asm-hw-rail-grip {
   background: var(--bg-subtle) !important;

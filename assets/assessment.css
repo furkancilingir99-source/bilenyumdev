@@ -2910,64 +2910,131 @@ body.asm-has-banner .stage {
   z-index: 40;
   touch-action: none;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group {
+.asm-hw-board-toolbar--docked {
+  flex: 0 0 148px;
+  width: 148px;
+  align-self: stretch;
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  height: auto;
+  max-height: none;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  border-right: 1px solid var(--asm-chrome-border);
+  padding: 10px 8px 12px;
+  overflow-y: auto;
+  overflow-x: visible;
+  z-index: 20;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+.asm-hw-board-toolbar--docked .asm-hw-toolbar-rail {
+  flex: 1;
+  min-height: 0;
+}
+.asm-hw-board-toolbar--docked .asm-hw-rail-grip {
+  display: none;
+}
+.asm-hw-workspace {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group {
   display: grid;
   gap: 5px;
   width: 100%;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--draw {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--draw,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--draw {
   grid-template-columns: 1fr 1fr;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--clear {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--clear,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--clear {
   grid-template-columns: 1fr;
 }
 .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--history,
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--zoom {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--zoom,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--history,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--zoom {
   grid-template-columns: 1fr 1fr;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--zoom {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--zoom,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--zoom {
   margin-top: auto;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--draw .asm-hw-pen-wrap,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--draw .asm-hw-shape-wrap,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--draw .asm-hw-eraser-wrap {
+  display: flex;
+  min-width: 0;
+  width: 100%;
+}
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--draw .asm-hw-tool {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary {
   min-height: 62px;
   padding: 8px 4px 6px;
   gap: 5px;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary svg {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary svg,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary svg {
   width: 26px;
   height: 26px;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary span:not(.asm-hw-pen-swatch) {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary span:not(.asm-hw-pen-swatch),
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary span:not(.asm-hw-pen-swatch) {
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.01em;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact {
   min-height: 42px;
   padding: 6px 4px;
   gap: 3px;
+  width: 100%;
+  box-sizing: border-box;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact svg {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact svg,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact svg {
   width: 18px;
   height: 18px;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact span:not(.asm-hw-pen-swatch) {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact span:not(.asm-hw-pen-swatch),
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact span:not(.asm-hw-pen-swatch) {
   font-size: 8px;
   font-weight: 700;
   line-height: 1.1;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact.asm-hw-tool-hint {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact.asm-hw-tool-hint,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact.asm-hw-tool-hint {
   min-height: 32px;
   grid-column: 1 / -1;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact.asm-hw-tool-hint svg {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact.asm-hw-tool-hint svg,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact.asm-hw-tool-hint svg {
   width: 16px;
   height: 16px;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact.asm-hw-tool-hint span {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact.asm-hw-tool-hint span,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact.asm-hw-tool-hint span {
   display: none;
 }
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool {
   width: auto;
 }
 .asm-hw-board-toolbar--float.is-dragging {
@@ -3080,14 +3147,16 @@ body.asm-has-banner .stage {
   min-width: 0;
 }
 .asm-hw-board-toolbar--float .asm-hw-tool[data-tool="pen"] .asm-hw-pen-swatch,
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary[data-tool="pen"] .asm-hw-pen-swatch {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary[data-tool="pen"] .asm-hw-pen-swatch,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary[data-tool="pen"] .asm-hw-pen-swatch {
   top: 6px;
   right: 6px;
   width: 9px;
   height: 9px;
 }
 .asm-hw-board-toolbar--float .asm-hw-toolbar-zoom .asm-hw-zoom-label,
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--zoom .asm-hw-zoom-label {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--zoom .asm-hw-zoom-label,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--zoom .asm-hw-zoom-label {
   grid-column: 1 / -1;
   width: 100%;
   min-height: 28px;
@@ -3098,36 +3167,34 @@ body.asm-has-banner .stage {
   padding: 4px 6px;
 }
 .asm-hw-board-toolbar--float .asm-hw-tool-hint,
-.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool-hint {
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool-hint,
+.asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool-hint {
   grid-column: 1 / -1;
 }
 .asm-homework-page .asm-hw-layout {
-  flex-direction: column;
-}
-.asm-homework-page,
-.asm-homework-page .asm-hw-layout,
-.asm-homework-page .asm-hw-board-wrap,
-.asm-homework-page .asm-hw-board-viewport {
-  background: #fff;
+  flex-direction: row;
+  align-items: stretch;
 }
 .asm-homework-page .asm-hw-board-wrap {
-  background: #fff;
-}
-.asm-homework-page .asm-hw-board-grid {
-  display: none;
+  flex: 1;
+  min-width: 0;
 }
 .asm-homework-page .asm-hw-sheet-cluster {
   position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 0;
+  left: 0;
+  right: 0;
+  transform: none;
+  width: 100%;
 }
 .asm-homework-page .asm-hw-sheet {
-  width: calc(100vw - 20px);
+  width: 100%;
   max-width: none;
+  margin: 0;
   background: #fff;
-  border: 1px solid rgba(26, 21, 56, 0.1);
-  box-shadow: 0 4px 20px rgba(26, 21, 56, 0.05);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 .asm-homework-page .asm-hw-sheet-head {
   background: #fff;
@@ -3175,10 +3242,17 @@ body.asm-has-banner .stage {
   font-size: 13px;
   color: rgba(26, 21, 56, 0.62);
 }
-.asm-homework-page .asm-hw-board-toolbar--float .asm-hw-tool--primary {
+.asm-homework-page,
+.asm-homework-page .asm-hw-layout,
+.asm-homework-page .asm-hw-workspace,
+.asm-homework-page .asm-hw-board-wrap,
+.asm-homework-page .asm-hw-board-viewport {
+  background: #fff;
+}
+.asm-homework-page .asm-hw-board-toolbar--docked .asm-hw-tool--primary {
   min-height: 58px;
 }
-.asm-homework-page .asm-hw-board-toolbar--float .asm-hw-tool--primary svg {
+.asm-homework-page .asm-hw-board-toolbar--docked .asm-hw-tool--primary svg {
   width: 24px;
   height: 24px;
 }
@@ -4034,26 +4108,21 @@ body.asm-has-banner .stage {
     margin: 0 0 8px;
   }
   .asm-hw-meta-palette .asm-q-palette { display: flex; }
-  .asm-homework-page .asm-hw-sheet-cluster {
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .asm-homework-page .asm-hw-sheet { width: calc(100vw - 16px); }
-  .asm-hw-board-toolbar--float { width: 136px; padding: 6px 6px 8px; left: 8px; }
-  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary {
+  .asm-homework-page .asm-hw-sheet { width: 100%; }
+  .asm-hw-board-toolbar--docked { flex-basis: 124px; width: 124px; padding: 8px 6px 10px; }
+  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary {
     min-height: 50px;
     padding: 6px 2px 4px;
   }
-  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary svg {
+  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary svg {
     width: 22px;
     height: 22px;
   }
-  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--primary span:not(.asm-hw-pen-swatch) { display: none; }
-  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact span:not(.asm-hw-pen-swatch) { display: none; }
-  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-tool--compact {
-    min-height: 38px;
-  }
-  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--float .asm-hw-toolbar-group--zoom .asm-hw-zoom-label { font-size: 9px; min-width: 0; }
+  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary span:not(.asm-hw-pen-swatch),
+  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact span:not(.asm-hw-pen-swatch) { display: none; }
+  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact { min-height: 38px; }
+  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--zoom .asm-hw-zoom-label { font-size: 9px; min-width: 0; }
+  .asm-hw-board-viewport { min-height: 280px; }
   .asm-homework-page .asm-hw-sheet-options { max-width: 100%; grid-template-columns: 1fr 1fr; }
   .asm-hw-block-figure svg { max-width: 280px; }
   .asm-hw-footer-nav {

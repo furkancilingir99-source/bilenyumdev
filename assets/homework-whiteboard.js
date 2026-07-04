@@ -281,7 +281,9 @@
     }
 
     function positionRailPopover(wrap, popover) {
-      if (!wrap || !popover || !toolbar.classList.contains('asm-hw-board-toolbar--rail')) return;
+      if (!wrap || !popover) return;
+      var isSideRail = toolbar.classList.contains('asm-hw-board-toolbar--rail');
+      if (!isSideRail) return;
       var rect = wrap.getBoundingClientRect();
       popover.style.position = 'fixed';
       popover.style.left = Math.round(rect.right + 10) + 'px';
@@ -719,18 +721,24 @@
       updateTransform();
     }
 
+    function syncSheetWidth() {
+      var sheet = root.querySelector('#hwQuestionSheet');
+      if (!sheet || !viewport) return;
+      var w = Math.max(480, viewport.clientWidth - 12);
+      sheet.style.width = w + 'px';
+    }
+
     function focusSheet() {
+      syncSheetWidth();
       syncLayout();
       var sheet = root.querySelector('#hwQuestionSheet');
-      var cluster = root.querySelector('#hwSheetCluster');
       var rect = viewport.getBoundingClientRect();
       var sheetW = sheet ? sheet.offsetWidth || LAYER_W : LAYER_W;
       var sheetH = sheet ? sheet.offsetHeight || 900 : 900;
-      var clusterX = cluster ? cluster.offsetLeft : 0;
-      zoom = Math.min(1, Math.max(ZOOM_MIN, (rect.width - 24) / sheetW));
+      zoom = Math.min(1, Math.max(ZOOM_MIN, (rect.width - 12) / sheetW));
       var scaledH = sheetH * zoom;
-      panX = (rect.width - sheetW * zoom) / 2 - clusterX * zoom;
-      panY = scaledH > rect.height - 20 ? 10 : Math.max(10, (rect.height - scaledH) / 2);
+      panX = Math.max(6, (rect.width - sheetW * zoom) / 2);
+      panY = scaledH > rect.height - 12 ? 6 : Math.max(6, (rect.height - scaledH) / 2);
       updateTransform();
     }
 
@@ -985,6 +993,7 @@
     }, { passive: false });
 
     function onResize() {
+      syncSheetWidth();
       syncLayout();
       focusSheet();
       repositionOpenPopovers();

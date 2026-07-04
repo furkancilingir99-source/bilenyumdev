@@ -30,44 +30,45 @@
   </header>
 
   <div class="asm-hw-layout">
-    <section class="asm-hw-board-wrap" aria-label="Çözüm tahtası">
-      <div class="asm-hw-board-meta" aria-label="Soru ilerlemesi">
-        <div class="asm-exam-progress asm-hw-meta-progress"><div class="asm-exam-progress-fill" style="width:0%"></div></div>
-        <div class="asm-q-palette-wrap asm-hw-meta-palette">
-          <p class="asm-q-palette-title">Sorular</p>
-          <div class="asm-q-palette" id="asmQPalette"></div>
-        </div>
-      </div>
-      <div class="asm-hw-board-viewport" id="hwBoardViewport">
-        <aside class="asm-hw-board-toolbar asm-hw-board-toolbar--rail asm-hw-board-toolbar--float" id="hwBoardToolbar" aria-label="Tahta araçları"></aside>
-        <div class="asm-hw-board-layer" id="hwBoardLayer">
-          <div class="asm-hw-sheet-cluster" id="hwSheetCluster">
-            <div class="asm-hw-sheet" id="hwQuestionSheet">
-              <header class="asm-hw-sheet-head" id="hwSheetHead">
-                <div class="asm-hw-sheet-head-inner" id="hwSheetHeadInner"></div>
-              </header>
-              <div class="asm-hw-draw-region" id="hwDrawRegion">
-                <div class="asm-hw-sheet-body" id="hwSheetBody"></div>
-                <div class="asm-hw-options-row asm-hw-sheet-interactive">
-                  <div class="asm-options asm-hw-sheet-options" id="hwSheetOptions"></div>
-                </div>
-                <div class="asm-hw-confirm-answer asm-hw-sheet-interactive" id="hwConfirmAnswer" hidden>
-                  <button type="button" class="asm-hw-confirm-answer-btn" id="hwConfirmAnswerBtn">Cevabımı Onayla</button>
-                </div>
-                <div class="asm-hw-solve-zone" id="hwSolveZone" aria-label="Çözüm alanı">
-                  <span class="asm-hw-solve-label">Çözüm alanı</span>
-                </div>
-              </div>
-              <footer class="asm-hw-sheet-foot">
-                <p class="asm-hw-sheet-guide">Bir şık seç, ardından <strong>Cevabımı Onayla</strong> ile cevabını gönder. Sorular paleti veya alttaki gezinme butonlarıyla istediğin soruya geçebilirsin.</p>
-              </footer>
-            </div>
+    <aside class="asm-hw-board-toolbar asm-hw-board-toolbar--rail asm-hw-board-toolbar--docked" id="hwBoardToolbar" aria-label="Tahta araçları"></aside>
+    <div class="asm-hw-workspace">
+      <section class="asm-hw-board-wrap" aria-label="Çözüm tahtası">
+        <div class="asm-hw-board-meta" aria-label="Soru ilerlemesi">
+          <div class="asm-exam-progress asm-hw-meta-progress"><div class="asm-exam-progress-fill" style="width:0%"></div></div>
+          <div class="asm-q-palette-wrap asm-hw-meta-palette">
+            <p class="asm-q-palette-title">Sorular</p>
+            <div class="asm-q-palette" id="asmQPalette"></div>
           </div>
-          <canvas id="hwDrawCanvas" aria-label="Çizim katmanı"></canvas>
         </div>
-        <div class="asm-hw-board-grid" aria-hidden="true"></div>
-      </div>
-    </section>
+        <div class="asm-hw-board-viewport" id="hwBoardViewport">
+          <div class="asm-hw-board-layer" id="hwBoardLayer">
+            <div class="asm-hw-sheet-cluster" id="hwSheetCluster">
+              <div class="asm-hw-sheet" id="hwQuestionSheet">
+                <header class="asm-hw-sheet-head" id="hwSheetHead">
+                  <div class="asm-hw-sheet-head-inner" id="hwSheetHeadInner"></div>
+                </header>
+                <div class="asm-hw-draw-region" id="hwDrawRegion">
+                  <div class="asm-hw-sheet-body" id="hwSheetBody"></div>
+                  <div class="asm-hw-options-row asm-hw-sheet-interactive">
+                    <div class="asm-options asm-hw-sheet-options" id="hwSheetOptions"></div>
+                  </div>
+                  <div class="asm-hw-confirm-answer asm-hw-sheet-interactive" id="hwConfirmAnswer" hidden>
+                    <button type="button" class="asm-hw-confirm-answer-btn" id="hwConfirmAnswerBtn">Cevabımı Onayla</button>
+                  </div>
+                  <div class="asm-hw-solve-zone" id="hwSolveZone" aria-label="Çözüm alanı">
+                    <span class="asm-hw-solve-label">Çözüm alanı</span>
+                  </div>
+                </div>
+                <footer class="asm-hw-sheet-foot">
+                  <p class="asm-hw-sheet-guide">Bir şık seç, ardından <strong>Cevabımı Onayla</strong> ile cevabını gönder. Sorular paleti veya alttaki gezinme butonlarıyla istediğin soruya geçebilirsin.</p>
+                </footer>
+              </div>
+            </div>
+            <canvas id="hwDrawCanvas" aria-label="Çizim katmanı"></canvas>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 
   <footer class="asm-exam-footer asm-exam-footer--actions asm-hw-footer-nav">
