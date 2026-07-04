@@ -898,6 +898,7 @@
 
   /* ---------- Boot ---------- */
   function boot() {
+    patchStudentNavLabels();
     var redirected = applyResetShortcut();
     if (!redirected) {
       devResetForTesting();
