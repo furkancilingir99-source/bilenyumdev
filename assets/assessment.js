@@ -41,7 +41,7 @@
   function devResetForTesting() {
     if (!DEV_RESET_ON_RELOAD) return;
     var page = currentPage();
-    var resetPages = ['ogrenci-dashboard.html', 'program.html', 'odevler.html', 'tekrarlar.html', 'sinavlar.html', 'performans.html'];
+    var resetPages = ['ogrenci-dashboard.html', 'program.html', 'odevler.html', 'tekrarlar.html', 'deneme-sinavlari.html', 'performans.html'];
     if (resetPages.indexOf(page) === -1) return;
 
     var placementDone = lsGet(KEYS.placement) === '1';
@@ -215,7 +215,7 @@
     return false;
   }
 
-  var STUDENT_PAGES = ['ogrenci-dashboard.html', 'program.html', 'odevler.html', 'tekrarlar.html', 'sinavlar.html', 'performans.html'];
+  var STUDENT_PAGES = ['ogrenci-dashboard.html', 'program.html', 'odevler.html', 'tekrarlar.html', 'deneme-sinavlari.html', 'performans.html'];
 
   function currentPage() {
     var name = (location.pathname.split('/').pop() || '').toLowerCase();
@@ -528,7 +528,7 @@
     'program.html':   '.prog-page',
     'odevler.html':   '.ov-page:not(.tk-page)',
     'tekrarlar.html': '.tk-page',
-    'sinavlar.html':  '.sn-page > .sn-section',
+    'deneme-sinavlari.html':  '.sn-page > .sn-section',
     'performans.html': '.perf-page'
   };
 
@@ -537,7 +537,7 @@
       return '<a href="sinav-sonuclari.html?view=placement" class="asm-btn asm-btn-completed">' +
         ICON_CHECK + ' Deneme Sınavını Tamamladın ' + ICON_ARROW + '</a>';
     }
-    var label = currentPage() === 'sinavlar.html'
+    var label = currentPage() === 'deneme-sinavlari.html'
       ? 'Deneme Sınavına Gir'
       : 'Seviye Belirleme Sınavına Gir';
     return '<a href="seviye-belirleme.html" class="asm-btn asm-btn-primary">' + label + ' ' + ICON_ARROW + '</a>';
@@ -686,7 +686,8 @@
   }
 
   function patchStudentNavLabels() {
-    document.querySelectorAll('.nav-rail a[href="sinavlar.html"]').forEach(function (link) {
+    document.querySelectorAll('.nav-rail a[href="deneme-sinavlari.html"], .nav-rail a[href="sinavlar.html"]').forEach(function (link) {
+      link.setAttribute('href', 'deneme-sinavlari.html');
       link.classList.add('is-label-wrap');
       link.setAttribute('title', 'Deneme Sınavları');
       var label = link.querySelector('.nav-item-label');

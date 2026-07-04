@@ -276,7 +276,7 @@
       root.innerHTML =
         '<main class="asm-hw-empty">' +
           '<p>' + (params.get('exam') ? 'Deneme sınavı bulunamadı.' : 'Ödev bulunamadı.') + '</p>' +
-          '<a href="' + (params.get('exam') ? 'sinavlar.html' : 'ogrenci-dashboard.html') + '" class="asm-btn asm-btn-primary">' +
+          '<a href="' + (params.get('exam') ? 'deneme-sinavlari.html' : 'ogrenci-dashboard.html') + '" class="asm-btn asm-btn-primary">' +
             (params.get('exam') ? 'Deneme Sınavlarına Dön' : 'Dashboard\'a Dön') + '</a>' +
         '</main>';
       return;
@@ -920,7 +920,7 @@
           completedAt: new Date().toISOString(),
           mode: mode
         }));
-        location.href = 'sinavlar.html?deneme=done&exam=' + encodeURIComponent(hwId);
+        location.href = 'deneme-sinavlari.html?deneme=done&exam=' + encodeURIComponent(hwId);
         return;
       }
 
@@ -1134,7 +1134,7 @@
     if (global.BilenyumExamStudentBar) {
       global.BilenyumExamStudentBar.mount(root, {
         showBack: true,
-        backHref: isDeneme ? 'sinavlar.html' : 'ogrenci-dashboard.html',
+        backHref: isDeneme ? 'deneme-sinavlari.html' : 'ogrenci-dashboard.html',
         backLabel: isDeneme ? 'Deneme Sınavları' : "Dashboard'a Dön",
         hideSection: true,
         dueAt: isDeneme ? null : (set.dueAt || null)

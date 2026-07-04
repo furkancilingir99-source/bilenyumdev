@@ -1635,7 +1635,12 @@ body.asm-has-banner .stage {
   display: none !important;
 }
 
-/* Seviye belirleme — ödev görünümü (yalnızca CSS; DOM/iskelet korunur) */
+/* Seviye belirleme — ödev ekranı görünümü (DOM ID'leri korunur) */
+.asm-placement-page.asm-homework-page {
+  background: #fff;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
 .asm-placement-page.asm-homework-page .asm-placement-exam-title {
   position: static;
   left: auto;
@@ -1657,10 +1662,22 @@ body.asm-has-banner .stage {
   background: #fff;
   border-bottom: 1px solid var(--asm-chrome-border);
 }
+.asm-hw-type-badge.is-placement {
+  background: rgba(229, 4, 123, 0.12);
+  border: 1.5px solid rgba(229, 4, 123, 0.35);
+  color: var(--brand-magenta, #e6087b);
+}
 .asm-placement-page .asm-placement-controls {
   padding: 10px 20px;
   background: #fff;
   box-shadow: none;
+  border-bottom: 1px solid var(--asm-chrome-border);
+}
+.asm-placement-page.asm-homework-page .asm-hw-layout {
+  flex: 1;
+  min-height: 0;
+  border-top: none;
+  background: #fff;
 }
 .asm-placement-page.asm-homework-page .asm-hw-board-wrap {
   display: grid;
@@ -1668,7 +1685,7 @@ body.asm-has-banner .stage {
   grid-template-rows: minmax(0, 1fr);
   flex: 1;
   min-height: 0;
-  background: #fff;
+  background: #fff !important;
   border: none;
   border-radius: 0;
 }
@@ -1683,66 +1700,87 @@ body.asm-has-banner .stage {
   min-height: 0;
   background: #fff;
 }
-.asm-placement-page.asm-homework-page .asm-hw-board-meta {
+.asm-placement-page.asm-homework-page .asm-hw-board-grid {
+  display: none;
+}
+.asm-placement-page.asm-homework-page .asm-hw-sheet-cluster {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  transform: none;
+  width: 100%;
+}
+.asm-placement-page.asm-homework-page .asm-hw-board-meta,
+.asm-placement-page.asm-homework-page .asm-placement-qnav {
   grid-column: 3;
   grid-row: 1;
   display: flex !important;
   flex-direction: column;
   align-items: stretch;
-  gap: 10px;
-  padding: 12px 10px;
+  flex: none;
+  width: 108px;
+  min-height: 0;
+  padding: 10px 8px;
   margin: 0;
   border: none;
   border-left: 1px solid var(--asm-chrome-border);
   background: #fff;
-  overflow-y: auto;
-  min-height: 0;
+  overflow: hidden;
+  pointer-events: auto;
 }
-.asm-placement-page.asm-homework-page .asm-hw-board-meta-label {
-  margin: 0;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(26, 21, 56, 0.52);
-}
-.asm-placement-page.asm-homework-page .asm-hw-board-meta-content {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 12px;
-}
-.asm-placement-page.asm-homework-page .asm-hw-meta-progress {
-  flex: none;
-  min-width: 0;
-  width: 100%;
-  height: 8px;
-}
-.asm-placement-page.asm-homework-page .asm-hw-meta-palette {
+.asm-placement-page.asm-homework-page .asm-placement-qnav .asm-hw-qnav-palette {
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
 }
-.asm-placement-page.asm-homework-page .asm-hw-meta-palette .asm-q-palette-title {
-  display: block;
-  margin: 0 0 8px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(26, 21, 56, 0.52);
-}
-.asm-placement-page.asm-homework-page .asm-hw-meta-palette .asm-q-palette {
-  display: grid;
+.asm-placement-page.asm-homework-page .asm-placement-qnav .asm-hw-qnav-track {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
 }
-.asm-placement-page.asm-homework-page .asm-hw-meta-palette .asm-q-pill {
+.asm-placement-page.asm-homework-page .asm-placement-qnav .asm-hw-qnav-track .asm-q-pill {
   height: 34px;
   min-height: 34px;
   font-size: 12px;
   border-radius: 9px;
 }
+.asm-placement-page.asm-homework-page .asm-placement-qnav .asm-hw-nav-progress-bar {
+  height: 8px;
+  margin-top: 4px;
+}
+.asm-placement-page.asm-homework-page .asm-exam-footer.asm-hw-footer-nav:not([hidden]) {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(220px, auto) minmax(140px, 1fr);
+  align-items: center;
+  gap: 12px 16px;
+  padding: 12px 20px 16px;
+  background: #fff;
+  border-top: 1px solid var(--asm-chrome-border);
+}
+.asm-placement-page.asm-homework-page .asm-placement-footer-center {
+  grid-column: 2;
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 320px;
+}
+.asm-placement-page.asm-homework-page .asm-placement-footer-center .asm-btn-finish-exam {
+  width: 100%;
+  max-width: 280px;
+  min-width: 0;
+  margin: 0;
+  border-color: var(--brand-magenta, #e6087b) !important;
+  color: #fff !important;
+  background: var(--brand-magenta, #e6087b) !important;
+}
+.asm-placement-page.asm-homework-page .asm-exam-footer.is-sayisal #asmFinishSozel,
+.asm-placement-page.asm-homework-page .asm-exam-footer.is-sozel #asmFinishSayisal {
+  display: none !important;
+}
 .asm-placement-page.is-break .asm-placement-controls,
-.asm-placement-page.is-break .asm-placement-layout {
+.asm-placement-page.is-break .asm-placement-layout,
+.asm-placement-page.is-break .asm-hw-footer-nav {
   display: none !important;
 }
 

@@ -13,8 +13,15 @@
 <body>
 
 <div class="asm-exam-page asm-placement-page asm-homework-page" id="asmPlacementExam">
-  <header class="asm-exam-topbar asm-placement-topbar">
-    <h1 class="asm-exam-topbar-title asm-placement-exam-title" id="asmPlacementExamTitle">Sayısal Bölüm Seviye Belirleme Sınavı</h1>
+  <header class="asm-exam-topbar asm-homework-topbar asm-placement-topbar">
+    <div class="asm-homework-topbar-left"></div>
+    <div class="asm-homework-topbar-center">
+      <h1 class="asm-exam-topbar-title asm-hw-title asm-placement-exam-title" id="asmPlacementExamTitle">Sayısal Bölüm Seviye Belirleme Sınavı</h1>
+      <p class="asm-hw-topic asm-placement-topic">Seviye Belirleme Sınavı · Sayısal ve Sözel</p>
+    </div>
+    <div class="asm-homework-topbar-badges">
+      <span class="asm-hw-type-badge is-placement" aria-hidden="true">SEVİYE</span>
+    </div>
   </header>
 
   <div class="asm-placement-controls" aria-label="Sınav bölümü ve ders seçimi">
@@ -43,24 +50,23 @@
 
   <div class="asm-hw-layout asm-placement-layout">
     <section class="asm-hw-board-wrap" aria-label="Sınav tahtası">
-      <div class="asm-hw-board-meta" aria-label="Soru ilerlemesi">
-        <p class="asm-placement-section-label asm-hw-board-meta-label">İlerleme</p>
-        <div class="asm-hw-board-meta-content">
-          <div class="asm-exam-progress asm-hw-meta-progress"><div class="asm-exam-progress-fill" style="width:0%"></div></div>
-          <div class="asm-q-palette-wrap asm-hw-meta-palette">
-            <p class="asm-q-palette-title">Sorular</p>
-            <div class="asm-q-palette" id="asmQPalette"></div>
+      <div class="asm-hw-board-meta asm-hw-qnav-rail asm-placement-qnav" aria-label="Soru navigasyonu">
+        <div class="asm-hw-qnav-progress">
+          <span class="asm-hw-qnav-label">Tamamlanan</span>
+          <div class="asm-exam-progress asm-hw-meta-progress asm-hw-nav-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="asm-exam-progress-fill"></div>
           </div>
+        </div>
+        <div class="asm-hw-qnav-divider" aria-hidden="true"></div>
+        <div class="asm-hw-qnav-palette">
+          <span class="asm-hw-qnav-label">Sorular</span>
+          <div class="asm-q-palette asm-hw-qnav-track" id="asmQPalette"></div>
         </div>
       </div>
       <div class="asm-hw-board-toolbar asm-hw-board-toolbar--rail asm-hw-board-toolbar--docked" id="hwBoardToolbar"></div>
       <div class="asm-hw-board-viewport" id="hwBoardViewport">
         <div class="asm-hw-board-layer" id="hwBoardLayer">
           <div class="asm-hw-sheet-cluster" id="hwSheetCluster">
-            <button type="button" class="asm-hw-nav-btn asm-hw-nav-outside asm-hw-nav-outside--prev" data-asm-prev aria-label="Önceki soru" disabled>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
-              <span>Önceki Soru</span>
-            </button>
             <div class="asm-hw-sheet" id="hwQuestionSheet">
               <header class="asm-hw-sheet-head" id="hwSheetHead">
                 <div class="asm-hw-sheet-head-inner" id="hwSheetHeadInner"></div>
@@ -78,10 +84,6 @@
                 <p class="asm-hw-sheet-guide">Bir şık seçerek cevabını işaretle. <strong>Önceki Soru</strong>, <strong>Sonraki Soru</strong> ve sorular paleti ile dersler arasında gezinebilirsin. Kalemi kullanarak soru ve çözüm alanına not alabilirsin.</p>
               </footer>
             </div>
-            <button type="button" class="asm-hw-nav-btn asm-hw-nav-outside asm-hw-nav-outside--next is-next" data-asm-next aria-label="Sonraki soru">
-              <span>Sonraki Soru</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
           </div>
           <canvas id="hwDrawCanvas" aria-label="Çizim katmanı"></canvas>
         </div>
@@ -90,9 +92,19 @@
     </section>
   </div>
 
-  <footer class="asm-exam-footer asm-exam-footer--actions" id="asmExamFooter" hidden>
-    <button type="button" class="asm-btn asm-btn-ghost asm-btn-finish-phase" id="asmFinishSayisal" hidden>Sayısal Sınavı Bitir</button>
-    <button type="button" class="asm-btn asm-btn-primary asm-btn-finish-exam" id="asmFinishSozel" hidden>Sınavı Bitir</button>
+  <footer class="asm-exam-footer asm-exam-footer--actions asm-hw-footer-nav" id="asmExamFooter" hidden>
+    <button type="button" class="asm-hw-nav-btn asm-hw-footer-nav-btn" data-asm-prev aria-label="Önceki soru" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Önceki Soru</span>
+    </button>
+    <div class="asm-placement-footer-center">
+      <button type="button" class="asm-btn asm-btn-primary asm-btn-finish-exam asm-btn-finish-phase" id="asmFinishSayisal" hidden>Sayısal Sınavı Bitir</button>
+      <button type="button" class="asm-btn asm-btn-primary asm-btn-finish-exam" id="asmFinishSozel" hidden>Sınavı Bitir</button>
+    </div>
+    <button type="button" class="asm-hw-nav-btn asm-hw-footer-nav-btn is-next" data-asm-next aria-label="Sonraki soru">
+      <span>Sonraki Soru</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
   </footer>
 
   <div class="asm-confirm" id="asmConfirm" hidden role="alertdialog" aria-modal="true" aria-labelledby="asmConfirmTitle">
