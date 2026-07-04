@@ -287,6 +287,53 @@
   background: var(--brand-magenta-12) !important;
   border-color: var(--brand-magenta) !important;
 }
+.asm-homework-page,
+.asm-homework-page .asm-hw-board-wrap,
+.asm-homework-page .asm-hw-board-viewport {
+  background: #fff !important;
+}
+.asm-hw-board-toolbar--float {
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.asm-hw-rail-grip {
+  background: var(--bg-subtle) !important;
+  color: var(--ink-dark-2) !important;
+}
+.asm-hw-rail-grip:hover {
+  background: var(--brand-purple-06) !important;
+  color: var(--ink-dark-1) !important;
+}
+.asm-homework-page .asm-hw-sheet {
+  background: #fff !important;
+  border-color: var(--brand-purple-14) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.asm-homework-page .asm-hw-sheet-head,
+.asm-homework-page .asm-hw-sheet-foot,
+.asm-homework-page .asm-hw-solve-zone {
+  background: #fff !important;
+}
+.asm-homework-page .asm-hw-solve-zone {
+  border-color: var(--brand-purple-18) !important;
+}
+.asm-homework-page .asm-hw-sheet-options {
+  max-width: 560px;
+}
+.asm-homework-page .asm-hw-sheet-options .asm-option {
+  padding: 8px 10px !important;
+  font-size: 13px !important;
+}
+.asm-homework-page .asm-hw-sheet-options .asm-option-letter {
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 11px !important;
+}
+.asm-homework-page .asm-hw-block-prompt {
+  font-size: 16px !important;
+  line-height: 1.72 !important;
+}
 .asm-hw-board-toolbar--rail { background: var(--bg-surface) !important; }
 .asm-hw-tool {
   background: var(--bg-surface) !important;

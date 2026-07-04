@@ -2893,6 +2893,45 @@ body.asm-has-banner .stage {
   overflow: visible;
   z-index: 20;
 }
+.asm-hw-board-toolbar--float {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 82px;
+  padding: 8px 6px 10px;
+  border: 1px solid rgba(26, 21, 56, 0.1);
+  border-right: 1px solid rgba(26, 21, 56, 0.1);
+  border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(26, 21, 56, 0.1);
+  max-height: calc(100% - 24px);
+  overflow-y: auto;
+  overflow-x: visible;
+  z-index: 40;
+  touch-action: none;
+}
+.asm-hw-board-toolbar--float.is-dragging {
+  box-shadow: 0 12px 36px rgba(26, 21, 56, 0.16);
+  cursor: grabbing;
+}
+.asm-hw-rail-grip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 28px;
+  margin: 0 0 6px;
+  padding: 4px 0;
+  border: none;
+  border-radius: 8px;
+  background: rgba(26, 21, 56, 0.05);
+  color: rgba(26, 21, 56, 0.42);
+  cursor: grab;
+  touch-action: none;
+}
+.asm-hw-rail-grip svg { width: 16px; height: 16px; }
+.asm-hw-rail-grip:hover { background: rgba(26, 21, 56, 0.08); color: rgba(26, 21, 56, 0.62); }
+.asm-hw-rail-grip:active { cursor: grabbing; }
 .asm-hw-toolbar-rail {
   display: flex;
   flex-direction: column;
@@ -2971,15 +3010,83 @@ body.asm-has-banner .stage {
   left: calc(100% + 10px);
   z-index: 500;
 }
+.asm-homework-page .asm-hw-layout {
+  flex-direction: column;
+}
+.asm-homework-page,
+.asm-homework-page .asm-hw-layout,
+.asm-homework-page .asm-hw-board-wrap,
+.asm-homework-page .asm-hw-board-viewport {
+  background: #fff;
+}
+.asm-homework-page .asm-hw-board-wrap {
+  background: #fff;
+}
+.asm-homework-page .asm-hw-board-grid {
+  display: none;
+}
 .asm-homework-page .asm-hw-sheet-cluster {
   position: absolute;
   top: 12px;
-  left: 0;
-  transform: none;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .asm-homework-page .asm-hw-sheet {
-  width: calc(100vw - 104px);
-  max-width: none;
+  width: min(900px, calc(100vw - 40px));
+  max-width: 900px;
+  background: #fff;
+  border: 1px solid rgba(26, 21, 56, 0.1);
+  box-shadow: 0 4px 20px rgba(26, 21, 56, 0.05);
+}
+.asm-homework-page .asm-hw-sheet-head {
+  background: #fff;
+  border-bottom: 1px solid rgba(26, 21, 56, 0.08);
+}
+.asm-homework-page .asm-hw-sheet-foot {
+  background: #fff;
+}
+.asm-homework-page .asm-hw-solve-zone {
+  background: #fff;
+  border: 1.5px dashed rgba(26, 21, 56, 0.14);
+  box-shadow: none;
+}
+.asm-homework-page .asm-hw-options-row {
+  display: flex;
+  justify-content: center;
+  padding: 0 20px;
+}
+.asm-homework-page .asm-hw-sheet-options {
+  width: 100%;
+  max-width: 560px;
+  gap: 8px;
+}
+.asm-homework-page .asm-hw-sheet-options .asm-option {
+  padding: 8px 10px;
+  font-size: 13px;
+  gap: 8px;
+  border-radius: 10px;
+}
+.asm-homework-page .asm-hw-sheet-options .asm-option-letter {
+  width: 24px;
+  height: 24px;
+  font-size: 11px;
+  border-radius: 6px;
+}
+.asm-homework-page .asm-hw-block-prompt {
+  font-size: 16px;
+  line-height: 1.72;
+  color: #1a1538;
+}
+.asm-homework-page .asm-hw-sheet-body {
+  padding: 20px 28px 0;
+}
+.asm-homework-page .asm-hw-sheet-topic {
+  font-size: 13px;
+  color: rgba(26, 21, 56, 0.62);
+}
+.asm-homework-page .asm-hw-board-toolbar--float .asm-hw-tool {
+  min-height: 52px;
+  font-size: 9px;
 }
 .asm-hw-footer-nav {
   display: grid;
@@ -3834,20 +3941,19 @@ body.asm-has-banner .stage {
   }
   .asm-hw-meta-palette .asm-q-palette { display: flex; }
   .asm-homework-page .asm-hw-sheet-cluster {
-    left: 0;
-    transform: none;
+    left: 50%;
+    transform: translateX(-50%);
   }
-  .asm-homework-page .asm-hw-sheet { width: calc(100vw - 72px); max-width: none; }
+  .asm-homework-page .asm-hw-sheet { width: min(calc(100vw - 32px), 900px); }
   .asm-hw-board-viewport { min-height: 280px; }
-  .asm-hw-board-toolbar--rail { width: 56px; padding: 8px 4px; }
-  .asm-hw-board-toolbar--rail .asm-hw-tool {
+  .asm-hw-board-toolbar--float { width: 56px; padding: 6px 4px 8px; left: 8px; }
+  .asm-hw-board-toolbar--float .asm-hw-tool {
     min-height: 44px;
     padding: 6px 2px;
   }
-  .asm-hw-board-toolbar--rail .asm-hw-tool span:not(.asm-hw-pen-swatch) { display: none; }
-  .asm-hw-board-toolbar--rail .asm-hw-zoom-label { font-size: 9px; min-width: 0; }
-  .asm-hw-solve-zone { min-height: 420px; margin-left: 16px; margin-right: 16px; }
-  .asm-hw-sheet-options { grid-template-columns: 1fr 1fr; }
+  .asm-hw-board-toolbar--float .asm-hw-tool span:not(.asm-hw-pen-swatch) { display: none; }
+  .asm-hw-board-toolbar--float .asm-hw-zoom-label { font-size: 9px; min-width: 0; }
+  .asm-homework-page .asm-hw-sheet-options { max-width: 100%; grid-template-columns: 1fr 1fr; }
   .asm-hw-block-figure svg { max-width: 280px; }
   .asm-hw-footer-nav {
     grid-template-columns: 1fr 1fr 1fr;

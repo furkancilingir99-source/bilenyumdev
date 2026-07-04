@@ -303,6 +303,67 @@
       if (eraserPopoverOpen && eraserWrap && eraserPopover) positionRailPopover(eraserWrap, eraserPopover);
     }
 
+    function mountRailDrag(toolbarEl, viewportEl, gripEl) {
+      if (!toolbarEl || !viewportEl || !gripEl || !toolbarEl.classList.contains('asm-hw-board-toolbar--float')) return;
+      var dragging = false;
+      var startX = 0;
+      var startY = 0;
+      var origLeft = 0;
+      var origTop = 0;
+
+      function clampRail(left, top) {
+        var vp = viewportEl.getBoundingClientRect();
+        var tb = toolbarEl.getBoundingClientRect();
+        var w = tb.width || toolbarEl.offsetWidth || 80;
+        var h = tb.height || toolbarEl.offsetHeight || 200;
+        var maxLeft = Math.max(8, vp.width - w - 8);
+        var maxTop = Math.max(8, vp.height - h - 8);
+        return {
+          left: Math.min(maxLeft, Math.max(8, left)),
+          top: Math.min(maxTop, Math.max(8, top))
+        };
+      }
+
+      function setRailPosition(left, top) {
+        var pos = clampRail(left, top);
+        toolbarEl.style.left = pos.left + 'px';
+        toolbarEl.style.top = pos.top + 'px';
+        toolbarEl.style.transform = 'none';
+        repositionOpenPopovers();
+      }
+
+      gripEl.addEventListener('pointerdown', function (e) {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        dragging = true;
+        toolbarEl.classList.add('is-dragging');
+        var vp = viewportEl.getBoundingClientRect();
+        var tb = toolbarEl.getBoundingClientRect();
+        startX = e.clientX;
+        startY = e.clientY;
+        origLeft = tb.left - vp.left;
+        origTop = tb.top - vp.top;
+        toolbarEl.style.transform = 'none';
+        try { gripEl.setPointerCapture(e.pointerId); } catch (err) {}
+      });
+
+      gripEl.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        setRailPosition(origLeft + (e.clientX - startX), origTop + (e.clientY - startY));
+      });
+
+      function endDrag(e) {
+        if (!dragging) return;
+        dragging = false;
+        toolbarEl.classList.remove('is-dragging');
+        try { if (e && e.pointerId != null) gripEl.releasePointerCapture(e.pointerId); } catch (err) {}
+      }
+
+      gripEl.addEventListener('pointerup', endDrag);
+      gripEl.addEventListener('pointercancel', endDrag);
+    }
+
     function syncLayout() {
       var region = root.querySelector('#hwDrawRegion');
       if (!region || !canvas) return;
@@ -666,10 +727,10 @@
       var sheetW = sheet ? sheet.offsetWidth || LAYER_W : LAYER_W;
       var sheetH = sheet ? sheet.offsetHeight || 900 : 900;
       var clusterX = cluster ? cluster.offsetLeft : 0;
-      zoom = Math.min(1, Math.max(ZOOM_MIN, (rect.width - 8) / sheetW));
+      zoom = Math.min(1, Math.max(ZOOM_MIN, (rect.width - 24) / sheetW));
       var scaledH = sheetH * zoom;
       panX = (rect.width - sheetW * zoom) / 2 - clusterX * zoom;
-      panY = scaledH > rect.height - 16 ? 8 : Math.max(8, (rect.height - scaledH) / 2);
+      panY = scaledH > rect.height - 20 ? 10 : Math.max(10, (rect.height - scaledH) / 2);
       updateTransform();
     }
 
@@ -755,6 +816,9 @@
     }
 
     toolbar.innerHTML =
+      '<button type="button" class="asm-hw-rail-grip" id="hwRailGrip" aria-label="Araç menüsünü taşı" title="Menüyü taşı">' +
+        '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/></svg>' +
+      '</button>' +
       '<div class="asm-hw-toolbar-rail">' +
         '<div class="asm-hw-toolbar-group">' +
           '<button type="button" class="asm-hw-tool" data-tool="pan" title="Kaydır (açık el)">' + TOOL_ICONS.pan + '<span>Kaydır</span></button>' +
@@ -808,6 +872,8 @@
     eraserSizeSlider = toolbar.querySelector('#hwEraserSizeSlider');
     eraserSizePreview = toolbar.querySelector('#hwEraserSizePreview');
     zoomLabel = toolbar.querySelector('#hwZoomLabel');
+
+    mountRailDrag(toolbar, viewport, toolbar.querySelector('#hwRailGrip'));
 
     toolbar.addEventListener('click', function (e) {
       var colorBtn = e.target.closest('[data-pen-color]');
