@@ -82,7 +82,7 @@
     var summaryHtml =
       '<header class="rbz-pagehead">' +
         '<div class="rbz-pagehead-main">' +
-          '<a href="dashboard.html" class="rbz-back">← Kontrol Merkezi</a>' +
+          '<a href="ogrenci-dashboard.html" class="rbz-back">← Kontrol Merkezi</a>' +
           '<h1 class="rbz-title">Rozetlerim</h1>' +
           '<p class="rbz-sub">' + unlocked.length + ' / ' + BADGES.length + ' rozet açıldı</p>' +
         '</div>' +

@@ -14,7 +14,7 @@
 
       var brand = document.createElement('a');
       brand.className = 'asm-exam-brand';
-      brand.href = 'dashboard.html';
+      brand.href = 'ogrenci-dashboard.html';
       brand.setAttribute('aria-label', 'Bilenyum anasayfa');
       brand.innerHTML = '<img src="assets/bilenyum-logo.svg" alt="Bilenyum" width="120" height="24" />';
       topbar.insertBefore(brand, topbar.firstChild);

@@ -1,4 +1,4 @@
-﻿(function (global) {
+(function (global) {
   'use strict';
 
   var Mock = global.LiveClassMock;
@@ -1610,7 +1610,7 @@
   el.leaveConfirm.addEventListener('click', function () {
     el.leaveModal.hidden = true;
     toast('Dersten ayrıldın.');
-    schedule(function () { location.href = 'dashboard.html'; }, 800);
+    schedule(function () { location.href = 'ogrenci-dashboard.html'; }, 800);
   });
 
   ['lcSettingsBtn', 'lcSettingsBtn2', 'lcAudioBtn', 'lcVideoBtn'].forEach(function (id) {
@@ -1680,7 +1680,7 @@
   });
 
   if (el.endedNotes) el.endedNotes.addEventListener('click', function () { toast('PDF çıktısı mock olarak hazırlandı.'); });
-  if (el.endedHome) el.endedHome.addEventListener('click', function () { location.href = 'dashboard.html'; });
+  if (el.endedHome) el.endedHome.addEventListener('click', function () { location.href = 'ogrenci-dashboard.html'; });
 
   document.getElementById('lcSettingsCaptions').addEventListener('change', function (e) {
     if (e.target.checked !== state.isCaptionsEnabled) toggleCaptions();

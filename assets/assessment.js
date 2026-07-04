@@ -13,9 +13,9 @@
  *   placementResults, attentionResults, combinedResults, assignedClan,
  *   studentName, studentGrade
  *
- * Test kısayolu: dashboard.html?reset=new-student
+ * Test kısayolu: ogrenci-dashboard.html?reset=new-student
  * veya konsolda: BilenyumAssessment.resetToNewStudent()
- * Mevcut öğrenci: dashboard.html?reset=existing-student
+ * Mevcut öğrenci: ogrenci-dashboard.html?reset=existing-student
  * veya konsolda: BilenyumAssessment.resetToExistingStudent()
  * ------------------------------------------------------------------------- */
 (function (global) {
@@ -41,7 +41,7 @@
   function devResetForTesting() {
     if (!DEV_RESET_ON_RELOAD) return;
     var page = currentPage();
-    var resetPages = ['dashboard.html', 'program.html', 'odevler.html', 'tekrarlar.html', 'sinavlar.html', 'performans.html'];
+    var resetPages = ['ogrenci-dashboard.html', 'program.html', 'odevler.html', 'tekrarlar.html', 'sinavlar.html', 'performans.html'];
     if (resetPages.indexOf(page) === -1) return;
 
     var placementDone = lsGet(KEYS.placement) === '1';
@@ -198,7 +198,7 @@
     if (reset === 'existing-student' || reset === 'current-student') {
       resetToExistingStudent();
       if (!isDashboardPage()) {
-        location.replace('dashboard.html');
+        location.replace('ogrenci-dashboard.html');
         return true;
       }
       history.replaceState(null, '', location.pathname);
@@ -208,31 +208,31 @@
     if (reset !== 'new-student' && reset !== '1') return false;
     resetToNewStudent();
     if (!isDashboardPage()) {
-      location.replace('dashboard.html');
+      location.replace('ogrenci-dashboard.html');
       return true;
     }
     history.replaceState(null, '', location.pathname);
     return false;
   }
 
-  var STUDENT_PAGES = ['dashboard.html', 'program.html', 'odevler.html', 'tekrarlar.html', 'sinavlar.html', 'performans.html'];
+  var STUDENT_PAGES = ['ogrenci-dashboard.html', 'program.html', 'odevler.html', 'tekrarlar.html', 'sinavlar.html', 'performans.html'];
 
   function currentPage() {
     var name = (location.pathname.split('/').pop() || '').toLowerCase();
-    if (!name) return 'dashboard.html';
+    if (!name) return 'ogrenci-dashboard.html';
     if (name.indexOf('.html') === -1) return name + '.html';
     return name;
   }
 
   function isDashboardPage(page) {
     page = page || currentPage();
-    return page === 'dashboard.html' || page === 'dashboard';
+    return page === 'ogrenci-dashboard.html' || page === 'ogrenci-dashboard' || page === 'dashboard.html' || page === 'dashboard';
   }
 
   function finishDevReset() {
     var page = currentPage();
     if (STUDENT_PAGES.indexOf(page) === -1) {
-      location.href = 'dashboard.html';
+      location.href = 'ogrenci-dashboard.html';
       return;
     }
     refresh();
@@ -524,7 +524,7 @@
 
   /* ---------- Content gates ---------- */
   var PAGE_SELECTORS = {
-    'dashboard.html': '.d3-card, .d3-stack',
+    'ogrenci-dashboard.html': '.d3-card, .d3-stack',
     'program.html':   '.prog-page',
     'odevler.html':   '.ov-page:not(.tk-page)',
     'tekrarlar.html': '.tk-page',

@@ -224,7 +224,7 @@
       root.innerHTML =
         '<main class="asm-hw-empty">' +
           '<p>Ödev bulunamadı.</p>' +
-          '<a href="dashboard.html" class="asm-btn asm-btn-primary">Dashboard\'a Dön</a>' +
+          '<a href="ogrenci-dashboard.html" class="asm-btn asm-btn-primary">Dashboard\'a Dön</a>' +
         '</main>';
       return;
     }
@@ -794,7 +794,7 @@
       locked = true;
       var Results = global.BilenyumHomeworkResults;
       if (!Results) {
-        location.href = 'dashboard.html';
+        location.href = 'ogrenci-dashboard.html';
         return;
       }
       var sessionSnapshot = buildHomeworkSessionSnapshot();
@@ -998,7 +998,7 @@
     if (global.BilenyumExamStudentBar) {
       global.BilenyumExamStudentBar.mount(root, {
         showBack: true,
-        backHref: 'dashboard.html',
+        backHref: 'ogrenci-dashboard.html',
         backLabel: "Dashboard'a Dön",
         hideSection: true,
         dueAt: set.dueAt || null

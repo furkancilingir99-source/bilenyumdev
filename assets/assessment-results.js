@@ -23,7 +23,7 @@
   }
 
   function welcomeDashboardBtn(className) {
-    return '<a href="dashboard.html?assessment=done" class="asm-btn asm-btn-primary' + (className ? ' ' + className : '') + '">Dashboard\'a Hoşgeldin ' + ICON_ARROW + '</a>';
+    return '<a href="ogrenci-dashboard.html?assessment=done" class="asm-btn asm-btn-primary' + (className ? ' ' + className : '') + '">Dashboard\'a Hoşgeldin ' + ICON_ARROW + '</a>';
   }
 
   function subjectRows(placement) {
@@ -186,7 +186,7 @@
     html += '<a href="sinav-sonuclari.html?view=placement" class="asm-btn asm-btn-primary">Sonucumu Göster ' + ICON_ARROW + '</a>';
     if (!status.attention) {
       html += '<a href="dikkat-testi.html" class="asm-btn asm-btn-primary asm-btn-attention">Dikkat Testine Geç ' + ICON_ARROW + '</a>';
-      html += '<a href="dashboard.html" class="asm-btn asm-btn-ghost">Dikkat Testini Daha Sonra Çöz</a>';
+      html += '<a href="ogrenci-dashboard.html" class="asm-btn asm-btn-ghost">Dikkat Testini Daha Sonra Çöz</a>';
     }
     return html;
   }
@@ -199,9 +199,9 @@
       html += welcomeDashboardBtn('asm-btn-welcome');
     } else if (!status.placement) {
       html += '<a href="seviye-belirleme.html" class="asm-btn asm-btn-primary asm-btn-attention">Seviye Sınavına Geç ' + ICON_ARROW + '</a>';
-      html += '<a href="dashboard.html" class="asm-btn asm-btn-ghost">Dashboard · Daha Sonra</a>';
+      html += '<a href="ogrenci-dashboard.html" class="asm-btn asm-btn-ghost">Dashboard · Daha Sonra</a>';
     } else {
-      html += '<a href="dashboard.html" class="asm-btn asm-btn-ghost">Dashboard · Daha Sonra</a>';
+      html += '<a href="ogrenci-dashboard.html" class="asm-btn asm-btn-ghost">Dashboard · Daha Sonra</a>';
     }
     return html;
   }
@@ -312,7 +312,7 @@
         if (!status.attention) {
           html += '<a href="dikkat-testi.html" class="asm-btn asm-btn-primary">Dikkat Testine Geç ' + ICON_ARROW + '</a>';
         }
-        html += '<a href="dashboard.html" class="asm-btn asm-btn-ghost">Dashboard</a>';
+        html += '<a href="ogrenci-dashboard.html" class="asm-btn asm-btn-ghost">Dashboard</a>';
       }
     } else if (view === 'attention') {
       if (status.allDone) {
@@ -322,7 +322,7 @@
         if (!status.placement) {
           html += '<a href="seviye-belirleme.html" class="asm-btn asm-btn-primary">Seviye Sınavına Geç ' + ICON_ARROW + '</a>';
         }
-        html += '<a href="dashboard.html" class="asm-btn asm-btn-ghost">Dashboard</a>';
+        html += '<a href="ogrenci-dashboard.html" class="asm-btn asm-btn-ghost">Dashboard</a>';
       }
     }
     html += '</div>';

@@ -3,7 +3,9 @@
   "trailingSlash": false,
   "redirects": [
     { "source": "/login", "destination": "/giris", "permanent": false },
-    { "source": "/login.html", "destination": "/giris", "permanent": false }
+    { "source": "/login.html", "destination": "/giris", "permanent": false },
+    { "source": "/dashboard", "destination": "/ogrenci-dashboard", "permanent": true },
+    { "source": "/dashboard.html", "destination": "/ogrenci-dashboard", "permanent": true }
   ],
   "headers": [
     {

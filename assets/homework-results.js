@@ -273,7 +273,7 @@
       '</section>' +
 
       '<div class="asm-hw-res-actions">' +
-        '<a href="dashboard.html" class="asm-btn asm-btn-primary">Kontrol Merkezine Dön ' + SVG_ARROW + '</a>' +
+        '<a href="ogrenci-dashboard.html" class="asm-btn asm-btn-primary">Kontrol Merkezine Dön ' + SVG_ARROW + '</a>' +
         '<a href="odevler.html" class="asm-btn asm-btn-ghost">Tüm Ödevlerim</a>' +
         (showContinue
           ? '<a href="' + continueHref + '" class="asm-btn asm-btn-ghost">Ödeve Devam Et</a>'

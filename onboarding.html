@@ -2179,7 +2179,7 @@
     ];
     const nodes = document.querySelectorAll('.ob-step-node');
     const lines = document.querySelectorAll('.ob-step-line');
-    // (legacy: inline final state removed; flow goes overlay → dashboard.html)
+    // (legacy: inline final state removed; flow goes overlay → ogrenci-dashboard.html)
 
     function setStep(n, opts) {
       // Show n-th panel (1-4), update indicator
@@ -2328,7 +2328,7 @@
 
         // After ~3s redirect to dashboard
         setTimeout(() => {
-          window.location.href = 'dashboard.html';
+          window.location.href = 'ogrenci-dashboard.html';
         }, 3000);
       });
     }

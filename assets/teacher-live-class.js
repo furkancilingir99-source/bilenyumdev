@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   'use strict';
 
   var Mock = window.TeacherLiveClassMock;
@@ -824,7 +824,7 @@
 
     // İptal — kontrol merkezine dön
     var cancel = document.getElementById('tlcJoinCancel');
-    if (cancel) cancel.onclick = function () { location.href = 'dashboard.html'; };
+    if (cancel) cancel.onclick = function () { location.href = 'ogrenci-dashboard.html'; };
     var test = document.getElementById('tlcJoinTest');
     if (test) test.onclick = function (e) { e.preventDefault(); toast('Mikrofon ve hoparlör testi başlatıldı.'); };
   }
@@ -1394,7 +1394,7 @@
       if (confirmCallback) confirmCallback();
       confirmCallback = null;
     };
-    document.getElementById('tlcBackHome').onclick = function () { location.href = 'dashboard.html'; };
+    document.getElementById('tlcBackHome').onclick = function () { location.href = 'ogrenci-dashboard.html'; };
 
     var breakCaret = document.getElementById('tlcBreakCaret');
     if (breakCaret) breakCaret.onclick = function (e) { e.stopPropagation(); toggleBreakMenu(); };

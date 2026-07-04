@@ -88,7 +88,7 @@
     if (!inner) return;
     var back = document.createElement('a');
     back.className = 'asm-student-bar-back';
-    back.href = href || 'dashboard.html';
+    back.href = href || 'ogrenci-dashboard.html';
     back.setAttribute('data-asm-student-back', '');
     back.textContent = label || "Dashboard'a Dön";
     var divider = document.createElement('div');
