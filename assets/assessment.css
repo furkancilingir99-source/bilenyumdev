@@ -3389,9 +3389,82 @@ body.asm-has-banner .stage {
 .asm-homework-page .asm-hw-board-viewport {
   background: #fff;
 }
-.asm-homework-page .asm-hw-board-toolbar--docked .asm-hw-tool--primary svg {
-  width: 30px;
-  height: 30px;
+.asm-homework-page .asm-hw-board-toolbar--docked {
+  flex: 0 0 84px;
+  width: 84px;
+  padding: 10px 8px;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-rail {
+  gap: 6px;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group {
+  gap: 6px;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool span:not(.asm-hw-pen-swatch) {
+  display: block;
+  max-width: 100%;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: rgba(26, 21, 56, 0.58);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool.is-active span:not(.asm-hw-pen-swatch) {
+  color: var(--brand-navy, #1a1538);
+  font-weight: 800;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary {
+  min-height: 58px;
+  padding: 8px 4px 6px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  border-radius: 10px;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary svg {
+  width: 26px;
+  height: 26px;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact {
+  min-height: 52px;
+  padding: 7px 4px 5px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 10px;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact svg {
+  width: 22px;
+  height: 22px;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact.asm-hw-tool-hint {
+  min-height: 40px;
+  flex-direction: row;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool-hint span {
+  display: none;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--zoom .asm-hw-zoom-label {
+  min-height: 22px;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 2px;
+  letter-spacing: -0.02em;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool {
+  border: 1px solid rgba(26, 21, 56, 0.08);
+  background: rgba(26, 21, 56, 0.02);
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool:hover:not(:disabled) {
+  background: rgba(91, 84, 201, 0.08);
+  border-color: rgba(91, 84, 201, 0.22);
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool.is-active {
+  background: rgba(229, 4, 123, 0.1);
+  border-color: rgba(229, 4, 123, 0.28);
 }
 
 /* Ödev — sağ soru navigasyon şeridi */
@@ -4422,14 +4495,27 @@ body.asm-has-banner .stage {
   }
   .asm-hw-meta-palette .asm-q-palette { display: flex; }
   .asm-homework-page .asm-hw-sheet { width: 100%; }
-  .asm-hw-board-toolbar--docked { flex-basis: 52px; width: 52px; padding: 6px 3px; }
-  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary svg {
-    width: 26px;
-    height: 26px;
+  .asm-homework-page .asm-hw-board-toolbar--docked {
+    flex-basis: 72px;
+    width: 72px;
+    padding: 8px 6px;
   }
-  .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact svg {
-    width: 22px;
-    height: 22px;
+  .asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool span:not(.asm-hw-pen-swatch) {
+    font-size: 8px;
+  }
+  .asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary {
+    min-height: 54px;
+  }
+  .asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary svg {
+    width: 24px;
+    height: 24px;
+  }
+  .asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact {
+    min-height: 48px;
+  }
+  .asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact svg {
+    width: 20px;
+    height: 20px;
   }
   .asm-hw-qnav-rail {
     flex-basis: 76px;

@@ -306,7 +306,22 @@
   background: var(--bg-surface) !important;
   border-color: var(--brand-purple-14) !important;
   box-shadow: none !important;
-  width: 56px;
+}
+.asm-homework-page .asm-hw-board-toolbar--docked {
+  width: 84px;
+  flex-basis: 84px;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool {
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple-14) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool span:not(.asm-hw-pen-swatch) {
+  color: var(--ink-dark-2) !important;
+}
+.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool.is-active {
+  background: var(--brand-magenta-12) !important;
+  border-color: var(--brand-magenta-35) !important;
 }
 .asm-homework-page .asm-hw-qnav-rail {
   background: #fff !important;
@@ -320,7 +335,7 @@
 }
 .asm-hw-qnav-current-num { color: var(--brand-magenta) !important; }
 @media (max-width: 960px) {
-  .asm-hw-board-toolbar--docked { width: 52px !important; flex-basis: 52px !important; }
+  .asm-homework-page .asm-hw-board-toolbar--docked { width: 72px !important; flex-basis: 72px !important; }
   .asm-hw-qnav-rail { width: 76px !important; flex-basis: 76px !important; }
 }
 .asm-hw-rail-grip {
