@@ -308,14 +308,20 @@
   box-shadow: none !important;
   width: 56px;
 }
-.asm-homework-page .asm-hw-board-meta--nav {
+.asm-homework-page .asm-hw-qnav-rail {
   background: #fff !important;
-  border-bottom-color: var(--brand-purple-14) !important;
+  border-left-color: var(--brand-purple-14) !important;
 }
-.asm-hw-nav-progress-count { color: var(--brand-navy) !important; }
-.asm-hw-nav-progress-bar { background: var(--brand-purple-10) !important; }
+.asm-hw-qnav-rail .asm-hw-nav-progress-bar { background: var(--brand-purple-10) !important; }
+.asm-hw-qnav-rail .asm-hw-nav-progress-count { color: var(--brand-navy) !important; }
+.asm-hw-qnav-current {
+  background: linear-gradient(180deg, var(--brand-magenta-12) 0%, var(--brand-magenta-08) 100%) !important;
+  border-color: var(--brand-magenta-35) !important;
+}
+.asm-hw-qnav-current-num { color: var(--brand-magenta) !important; }
 @media (max-width: 960px) {
   .asm-hw-board-toolbar--docked { width: 52px !important; flex-basis: 52px !important; }
+  .asm-hw-qnav-rail { width: 48px !important; flex-basis: 48px !important; }
 }
 .asm-hw-rail-grip {
   background: var(--bg-subtle) !important;

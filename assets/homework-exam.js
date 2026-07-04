@@ -232,6 +232,9 @@
     var progressFill = root.querySelector('.asm-exam-progress-fill');
     var progressBar = root.querySelector('#hwProgressBar');
     var progressCount = root.querySelector('#hwProgressCount');
+    var currentNumEl = root.querySelector('#hwCurrentNum');
+    var currentTotalEl = root.querySelector('#hwCurrentTotal');
+    var questionNavEl = root.querySelector('#hwQuestionNav');
     var questionSheet = root.querySelector('#hwQuestionSheet');
     var prevBtn = root.querySelector('[data-asm-prev]');
     var nextBtn = root.querySelector('[data-asm-next]');
@@ -477,6 +480,15 @@
       else closeQuestionStatusToast();
     }
 
+    function updateCurrentNav() {
+      var total = questions.length;
+      if (currentNumEl) currentNumEl.textContent = String(idx + 1);
+      if (currentTotalEl) currentTotalEl.textContent = '/ ' + total;
+      if (questionNavEl) {
+        questionNavEl.setAttribute('aria-label', 'Soru navigasyonu, soru ' + (idx + 1) + ' / ' + total);
+      }
+    }
+
     function updateProgress() {
       var done = questionResolved.filter(function (ok) { return ok; }).length;
       var total = questions.length;
@@ -491,6 +503,7 @@
         progressBar.setAttribute('aria-valuenow', String(pct));
         progressBar.setAttribute('aria-valuetext', done + ' soru tamamlandı, ' + total + ' sorudan');
       }
+      updateCurrentNav();
     }
 
     function optionClass(q, qi, i) {
@@ -790,11 +803,13 @@
         if (questionResolved[i]) cls += ' is-answered';
         else if (deferredLater[i]) cls += ' is-deferred';
         else if (pendingSelection[i] != null || wrongAttempts[i] > 0) cls += ' is-draft';
-        return '<button type="button" class="' + cls + '" data-qidx="' + i + '" aria-label="Soru ' + (i + 1) + '">' + (i + 1) + '</button>';
+        return '<button type="button" class="' + cls + '" id="hw-q-pill-' + i + '" data-qidx="' + i + '"' +
+          (i === idx ? ' aria-current="true"' : '') +
+          ' aria-label="Soru ' + (i + 1) + (i === idx ? ', şu an bu sorudasın' : '') + '">' + (i + 1) + '</button>';
       }).join('');
       var currentPill = paletteEl.querySelector('.asm-q-pill.is-current');
       if (currentPill && typeof currentPill.scrollIntoView === 'function') {
-        currentPill.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+        currentPill.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
       }
     }
 

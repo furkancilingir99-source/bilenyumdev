@@ -33,21 +33,6 @@
     <aside class="asm-hw-board-toolbar asm-hw-board-toolbar--rail asm-hw-board-toolbar--docked" id="hwBoardToolbar" aria-label="Tahta araçları"></aside>
     <div class="asm-hw-workspace">
       <section class="asm-hw-board-wrap" aria-label="Çözüm tahtası">
-        <div class="asm-hw-board-meta asm-hw-board-meta--nav" aria-label="Soru ilerlemesi">
-          <div class="asm-hw-nav-progress">
-            <div class="asm-hw-nav-progress-head">
-              <span class="asm-hw-nav-progress-label">İlerleme</span>
-              <strong class="asm-hw-nav-progress-count" id="hwProgressCount">0 / 0</strong>
-            </div>
-            <div class="asm-exam-progress asm-hw-meta-progress asm-hw-nav-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="hwProgressBar">
-              <div class="asm-exam-progress-fill"></div>
-            </div>
-          </div>
-          <div class="asm-hw-nav-palette">
-            <span class="asm-hw-nav-palette-label">Sorular</span>
-            <div class="asm-q-palette asm-hw-nav-palette-track" id="asmQPalette"></div>
-          </div>
-        </div>
         <div class="asm-hw-board-viewport" id="hwBoardViewport">
           <div class="asm-hw-board-layer" id="hwBoardLayer">
             <div class="asm-hw-sheet-cluster" id="hwSheetCluster">
@@ -77,6 +62,28 @@
         </div>
       </section>
     </div>
+    <aside class="asm-hw-qnav-rail" id="hwQuestionNav" aria-label="Soru navigasyonu">
+      <div class="asm-hw-qnav-current" aria-live="polite" aria-atomic="true">
+        <span class="asm-hw-qnav-label">Soru</span>
+        <div class="asm-hw-qnav-current-row">
+          <strong class="asm-hw-qnav-current-num" id="hwCurrentNum">1</strong>
+          <span class="asm-hw-qnav-current-total" id="hwCurrentTotal">/ 1</span>
+        </div>
+      </div>
+      <div class="asm-hw-qnav-divider" aria-hidden="true"></div>
+      <div class="asm-hw-qnav-progress">
+        <span class="asm-hw-qnav-label">Tamamlanan</span>
+        <strong class="asm-hw-nav-progress-count" id="hwProgressCount">0 / 0</strong>
+        <div class="asm-exam-progress asm-hw-meta-progress asm-hw-nav-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="hwProgressBar">
+          <div class="asm-exam-progress-fill"></div>
+        </div>
+      </div>
+      <div class="asm-hw-qnav-divider" aria-hidden="true"></div>
+      <div class="asm-hw-qnav-palette">
+        <span class="asm-hw-qnav-label">Sorular</span>
+        <div class="asm-q-palette asm-hw-qnav-track" id="asmQPalette"></div>
+      </div>
+    </aside>
   </div>
 
   <footer class="asm-exam-footer asm-exam-footer--actions asm-hw-footer-nav">
