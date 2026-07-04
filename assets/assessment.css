@@ -2726,6 +2726,7 @@ body.asm-has-banner .stage {
   flex-direction: row;
   min-height: 0;
   border-top: 1px solid var(--asm-chrome-border);
+  overflow: visible;
 }
 
 .asm-hw-board-meta {
@@ -2889,9 +2890,8 @@ body.asm-has-banner .stage {
   padding: 12px 8px;
   border-bottom: none;
   border-right: 1px solid var(--asm-chrome-border);
-  overflow-y: auto;
-  overflow-x: visible;
-  z-index: 6;
+  overflow: visible;
+  z-index: 20;
 }
 .asm-hw-toolbar-rail {
   display: flex;
@@ -2969,6 +2969,17 @@ body.asm-has-banner .stage {
 .asm-hw-board-toolbar--rail .asm-hw-eraser-popover {
   top: 0;
   left: calc(100% + 10px);
+  z-index: 500;
+}
+.asm-homework-page .asm-hw-sheet-cluster {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  transform: none;
+}
+.asm-homework-page .asm-hw-sheet {
+  width: calc(100vw - 104px);
+  max-width: none;
 }
 .asm-hw-footer-nav {
   display: grid;
@@ -3822,11 +3833,11 @@ body.asm-has-banner .stage {
     margin: 0 0 8px;
   }
   .asm-hw-meta-palette .asm-q-palette { display: flex; }
-  .asm-hw-sheet-cluster {
-    left: 50%;
-    transform: translateX(-50%);
+  .asm-homework-page .asm-hw-sheet-cluster {
+    left: 0;
+    transform: none;
   }
-  .asm-hw-sheet { width: min(720px, calc(100vw - 72px)); max-width: none; }
+  .asm-homework-page .asm-hw-sheet { width: calc(100vw - 72px); max-width: none; }
   .asm-hw-board-viewport { min-height: 280px; }
   .asm-hw-board-toolbar--rail { width: 56px; padding: 8px 4px; }
   .asm-hw-board-toolbar--rail .asm-hw-tool {

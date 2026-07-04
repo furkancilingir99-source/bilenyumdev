@@ -269,14 +269,38 @@
     }
 
     function syncOutsideNav() {
+      var prev = root.querySelector('[data-asm-prev]');
+      if (!prev || !prev.classList.contains('asm-hw-nav-outside')) return;
       var cluster = root.querySelector('#hwSheetCluster');
       var anchor = root.querySelector('.asm-hw-options-row');
-      var prev = root.querySelector('[data-asm-prev]');
       var next = root.querySelector('[data-asm-next]');
-      if (!cluster || !anchor || !prev || !next) return;
+      if (!cluster || !anchor || !next) return;
       var top = offsetTopWithin(anchor, cluster) + Math.max(0, (anchor.offsetHeight - prev.offsetHeight) / 2);
       prev.style.top = top + 'px';
       next.style.top = top + 'px';
+    }
+
+    function positionRailPopover(wrap, popover) {
+      if (!wrap || !popover || !toolbar.classList.contains('asm-hw-board-toolbar--rail')) return;
+      var rect = wrap.getBoundingClientRect();
+      popover.style.position = 'fixed';
+      popover.style.left = Math.round(rect.right + 10) + 'px';
+      popover.style.top = Math.round(rect.top) + 'px';
+      popover.style.zIndex = '500';
+    }
+
+    function resetPopoverPosition(popover) {
+      if (!popover) return;
+      popover.style.position = '';
+      popover.style.left = '';
+      popover.style.top = '';
+      popover.style.zIndex = '';
+    }
+
+    function repositionOpenPopovers() {
+      if (penPopoverOpen && penWrap && penPopover) positionRailPopover(penWrap, penPopover);
+      if (shapePopoverOpen && shapeWrap && shapePopover) positionRailPopover(shapeWrap, shapePopover);
+      if (eraserPopoverOpen && eraserWrap && eraserPopover) positionRailPopover(eraserWrap, eraserPopover);
     }
 
     function syncLayout() {
@@ -354,19 +378,28 @@
 
     function closePenPopover() {
       penPopoverOpen = false;
-      if (penPopover) penPopover.hidden = true;
+      if (penPopover) {
+        penPopover.hidden = true;
+        resetPopoverPosition(penPopover);
+      }
       if (penWrap) penWrap.classList.remove('is-open');
     }
 
     function closeShapePopover() {
       shapePopoverOpen = false;
-      if (shapePopover) shapePopover.hidden = true;
+      if (shapePopover) {
+        shapePopover.hidden = true;
+        resetPopoverPosition(shapePopover);
+      }
       if (shapeWrap) shapeWrap.classList.remove('is-open');
     }
 
     function closeEraserPopover() {
       eraserPopoverOpen = false;
-      if (eraserPopover) eraserPopover.hidden = true;
+      if (eraserPopover) {
+        eraserPopover.hidden = true;
+        resetPopoverPosition(eraserPopover);
+      }
       if (eraserWrap) eraserWrap.classList.remove('is-open');
     }
 
@@ -379,7 +412,11 @@
     function setPenPopover(open) {
       if (open) closeOtherPopovers('pen');
       penPopoverOpen = open;
-      if (penPopover) penPopover.hidden = !open;
+      if (penPopover) {
+        penPopover.hidden = !open;
+        if (open) positionRailPopover(penWrap, penPopover);
+        else resetPopoverPosition(penPopover);
+      }
       if (penWrap) penWrap.classList.toggle('is-open', open);
     }
 
@@ -393,7 +430,11 @@
     function setShapePopover(open) {
       if (open) closeOtherPopovers('shape');
       shapePopoverOpen = open;
-      if (shapePopover) shapePopover.hidden = !open;
+      if (shapePopover) {
+        shapePopover.hidden = !open;
+        if (open) positionRailPopover(shapeWrap, shapePopover);
+        else resetPopoverPosition(shapePopover);
+      }
       if (shapeWrap) shapeWrap.classList.toggle('is-open', open);
     }
 
@@ -415,7 +456,11 @@
     function setEraserPopover(open) {
       if (open) closeOtherPopovers('eraser');
       eraserPopoverOpen = open;
-      if (eraserPopover) eraserPopover.hidden = !open;
+      if (eraserPopover) {
+        eraserPopover.hidden = !open;
+        if (open) positionRailPopover(eraserWrap, eraserPopover);
+        else resetPopoverPosition(eraserPopover);
+      }
       if (eraserWrap) eraserWrap.classList.toggle('is-open', open);
     }
 
@@ -616,13 +661,15 @@
     function focusSheet() {
       syncLayout();
       var sheet = root.querySelector('#hwQuestionSheet');
+      var cluster = root.querySelector('#hwSheetCluster');
       var rect = viewport.getBoundingClientRect();
       var sheetW = sheet ? sheet.offsetWidth || LAYER_W : LAYER_W;
       var sheetH = sheet ? sheet.offsetHeight || 900 : 900;
-      zoom = Math.min(1, Math.max(0.52, (rect.width - 24) / sheetW));
+      var clusterX = cluster ? cluster.offsetLeft : 0;
+      zoom = Math.min(1, Math.max(ZOOM_MIN, (rect.width - 8) / sheetW));
       var scaledH = sheetH * zoom;
-      panX = Math.max(8, (rect.width - sheetW * zoom) / 2);
-      panY = scaledH > rect.height - 24 ? 8 : Math.max(8, (rect.height - scaledH) / 2);
+      panX = (rect.width - sheetW * zoom) / 2 - clusterX * zoom;
+      panY = scaledH > rect.height - 16 ? 8 : Math.max(8, (rect.height - scaledH) / 2);
       updateTransform();
     }
 
@@ -872,6 +919,7 @@
     function onResize() {
       syncLayout();
       focusSheet();
+      repositionOpenPopovers();
     }
 
     window.addEventListener('resize', onResize);
