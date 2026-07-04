@@ -9,9 +9,16 @@
   var LAYER_W = 960;
   var LAYER_H = 2400;
   var MAX_UNDO = 40;
-  var ZOOM_MIN = 0.35;
-  var ZOOM_MAX = 2.5;
-  var ZOOM_STEP = 0.12;
+  var ZOOM_LEVELS = (function () {
+    var levels = [];
+    var p;
+    for (p = 50; p <= 250; p += 10) {
+      levels.push(p / 100);
+    }
+    return levels;
+  })();
+  var ZOOM_MIN = ZOOM_LEVELS[0];
+  var ZOOM_MAX = ZOOM_LEVELS[ZOOM_LEVELS.length - 1];
   var PEN_SIZE_MIN = 1;
   var PEN_SIZE_MAX = 16;
   var ERASER_SIZE_MIN = 10;
@@ -701,13 +708,52 @@
       }
     }
 
-    function zoomAt(factor, cx, cy) {
+    function nearestZoomIndex(value) {
+      var best = 0;
+      var bestDiff = Math.abs(value - ZOOM_LEVELS[0]);
+      for (var i = 1; i < ZOOM_LEVELS.length; i++) {
+        var diff = Math.abs(value - ZOOM_LEVELS[i]);
+        if (diff < bestDiff) {
+          best = i;
+          bestDiff = diff;
+        }
+      }
+      return best;
+    }
+
+    function bestFitZoomLevel() {
+      syncSheetWidth();
+      var sheet = root.querySelector('#hwQuestionSheet');
+      var rect = viewport.getBoundingClientRect();
+      var sheetW = sheet ? sheet.offsetWidth || LAYER_W : LAYER_W;
+      var fit = Math.min(1, Math.max(ZOOM_MIN, (rect.width - 12) / sheetW));
+      var chosen = ZOOM_LEVELS[0];
+      for (var i = 0; i < ZOOM_LEVELS.length; i++) {
+        if (ZOOM_LEVELS[i] <= fit + 0.0001) chosen = ZOOM_LEVELS[i];
+        else break;
+      }
+      return chosen;
+    }
+
+    function applyZoomAt(newZoom, cx, cy) {
+      newZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, newZoom));
+      if (Math.abs(newZoom - zoom) < 0.0001) return;
       var before = screenToWorld(cx, cy);
-      zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom * factor));
+      zoom = newZoom;
       var rect = viewport.getBoundingClientRect();
       panX = cx - rect.left - before.x * zoom;
       panY = cy - rect.top - before.y * zoom;
       updateTransform();
+    }
+
+    function stepZoom(direction, cx, cy) {
+      var idx = nearestZoomIndex(zoom);
+      var next = Math.max(0, Math.min(ZOOM_LEVELS.length - 1, idx + direction));
+      applyZoomAt(ZOOM_LEVELS[next], cx, cy);
+    }
+
+    function zoomAt(factor, cx, cy) {
+      stepZoom(factor >= 1 ? 1 : -1, cx, cy);
     }
 
     function fitView() {
@@ -733,7 +779,7 @@
       var sheet = root.querySelector('#hwQuestionSheet');
       var rect = viewport.getBoundingClientRect();
       var sheetW = sheet ? sheet.offsetWidth || LAYER_W : LAYER_W;
-      zoom = Math.min(1, Math.max(ZOOM_MIN, (rect.width - 12) / sheetW));
+      zoom = bestFitZoomLevel();
       panX = Math.max(6, (rect.width - sheetW * zoom) / 2);
       panY = 8;
       updateTransform();
@@ -956,8 +1002,8 @@
         updateUndoButtons();
         saveQuestionState(activeQuestion);
       }
-      if (act === 'zoom-in') zoomAt(1 + ZOOM_STEP, viewport.clientWidth / 2, viewport.clientHeight / 2);
-      if (act === 'zoom-out') zoomAt(1 - ZOOM_STEP, viewport.clientWidth / 2, viewport.clientHeight / 2);
+      if (act === 'zoom-in') stepZoom(1, viewport.clientWidth / 2, viewport.clientHeight / 2);
+      if (act === 'zoom-out') stepZoom(-1, viewport.clientWidth / 2, viewport.clientHeight / 2);
     });
 
     if (penSizeSlider) {
@@ -986,7 +1032,7 @@
     viewport.addEventListener('pointercancel', onPointerUp);
     viewport.addEventListener('wheel', function (e) {
       e.preventDefault();
-      zoomAt(e.deltaY < 0 ? 1 + ZOOM_STEP : 1 - ZOOM_STEP, e.clientX, e.clientY);
+      zoomAt(e.deltaY < 0 ? 1.1 : 0.9, e.clientX, e.clientY);
     }, { passive: false });
 
     function onResize() {
