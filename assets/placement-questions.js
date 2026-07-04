@@ -1,25 +1,30 @@
 /* ---------------------------------------------------------------------------
  * Bilenyum placement-questions.js — Seviye Belirleme soru bankası
  *
+ * Ders başına soru adedi:
+ *   Matematik 20 · Fen 20 · Türkçe 20 · Sosyal 10 · Din 10 · İngilizce 10
+ *
  * Soru şeması:
  *   subjectCode: mat | trk | fen | ing | sos | din
  *   type:        standard | visual
  *   skill:       beceri (opsiyonel)
- *   unit:        ünite adı (soru başlığı sağ üst)
- *   unitSubtitle: ünite alt başlığı
- *   q, opts, correct
- *   visual: {
- *     svg:   inline SVG string
- *     src:   JPEG/PNG yolu  →  visual: { src: 'assets/sorular/mat-01.jpg', alt: '...' }
- *     embed: SVG dosya yolu (Illustrator export) → assets/sorular/diagram.svg
- *     alt, caption
- *   }
- *   videoUrl: (opsiyonel) soru video çözümü — yoksa varsayılan demo video kullanılır
+ *   unit, unitSubtitle, q, opts, correct
  * ------------------------------------------------------------------------- */
 (function (global) {
   'use strict';
 
   var DEFAULT_VIDEO = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+
+  var SUBJECT_COUNTS = {
+    mat: 20,
+    fen: 20,
+    trk: 20,
+    sos: 10,
+    din: 10,
+    ing: 10
+  };
+
+  var BANK_ORDER = ['mat', 'fen', 'trk', 'sos', 'din', 'ing'];
 
   var SVG_GRID_AREA =
     '<svg viewBox="0 0 220 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
@@ -67,7 +72,7 @@
     return '<svg viewBox="0 0 64 64"><rect width="64" height="64" rx="8" fill="rgba(255,255,255,0.06)"/><polygon points="12,48 52,48 44,16 20,28" fill="rgba(229,4,123,0.35)" stroke="#e5047b" stroke-width="2"/></svg>';
   }
 
-  global.BilenyumPlacementQuestions = [
+  var SEED_QUESTIONS = [
     {
       subjectCode: 'mat', type: 'standard',
       unit: 'Doğal Sayılar', unitSubtitle: 'Çarpma İşlemi',
@@ -77,25 +82,28 @@
       subjectCode: 'mat', type: 'visual', skill: 'beceri', subject: 'Matematik',
       unit: 'Geometri', unitSubtitle: 'Alan Hesaplama',
       q: 'Şekilde boyalı birim karelerin toplam alanı kaç birim karedir?',
-      visual: { svg: SVG_GRID_AREA, alt: 'Birim kare ızgara', caption: 'Her kare 1 birim² · SVG veya embed: assets/sorular/mat-grid.svg' },
+      visual: { svg: SVG_GRID_AREA, alt: 'Birim kare ızgara', caption: 'Her kare 1 birim²' },
       opts: ['6 birim²', '8 birim²', '10 birim²', '12 birim²'], correct: 1
     },
     {
       subjectCode: 'mat', type: 'visual', skill: 'beceri', subject: 'Matematik',
       unit: 'Geometri', unitSubtitle: 'Açılar ve Üçgenler',
       q: 'Üçgende ? ile gösterilen açının ölçüsü kaç derecedir?',
-      visual: { svg: SVG_TRIANGLE_ANGLE, alt: 'Üçgen açı sorusu', caption: 'Illustrator export: visual.embed = "assets/sorular/mat-aci.svg"' },
+      visual: { svg: SVG_TRIANGLE_ANGLE, alt: 'Üçgen açı sorusu' },
       opts: ['60°', '70°', '80°', '90°'], correct: 1
     },
     {
-      subjectCode: 'trk', type: 'standard',
-      unit: 'Dil Bilgisi', unitSubtitle: 'Fiil ve Özne',
-      q: '"Koşmak" fiilinin öznesi hangisidir?', opts: ['Hızlı', 'Ali', 'Dün', 'Güzel'], correct: 1
-    },
-    {
-      subjectCode: 'trk', type: 'standard',
-      unit: 'Dil Bilgisi', unitSubtitle: 'İsim Türleri',
-      q: 'Aşağıdakilerden hangisi somut isimdir?', opts: ['Sevgi', 'Mutluluk', 'Masa', 'Cesaret'], correct: 2
+      subjectCode: 'mat', type: 'visual', skill: 'beceri', subject: 'Matematik',
+      unit: 'Geometri', unitSubtitle: 'Simetri',
+      q: 'Hangisi en az bir simetri eksenine sahiptir?',
+      visual: { svg: svgShape('sym'), alt: 'Simetri örneği' },
+      opts: [
+        { label: 'Şekil I', svg: svgShape('asym') },
+        { label: 'Şekil II', svg: svgShape('sym') },
+        { label: 'Şekil III', svg: svgShape('asym') },
+        { label: 'Şekil IV', svg: svgShape('sym') }
+      ],
+      correct: 1
     },
     {
       subjectCode: 'fen', type: 'standard',
@@ -108,14 +116,14 @@
       q: 'Güneş sisteminde Dünya\'dan sonra gelen gezegen hangisidir?', opts: ['Venüs', 'Mars', 'Jüpiter', 'Merkür'], correct: 1
     },
     {
-      subjectCode: 'ing', type: 'standard',
-      unit: 'Grammar', unitSubtitle: 'Present Simple',
-      q: '"She ___ to school every day." — Boşluğa hangisi gelir?', opts: ['go', 'goes', 'going', 'went'], correct: 1
+      subjectCode: 'trk', type: 'standard',
+      unit: 'Dil Bilgisi', unitSubtitle: 'Fiil ve Özne',
+      q: '"Koşmak" fiilinin öznesi hangisidir?', opts: ['Hızlı', 'Ali', 'Dün', 'Güzel'], correct: 1
     },
     {
-      subjectCode: 'ing', type: 'standard',
-      unit: 'Vocabulary', unitSubtitle: 'Adjectives',
-      q: '"Beautiful" kelimesinin Türkçe karşılığı hangisidir?', opts: ['Hızlı', 'Güzel', 'Zor', 'Ucuz'], correct: 1
+      subjectCode: 'trk', type: 'standard',
+      unit: 'Dil Bilgisi', unitSubtitle: 'İsim Türleri',
+      q: 'Aşağıdakilerden hangisi somut isimdir?', opts: ['Sevgi', 'Mutluluk', 'Masa', 'Cesaret'], correct: 2
     },
     {
       subjectCode: 'sos', type: 'standard',
@@ -131,7 +139,7 @@
       subjectCode: 'din', type: 'visual', skill: 'beceri', subject: 'Din Kültürü',
       unit: 'Değerler', unitSubtitle: 'Grafik Okuma',
       q: 'Grafikte en yüksek sütun hangi seçeneği temsil eder?',
-      visual: { svg: SVG_BAR_CHART, alt: 'Sütun grafiği', caption: 'Görsel JPEG: visual.src = "assets/sorular/din-grafik.jpg"' },
+      visual: { svg: SVG_BAR_CHART, alt: 'Sütun grafiği' },
       opts: ['A', 'B', 'C', 'D'], correct: 1
     },
     {
@@ -140,17 +148,53 @@
       q: 'İslam dininde günde beş vakit kılınan ibadet hangisidir?', opts: ['Oruç', 'Namaz', 'Zekât', 'Hac'], correct: 1
     },
     {
-      subjectCode: 'mat', type: 'visual', skill: 'beceri', subject: 'Matematik',
-      unit: 'Geometri', unitSubtitle: 'Simetri',
-      q: 'Hangisi en az bir simetri eksenine sahiptir?',
-      visual: { svg: svgShape('sym'), alt: 'Simetri örneği', caption: 'Şıklardaki görselleri incele.' },
-      opts: [
-        { label: 'Şekil I', svg: svgShape('asym') },
-        { label: 'Şekil II', svg: svgShape('sym') },
-        { label: 'Şekil III', svg: svgShape('asym') },
-        { label: 'Şekil IV', svg: svgShape('sym') }
-      ],
-      correct: 1
+      subjectCode: 'ing', type: 'standard',
+      unit: 'Grammar', unitSubtitle: 'Present Simple',
+      q: '"She ___ to school every day." — Boşluğa hangisi gelir?', opts: ['go', 'goes', 'going', 'went'], correct: 1
+    },
+    {
+      subjectCode: 'ing', type: 'standard',
+      unit: 'Vocabulary', unitSubtitle: 'Adjectives',
+      q: '"Beautiful" kelimesinin Türkçe karşılığı hangisidir?', opts: ['Hızlı', 'Güzel', 'Zor', 'Ucuz'], correct: 1
     }
   ];
+
+  function cloneQuestion(seed, subjectIndex) {
+    var copy = JSON.parse(JSON.stringify(seed));
+    copy.unitSubtitle = (copy.unitSubtitle || '—') + ' · Soru ' + (subjectIndex + 1);
+    return copy;
+  }
+
+  function buildQuestionBank(seeds, counts, order) {
+    var bySubject = {};
+    seeds.forEach(function (q) {
+      var code = q.subjectCode || 'mat';
+      if (!bySubject[code]) bySubject[code] = [];
+      bySubject[code].push(q);
+    });
+
+    var bank = [];
+    order.forEach(function (code) {
+      var target = counts[code] || 0;
+      var pool = bySubject[code] || [];
+      if (!pool.length) {
+        pool = [{
+          subjectCode: code,
+          type: 'standard',
+          unit: 'Genel',
+          unitSubtitle: 'Seviye Belirleme',
+          q: 'Bu derste örnek soru metni yer alır. Doğru seçeneği işaretle.',
+          opts: ['Seçenek A', 'Seçenek B', 'Seçenek C', 'Seçenek D'],
+          correct: 0
+        }];
+      }
+      for (var i = 0; i < target; i++) {
+        bank.push(cloneQuestion(pool[i % pool.length], i));
+      }
+    });
+    return bank;
+  }
+
+  global.BilenyumPlacementSubjectCounts = SUBJECT_COUNTS;
+  global.BilenyumPlacementQuestions = buildQuestionBank(SEED_QUESTIONS, SUBJECT_COUNTS, BANK_ORDER);
 })(typeof window !== 'undefined' ? window : this);
