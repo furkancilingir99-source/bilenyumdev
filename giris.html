@@ -605,7 +605,8 @@
     if (!form) return;
 
     const params = new URLSearchParams(window.location.search);
-    const redirectTo = params.get('from') || 'dashboard.html';
+    const fromParam = params.get('from') || '/';
+    const redirectTo = (fromParam.charAt(0) === '/' && fromParam.charAt(1) !== '/') ? fromParam : '/';
 
     if (params.get('expired') === '1') {
       showError('Oturumunuz sona erdi. Lütfen tekrar giriş yapın.');

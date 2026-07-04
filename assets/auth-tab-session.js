@@ -100,15 +100,6 @@
     return id;
   }
 
-  function countOtherLiveTabs(now) {
-    var tabs = readTabs();
-    var count = 0;
-    Object.keys(tabs).forEach(function (id) {
-      if (id !== tabId && now - tabs[id] <= STALE_MS) count++;
-    });
-    return count;
-  }
-
   function logoutBeacon() {
     if (navigator.sendBeacon) {
       navigator.sendBeacon('/api/logout');
@@ -135,9 +126,14 @@
       });
   }
 
+  function adoptBrowserSession(globalId) {
+    try {
+      sessionStorage.setItem(TAB_SESSION_KEY, globalId);
+    } catch (e) {}
+  }
+
   function enforceBrowserSessionOnLoad() {
     syncTab();
-    var now = Date.now();
     var globalId = getBrowserSessionId();
     var tabSessionId = getTabSessionId();
 
@@ -146,19 +142,13 @@
       return;
     }
 
-    if (tabSessionId) {
-      if (tabSessionId !== globalId) forceLogoutIfAuthenticated();
-      return;
+    if (!tabSessionId || tabSessionId !== globalId) {
+      if (tabSessionId && tabSessionId !== globalId) {
+        forceLogoutIfAuthenticated();
+        return;
+      }
+      adoptBrowserSession(globalId);
     }
-
-    if (countOtherLiveTabs(now) > 0) {
-      try {
-        sessionStorage.setItem(TAB_SESSION_KEY, globalId);
-      } catch (e) {}
-      return;
-    }
-
-    forceLogoutIfAuthenticated();
   }
 
   function shouldSkipLogout() {

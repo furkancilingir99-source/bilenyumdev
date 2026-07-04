@@ -9,9 +9,8 @@ import {
 function redirectToLogin(url, pathname, clearCookies) {
   const loginUrl = new URL('/giris', url.origin);
   if (clearCookies) loginUrl.searchParams.set('expired', '1');
-  if (pathname && pathname !== '/') {
-    loginUrl.searchParams.set('from', pathname + url.search);
-  }
+  const safePath = pathname || '/';
+  loginUrl.searchParams.set('from', safePath + url.search);
   const response = Response.redirect(loginUrl.toString(), 302);
   if (clearCookies) {
     clearSessionCookieHeaders().forEach(function (c) {
