@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Deneme Sınavı · Bilenyum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/assessment.css">
+<link rel="stylesheet" href="assets/assessment-light.css">
+</head>
+<body>
+
+<div class="asm-exam-page asm-homework-page is-trial-exam" id="asmHomeworkExam" data-subject="genel">
+  <header class="asm-exam-topbar asm-homework-topbar">
+    <div class="asm-homework-topbar-left"></div>
+    <div class="asm-homework-topbar-center">
+      <h1 class="asm-exam-topbar-title asm-hw-title" id="hwTitle">Deneme Sınavı</h1>
+      <p class="asm-hw-topic" id="hwTopic">Bilenyum Genel Deneme · 12</p>
+    </div>
+    <div class="asm-homework-topbar-badges">
+      <span class="asm-hw-type-badge is-deneme" id="hwTypeBadge" data-type="deneme">LGS</span>
+      <span class="asm-hw-edu-week" id="hwEduWeek" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span id="hwEduWeekText">—</span>
+      </span>
+      <span class="asm-hw-subject-badge" id="hwSubjectBadge" data-subject="genel">Genel Deneme</span>
+    </div>
+  </header>
+
+  <div class="asm-hw-layout">
+    <aside class="asm-hw-board-toolbar asm-hw-board-toolbar--rail asm-hw-board-toolbar--docked" id="hwBoardToolbar" aria-label="Tahta araçları"></aside>
+    <div class="asm-hw-workspace">
+      <section class="asm-hw-board-wrap" aria-label="Çözüm tahtası">
+        <div class="asm-hw-board-viewport" id="hwBoardViewport">
+          <div class="asm-hw-board-layer" id="hwBoardLayer">
+            <div class="asm-hw-sheet-cluster" id="hwSheetCluster">
+              <div class="asm-hw-sheet" id="hwQuestionSheet">
+                <header class="asm-hw-sheet-head" id="hwSheetHead">
+                  <div class="asm-hw-sheet-head-inner" id="hwSheetHeadInner"></div>
+                </header>
+                <div class="asm-hw-draw-region" id="hwDrawRegion">
+                  <div class="asm-hw-sheet-body" id="hwSheetBody"></div>
+                  <div class="asm-hw-options-row asm-hw-sheet-interactive">
+                    <div class="asm-options asm-hw-sheet-options" id="hwSheetOptions"></div>
+                  </div>
+                  <div class="asm-hw-confirm-answer asm-hw-sheet-interactive" id="hwConfirmAnswer" hidden>
+                    <button type="button" class="asm-hw-confirm-answer-btn" id="hwConfirmAnswerBtn">Cevabımı Onayla</button>
+                  </div>
+                  <div class="asm-hw-solve-zone" id="hwSolveZone" aria-label="Çözüm alanı">
+                    <span class="asm-hw-solve-label">Çözüm alanı</span>
+                  </div>
+                </div>
+                <footer class="asm-hw-sheet-foot">
+                  <p class="asm-hw-sheet-guide">Bir şık seç, ardından <strong>Cevabımı Onayla</strong> ile cevabını gönder. Sorular paleti veya alttaki gezinme butonlarıyla istediğin soruya geçebilirsin.</p>
+                </footer>
+              </div>
+            </div>
+            <canvas id="hwDrawCanvas" aria-label="Çizim katmanı"></canvas>
+          </div>
+        </div>
+      </section>
+    </div>
+    <aside class="asm-hw-qnav-rail" id="hwQuestionNav" aria-label="Soru navigasyonu">
+      <div class="asm-hw-qnav-current" aria-live="polite" aria-atomic="true">
+        <span class="asm-hw-qnav-label">Soru</span>
+        <div class="asm-hw-qnav-current-row">
+          <strong class="asm-hw-qnav-current-num" id="hwCurrentNum">1</strong>
+          <span class="asm-hw-qnav-current-total" id="hwCurrentTotal">/ 1</span>
+        </div>
+      </div>
+      <div class="asm-hw-qnav-divider" aria-hidden="true"></div>
+      <div class="asm-hw-qnav-progress">
+        <span class="asm-hw-qnav-label">Tamamlanan</span>
+        <strong class="asm-hw-nav-progress-count" id="hwProgressCount">0 / 0</strong>
+        <div class="asm-exam-progress asm-hw-meta-progress asm-hw-nav-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="hwProgressBar">
+          <div class="asm-exam-progress-fill"></div>
+        </div>
+      </div>
+      <div class="asm-hw-qnav-divider" aria-hidden="true"></div>
+      <div class="asm-hw-qnav-palette">
+        <span class="asm-hw-qnav-label">Sorular</span>
+        <div class="asm-q-palette asm-hw-qnav-track" id="asmQPalette"></div>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="asm-exam-footer asm-exam-footer--actions asm-hw-footer-nav">
+    <button type="button" class="asm-hw-nav-btn asm-hw-footer-nav-btn" data-asm-prev aria-label="Önceki soru" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Önceki Soru</span>
+    </button>
+    <button type="button" class="asm-btn asm-btn-primary asm-btn-finish-exam" id="hwFinishBtn">Sınavı Bitir</button>
+    <button type="button" class="asm-hw-nav-btn asm-hw-footer-nav-btn is-next" data-asm-next aria-label="Sonraki soru">
+      <span>Sonraki Soru</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </footer>
+
+  <div class="asm-confirm" id="hwConfirm" hidden role="alertdialog" aria-modal="true" aria-labelledby="hwConfirmTitle">
+    <div class="asm-confirm-backdrop" data-hw-confirm-cancel></div>
+    <div class="asm-confirm-card">
+      <h3 class="asm-confirm-title" id="hwConfirmTitle">Emin misin?</h3>
+      <p class="asm-confirm-hint" id="hwConfirmHint" hidden></p>
+      <p class="asm-confirm-text" id="hwConfirmText"></p>
+      <div class="asm-confirm-actions">
+        <button type="button" class="asm-btn asm-btn-ghost" data-hw-confirm-cancel id="hwConfirmCancel">Sorulara Dön</button>
+        <button type="button" class="asm-btn asm-btn-primary" id="hwConfirmOk">Yine de Bitir</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="asm-hw-q-status" id="hwQuestionStatus" hidden role="alertdialog" aria-modal="true" aria-labelledby="hwQuestionStatusTitle">
+    <div class="asm-hw-q-status-backdrop" data-hw-q-status-close></div>
+    <div class="asm-hw-q-status-card">
+      <p class="asm-hw-q-status-title" id="hwQuestionStatusTitle"></p>
+      <p class="asm-hw-q-status-text" id="hwQuestionStatusText"></p>
+      <div class="asm-hw-q-status-actions">
+        <button type="button" class="asm-hw-q-status-close" id="hwQuestionStatusOk">Tamam</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="asm-hw-skip-modal" id="hwSkipChoice" hidden role="alertdialog" aria-modal="true" aria-labelledby="hwSkipChoiceTitle">
+    <div class="asm-hw-skip-modal-backdrop" data-hw-skip-cancel></div>
+    <div class="asm-hw-skip-modal-card">
+      <h3 class="asm-hw-skip-modal-title" id="hwSkipChoiceTitle">Bu soruyu nasıl geçmek istiyorsun?</h3>
+      <p class="asm-hw-skip-modal-intro">Henüz bir cevap seçmedin. Devam etmek için aşağıdaki seçeneklerden birini kullan.</p>
+      <div class="asm-hw-skip-options">
+        <div class="asm-hw-skip-option">
+          <p class="asm-hw-skip-option-text">Soruyu daha sonra çözmek istiyorsan, sorular paletinden bu soruya geri dönebilirsin.</p>
+          <button type="button" class="asm-btn asm-btn-ghost asm-hw-skip-option-btn" id="hwSkipLater">Daha Sonra Çöz</button>
+        </div>
+        <div class="asm-hw-skip-option asm-hw-skip-option--video">
+          <p class="asm-hw-skip-option-text">Soruyu çözemediysen, video çözümünü izleyerek nasıl yapıldığını öğrenebilirsin.</p>
+          <button type="button" class="asm-btn asm-btn-primary asm-hw-skip-option-btn" id="hwSkipVideo">Sorunun Video Çözümünü İzle</button>
+        </div>
+      </div>
+      <button type="button" class="asm-hw-skip-cancel" data-hw-skip-cancel id="hwSkipCancel">Soruya Dön</button>
+    </div>
+  </div>
+
+  <div class="asm-confirm asm-confirm--attempt" id="hwAttemptWarn" hidden role="alertdialog" aria-modal="true" aria-labelledby="hwAttemptWarnTitle">
+    <div class="asm-confirm-backdrop"></div>
+    <div class="asm-confirm-card">
+      <h3 class="asm-confirm-title" id="hwAttemptWarnTitle">Dikkat!</h3>
+      <p class="asm-confirm-hint">1 yanlış cevap hakkın kaldı.</p>
+      <p class="asm-confirm-text">Doğru şıkkı bulmaya çalış. İkinci yanlışta sorunun video çözümünü izlemen gerekecek.</p>
+      <div class="asm-confirm-actions">
+        <button type="button" class="asm-btn asm-btn-primary" id="hwAttemptWarnOk">Tekrar Dene</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="asm-hw-video-modal" id="hwVideoModal" hidden role="dialog" aria-modal="true" aria-labelledby="hwVideoModalTitle">
+    <div class="asm-hw-video-modal-backdrop"></div>
+    <div class="asm-hw-video-modal-card">
+      <h3 class="asm-hw-video-modal-title" id="hwVideoModalTitle">Çözümü İzle</h3>
+      <p class="asm-hw-video-modal-notice" id="hwVideoModalNotice">Bu soruya iki kez yanlış cevap verdin. Bu sorunun video çözümünü izleyerek çözümünü öğrenmeni istiyoruz.</p>
+      <p class="asm-hw-video-modal-sub" id="hwVideoModalSub">Videoyu dilediğin hızda izleyebilir veya doğrudan sonraki soruya geçebilirsin.</p>
+      <div class="asm-hw-video-meta" id="hwVideoMeta" aria-label="Ödev bilgileri"></div>
+      <div class="asm-hw-vp" id="hwVideoPlayerRoot">
+        <div class="asm-hw-vp-stage" id="hwVideoStage" tabindex="0" aria-label="Video oynatıcı">
+          <video class="asm-hw-vp-video" id="hwVideoEl" playsinline preload="metadata"></video>
+          <button type="button" class="asm-hw-vp-center-play" id="hwVpCenterPlay" aria-label="Oynat">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="8 5 19 12 8 19"/></svg>
+          </button>
+          <div class="asm-hw-vp-overlay" id="hwVpOverlay" aria-label="Video oynatıcı kontrolleri">
+            <div class="asm-hw-vp-progress">
+              <input type="range" class="asm-hw-vp-seek" id="hwVpSeek" min="0" max="100" value="0" step="0.1" aria-label="Video konumu" />
+            </div>
+            <div class="asm-hw-vp-bar">
+              <button type="button" class="asm-hw-vp-btn asm-hw-vp-btn--play" id="hwVpPlay" aria-label="Oynat">
+                <svg class="asm-hw-vp-icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="8 5 19 12 8 19"/></svg>
+                <svg class="asm-hw-vp-icon-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+              </button>
+              <button type="button" class="asm-hw-vp-btn" id="hwVpRewind" aria-label="10 saniye geri sar" title="10 sn geri">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.5-6.2"/><polyline points="3 3 3 9 9 9"/></svg>
+              </button>
+              <button type="button" class="asm-hw-vp-btn" id="hwVpForward" aria-label="10 saniye ileri sar" title="10 sn ileri">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.5-6.2"/><polyline points="21 3 21 9 15 9"/></svg>
+              </button>
+              <div class="asm-hw-vp-volume-group">
+                <button type="button" class="asm-hw-vp-btn" id="hwVpMute" aria-label="Sesi kapat">
+                  <svg class="asm-hw-vp-icon-vol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                  <svg class="asm-hw-vp-icon-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                </button>
+                <input type="range" class="asm-hw-vp-volume" id="hwVpVolume" min="0" max="1" step="0.05" value="1" aria-label="Ses seviyesi" />
+              </div>
+              <span class="asm-hw-vp-time"><span id="hwVpCurrent">0:00</span><span class="asm-hw-vp-time-sep"> / </span><span id="hwVpDuration">0:00</span></span>
+              <span class="asm-hw-vp-bar-spacer" aria-hidden="true"></span>
+              <label class="asm-hw-vp-speed-wrap">
+                <span class="asm-hw-vp-speed-label">Hız</span>
+                <select class="asm-hw-vp-speed" id="hwVpSpeed" aria-label="Oynatma hızı">
+                  <option value="0.75">0.75x</option>
+                  <option value="1" selected>1x</option>
+                  <option value="1.25">1.25x</option>
+                  <option value="1.5">1.5x</option>
+                </select>
+              </label>
+              <button type="button" class="asm-hw-vp-btn asm-hw-vp-btn--fs" id="hwVpFullscreen" aria-label="Tam ekran">
+                <svg class="asm-hw-vp-icon-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                <svg class="asm-hw-vp-icon-compress" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="asm-hw-video-modal-actions">
+        <button type="button" class="asm-btn asm-btn-primary" id="hwVideoDone">Sonraki Soruya Geç</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="asm-finish-overlay" id="hwFinishOverlay" hidden role="dialog" aria-modal="true">
+    <div class="asm-finish-modal">
+      <div class="asm-finish-modal-inner" id="hwFinishInner"></div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/homework-questions.js"></script>
+<script src="assets/homework-whiteboard.js"></script>
+<script src="assets/homework-results.js"></script>
+<script src="assets/exam-header.js"></script>
+<script src="assets/exam-student-bar.js"></script>
+<script src="assets/homework-video-player.js"></script>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  if (!params.get('exam') && !params.get('hw')) {
+    location.replace('deneme-sinavi.html?exam=genel-deneme-12');
+  }
+})();
+</script>
+<script src="assets/homework-exam.js"></script>
+<script src="assets/auth-tab-session.js"></script>
+<script src="assets/assessment.js"></script>
+</body>
+</html>

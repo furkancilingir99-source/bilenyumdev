@@ -398,6 +398,84 @@
           opts: ['Sevgi', 'Mutluluk', 'Masa', 'Cesaret'], correct: 2
         }
       ]
+    },
+    'genel-deneme-12': {
+      id: 'genel-deneme-12',
+      examType: 'deneme',
+      subject: 'genel',
+      subjectLabel: 'Genel Deneme',
+      homeworkType: 'rud',
+      eduWeek: 17,
+      gradeLevel: 8,
+      unit: 'LGS Genel Deneme',
+      unitSubtitle: '80 Soru · 5 Ders · 135 Dakika',
+      title: 'Bilenyum Genel Deneme · 12',
+      topic: 'LGS Formatı · 10 Soru (Demo)',
+      questions: [
+        {
+          type: 'visual', skill: 'beceri', subject: 'Matematik',
+          unit: 'Geometri', unitSubtitle: 'Üçgende Açı',
+          q: 'Şekilde verilen ABC üçgeninde m(∠A) = 65° ve m(∠B) = 45° olduğuna göre m(∠C) kaç derecedir?',
+          visual: { svg: SVG_TRIANGLE, alt: 'Üçgen açı sorusu' },
+          opts: ['60°', '70°', '80°', '90°'], correct: 1
+        },
+        {
+          type: 'standard', subject: 'Matematik',
+          unit: 'Sayılar', unitSubtitle: 'Köklü Sayılar',
+          q: '√48 + √27 ifadesinin sadeleştirilmiş hali aşağıdakilerden hangisidir?',
+          opts: ['5√3', '6√3', '7√3', '8√3'], correct: 2
+        },
+        {
+          type: 'visual', skill: 'beceri', subject: 'Fen Bilimleri',
+          unit: 'Madde ve Doğa', unitSubtitle: 'Su Döngüsü',
+          q: 'Görselde numaralandırılan olaylardan hangisi yoğuşmadır?',
+          visual: { svg: SVG_WATER_CYCLE, alt: 'Su döngüsü' },
+          opts: ['1', '2', '3', '4'], correct: 1
+        },
+        {
+          type: 'standard', subject: 'Fen Bilimleri',
+          unit: 'Canlılar', unitSubtitle: 'Besin Zinciri',
+          q: 'Bir besin zincirinde enerji akışı hangi yönde gerçekleşir?',
+          opts: ['Üreticiden tüketiciye', 'Tüketiciden üreticiye', 'Her iki yönde eşit', 'Rastgele'], correct: 0
+        },
+        {
+          type: 'standard', subject: 'Türkçe',
+          unit: 'Anlam Bilgisi', unitSubtitle: 'Paragraf',
+          q: 'Aşağıdaki cümlelerden hangisi kanıt cümlesi niteliğindedir?',
+          opts: ['Kitap okumak çok keyiflidir.', 'Araştırmaya göre düzenli okuyan öğrenciler kelime dağarcığı %30 artar.', 'Herkes okumalı.', 'Okumak güzeldir.'], correct: 1
+        },
+        {
+          type: 'standard', subject: 'Türkçe',
+          unit: 'Dil Bilgisi', unitSubtitle: 'Fiilimsiler',
+          q: '"Koşarak okula gitti." cümlesindeki "koşarak" sözcüğü hangi fiilimsi türündedir?',
+          opts: ['İsim-fiil', 'Sıfat-fiil', 'Zarf-fiil', 'Fiil'], correct: 2
+        },
+        {
+          type: 'standard', subject: 'Sosyal Bilgiler',
+          unit: 'Tarih', unitSubtitle: 'Osmanlı',
+          q: 'Osmanlı Devleti\'nde Lale Devri hangi padişah döneminde yaşanmıştır?',
+          opts: ['III. Ahmet', 'II. Mahmut', 'IV. Murat', 'Yavuz Sultan Selim'], correct: 0
+        },
+        {
+          type: 'standard', subject: 'Din Kültürü',
+          unit: 'Ahlak', unitSubtitle: 'Temel Değerler',
+          q: 'İslam\'da "doğruluk" kavramını en iyi ifade eden kavram hangisidir?',
+          opts: ['Sabır', 'Sidk', 'Şükür', 'Tevazu'], correct: 1
+        },
+        {
+          type: 'visual', skill: 'beceri', subject: 'İngilizce',
+          unit: 'Grammar', unitSubtitle: 'Simple Present',
+          q: 'Look at the dialogue. Which question fits in the first speech bubble?',
+          visual: { svg: SVG_DIALOGUE, alt: 'Dialogue' },
+          opts: ['How often do you meet?', 'What is your name?', 'Where is the library?', 'How old are you?'], correct: 0
+        },
+        {
+          type: 'standard', subject: 'Matematik',
+          unit: 'Veri', unitSubtitle: 'Olasılık',
+          q: 'Adil bir zar atıldığında tek sayı gelme olasılığı kaçtır?',
+          opts: ['1/6', '1/3', '1/2', '2/3'], correct: 2
+        }
+      ]
     }
   };
 })(typeof window !== 'undefined' ? window : this);

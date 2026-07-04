@@ -215,10 +215,11 @@
     if (!root) return;
 
     var params = new URLSearchParams(location.search);
-    var hwId = params.get('hw') || 'mat-koklu';
+    var hwId = params.get('exam') || params.get('hw') || 'mat-koklu';
     var isRetry = params.get('retry') === '1';
     var sets = global.BilenyumHomeworkSets || {};
     var set = sets[hwId];
+    var isDeneme = !!(set && set.examType === 'deneme');
 
     var titleEl = root.querySelector('#hwTitle');
     var topicEl = root.querySelector('#hwTopic');
@@ -274,10 +275,16 @@
     if (!set) {
       root.innerHTML =
         '<main class="asm-hw-empty">' +
-          '<p>Ödev bulunamadı.</p>' +
-          '<a href="ogrenci-dashboard.html" class="asm-btn asm-btn-primary">Dashboard\'a Dön</a>' +
+          '<p>' + (params.get('exam') ? 'Deneme sınavı bulunamadı.' : 'Ödev bulunamadı.') + '</p>' +
+          '<a href="' + (params.get('exam') ? 'sinavlar.html' : 'ogrenci-dashboard.html') + '" class="asm-btn asm-btn-primary">' +
+            (params.get('exam') ? 'Deneme Sınavlarına Dön' : 'Dashboard\'a Dön') + '</a>' +
         '</main>';
       return;
+    }
+
+    if (isDeneme) {
+      root.classList.add('is-trial-exam');
+      document.title = (set.title || 'Deneme Sınavı') + ' · Bilenyum';
     }
 
     if (titleEl) titleEl.textContent = set.title || 'Ödev';
@@ -287,10 +294,16 @@
       subjectEl.setAttribute('data-subject', set.subject);
     }
     if (typeBadgeEl) {
-      var hwType = set.homeworkType === 'rud' ? 'rud' : 'kid';
-      typeBadgeEl.textContent = hwType === 'rud' ? 'RUD' : 'KİD';
-      typeBadgeEl.className = 'asm-hw-type-badge is-' + hwType;
-      typeBadgeEl.setAttribute('data-type', hwType);
+      if (isDeneme) {
+        typeBadgeEl.textContent = 'LGS';
+        typeBadgeEl.className = 'asm-hw-type-badge is-deneme';
+        typeBadgeEl.setAttribute('data-type', 'deneme');
+      } else {
+        var hwType = set.homeworkType === 'rud' ? 'rud' : 'kid';
+        typeBadgeEl.textContent = hwType === 'rud' ? 'RUD' : 'KİD';
+        typeBadgeEl.className = 'asm-hw-type-badge is-' + hwType;
+        typeBadgeEl.setAttribute('data-type', hwType);
+      }
     }
     var weekLabel = formatEduWeek(set.eduWeek);
     if (eduWeekEl && eduWeekText) {
@@ -302,6 +315,7 @@
       }
     }
     root.setAttribute('data-subject', set.subject);
+    if (finishBtn && isDeneme) finishBtn.textContent = 'Sınavı Bitir';
 
     var board = global.BilenyumHomeworkBoard
       ? global.BilenyumHomeworkBoard.mount(root, { penColor: '#000000', penSize: 2 })
@@ -316,7 +330,9 @@
     var videoWatched = [];
     var deferredLater = [];
     var revealedByVideo = [];
-    var SHEET_GUIDE_DEFAULT = 'Bir şık seç, ardından <strong>Cevabımı Onayla</strong> ile cevabını gönder. <strong>Önceki Soru</strong> ve sorular paleti ile istediğin soruya geçebilirsin; cevap vermeden ilerlemek için <strong>Sonraki Soru</strong> butonunu kullan.';
+    var SHEET_GUIDE_DEFAULT = isDeneme
+      ? 'Bir şık seç, ardından <strong>Cevabımı Onayla</strong> ile cevabını gönder. Deneme sınavında her soru için tek cevap hakkın vardır. Sorular paleti veya alttaki gezinme ile istediğin soruya geçebilirsin.'
+      : 'Bir şık seç, ardından <strong>Cevabımı Onayla</strong> ile cevabını gönder. <strong>Önceki Soru</strong> ve sorular paleti ile istediğin soruya geçebilirsin; cevap vermeden ilerlemek için <strong>Sonraki Soru</strong> butonunu kullan.';
     var SHEET_GUIDE_REVEALED = 'Video çözümünü izledin; doğru cevap aşağıda yeşil ile gösteriliyor. Bu soruya artık şık işaretleyemezsin.';
     var idx = 0;
     var locked = false;
@@ -527,6 +543,7 @@
     }
 
     function blockCurrentQuestion(targetIdx) {
+      if (isDeneme) return false;
       if (questionResolved[idx]) return false;
       var navTarget = targetIdx != null ? targetIdx : idx + 1;
       if (wrongAttempts[idx] >= 2 && !videoWatched[idx]) {
@@ -730,6 +747,17 @@
       pendingSelection[idx] = null;
       renderConfirmBar(idx);
 
+      if (isDeneme) {
+        answers[idx] = optIndex;
+        lastSelection[idx] = optIndex;
+        questionResolved[idx] = true;
+        renderOptions(q, idx);
+        renderPalette();
+        updateProgress();
+        if (idx < questions.length - 1) goToQuestion(idx + 1, { force: true });
+        return;
+      }
+
       if (optIndex === q.correct) {
         answers[idx] = optIndex;
         lastSelection[idx] = optIndex;
@@ -875,6 +903,27 @@
     function goToResults(mode) {
       if (locked) return;
       locked = true;
+
+      if (isDeneme) {
+        var denemeScore = scoreResult();
+        var blank = denemeScore.total - denemeScore.correct - denemeScore.wrong;
+        var net = Math.max(0, denemeScore.correct - denemeScore.wrong / 3);
+        lsSet('trialExam.' + hwId, JSON.stringify({
+          examId: hwId,
+          name: set.title,
+          type: 'genel',
+          correct: denemeScore.correct,
+          wrong: denemeScore.wrong,
+          blank: blank,
+          total: denemeScore.total,
+          net: Math.round(net * 100) / 100,
+          completedAt: new Date().toISOString(),
+          mode: mode
+        }));
+        location.href = 'sinavlar.html?deneme=done&exam=' + encodeURIComponent(hwId);
+        return;
+      }
+
       var Results = global.BilenyumHomeworkResults;
       if (!Results) {
         location.href = 'ogrenci-dashboard.html';
@@ -963,8 +1012,12 @@
       }
       if (confirmText) {
         confirmText.textContent = mode === 'leave'
-          ? 'Henüz tüm soruları yanıtlamadın. Yine de dashboard\'a dönmek istiyor musun?'
-          : 'Henüz tüm soruları yanıtlamadın. Yine de ödevi teslim etmek istiyor musun?';
+          ? (isDeneme
+            ? 'Henüz tüm soruları yanıtlamadın. Yine de deneme sınavları sayfasına dönmek istiyor musun?'
+            : 'Henüz tüm soruları yanıtlamadın. Yine de dashboard\'a dönmek istiyor musun?')
+          : (isDeneme
+            ? 'Henüz tüm soruları yanıtlamadın. Yine de sınavı teslim etmek istiyor musun?'
+            : 'Henüz tüm soruları yanıtlamadın. Yine de ödevi teslim etmek istiyor musun?');
       }
       if (confirmOkBtn) {
         confirmOkBtn.textContent = mode === 'leave' ? 'Yine de Çık' : 'Yine de Bitir';
@@ -1081,10 +1134,10 @@
     if (global.BilenyumExamStudentBar) {
       global.BilenyumExamStudentBar.mount(root, {
         showBack: true,
-        backHref: 'ogrenci-dashboard.html',
-        backLabel: "Dashboard'a Dön",
+        backHref: isDeneme ? 'sinavlar.html' : 'ogrenci-dashboard.html',
+        backLabel: isDeneme ? 'Deneme Sınavları' : "Dashboard'a Dön",
         hideSection: true,
-        dueAt: set.dueAt || null
+        dueAt: isDeneme ? null : (set.dueAt || null)
       });
       var backLink = root.querySelector('[data-asm-student-back]');
       if (backLink) {

@@ -321,6 +321,13 @@
   letter-spacing: 0.05em; text-transform: uppercase;
   text-align: center;
 }
+.nav-item.is-label-wrap .nav-item-label {
+  white-space: normal;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-size: 9px;
+}
 
 /* ============ YUMI ============ */
 .yumi-dock {

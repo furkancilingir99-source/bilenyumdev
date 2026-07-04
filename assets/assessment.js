@@ -35,8 +35,8 @@
 
   /* Geliştirme: false = sayfa yenilemede otomatik sıfırlama kapalı (canlı mod) */
   var DEV_RESET_ON_RELOAD = false;
-  /* Test kısayolu: ↺ Yeni öğrenci butonu — yalnızca geliştirme */
-  var DEV_RESET_SHORTCUT = false;
+  /* Test kısayolu: ↺ Yeni öğrenci butonu — geliştirme / demo */
+  var DEV_RESET_SHORTCUT = true;
 
   function devResetForTesting() {
     if (!DEV_RESET_ON_RELOAD) return;
@@ -251,10 +251,10 @@
     existingBtn.type = 'button';
     existingBtn.id = 'asmDevExisting';
     existingBtn.className = 'asm-dev-reset asm-dev-reset--existing';
-    existingBtn.title = 'Sınavları tamamlanmış — tüm platform özellikleri açık';
-    existingBtn.textContent = '✓ Mevcut öğrenci';
+    existingBtn.title = 'Sınavlar tamamlanmış — tüm platform özellikleri açık (eski / mevcut öğrenci)';
+    existingBtn.textContent = '✓ Eski öğrenci';
     existingBtn.addEventListener('click', function () {
-      if (!confirm('Mevcut öğrenci moduna geçilsin mi? Sınavlar tamamlanmış sayılır ve platformun tüm bölümleri açılır.')) return;
+      if (!confirm('Eski öğrenci moduna geçilsin mi? Sınavlar tamamlanmış sayılır ve platformun tüm bölümleri açılır.')) return;
       resetToExistingStudent();
       finishDevReset();
     });
@@ -528,7 +528,7 @@
     'program.html':   '.prog-page',
     'odevler.html':   '.ov-page:not(.tk-page)',
     'tekrarlar.html': '.tk-page',
-    'sinavlar.html':  '.sn-page',
+    'sinavlar.html':  '.sn-page > .sn-section',
     'performans.html': '.perf-page'
   };
 
@@ -682,7 +682,17 @@
     });
   }
 
+  function patchStudentNavLabels() {
+    document.querySelectorAll('.nav-rail a[href="sinavlar.html"]').forEach(function (link) {
+      link.classList.add('is-label-wrap');
+      link.setAttribute('title', 'Deneme Sınavları');
+      var label = link.querySelector('.nav-item-label');
+      if (label) label.innerHTML = 'Deneme<br>Sınavları';
+    });
+  }
+
   function refresh() {
+    patchStudentNavLabels();
     if (isAllDone()) {
       unlockDashboardFeatures();
       return;
@@ -888,36 +898,37 @@
 
   /* ---------- Boot ---------- */
   function boot() {
-    if (applyResetShortcut()) return;
+    var redirected = applyResetShortcut();
+    if (!redirected) {
+      devResetForTesting();
 
-    devResetForTesting();
+      var page = currentPage();
 
-    var page = currentPage();
+      if (page === 'seviye-belirleme.html') {
+        var placementRoot = document.getElementById('asmPlacementExam');
+        if (global.BilenyumCrossBreak && placementRoot) {
+          global.BilenyumCrossBreak.runGate('placement', placementRoot, initPlacementExam);
+        } else {
+          initPlacementExam();
+        }
+      } else if (page === 'dikkat-testi.html') {
+        var attentionRoot = document.getElementById('asmAttentionExam');
+        if (global.BilenyumCrossBreak && attentionRoot) {
+          global.BilenyumCrossBreak.runGate('attention', attentionRoot, initAttentionExam);
+        } else {
+          initAttentionExam();
+        }
+      } else if (page === 'sinav-sonuclari.html') {
+        if (global.BilenyumExamHeader) global.BilenyumExamHeader.mount();
+      } else if (STUDENT_PAGES.indexOf(page) !== -1) {
+        bindModalEvents();
+        refresh();
+        initDashboardGate();
 
-    if (page === 'seviye-belirleme.html') {
-      var placementRoot = document.getElementById('asmPlacementExam');
-      if (global.BilenyumCrossBreak && placementRoot) {
-        global.BilenyumCrossBreak.runGate('placement', placementRoot, initPlacementExam);
-      } else {
-        initPlacementExam();
-      }
-    } else if (page === 'dikkat-testi.html') {
-      var attentionRoot = document.getElementById('asmAttentionExam');
-      if (global.BilenyumCrossBreak && attentionRoot) {
-        global.BilenyumCrossBreak.runGate('attention', attentionRoot, initAttentionExam);
-      } else {
-        initAttentionExam();
-      }
-    } else if (page === 'sinav-sonuclari.html') {
-      if (global.BilenyumExamHeader) global.BilenyumExamHeader.mount();
-    } else if (STUDENT_PAGES.indexOf(page) !== -1) {
-      bindModalEvents();
-      refresh();
-      initDashboardGate();
-
-      if (location.search.indexOf('assessment=done') !== -1 && isAllDone()) {
-        showCompletionToast();
-        history.replaceState(null, '', location.pathname);
+        if (location.search.indexOf('assessment=done') !== -1 && isAllDone()) {
+          showCompletionToast();
+          history.replaceState(null, '', location.pathname);
+        }
       }
     }
 

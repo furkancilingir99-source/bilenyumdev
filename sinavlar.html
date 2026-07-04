@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Sonuçlar — Bilenyum</title>
-<meta name="description" content="Bilenyum — geçmiş deneme sınavların, net trend grafiğin, yaklaşan sınav sonuçların ve cevap anahtarları tek ekranda." />
+<title>Deneme Sınavları — Bilenyum</title>
+<meta name="description" content="Bilenyum — yaklaşan deneme sınavlarına katıl, geçmiş deneme sonuçlarını ve net trendini tek ekranda gör." />
 <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%233e3a8e'/%3E%3Ctext x='50' y='65' text-anchor='middle' font-family='Inter,system-ui,sans-serif' font-size='62' font-weight='900' fill='white' letter-spacing='-3'%3Eb%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -9990,9 +9990,9 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
       <span class="nav-item-label">Ders Tekrarları</span>
     </a>
-    <a class="nav-item is-active" href="sinavlar.html" title="Sonuçlar" aria-current="page">
+    <a class="nav-item is-active is-label-wrap" href="sinavlar.html" title="Deneme Sınavları" aria-current="page">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 14 11 16 15 12"/></svg>
-      <span class="nav-item-label">Sonuçlar</span>
+      <span class="nav-item-label">Deneme<br>Sınavları</span>
     </a>
     <a class="nav-item" href="performans.html" title="Performans">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -10051,7 +10051,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     <!-- HEAD: başlık + filtre chip'leri -->
     <div class="sn-head">
       <header class="sn-pagehead">
-        <h1 class="sn-pagehead-title">Sonuçlar</h1>
+        <h1 class="sn-pagehead-title">Deneme Sınavları</h1>
         <span class="sn-section-line" aria-hidden="true"></span>
       </header>
     </div>
@@ -12228,9 +12228,14 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   // ====== YAKLAŞAN SINAV BUTONLARI ======
   var UPCOMING_EXAM = {
     name: 'Bilenyum Genel Deneme · 12',
-    at: new Date(2026, 5, 14, 10, 0, 0)
+    id: 'genel-deneme-12',
+    at: new Date(2026, 5, 14, 10, 0, 0),
+    durationMin: 135,
+    entryHref: 'deneme-sinavi.html?exam=genel-deneme-12'
   };
   var REMIND_STORAGE_KEY = 'bilenyum.snRemind.upcoming';
+  var JOIN_STORAGE_KEY = 'bilenyum.snJoin.upcoming';
+  var JOIN_EARLY_MS = 15 * 60 * 1000;
 
   function pad2(n) { return n < 10 ? '0' + n : '' + n; }
 
@@ -12461,13 +12466,52 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     setTimeout(function () { remindModal.hidden = true; }, 220);
   }
 
+  function isExamEntryOpen() {
+    if (location.search.indexOf('exam-live=1') !== -1) return true;
+    var now = Date.now();
+    var start = UPCOMING_EXAM.at.getTime();
+    var end = start + (UPCOMING_EXAM.durationMin || 135) * 60 * 1000;
+    return now >= start - JOIN_EARLY_MS && now <= end;
+  }
+
+  function loadJoinState() {
+    try {
+      var raw = localStorage.getItem(JOIN_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function saveJoinState() {
+    localStorage.setItem(JOIN_STORAGE_KEY, JSON.stringify({
+      exam: UPCOMING_EXAM.name,
+      joinedAt: new Date().toISOString()
+    }));
+  }
+
+  function updateJoinButtonUI() {
+    if (!joinBtn) return;
+    var live = isExamEntryOpen();
+    var joined = !!loadJoinState();
+    joinBtn.classList.toggle('is-joined', joined && !live);
+    var label = joinBtn.querySelector('.sn-upcoming-join-default span:last-child');
+    if (label) {
+      label.textContent = live ? 'Sınava Başla' : (joined ? 'Denemeye Gir' : 'Denemeye Gir');
+    }
+    joinBtn.setAttribute('aria-disabled', 'false');
+    joinBtn.setAttribute('aria-label', live ? 'Sınava başla' : (joined ? 'Denemeye gir' : 'Sınava katıl'));
+  }
+
+  updateJoinButtonUI();
+
   if (joinBtn) {
     joinBtn.addEventListener('click', function(){
-      if (joinBtn.classList.contains('is-joined')) return;
-      joinBtn.classList.add('is-joined');
-      joinBtn.setAttribute('aria-label', 'Sınava katıldın');
-      joinBtn.setAttribute('aria-disabled', 'true');
-      showToast('Sınava katıldın · Başarılar! 🎯');
+      if (!loadJoinState()) {
+        saveJoinState();
+        showToast('Kaydın alındı · Deneme ekranına yönlendiriliyorsun.');
+      }
+      location.href = UPCOMING_EXAM.entryHref;
     });
   }
 
@@ -12683,6 +12727,14 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 
   // ====== INIT ======
   renderList();
+
+  (function () {
+    var params = new URLSearchParams(location.search);
+    if (params.get('deneme') === 'done') {
+      showToast('Deneme sınavın teslim edildi · Sonuçların kısa sürede burada görünecek.');
+      history.replaceState(null, '', location.pathname);
+    }
+  })();
 
   // ====== ANIMATIONS — sayı sayacı + donut grow (sayfa yüklenince oynar) ======
   (function animateInit(){
