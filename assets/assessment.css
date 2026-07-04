@@ -2605,17 +2605,86 @@ body.asm-has-banner .stage {
   user-select: none;
 }
 .asm-homework-topbar {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(0, 520px) minmax(120px, 1fr);
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
+  gap: 12px 16px;
+  padding-top: 14px;
+  padding-bottom: 14px;
 }
 .asm-homework-topbar-left {
   display: flex;
   align-items: center;
   gap: 14px;
   min-width: 0;
+  justify-self: start;
+}
+.asm-homework-topbar-center {
+  justify-self: center;
+  text-align: center;
+  min-width: 0;
+  width: 100%;
+  max-width: 520px;
+}
+.asm-hw-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--brand-navy, #1a1538);
+  letter-spacing: -0.02em;
+}
+.asm-homework-topbar-titles { min-width: 0; }
+.asm-hw-topic {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: rgba(26, 21, 56, 0.58);
+  font-weight: 600;
+  line-height: 1.35;
+}
+.asm-homework-topbar-badges {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-self: end;
+}
+.asm-hw-type-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.asm-hw-type-badge.is-kid {
+  background: rgba(91, 84, 201, 0.14);
+  border: 1.5px solid rgba(91, 84, 201, 0.38);
+  color: #4338ca;
+}
+.asm-hw-type-badge.is-rud {
+  background: rgba(43, 159, 212, 0.14);
+  border: 1.5px solid rgba(43, 159, 212, 0.38);
+  color: #0369a1;
+}
+.asm-hw-subject-badge {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(168, 164, 240, 0.28);
 }
 .asm-hw-back {
   flex-shrink: 0;
@@ -2632,24 +2701,6 @@ body.asm-has-banner .stage {
   color: #fff;
   border-color: rgba(168, 164, 240, 0.45);
   background: rgba(255, 255, 255, 0.06);
-}
-.asm-homework-topbar-titles { min-width: 0; }
-.asm-hw-topic {
-  margin: 4px 0 0;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.58);
-  font-weight: 600;
-}
-.asm-hw-subject-badge {
-  flex-shrink: 0;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(168, 164, 240, 0.28);
 }
 .asm-hw-subject-badge[data-subject="mat"] { color: #ff9ad8; border-color: rgba(255, 109, 198, 0.35); }
 .asm-hw-subject-badge[data-subject="fen"] { color: #8ee8b8; border-color: rgba(109, 212, 158, 0.35); }
@@ -2707,12 +2758,6 @@ body.asm-has-banner .stage {
 .asm-homework-page .asm-confirm a {
   -webkit-user-select: auto;
   user-select: auto;
-}
-.asm-homework-topbar-badges {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
 }
 .asm-hw-edu-week {
   display: inline-flex;
@@ -3221,6 +3266,7 @@ body.asm-has-banner .stage {
 .asm-homework-page .asm-hw-board-wrap {
   flex: 1;
   min-width: 0;
+  background: #fff;
 }
 .asm-homework-page .asm-hw-sheet-cluster {
   position: absolute;
@@ -3242,17 +3288,20 @@ body.asm-has-banner .stage {
 .asm-homework-page .asm-hw-sheet-head {
   background: #fff;
   border-bottom: 1px solid rgba(26, 21, 56, 0.08);
+  padding: 10px 20px 8px;
 }
 .asm-homework-page .asm-hw-sheet-foot {
-  background: #fff;
+  display: none;
 }
 .asm-homework-page .asm-hw-solve-zone {
   background: #fff;
   border: 1.5px dashed rgba(26, 21, 56, 0.14);
   box-shadow: none;
   margin-top: 8px;
+  margin-bottom: 12px;
   position: relative;
   z-index: 1;
+  min-height: 220px;
 }
 .asm-homework-page .asm-hw-options-row {
   display: flex;
@@ -3303,10 +3352,10 @@ body.asm-has-banner .stage {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 14px;
+  gap: 12px;
   max-width: 640px;
   margin: 0 auto;
-  padding: 20px 28px 0;
+  padding: 14px 24px 0;
   width: 100%;
   box-sizing: border-box;
 }
@@ -3345,115 +3394,123 @@ body.asm-has-banner .stage {
   height: 30px;
 }
 
-/* Ödev — ilerleme navigasyonu */
+/* Ödev — ilerleme navigasyonu (kompakt üst şerit) */
 .asm-homework-page .asm-hw-board-meta--nav {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 14px 18px 16px;
-  background: linear-gradient(180deg, #faf9ff 0%, #fff 52%);
-  border-bottom: 1px solid rgba(26, 21, 56, 0.08);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
-}
-.asm-hw-nav-progress {
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(91, 84, 201, 0.12);
-  box-shadow: 0 4px 18px rgba(26, 21, 56, 0.04);
-}
-.asm-hw-nav-progress-head {
-  display: flex;
-  align-items: baseline;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-.asm-hw-nav-progress-label,
-.asm-hw-nav-palette-label {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(26, 21, 56, 0.48);
-}
-.asm-hw-nav-progress-count {
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--brand-navy, #1a1538);
-  letter-spacing: -0.02em;
-}
-.asm-hw-nav-progress-bar {
-  height: 8px;
-  margin: 0;
-  border-radius: 999px;
-  background: rgba(168, 164, 240, 0.2);
-  overflow: hidden;
-  box-shadow: inset 0 1px 3px rgba(26, 21, 56, 0.08);
-}
-.asm-hw-nav-progress-bar .asm-exam-progress-fill {
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--brand-magenta, #e6087b) 0%, var(--brand-purple, #5b54c9) 100%);
-  box-shadow: 0 0 12px rgba(229, 4, 123, 0.35);
-  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  gap: 12px 16px;
+  flex-shrink: 0;
+  padding: 6px 14px;
+  background: #fff;
+  border-bottom: 1px solid rgba(26, 21, 56, 0.08);
+  box-shadow: none;
 }
 .asm-hw-nav-palette {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(26, 21, 56, 0.06);
+  flex: 1 1 auto;
+  order: 1;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+.asm-hw-nav-progress {
+  flex: 0 0 min(200px, 32vw);
+  order: 2;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.asm-hw-nav-progress-head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.asm-hw-nav-progress-label,
+.asm-hw-nav-palette-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(26, 21, 56, 0.45);
+  white-space: nowrap;
+}
+.asm-hw-nav-progress-count {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--brand-navy, #1a1538);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.asm-hw-nav-progress-bar {
+  height: 5px;
+  margin: 0;
+  border-radius: 999px;
+  background: rgba(168, 164, 240, 0.22);
+  overflow: hidden;
+  box-shadow: none;
+}
+.asm-hw-nav-progress-bar .asm-exam-progress-fill {
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--brand-magenta, #e6087b) 0%, var(--brand-purple, #5b54c9) 100%);
+  box-shadow: none;
+  transition: width 0.35s ease;
 }
 .asm-hw-nav-palette-label {
   flex-shrink: 0;
-  writing-mode: horizontal-tb;
 }
 .asm-hw-nav-palette-track {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: 7px;
+  gap: 5px;
   min-width: 0;
   flex: 1;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 3px 6px 5px;
-  scroll-snap-type: x mandatory;
+  padding: 1px 2px;
+  scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+  mask-image: none;
 }
 .asm-hw-nav-palette-track::-webkit-scrollbar {
   display: none;
 }
 .asm-hw-nav-palette-track .asm-q-pill {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  border-radius: 12px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 9px;
   flex-shrink: 0;
   scroll-snap-align: center;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
-  border-width: 2px;
+  border-width: 1.5px;
   border-color: rgba(26, 21, 56, 0.1);
   background: #fff;
-  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+  transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease, background 0.14s ease;
 }
 .asm-hw-nav-palette-track .asm-q-pill:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(26, 21, 56, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(26, 21, 56, 0.08);
   border-color: rgba(91, 84, 201, 0.35);
 }
 .asm-hw-nav-palette-track .asm-q-pill.is-current {
-  transform: scale(1.08);
+  transform: scale(1.04);
   border-color: var(--brand-magenta, #e6087b);
-  background: linear-gradient(180deg, rgba(229, 4, 123, 0.14) 0%, rgba(229, 4, 123, 0.08) 100%);
-  box-shadow: 0 0 0 3px rgba(229, 4, 123, 0.16), 0 4px 14px rgba(229, 4, 123, 0.18);
+  background: rgba(229, 4, 123, 0.1);
+  box-shadow: 0 0 0 2px rgba(229, 4, 123, 0.14);
   color: var(--brand-magenta, #e6087b);
 }
 .asm-hw-nav-palette-track .asm-q-pill.is-answered {
@@ -4339,10 +4396,23 @@ body.asm-has-banner .stage {
     width: 22px;
     height: 22px;
   }
-  .asm-homework-page .asm-hw-board-meta--nav { padding: 10px 12px 12px; }
-  .asm-hw-nav-progress { padding: 10px 12px; }
-  .asm-hw-nav-palette { padding: 8px 10px; }
-  .asm-hw-nav-palette-track .asm-q-pill { width: 36px; height: 36px; min-width: 36px; font-size: 11px; }
+  .asm-homework-page .asm-hw-board-meta--nav {
+    flex-wrap: wrap;
+    padding: 6px 10px;
+    gap: 8px;
+  }
+  .asm-hw-nav-progress {
+    flex: 1 1 100%;
+    max-width: none;
+    order: 0;
+  }
+  .asm-hw-nav-palette {
+    order: 1;
+  }
+  .asm-hw-nav-progress-head {
+    justify-content: space-between;
+  }
+  .asm-hw-nav-palette-track .asm-q-pill { width: 30px; height: 30px; min-width: 30px; font-size: 10px; }
   .asm-hw-board-viewport { min-height: 280px; }
   .asm-homework-page .asm-hw-sheet-options { max-width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .asm-homework-page .asm-hw-sheet-options .asm-option { min-height: 46px; font-size: 14px; }
@@ -4367,7 +4437,28 @@ body.asm-has-banner .stage {
 }
 
 @media (max-width: 640px) {
-  .asm-homework-topbar { flex-direction: column; align-items: flex-start; }
+  .asm-homework-topbar {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "left"
+      "center"
+      "badges";
+    gap: 10px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  .asm-homework-topbar-left { grid-area: left; }
+  .asm-homework-topbar-center {
+    grid-area: center;
+    justify-self: stretch;
+    max-width: none;
+  }
+  .asm-homework-topbar-badges {
+    grid-area: badges;
+    justify-self: stretch;
+    justify-content: flex-start;
+  }
+  .asm-hw-title { font-size: 17px; }
   .asm-homework-topbar .asm-exam-brand img,
   .asm-homework-topbar .asm-exam-brand-logo { height: 36px; }
   .asm-hw-toolbar-group + .asm-hw-toolbar-group {

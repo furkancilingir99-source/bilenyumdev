@@ -179,6 +179,16 @@
     body.innerHTML = parts.join('');
   }
 
+  function formatHomeworkSubtitle(set) {
+    if (!set) return '';
+    var sub = set.unitSubtitle || set.unit || '';
+    var total = (set.questions || []).length;
+    if (sub && total) return sub + ' · ' + total + ' Soru';
+    if (sub) return sub;
+    if (total) return total + ' Soru';
+    return set.topic || '';
+  }
+
   function mountQuestionChrome(root) {
     var body = root.querySelector('#hwSheetBody');
     var optionsRow = root.querySelector('.asm-hw-options-row');
@@ -213,6 +223,7 @@
     var titleEl = root.querySelector('#hwTitle');
     var topicEl = root.querySelector('#hwTopic');
     var subjectEl = root.querySelector('#hwSubjectBadge');
+    var typeBadgeEl = root.querySelector('#hwTypeBadge');
     var eduWeekEl = root.querySelector('#hwEduWeek');
     var eduWeekText = root.querySelector('#hwEduWeekText');
     var qNum = null;
@@ -266,11 +277,17 @@
       return;
     }
 
-    if (titleEl) titleEl.textContent = set.icon + ' ' + set.title;
-    if (topicEl) topicEl.textContent = set.topic;
+    if (titleEl) titleEl.textContent = set.title || 'Ödev';
+    if (topicEl) topicEl.textContent = formatHomeworkSubtitle(set);
     if (subjectEl) {
       subjectEl.textContent = set.subjectLabel;
       subjectEl.setAttribute('data-subject', set.subject);
+    }
+    if (typeBadgeEl) {
+      var hwType = set.homeworkType === 'rud' ? 'rud' : 'kid';
+      typeBadgeEl.textContent = hwType === 'rud' ? 'RUD' : 'KİD';
+      typeBadgeEl.className = 'asm-hw-type-badge is-' + hwType;
+      typeBadgeEl.setAttribute('data-type', hwType);
     }
     var weekLabel = formatEduWeek(set.eduWeek);
     if (eduWeekEl && eduWeekText) {

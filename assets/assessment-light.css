@@ -83,6 +83,16 @@
 }
 
 /* ---- Ödev üst bar ---- */
+.asm-hw-type-badge.is-kid {
+  background: rgba(91, 84, 201, 0.14) !important;
+  border: 1.5px solid rgba(91, 84, 201, 0.38) !important;
+  color: #4338ca !important;
+}
+.asm-hw-type-badge.is-rud {
+  background: rgba(43, 159, 212, 0.14) !important;
+  border: 1.5px solid rgba(43, 159, 212, 0.38) !important;
+  color: #0369a1 !important;
+}
 .asm-hw-topic { color: var(--ink-dark-1) !important; }
 .asm-hw-subject-badge {
   background: var(--brand-purple-06) !important;
@@ -299,16 +309,8 @@
   width: 56px;
 }
 .asm-homework-page .asm-hw-board-meta--nav {
-  background: linear-gradient(180deg, var(--bg-subtle) 0%, #fff 52%) !important;
+  background: #fff !important;
   border-bottom-color: var(--brand-purple-14) !important;
-}
-.asm-hw-nav-progress {
-  background: var(--bg-surface) !important;
-  border-color: var(--brand-purple-14) !important;
-}
-.asm-hw-nav-palette {
-  background: var(--bg-surface) !important;
-  border-color: var(--brand-purple-10) !important;
 }
 .asm-hw-nav-progress-count { color: var(--brand-navy) !important; }
 .asm-hw-nav-progress-bar { background: var(--brand-purple-10) !important; }

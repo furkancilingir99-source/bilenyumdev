@@ -733,11 +733,9 @@
       var sheet = root.querySelector('#hwQuestionSheet');
       var rect = viewport.getBoundingClientRect();
       var sheetW = sheet ? sheet.offsetWidth || LAYER_W : LAYER_W;
-      var sheetH = sheet ? sheet.offsetHeight || 900 : 900;
       zoom = Math.min(1, Math.max(ZOOM_MIN, (rect.width - 12) / sheetW));
-      var scaledH = sheetH * zoom;
       panX = Math.max(6, (rect.width - sheetW * zoom) / 2);
-      panY = scaledH > rect.height - 12 ? 6 : Math.max(6, (rect.height - scaledH) / 2);
+      panY = 8;
       updateTransform();
     }
 
