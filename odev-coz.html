@@ -30,6 +30,7 @@
   </header>
 
   <div class="asm-hw-layout">
+    <aside class="asm-hw-board-toolbar asm-hw-board-toolbar--rail" id="hwBoardToolbar" aria-label="Tahta araçları"></aside>
     <section class="asm-hw-board-wrap" aria-label="Çözüm tahtası">
       <div class="asm-hw-board-meta" aria-label="Soru ilerlemesi">
         <div class="asm-exam-progress asm-hw-meta-progress"><div class="asm-exam-progress-fill" style="width:0%"></div></div>
@@ -38,14 +39,9 @@
           <div class="asm-q-palette" id="asmQPalette"></div>
         </div>
       </div>
-      <div class="asm-hw-board-toolbar" id="hwBoardToolbar"></div>
       <div class="asm-hw-board-viewport" id="hwBoardViewport">
         <div class="asm-hw-board-layer" id="hwBoardLayer">
           <div class="asm-hw-sheet-cluster" id="hwSheetCluster">
-            <button type="button" class="asm-hw-nav-btn asm-hw-nav-outside asm-hw-nav-outside--prev" data-asm-prev aria-label="Önceki soru" disabled>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
-              <span>Önceki Soru</span>
-            </button>
             <div class="asm-hw-sheet" id="hwQuestionSheet">
               <header class="asm-hw-sheet-head" id="hwSheetHead">
                 <div class="asm-hw-sheet-head-inner" id="hwSheetHeadInner"></div>
@@ -63,13 +59,9 @@
                 </div>
               </div>
               <footer class="asm-hw-sheet-foot">
-                <p class="asm-hw-sheet-guide">Bir şık seç, ardından <strong>Cevabımı Onayla</strong> ile cevabını gönder. <strong>Önceki Soru</strong> ve sorular paleti ile istediğin soruya geçebilirsin; cevap vermeden ilerlemek için <strong>Sonraki Soru</strong> butonunu kullan.</p>
+                <p class="asm-hw-sheet-guide">Bir şık seç, ardından <strong>Cevabımı Onayla</strong> ile cevabını gönder. Sorular paleti veya alttaki gezinme butonlarıyla istediğin soruya geçebilirsin.</p>
               </footer>
             </div>
-            <button type="button" class="asm-hw-nav-btn asm-hw-nav-outside asm-hw-nav-outside--next is-next" data-asm-next aria-label="Sonraki soru">
-              <span>Sonraki Soru</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
           </div>
           <canvas id="hwDrawCanvas" aria-label="Çizim katmanı"></canvas>
         </div>
@@ -78,8 +70,16 @@
     </section>
   </div>
 
-  <footer class="asm-exam-footer asm-exam-footer--actions">
+  <footer class="asm-exam-footer asm-exam-footer--actions asm-hw-footer-nav">
+    <button type="button" class="asm-hw-nav-btn asm-hw-footer-nav-btn" data-asm-prev aria-label="Önceki soru" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Önceki Soru</span>
+    </button>
     <button type="button" class="asm-btn asm-btn-primary asm-btn-finish-exam" id="hwFinishBtn">Ödevi Bitir</button>
+    <button type="button" class="asm-hw-nav-btn asm-hw-footer-nav-btn is-next" data-asm-next aria-label="Sonraki soru">
+      <span>Sonraki Soru</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
   </footer>
 
   <div class="asm-confirm" id="hwConfirm" hidden role="alertdialog" aria-modal="true" aria-labelledby="hwConfirmTitle">

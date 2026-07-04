@@ -523,7 +523,7 @@
     }
 
     function onPointerDown(e) {
-      if (e.target.closest('.asm-hw-sheet-interactive, .asm-hw-nav-outside, .asm-hw-sheet-foot, .asm-hw-confirm-answer, button, a, input, label')) {
+      if (e.target.closest('.asm-hw-sheet-interactive, .asm-hw-sheet-foot, .asm-hw-confirm-answer, button, a, input, label')) {
         return;
       }
       if (e.button === 1 || tool === 'pan') {
@@ -619,12 +619,10 @@
       var rect = viewport.getBoundingClientRect();
       var sheetW = sheet ? sheet.offsetWidth || LAYER_W : LAYER_W;
       var sheetH = sheet ? sheet.offsetHeight || 900 : 900;
-      var navPad = 120;
-      var frameW = sheetW + navPad * 2;
-      zoom = Math.min(1, Math.max(0.48, (rect.width - 48) / frameW));
+      zoom = Math.min(1, Math.max(0.52, (rect.width - 24) / sheetW));
       var scaledH = sheetH * zoom;
-      panX = Math.max(12, (rect.width - frameW * zoom) / 2);
-      panY = scaledH > rect.height - 40 ? 16 : Math.max(16, (rect.height - scaledH) / 2);
+      panX = Math.max(8, (rect.width - sheetW * zoom) / 2);
+      panY = scaledH > rect.height - 24 ? 8 : Math.max(8, (rect.height - scaledH) / 2);
       updateTransform();
     }
 
@@ -710,41 +708,45 @@
     }
 
     toolbar.innerHTML =
-      '<div class="asm-hw-toolbar-group">' +
-        '<button type="button" class="asm-hw-tool" data-tool="pan" title="Kaydır (açık el)">' + TOOL_ICONS.pan + '<span>Kaydır</span></button>' +
-        '<div class="asm-hw-pen-wrap" id="hwPenWrap">' +
-          '<button type="button" class="asm-hw-tool is-active" data-tool="pen" id="hwPenBtn" title="Kalem">' +
-            TOOL_ICONS.pen +
-            '<span>Kalem</span>' +
-            '<span class="asm-hw-pen-swatch" id="hwPenSwatch" aria-hidden="true"></span>' +
-          '</button>' +
-          buildPenPopover() +
+      '<div class="asm-hw-toolbar-rail">' +
+        '<div class="asm-hw-toolbar-group">' +
+          '<button type="button" class="asm-hw-tool" data-tool="pan" title="Kaydır (açık el)">' + TOOL_ICONS.pan + '<span>Kaydır</span></button>' +
+          '<div class="asm-hw-pen-wrap" id="hwPenWrap">' +
+            '<button type="button" class="asm-hw-tool is-active" data-tool="pen" id="hwPenBtn" title="Kalem">' +
+              TOOL_ICONS.pen +
+              '<span>Kalem</span>' +
+              '<span class="asm-hw-pen-swatch" id="hwPenSwatch" aria-hidden="true"></span>' +
+            '</button>' +
+            buildPenPopover() +
+          '</div>' +
+          '<div class="asm-hw-shape-wrap" id="hwShapeWrap">' +
+            '<button type="button" class="asm-hw-tool" data-tool="shape" id="hwShapeBtn" title="Şekil">' +
+              TOOL_ICONS.shape + '<span>Şekil</span>' +
+            '</button>' +
+            buildShapePopover() +
+          '</div>' +
+          '<div class="asm-hw-eraser-wrap" id="hwEraserWrap">' +
+            '<button type="button" class="asm-hw-tool" data-tool="eraser" id="hwEraserBtn" title="Silgi">' +
+              TOOL_ICONS.eraser + '<span>Silgi</span>' +
+            '</button>' +
+            buildEraserPopover() +
+          '</div>' +
         '</div>' +
-        '<div class="asm-hw-shape-wrap" id="hwShapeWrap">' +
-          '<button type="button" class="asm-hw-tool" data-tool="shape" id="hwShapeBtn" title="Şekil">' +
-            TOOL_ICONS.shape + '<span>Şekil</span>' +
-          '</button>' +
-          buildShapePopover() +
+        '<div class="asm-hw-toolbar-divider" aria-hidden="true"></div>' +
+        '<div class="asm-hw-toolbar-group">' +
+          '<button type="button" class="asm-hw-tool" data-action="clear" title="Temizle">' + TOOL_ICONS.clear + '<span>Temizle</span></button>' +
+          '<button type="button" class="asm-hw-tool" data-action="undo" title="Geri Al" disabled>' + TOOL_ICONS.undo + '<span>Geri Al</span></button>' +
+          '<button type="button" class="asm-hw-tool" data-action="redo" title="İleri Al" disabled>' + TOOL_ICONS.redo + '<span>İleri Al</span></button>' +
         '</div>' +
-        '<div class="asm-hw-eraser-wrap" id="hwEraserWrap">' +
-          '<button type="button" class="asm-hw-tool" data-tool="eraser" id="hwEraserBtn" title="Silgi">' +
-            TOOL_ICONS.eraser + '<span>Silgi</span>' +
+        '<div class="asm-hw-toolbar-divider" aria-hidden="true"></div>' +
+        '<div class="asm-hw-toolbar-group asm-hw-toolbar-zoom">' +
+          '<button type="button" class="asm-hw-tool" data-action="zoom-out" title="Uzaklaştır">' + TOOL_ICONS.zoomOut + '<span>Uzaklaştır</span></button>' +
+          '<span class="asm-hw-zoom-label" id="hwZoomLabel" aria-live="polite">100%</span>' +
+          '<button type="button" class="asm-hw-tool" data-action="zoom-in" title="Yakınlaştır">' + TOOL_ICONS.zoomIn + '<span>Yakınlaştır</span></button>' +
+          '<button type="button" class="asm-hw-tool asm-hw-tool-hint" title="Soru görselinin ve çözüm alanının üzerine çizebilir, tahtayı kaydırabilir ve yakınlaştırabilirsin." aria-label="Tahta ipucu">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="10" x2="12" y2="16"/><line x1="12" y1="7" x2="12.01" y2="7"/></svg>' +
           '</button>' +
-          buildEraserPopover() +
         '</div>' +
-      '</div>' +
-      '<div class="asm-hw-toolbar-group">' +
-        '<button type="button" class="asm-hw-tool" data-action="clear" title="Temizle">' + TOOL_ICONS.clear + '<span>Temizle</span></button>' +
-        '<button type="button" class="asm-hw-tool" data-action="undo" title="Geri Al" disabled>' + TOOL_ICONS.undo + '<span>Geri Al</span></button>' +
-        '<button type="button" class="asm-hw-tool" data-action="redo" title="İleri Al" disabled>' + TOOL_ICONS.redo + '<span>İleri Al</span></button>' +
-      '</div>' +
-      '<div class="asm-hw-toolbar-group asm-hw-toolbar-zoom">' +
-        '<button type="button" class="asm-hw-tool" data-action="zoom-out" title="Uzaklaştır">' + TOOL_ICONS.zoomOut + '<span>Uzaklaştır</span></button>' +
-        '<span class="asm-hw-zoom-label" id="hwZoomLabel" aria-live="polite">100%</span>' +
-        '<button type="button" class="asm-hw-tool" data-action="zoom-in" title="Yakınlaştır">' + TOOL_ICONS.zoomIn + '<span>Yakınlaştır</span></button>' +
-        '<button type="button" class="asm-hw-tool asm-hw-tool-hint" title="Soru görselinin ve çözüm alanının üzerine çizebilir, tahtayı kaydırabilir ve yakınlaştırabilirsin." aria-label="Tahta ipucu">' +
-          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="10" x2="12" y2="16"/><line x1="12" y1="7" x2="12.01" y2="7"/></svg>' +
-        '</button>' +
       '</div>';
 
     penWrap = toolbar.querySelector('#hwPenWrap');

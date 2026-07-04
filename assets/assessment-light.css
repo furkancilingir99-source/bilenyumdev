@@ -270,7 +270,24 @@
 }
 
 /* ---- Tahta araçları ---- */
-.asm-hw-board-toolbar { background: var(--bg-surface) !important; }
+.asm-hw-footer-nav-btn {
+  background: var(--bg-surface) !important;
+  border-color: var(--brand-purple-28) !important;
+  color: var(--brand-navy) !important;
+}
+.asm-hw-footer-nav-btn.is-next {
+  background: linear-gradient(165deg, var(--brand-magenta-08), var(--bg-surface)) !important;
+  border-color: var(--brand-magenta-35) !important;
+}
+.asm-hw-footer-nav-btn:hover:not(:disabled) {
+  background: var(--brand-purple-06) !important;
+  border-color: var(--brand-purple-45) !important;
+}
+.asm-hw-footer-nav-btn.is-next:hover:not(:disabled) {
+  background: var(--brand-magenta-12) !important;
+  border-color: var(--brand-magenta) !important;
+}
+.asm-hw-board-toolbar--rail { background: var(--bg-surface) !important; }
 .asm-hw-tool {
   background: var(--bg-surface) !important;
   border: 1px solid var(--brand-purple-14) !important;
