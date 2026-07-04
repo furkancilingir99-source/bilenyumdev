@@ -374,14 +374,14 @@
     }
 
     function syncLayout() {
-      var solveZone = root.querySelector('#hwSolveZone');
-      if (!solveZone || !canvas) return;
+      var region = root.querySelector('#hwDrawRegion');
+      if (!region || !canvas) return;
 
-      var pos = offsetWithin(solveZone, layer);
+      var pos = offsetWithin(region, layer);
       if (!pos) return;
 
-      var regionW = solveZone.offsetWidth || SOLVE_W;
-      var regionH = Math.max(SOLVE_H, solveZone.offsetHeight || SOLVE_H);
+      var regionW = region.offsetWidth || SOLVE_W;
+      var regionH = Math.max(SOLVE_H, region.offsetHeight || SOLVE_H);
       var ox = pos.x;
       var oy = pos.y;
 
@@ -637,7 +637,7 @@
     }
 
     function onPointerDown(e) {
-      if (e.target.closest('.asm-hw-sheet-interactive, .asm-hw-sheet-foot, .asm-hw-confirm-answer, button, a, input, label')) {
+      if (e.target.closest('.asm-hw-board-toolbar, .asm-hw-qnav-rail, .asm-hw-sheet-interactive, .asm-hw-sheet-foot, .asm-hw-confirm-answer, button, a, input, label')) {
         return;
       }
       if (e.button === 1 || tool === 'pan') {
@@ -948,11 +948,11 @@
       var shapeMainBtn = e.target.closest('#hwShapeBtn');
       if (shapeMainBtn) {
         e.stopPropagation();
-        if (tool === 'shape') {
-          setShapePopover(!shapePopoverOpen);
-        } else {
+        if (tool !== 'shape') {
           setTool('shape');
           setShapePopover(true);
+        } else {
+          setShapePopover(!shapePopoverOpen);
         }
         return;
       }
@@ -960,11 +960,11 @@
       var eraserMainBtn = e.target.closest('#hwEraserBtn');
       if (eraserMainBtn) {
         e.stopPropagation();
-        if (tool === 'eraser') {
-          setEraserPopover(!eraserPopoverOpen);
-        } else {
+        if (tool !== 'eraser') {
           setTool('eraser');
           setEraserPopover(true);
+        } else {
+          setEraserPopover(!eraserPopoverOpen);
         }
         return;
       }
@@ -972,11 +972,11 @@
       var penBtn = e.target.closest('#hwPenBtn');
       if (penBtn) {
         e.stopPropagation();
-        if (tool === 'pen') {
-          setPenPopover(!penPopoverOpen);
-        } else {
+        if (tool !== 'pen') {
           setTool('pen');
           setPenPopover(true);
+        } else {
+          setPenPopover(!penPopoverOpen);
         }
         return;
       }
@@ -984,6 +984,9 @@
       var toolBtn = e.target.closest('[data-tool]');
       if (toolBtn) {
         setTool(toolBtn.getAttribute('data-tool'));
+        closePenPopover();
+        closeShapePopover();
+        closeEraserPopover();
         return;
       }
       var action = e.target.closest('[data-action]');
