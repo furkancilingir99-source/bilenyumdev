@@ -316,10 +316,10 @@
   flex-basis: 108px;
 }
 .asm-placement-page.asm-homework-page .asm-placement-qnav.asm-hw-qnav-rail {
-  width: 132px !important;
-  flex-basis: 132px !important;
-  min-width: 132px !important;
-  max-width: 132px !important;
+  width: 108px !important;
+  flex-basis: 108px !important;
+  min-width: 108px !important;
+  max-width: 108px !important;
 }
 .asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool {
   background: var(--bg-surface) !important;
@@ -348,11 +348,11 @@
   .asm-homework-page .asm-hw-board-toolbar--docked { width: 72px !important; flex-basis: 72px !important; }
   .asm-homework-page .asm-hw-qnav-rail { width: 96px !important; flex-basis: 96px !important; }
   .asm-placement-page.asm-homework-page .asm-placement-qnav.asm-hw-qnav-rail {
-    width: 120px !important;
-    flex-basis: 120px !important;
-    min-width: 120px !important;
-    max-width: 120px !important;
-    padding: 8px 8px !important;
+    width: 96px !important;
+    flex-basis: 96px !important;
+    min-width: 96px !important;
+    max-width: 96px !important;
+    padding: 8px 6px !important;
   }
 }
 .asm-hw-rail-grip {
