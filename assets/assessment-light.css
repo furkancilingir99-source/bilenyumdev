@@ -296,6 +296,10 @@
   background: var(--bg-surface) !important;
   border-color: var(--brand-purple-14) !important;
   box-shadow: var(--shadow-lg) !important;
+  width: 156px;
+}
+@media (max-width: 960px) {
+  .asm-hw-board-toolbar--float { width: 112px !important; }
 }
 .asm-hw-rail-grip {
   background: var(--bg-subtle) !important;
