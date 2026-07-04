@@ -1679,6 +1679,92 @@ body.asm-has-banner .stage {
   border-bottom: 1px solid var(--asm-chrome-border);
   flex-shrink: 0;
 }
+.asm-placement-page .asm-subject-tabs {
+  gap: 10px;
+  max-width: none;
+}
+.asm-placement-page .asm-subject-tab {
+  padding: 12px 22px;
+  min-height: 46px;
+  border-radius: 12px;
+  font-size: 14px;
+  gap: 10px;
+}
+.asm-placement-page .asm-subject-tab-count {
+  font-size: 11px;
+}
+/* Sol tahta araçları — dikey taşmayı önle, 2 sütun kompakt düzen */
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--docked {
+  flex: 0 0 84px;
+  width: 84px;
+  min-width: 84px;
+  padding: 6px 5px;
+  overflow-x: visible;
+  overflow-y: hidden;
+  align-self: stretch;
+}
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-rail {
+  gap: 3px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: visible;
+}
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group {
+  gap: 3px;
+}
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--draw,
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--history,
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--zoom {
+  grid-template-columns: 1fr 1fr;
+}
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--clear {
+  grid-template-columns: 1fr;
+}
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-divider {
+  margin: 1px 0;
+}
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool span:not(.asm-hw-pen-swatch) {
+  display: none;
+}
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary {
+  min-height: 42px;
+  padding: 6px 2px;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0;
+  border-radius: 9px;
+}
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary svg {
+  width: 22px;
+  height: 22px;
+}
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact {
+  min-height: 38px;
+  padding: 5px 2px;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0;
+  border-radius: 9px;
+}
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact svg {
+  width: 20px;
+  height: 20px;
+}
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--zoom .asm-hw-zoom-label {
+  grid-column: 1 / -1;
+  min-height: 16px;
+  font-size: 9px;
+  padding: 2px;
+  margin: 0;
+}
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool-hint {
+  display: none;
+}
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--draw .asm-hw-pen-wrap,
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--draw .asm-hw-shape-wrap,
+.asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-toolbar-group--draw .asm-hw-eraser-wrap {
+  min-width: 0;
+}
 .asm-placement-page.asm-homework-page .asm-hw-layout {
   flex: 1 1 auto;
   min-height: 0;
@@ -1686,25 +1772,19 @@ body.asm-has-banner .stage {
   background: #fff;
   overflow: hidden;
 }
+.asm-placement-page.asm-homework-page .asm-hw-layout {
+  flex-direction: row;
+  align-items: stretch;
+}
 .asm-placement-page.asm-homework-page .asm-hw-board-wrap {
-  display: grid;
-  grid-template-columns: 84px minmax(0, 1fr) 120px;
-  grid-template-rows: minmax(0, 1fr);
   flex: 1;
+  min-width: 0;
   min-height: 0;
-  height: 100%;
   background: #fff !important;
   border: none;
   border-radius: 0;
 }
-.asm-placement-page.asm-homework-page .asm-hw-board-toolbar {
-  grid-column: 1;
-  grid-row: 1;
-  align-self: stretch;
-}
 .asm-placement-page.asm-homework-page .asm-hw-board-viewport {
-  grid-column: 2;
-  grid-row: 1;
   min-height: 0;
   background: #fff;
 }
@@ -1716,14 +1796,17 @@ body.asm-has-banner .stage {
   transform: none;
   width: 100%;
 }
-.asm-placement-page.asm-homework-page .asm-placement-qnav {
-  grid-column: 3;
-  grid-row: 1;
-  align-self: stretch;
-  width: 120px;
+.asm-placement-page.asm-homework-page .asm-placement-qnav.asm-hw-qnav-rail {
+  flex: 0 0 132px;
+  width: 132px;
+  min-width: 132px;
+  max-width: 132px;
+  padding: 10px 10px;
+  box-sizing: border-box;
   min-height: 0;
   max-height: 100%;
   overflow: hidden;
+  border-left: 1px solid var(--asm-chrome-border);
 }
 .asm-placement-page.asm-homework-page .asm-placement-qnav .asm-hw-qnav-palette {
   flex: 1;
@@ -1737,16 +1820,51 @@ body.asm-has-banner .stage {
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
-  padding-right: 2px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 5px;
+  padding: 2px 0 4px;
 }
 .asm-placement-page.asm-homework-page .asm-placement-qnav .asm-hw-qnav-track .asm-q-pill {
-  height: 36px;
-  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  height: 34px;
+  min-height: 34px;
+  padding: 0 8px;
   font-size: 12px;
   font-weight: 700;
   border-radius: 9px;
+  text-align: left;
+  box-sizing: border-box;
+}
+.asm-placement-page.asm-homework-page .asm-placement-qnav .asm-hw-qnav-track .asm-q-pill.is-current::after {
+  display: none;
+}
+.asm-placement-page.asm-homework-page .asm-placement-qnav .asm-hw-qnav-track .asm-q-pill-num {
+  flex-shrink: 0;
+  min-width: 1.1em;
+}
+.asm-placement-page.asm-homework-page .asm-placement-qnav .asm-hw-qnav-track .asm-q-pill-ans {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--brand-purple, #5b54c9);
+}
+.asm-placement-page.asm-homework-page .asm-placement-qnav .asm-hw-qnav-track .asm-q-pill-ans.is-blank {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: lowercase;
+  color: rgba(26, 21, 56, 0.42);
+}
+.asm-placement-page.asm-homework-page .asm-hw-qnav-track .asm-q-pill.is-blank-passed:not(.is-current) {
+  border-color: rgba(26, 21, 56, 0.14);
+  background: rgba(26, 21, 56, 0.04);
+  color: rgba(26, 21, 56, 0.55);
 }
 .asm-placement-page.asm-homework-page .asm-placement-qnav .asm-hw-nav-progress-bar {
   height: 8px;
@@ -1767,6 +1885,43 @@ body.asm-has-banner .stage {
   border-color: rgba(229, 4, 123, 0.45);
   background: rgba(229, 4, 123, 0.06);
   color: var(--brand-navy, #1a1538);
+}
+/* Şıklar — kompakt ve ortalanmış */
+.asm-placement-page.asm-homework-page .asm-hw-options-row {
+  display: flex;
+  justify-content: center;
+  padding: 0 20px;
+  margin: 10px auto 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.asm-placement-page.asm-homework-page .asm-hw-sheet-options {
+  width: auto;
+  max-width: 520px;
+  margin: 0 auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.asm-placement-page.asm-homework-page .asm-hw-sheet-options.asm-options--visual,
+.asm-placement-page.asm-homework-page .asm-hw-sheet-options.asm-hw-sheet-options--visual {
+  max-width: 420px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.asm-placement-page.asm-homework-page .asm-hw-sheet-options .asm-option {
+  min-height: 42px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-weight: 700;
+  gap: 8px;
+  border-radius: 10px;
+  justify-content: center;
+  text-align: center;
+}
+.asm-placement-page.asm-homework-page .asm-hw-sheet-options .asm-option-letter {
+  width: 24px;
+  height: 24px;
+  font-size: 11px;
+  border-radius: 7px;
 }
 .asm-placement-page.asm-homework-page #asmExamFooter {
   flex-shrink: 0;
@@ -4679,6 +4834,36 @@ body.asm-has-banner .stage {
     width: 96px;
     padding: 8px 6px;
   }
+  .asm-placement-page.asm-homework-page .asm-placement-qnav.asm-hw-qnav-rail {
+    flex-basis: 120px;
+    width: 120px;
+    min-width: 120px;
+    max-width: 120px;
+    padding: 8px 8px;
+  }
+  .asm-placement-page.asm-homework-page .asm-hw-board-toolbar--docked {
+    flex-basis: 72px;
+    width: 72px;
+    min-width: 72px;
+    padding: 5px 4px;
+  }
+  .asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary {
+    min-height: 38px;
+  }
+  .asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--primary svg {
+    width: 20px;
+    height: 20px;
+  }
+  .asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact {
+    min-height: 34px;
+  }
+  .asm-placement-page.asm-homework-page .asm-hw-board-toolbar--rail.asm-hw-board-toolbar--docked .asm-hw-tool--compact svg {
+    width: 18px;
+    height: 18px;
+  }
+  .asm-placement-page.asm-homework-page .asm-placement-qnav .asm-hw-qnav-track {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
   .asm-hw-qnav-track .asm-q-pill {
     height: 32px;
     min-height: 32px;
@@ -4688,6 +4873,10 @@ body.asm-has-banner .stage {
   .asm-hw-qnav-track .asm-q-pill.is-current { font-size: 13px; }
   .asm-hw-board-viewport { min-height: 280px; }
   .asm-homework-page .asm-hw-sheet-options { max-width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .asm-placement-page.asm-homework-page .asm-hw-sheet-options {
+    max-width: 380px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .asm-homework-page .asm-hw-sheet-options .asm-option { min-height: 46px; font-size: 14px; }
   .asm-homework-page .asm-hw-block-figure { max-width: 300px; }
   .asm-hw-footer-nav {

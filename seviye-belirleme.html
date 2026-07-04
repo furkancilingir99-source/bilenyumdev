@@ -49,51 +49,53 @@
   </div>
 
   <div class="asm-hw-layout asm-placement-layout">
-    <section class="asm-hw-board-wrap" aria-label="Sınav tahtası">
-      <div class="asm-hw-board-toolbar asm-hw-board-toolbar--rail asm-hw-board-toolbar--docked" id="hwBoardToolbar"></div>
-      <div class="asm-hw-board-viewport" id="hwBoardViewport">
-        <div class="asm-hw-board-layer" id="hwBoardLayer">
-          <div class="asm-hw-sheet-cluster" id="hwSheetCluster">
-            <div class="asm-hw-sheet" id="hwQuestionSheet">
-              <header class="asm-hw-sheet-head" id="hwSheetHead">
-                <div class="asm-hw-sheet-head-inner" id="hwSheetHeadInner"></div>
-              </header>
-              <div class="asm-hw-draw-region" id="hwDrawRegion">
-                <div class="asm-hw-sheet-body" id="hwSheetBody"></div>
-                <div class="asm-hw-options-row asm-hw-sheet-interactive">
-                  <div class="asm-options asm-hw-sheet-options" id="hwSheetOptions"></div>
-                </div>
-                <div class="asm-hw-solve-zone" id="hwSolveZone" aria-label="Çözüm alanı">
-                  <span class="asm-hw-solve-label">Çözüm alanı</span>
+    <aside class="asm-hw-board-toolbar asm-hw-board-toolbar--rail asm-hw-board-toolbar--docked" id="hwBoardToolbar" aria-label="Tahta araçları"></aside>
+    <div class="asm-hw-workspace">
+      <section class="asm-hw-board-wrap" aria-label="Sınav tahtası">
+        <div class="asm-hw-board-viewport" id="hwBoardViewport">
+          <div class="asm-hw-board-layer" id="hwBoardLayer">
+            <div class="asm-hw-sheet-cluster" id="hwSheetCluster">
+              <div class="asm-hw-sheet" id="hwQuestionSheet">
+                <header class="asm-hw-sheet-head" id="hwSheetHead">
+                  <div class="asm-hw-sheet-head-inner" id="hwSheetHeadInner"></div>
+                </header>
+                <div class="asm-hw-draw-region" id="hwDrawRegion">
+                  <div class="asm-hw-sheet-body" id="hwSheetBody"></div>
+                  <div class="asm-hw-options-row asm-hw-sheet-interactive">
+                    <div class="asm-options asm-hw-sheet-options" id="hwSheetOptions"></div>
+                  </div>
+                  <div class="asm-hw-solve-zone" id="hwSolveZone" aria-label="Çözüm alanı">
+                    <span class="asm-hw-solve-label">Çözüm alanı</span>
+                  </div>
                 </div>
               </div>
             </div>
+            <canvas id="hwDrawCanvas" aria-label="Çizim katmanı"></canvas>
           </div>
-          <canvas id="hwDrawCanvas" aria-label="Çizim katmanı"></canvas>
+        </div>
+      </section>
+    </div>
+    <aside class="asm-hw-qnav-rail asm-placement-qnav" aria-label="Soru navigasyonu">
+      <div class="asm-hw-qnav-current" aria-live="polite" aria-atomic="true">
+        <span class="asm-hw-qnav-label">Soru</span>
+        <div class="asm-hw-qnav-current-row">
+          <strong class="asm-hw-qnav-current-num" id="asmPlacementQCurrent">1</strong>
+          <span class="asm-hw-qnav-current-total" id="asmPlacementQTotal">/ 1</span>
         </div>
       </div>
-      <aside class="asm-hw-board-meta asm-hw-qnav-rail asm-placement-qnav" aria-label="Soru navigasyonu">
-        <div class="asm-hw-qnav-current" aria-live="polite" aria-atomic="true">
-          <span class="asm-hw-qnav-label">Soru</span>
-          <div class="asm-hw-qnav-current-row">
-            <strong class="asm-hw-qnav-current-num" id="asmPlacementQCurrent">1</strong>
-            <span class="asm-hw-qnav-current-total" id="asmPlacementQTotal">/ 1</span>
-          </div>
+      <div class="asm-hw-qnav-divider" aria-hidden="true"></div>
+      <div class="asm-hw-qnav-progress">
+        <span class="asm-hw-qnav-label">Tamamlanan</span>
+        <div class="asm-exam-progress asm-hw-meta-progress asm-hw-nav-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="asm-exam-progress-fill"></div>
         </div>
-        <div class="asm-hw-qnav-divider" aria-hidden="true"></div>
-        <div class="asm-hw-qnav-progress">
-          <span class="asm-hw-qnav-label">Tamamlanan</span>
-          <div class="asm-exam-progress asm-hw-meta-progress asm-hw-nav-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-            <div class="asm-exam-progress-fill"></div>
-          </div>
-        </div>
-        <div class="asm-hw-qnav-divider" aria-hidden="true"></div>
-        <div class="asm-hw-qnav-palette">
-          <span class="asm-hw-qnav-label">Sorular</span>
-          <div class="asm-q-palette asm-hw-qnav-track" id="asmQPalette"></div>
-        </div>
-      </aside>
-    </section>
+      </div>
+      <div class="asm-hw-qnav-divider" aria-hidden="true"></div>
+      <div class="asm-hw-qnav-palette">
+        <span class="asm-hw-qnav-label">Sorular</span>
+        <div class="asm-q-palette asm-hw-qnav-track" id="asmQPalette"></div>
+      </div>
+    </aside>
   </div>
 
   <footer class="asm-exam-footer asm-exam-footer--actions asm-hw-footer-nav" id="asmExamFooter">

@@ -165,8 +165,10 @@
   function loadState() {
     var answers = [];
     var subjectIdx = {};
+    var passedBlank = {};
     try { answers = JSON.parse(lsGet('placementAnswers') || '[]'); } catch (e) {}
     try { subjectIdx = JSON.parse(lsGet('placementSubjectIdx') || '{}'); } catch (e) {}
+    try { passedBlank = JSON.parse(lsGet('placementPassedBlank') || '{}'); } catch (e) {}
     var sayisalDone = lsGet('placementSayisalDone') === '1';
     var sozelStarted = lsGet('placementSozelStarted') === '1';
     var phase = 'sayisal';
@@ -176,6 +178,7 @@
       phase: phase,
       answers: answers,
       subjectIdx: subjectIdx,
+      passedBlank: passedBlank,
       activeSubject: lsGet('placementActiveSubject') || null,
       sayisalEndAt: lsGet('placementSayisalEndAt'),
       breakEndAt: lsGet('placementBreakEndAt')
@@ -185,6 +188,7 @@
   function saveState(state) {
     lsSet('placementAnswers', JSON.stringify(state.answers));
     lsSet('placementSubjectIdx', JSON.stringify(state.subjectIdx));
+    lsSet('placementPassedBlank', JSON.stringify(state.passedBlank || {}));
     if (state.activeSubject) lsSet('placementActiveSubject', state.activeSubject);
     if (state.sayisalEndAt) lsSet('placementSayisalEndAt', state.sayisalEndAt);
   }
@@ -214,6 +218,7 @@
     var state = loadState();
     var phase = state.phase;
     var answers = state.answers;
+    var passedBlank = state.passedBlank || {};
     if (answers.length < questions.length) {
       answers.length = questions.length;
     }
@@ -305,6 +310,32 @@
       saveState(state);
     }
 
+    function markCurrentPassedIfBlank() {
+      var entry = currentEntry();
+      if (!entry) return;
+      if (answers[entry.globalIndex] == null) {
+        passedBlank[String(entry.globalIndex)] = true;
+        state.passedBlank = passedBlank;
+        saveState(state);
+      }
+    }
+
+    function clearPassedForEntry(entry) {
+      if (!entry) return;
+      var key = String(entry.globalIndex);
+      if (passedBlank[key]) {
+        delete passedBlank[key];
+        state.passedBlank = passedBlank;
+        saveState(state);
+      }
+    }
+
+    function navigateTo(fn) {
+      markCurrentPassedIfBlank();
+      fn();
+      clearPassedForEntry(currentEntry());
+    }
+
     function currentEntry() {
       var list = currentList();
       var li = currentLocalIdx();
@@ -379,12 +410,36 @@
       var list = currentList();
       var li = currentLocalIdx();
       paletteEl.innerHTML = list.map(function (entry, i) {
-        var ans = answers[entry.globalIndex];
+        var gi = entry.globalIndex;
+        var ans = answers[gi];
         var cls = 'asm-q-pill';
+        var ansHtml = '';
         if (i === li) cls += ' is-current';
-        if (ans != null) cls += ' is-marked';
-        return '<button type="button" class="' + cls + '" data-qidx="' + i + '">' + (i + 1) + '</button>';
+        if (i !== li) {
+          if (ans != null) {
+            cls += ' is-marked';
+            ansHtml = '<span class="asm-q-pill-ans">' + String.fromCharCode(65 + ans) + '</span>';
+          } else if (passedBlank[String(gi)]) {
+            cls += ' is-blank-passed';
+            ansHtml = '<span class="asm-q-pill-ans is-blank">boş</span>';
+          }
+        } else if (ans != null) {
+          cls += ' is-marked';
+        }
+        var ariaSuffix = '';
+        if (i !== li) {
+          if (ans != null) ariaSuffix = ', cevap ' + String.fromCharCode(65 + ans);
+          else if (passedBlank[String(gi)]) ariaSuffix = ', boş bırakıldı';
+        }
+        return '<button type="button" class="' + cls + '" data-qidx="' + i + '"' +
+          (i === li ? ' aria-current="true"' : '') +
+          ' aria-label="Soru ' + (i + 1) + ariaSuffix + '">' +
+          '<span class="asm-q-pill-num">' + (i + 1) + '</span>' + ansHtml + '</button>';
       }).join('');
+      var currentPill = paletteEl.querySelector('.asm-q-pill.is-current');
+      if (currentPill && typeof currentPill.scrollIntoView === 'function') {
+        currentPill.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+      }
     }
 
     function renderOptions(q, gi) {
@@ -424,34 +479,38 @@
 
     function goPrev() {
       if (locked || !canGoPrev()) return;
-      var list = currentList();
-      var li = currentLocalIdx();
-      var subs = phaseSubjects();
-      var si = subs.indexOf(activeSubject());
-      if (li > 0) {
-        setLocalIdx(li - 1);
-      } else if (si > 0) {
-        state.activeSubject = subs[si - 1];
-        var prevList = bySubject[state.activeSubject] || [];
-        subjectIdx[state.activeSubject] = Math.max(0, prevList.length - 1);
-        saveState(state);
-      }
+      navigateTo(function () {
+        var list = currentList();
+        var li = currentLocalIdx();
+        var subs = phaseSubjects();
+        var si = subs.indexOf(activeSubject());
+        if (li > 0) {
+          setLocalIdx(li - 1);
+        } else if (si > 0) {
+          state.activeSubject = subs[si - 1];
+          var prevList = bySubject[state.activeSubject] || [];
+          subjectIdx[state.activeSubject] = Math.max(0, prevList.length - 1);
+          saveState(state);
+        }
+      });
       render();
     }
 
     function goNext() {
       if (locked || !canGoNext()) return;
-      var list = currentList();
-      var li = currentLocalIdx();
-      var subs = phaseSubjects();
-      var si = subs.indexOf(activeSubject());
-      if (li < list.length - 1) {
-        setLocalIdx(li + 1);
-      } else if (si < subs.length - 1) {
-        state.activeSubject = subs[si + 1];
-        subjectIdx[state.activeSubject] = subjectIdx[state.activeSubject] || 0;
-        saveState(state);
-      }
+      navigateTo(function () {
+        var list = currentList();
+        var li = currentLocalIdx();
+        var subs = phaseSubjects();
+        var si = subs.indexOf(activeSubject());
+        if (li < list.length - 1) {
+          setLocalIdx(li + 1);
+        } else if (si < subs.length - 1) {
+          state.activeSubject = subs[si + 1];
+          subjectIdx[state.activeSubject] = subjectIdx[state.activeSubject] || 0;
+          saveState(state);
+        }
+      });
       render();
     }
 
@@ -813,15 +872,21 @@
     if (tabsEl) tabsEl.addEventListener('click', function (e) {
       var tab = e.target.closest('[data-subject]');
       if (!tab || locked) return;
-      state.activeSubject = tab.getAttribute('data-subject');
-      saveState(state);
+      navigateTo(function () {
+        state.activeSubject = tab.getAttribute('data-subject');
+        saveState(state);
+      });
       render();
     });
 
     if (paletteEl) paletteEl.addEventListener('click', function (e) {
       var pill = e.target.closest('[data-qidx]');
       if (!pill || locked) return;
-      setLocalIdx(parseInt(pill.getAttribute('data-qidx'), 10));
+      var nextIdx = parseInt(pill.getAttribute('data-qidx'), 10);
+      if (nextIdx === currentLocalIdx()) return;
+      navigateTo(function () {
+        setLocalIdx(nextIdx);
+      });
       render();
     });
 
@@ -831,6 +896,8 @@
       var entry = currentEntry();
       if (!entry) return;
       answers[entry.globalIndex] = parseInt(btn.getAttribute('data-opt'), 10);
+      delete passedBlank[String(entry.globalIndex)];
+      state.passedBlank = passedBlank;
       saveState(state);
       render();
     });
