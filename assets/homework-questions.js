@@ -163,6 +163,85 @@
             { label: 'Şekil IV', svg: symSvg('N') }
           ],
           correct: 1
+        },
+        {
+          type: 'standard',
+          unit: 'Köklü Sayılar',
+          unitSubtitle: 'Köklü Sayılarda Çarpma',
+          q: '√6 · √24 işleminin sonucu hangisidir?',
+          opts: ['6√2', '12', '4√3', '2√6'], correct: 1
+        },
+        {
+          type: 'visual', skill: 'beceri', subject: 'Matematik',
+          unit: 'Köklü Sayılar',
+          unitSubtitle: 'Köklü İfadelerin Sadeleştirilmesi',
+          q: '√72 ifadesinin sadeleştirilmiş hali hangisidir?',
+          visual: { svg: symSvg('√72'), alt: 'Kök 72' },
+          opts: ['6√2', '8√2', '3√8', '12√6'], correct: 0
+        },
+        {
+          type: 'standard',
+          unit: 'Köklü Sayılar',
+          unitSubtitle: 'Köklü Sayılarda Toplama',
+          q: '√18 + √8 işleminin sonucu hangisidir?',
+          opts: ['5√2', '√26', '6√2', '4√2'], correct: 0
+        },
+        {
+          type: 'standard',
+          unit: 'Köklü Sayılar',
+          unitSubtitle: 'Köklü Sayılarda Çarpma',
+          q: '3√2 · 2√3 işleminin sonucu hangisidir?',
+          opts: ['5√5', '6√6', '6√5', '12'], correct: 1
+        },
+        {
+          type: 'standard',
+          unit: 'Köklü Sayılar',
+          unitSubtitle: 'Köklü Sayılarda Çıkarma',
+          q: '√50 − √18 işleminin sonucu hangisidir?',
+          opts: ['2√2', '4√2', '√32', '8'], correct: 0
+        },
+        {
+          type: 'standard',
+          unit: 'Köklü Sayılar',
+          unitSubtitle: 'Köklü Sayılarda Bölme',
+          q: '√27 ÷ √3 işleminin sonucu hangisidir?',
+          opts: ['3', '√9', '3√3', '9'], correct: 0
+        },
+        {
+          type: 'standard',
+          unit: 'Köklü Sayılar',
+          unitSubtitle: 'Rasyonel ve İrrasyonel Sayılar',
+          q: 'Aşağıdakilerden hangisi irrasyonel bir sayıdır?',
+          opts: ['√16', '√25', '√7', '√36'], correct: 2
+        },
+        {
+          type: 'standard',
+          unit: 'Köklü Sayılar',
+          unitSubtitle: 'Köklü Sayılarda Toplama',
+          q: '√20 + √45 işleminin sonucu hangisidir?',
+          opts: ['5√5', '√65', '13√5', '7√5'], correct: 0
+        },
+        {
+          type: 'standard',
+          unit: 'Köklü Sayılar',
+          unitSubtitle: 'Köklü Sayılarda Bölme',
+          q: '2√12 ÷ √3 işleminin sonucu hangisidir?',
+          opts: ['2√4', '4', '2√3', '6'], correct: 1
+        },
+        {
+          type: 'visual', skill: 'beceri', subject: 'Matematik',
+          unit: 'Köklü Sayılar',
+          unitSubtitle: 'Köklü Sayılarda Dört İşlem',
+          q: '√75 − √48 işleminin sonucu hangisidir?',
+          visual: { svg: symSvg('√?'), alt: 'Köklü ifade' },
+          opts: ['√3', '3√3', '5√3', '√27'], correct: 1
+        },
+        {
+          type: 'standard',
+          unit: 'Köklü Sayılar',
+          unitSubtitle: 'Köklü Sayılarda Karşılaştırma',
+          q: '√50 ile 7√2 sayılarından hangisi daha büyüktür?',
+          opts: ['√50', '7√2', 'Eşitler', 'Karşılaştırılamaz'], correct: 1
         }
       ]
     },

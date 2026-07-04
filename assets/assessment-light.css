@@ -321,7 +321,7 @@
 .asm-hw-qnav-current-num { color: var(--brand-magenta) !important; }
 @media (max-width: 960px) {
   .asm-hw-board-toolbar--docked { width: 52px !important; flex-basis: 52px !important; }
-  .asm-hw-qnav-rail { width: 48px !important; flex-basis: 48px !important; }
+  .asm-hw-qnav-rail { width: 76px !important; flex-basis: 76px !important; }
 }
 .asm-hw-rail-grip {
   background: var(--bg-subtle) !important;

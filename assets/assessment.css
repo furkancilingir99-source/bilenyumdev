@@ -3396,14 +3396,14 @@ body.asm-has-banner .stage {
 
 /* Ödev — sağ soru navigasyon şeridi */
 .asm-hw-qnav-rail {
-  flex: 0 0 56px;
-  width: 56px;
+  flex: 0 0 88px;
+  width: 88px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   border-left: 1px solid var(--asm-chrome-border);
   background: #fff;
-  padding: 8px 6px;
+  padding: 8px 7px;
   overflow: hidden;
   z-index: 20;
 }
@@ -3490,28 +3490,28 @@ body.asm-has-banner .stage {
   gap: 4px;
 }
 .asm-hw-qnav-track {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
   gap: 5px;
   flex: 1;
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  padding: 2px 0 4px;
+  padding: 2px 1px 4px;
   scroll-snap-type: y proximity;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
 }
 .asm-hw-qnav-track .asm-q-pill {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
-  border-radius: 10px;
+  width: 100%;
+  height: 30px;
+  min-width: 0;
+  min-height: 30px;
+  border-radius: 8px;
   flex-shrink: 0;
   scroll-snap-align: center;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   border-width: 1.5px;
   border-color: rgba(26, 21, 56, 0.1);
@@ -3526,27 +3526,27 @@ body.asm-has-banner .stage {
   border-color: rgba(91, 84, 201, 0.35);
 }
 .asm-hw-qnav-track .asm-q-pill.is-current {
-  transform: scale(1.08);
+  transform: scale(1.05);
   border-color: var(--brand-magenta, #e6087b);
   border-width: 2px;
   background: linear-gradient(180deg, rgba(229, 4, 123, 0.18) 0%, rgba(229, 4, 123, 0.08) 100%);
-  box-shadow: 0 0 0 3px rgba(229, 4, 123, 0.2), 0 4px 12px rgba(229, 4, 123, 0.22);
+  box-shadow: 0 0 0 2px rgba(229, 4, 123, 0.18), 0 3px 10px rgba(229, 4, 123, 0.18);
   color: var(--brand-magenta, #e6087b);
-  font-size: 12px;
+  font-size: 11px;
   position: relative;
   z-index: 1;
 }
 .asm-hw-qnav-track .asm-q-pill.is-current::after {
   content: '';
   position: absolute;
-  left: -7px;
+  left: -4px;
   top: 50%;
   transform: translateY(-50%);
   width: 3px;
-  height: 22px;
+  height: 18px;
   border-radius: 999px;
   background: var(--brand-magenta, #e6087b);
-  box-shadow: 0 0 8px rgba(229, 4, 123, 0.45);
+  box-shadow: 0 0 6px rgba(229, 4, 123, 0.4);
 }
 .asm-hw-qnav-track .asm-q-pill.is-answered:not(.is-current) {
   border-color: rgba(46, 168, 106, 0.5);
@@ -4432,16 +4432,14 @@ body.asm-has-banner .stage {
     height: 22px;
   }
   .asm-hw-qnav-rail {
-    flex-basis: 48px;
-    width: 48px;
-    padding: 6px 4px;
+    flex-basis: 76px;
+    width: 76px;
+    padding: 6px 5px;
   }
   .asm-hw-qnav-track .asm-q-pill {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    min-height: 32px;
-    font-size: 10px;
+    height: 28px;
+    min-height: 28px;
+    font-size: 9px;
   }
   .asm-hw-qnav-current-num { font-size: 20px; }
   .asm-hw-qnav-track .asm-q-pill.is-current { font-size: 11px; }
