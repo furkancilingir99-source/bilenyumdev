@@ -275,6 +275,9 @@
 .pop-icon--clan  { background: linear-gradient(135deg, rgba(168,164,240,0.22), rgba(105,100,196,0.18)); color: #c0bcff; box-shadow: inset 0 0 0 1px rgba(168,164,240,0.32); }
 .pop-icon--live  { background: linear-gradient(135deg, var(--brand-purple-18), var(--brand-purple-06)); color: var(--brand-purple); box-shadow: inset 0 0 0 1px var(--brand-purple-28); }
 .pop-icon--sys   { background: linear-gradient(135deg, rgba(109,212,158,0.22), rgba(61,166,110,0.18)); color: #8de3b3; box-shadow: inset 0 0 0 1px rgba(109,212,158,0.32); }
+.pop-icon--hw     { background: linear-gradient(135deg, rgba(255,138,58,0.22), rgba(212,74,0,0.16)); color: #ffb07a; box-shadow: inset 0 0 0 1px rgba(255,138,58,0.32); }
+.pop-icon--student { background: linear-gradient(135deg, rgba(74,214,255,0.20), rgba(43,159,212,0.16)); color: #7ee0ff; box-shadow: inset 0 0 0 1px rgba(74,214,255,0.30); }
+.pop-icon--msg    { background: linear-gradient(135deg, rgba(168,164,240,0.22), rgba(105,100,196,0.18)); color: #c0bcff; box-shadow: inset 0 0 0 1px rgba(168,164,240,0.32); }
 
 .sn-inbox-empty {
   padding: 40px 20px;

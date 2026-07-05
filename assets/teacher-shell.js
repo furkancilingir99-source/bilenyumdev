@@ -14,6 +14,7 @@
   var ICON_HW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>';
   var ICON_PERF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>';
   var ICON_EXAM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V3a1 1 0 0 1 1-1z"/><path d="M9 12l2 2 4-4"/></svg>';
+  var ICON_NOTIF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
   var ICON_CHEVRON = '<svg class="hud-player-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
 
   var NAV_ITEMS = [
@@ -44,6 +45,10 @@
           '<img src="assets/bilenyum-logo.svg" alt="Bilenyum" />' +
         '</a>' +
         '<div class="hud-stats">' +
+          '<button type="button" class="stat-icon-btn is-notif" id="teacherNotifBtn" aria-haspopup="dialog" aria-expanded="false" aria-label="Bildirimler">' +
+            ICON_NOTIF +
+            '<span class="notif-dot"></span>' +
+          '</button>' +
           '<div class="hud-profile">' +
             '<button type="button" class="hud-player" id="profileBtn" aria-haspopup="true" aria-expanded="false" aria-label="Profil">' +
               '<span class="player-avatar-wrap">' +
@@ -99,9 +104,30 @@
     }
   }
 
+  function loadTeacherNotifications() {
+    if (!document.getElementById('teacherNotifBtn')) return;
+    if (global.TeacherNotifications) {
+      global.TeacherNotifications.init();
+      return;
+    }
+    if (!document.querySelector('link[href*="inbox.css"]')) {
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'assets/inbox.css';
+      document.head.appendChild(link);
+    }
+    var script = document.createElement('script');
+    script.src = 'assets/teacher-notifications.js';
+    script.onload = function () {
+      if (global.TeacherNotifications) global.TeacherNotifications.init();
+    };
+    document.head.appendChild(script);
+  }
+
   function init() {
     mount();
     initTeacherProfileMenu();
+    loadTeacherNotifications();
     if (global.DashboardSwitcher) {
       global.DashboardSwitcher.mount();
       if (global.DashboardSwitcher.syncHudHeight) global.DashboardSwitcher.syncHudHeight();
