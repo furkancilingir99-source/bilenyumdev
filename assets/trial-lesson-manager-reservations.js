@@ -404,24 +404,33 @@
     if (!drawerBody || !drawerTitle) return;
     drawerTitle.textContent = studentName(r);
     drawerBody.innerHTML =
-      '<div class="tm-detail-section">' +
-        '<h4 class="tm-detail-section-title">Öğrenci</h4>' +
+      '<div class="tm-detail-card is-student">' +
+        '<div class="tm-detail-card-head">' +
+          '<span class="tm-detail-card-icon" aria-hidden="true">🎓</span>' +
+          '<h4 class="tm-detail-card-title">Öğrenci</h4>' +
+        '</div>' +
         '<dl class="tm-detail-dl">' +
           '<div><dt>Ad Soyad</dt><dd>' + escapeHtml(studentName(r)) + '</dd></div>' +
           '<div><dt>Sınıf</dt><dd>' + escapeHtml(r.grade) + '</dd></div>' +
           '<div><dt>Deneme dersi</dt><dd>' + escapeHtml(r.subject) + '</dd></div>' +
         '</dl>' +
       '</div>' +
-      '<div class="tm-detail-section">' +
-        '<h4 class="tm-detail-section-title">Veli</h4>' +
+      '<div class="tm-detail-card is-parent">' +
+        '<div class="tm-detail-card-head">' +
+          '<span class="tm-detail-card-icon" aria-hidden="true">👤</span>' +
+          '<h4 class="tm-detail-card-title">Veli</h4>' +
+        '</div>' +
         '<dl class="tm-detail-dl">' +
           '<div><dt>Ad Soyad</dt><dd>' + escapeHtml(parentName(r)) + '</dd></div>' +
           '<div><dt>Telefon</dt><dd><a href="tel:' + escapeHtml(r.phone.replace(/\s/g, '')) + '">' + escapeHtml(r.phone) + '</a></dd></div>' +
           '<div><dt>E-posta</dt><dd><a href="mailto:' + escapeHtml(r.email) + '">' + escapeHtml(r.email) + '</a></dd></div>' +
         '</dl>' +
       '</div>' +
-      '<div class="tm-detail-section">' +
-        '<h4 class="tm-detail-section-title">Rezervasyon</h4>' +
+      '<div class="tm-detail-card is-reservation">' +
+        '<div class="tm-detail-card-head">' +
+          '<span class="tm-detail-card-icon" aria-hidden="true">📅</span>' +
+          '<h4 class="tm-detail-card-title">Rezervasyon</h4>' +
+        '</div>' +
         '<dl class="tm-detail-dl">' +
           '<div><dt>Kayıt tarihi</dt><dd>' + escapeHtml(formatCreatedAt(r.createdAt)) + '</dd></div>' +
           '<div><dt>Ders tarihi / saat</dt><dd>' + escapeHtml(r.slotLabel) + '</dd></div>' +
