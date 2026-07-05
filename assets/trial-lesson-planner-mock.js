@@ -196,6 +196,73 @@
     return true;
   }
 
+  function getReservationById(id) {
+    var rows = getReservationStore();
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i].id === id) return rows[i];
+    }
+    return null;
+  }
+
+  function getStudentDetailsForLesson(lesson) {
+    return (lesson.studentIds || []).map(function (sid) {
+      var r = getReservationById(sid);
+      if (!r) {
+        return {
+          reservationId: sid,
+          name: '—',
+          grade: '—',
+          subject: '—',
+          parent: '—',
+          phone: '—',
+          email: '—',
+          preferredSlot: '—',
+          status: 'unknown'
+        };
+      }
+      return {
+        reservationId: r.id,
+        name: r.studentFirstName + ' ' + r.studentLastName,
+        grade: r.grade,
+        subject: r.subject,
+        parent: r.parentFirstName + ' ' + r.parentLastName,
+        phone: r.phone,
+        email: r.email,
+        preferredSlot: r.slotLabel,
+        status: r.status
+      };
+    });
+  }
+
+  function getEnrichedPlannedLesson(id) {
+    var lesson = getPlannedLessonById(id);
+    if (!lesson) return null;
+    var teacher = getTeacherById(lesson.teacherId);
+    return {
+      id: lesson.id,
+      subject: lesson.subject,
+      grade: lesson.grade,
+      teacherId: lesson.teacherId,
+      teacherName: teacher ? teacher.name : '—',
+      teacherSubjects: teacher ? teacher.subjects.slice() : [],
+      slotLabel: lesson.slotLabel,
+      slotDateKey: lesson.slotDateKey,
+      slotTime: lesson.slotTime,
+      studentIds: lesson.studentIds.slice(),
+      students: getStudentDetailsForLesson(lesson),
+      updatedAt: lesson.updatedAt,
+      conflicts: checkConflicts(lesson)
+    };
+  }
+
+  function getFilterOptions() {
+    return {
+      grades: GRADES.slice(),
+      subjects: SUBJECTS.slice(),
+      teachers: TEACHERS.map(function (t) { return { id: t.id, name: t.name }; })
+    };
+  }
+
   global.TrialLessonPlannerMock = {
     SUBJECTS: SUBJECTS,
     GRADES: GRADES,
@@ -206,6 +273,8 @@
     getEligibleStudents: getEligibleStudents,
     checkConflicts: checkConflicts,
     savePlannedLesson: savePlannedLesson,
-    deletePlannedLesson: deletePlannedLesson
+    deletePlannedLesson: deletePlannedLesson,
+    getEnrichedPlannedLesson: getEnrichedPlannedLesson,
+    getFilterOptions: getFilterOptions
   };
 })(typeof window !== 'undefined' ? window : this);

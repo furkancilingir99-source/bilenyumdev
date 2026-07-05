@@ -783,6 +783,93 @@
 .tm-detail-card.is-parent .tm-detail-dl a { color: #c0066a; }
 .tm-detail-card.is-reservation .tm-detail-dl a { color: #0284c7; }
 
+.tm-detail-card.is-lesson {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.08), rgba(14, 165, 183, 0.04));
+  border-color: rgba(2, 132, 199, 0.22);
+}
+
+.tm-detail-card.is-teacher {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.04));
+  border-color: rgba(16, 185, 129, 0.22);
+}
+
+.tm-detail-card.is-lesson .tm-detail-card-icon {
+  background: rgba(2, 132, 199, 0.14);
+}
+
+.tm-detail-card.is-teacher .tm-detail-card-icon {
+  background: rgba(16, 185, 129, 0.14);
+}
+
+.tm-detail-card.is-lesson .tm-detail-card-title { color: #0284c7; }
+.tm-detail-card.is-teacher .tm-detail-card-title { color: #047857; }
+.tm-detail-card.is-lesson .tm-detail-dl dt { color: #0369a1; }
+.tm-detail-card.is-teacher .tm-detail-dl dt { color: #047857; }
+
+.tm-planned-students-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tm-planned-students-heading {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-planned-student-card {
+  margin-bottom: 0;
+}
+
+.tm-planned-no-students {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.tm-planned-conflict-alert {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #92400e;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tm-planned-conflict-alert ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.tm-planned-drawer-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+
+.tm-planned-drawer-actions .tm-planner-btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tm-planner-editor-head-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tm-planner-editor-head-row .tm-panel-link {
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
 .tm-detail-section + .tm-detail-section {
   margin-top: 0;
   padding-top: 0;
@@ -1067,103 +1154,6 @@
 }
 
 /* ── Ders Planla ── */
-.tm-planner-layout {
-  display: grid;
-  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
-  gap: 16px;
-  align-items: start;
-}
-
-.tm-planner-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: calc(100vh - 220px);
-  overflow: hidden;
-}
-
-.tm-planner-sidebar-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.tm-planner-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow-y: auto;
-  padding-right: 4px;
-  min-height: 120px;
-}
-
-.tm-planner-empty {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: #64748b;
-  line-height: 1.5;
-}
-
-.tm-planner-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(62, 58, 142, 0.12);
-  background: rgba(255, 255, 255, 0.85);
-  text-align: left;
-  cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
-}
-
-.tm-planner-card:hover {
-  border-color: rgba(2, 132, 199, 0.35);
-  box-shadow: 0 4px 14px rgba(40, 38, 90, 0.08);
-}
-
-.tm-planner-card.is-active {
-  border-color: #0284c7;
-  background: rgba(2, 132, 199, 0.06);
-  box-shadow: 0 0 0 1px rgba(2, 132, 199, 0.2);
-}
-
-.tm-planner-card-warn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 20px;
-  height: 20px;
-  border-radius: 999px;
-  background: #fef3c7;
-  color: #b45309;
-  font-size: 12px;
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tm-planner-card-subject {
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--brand-navy, #28265a);
-}
-
-.tm-planner-card-meta,
-.tm-planner-card-slot,
-.tm-planner-card-count {
-  font-size: 12px;
-  font-weight: 600;
-  color: #64748b;
-}
-
 .tm-planner-editor-wrap {
   min-height: 420px;
 }
@@ -1406,14 +1396,6 @@
 }
 
 @media (max-width: 960px) {
-  .tm-planner-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .tm-planner-sidebar {
-    max-height: none;
-  }
-
   .tm-planner-form-grid {
     grid-template-columns: 1fr;
   }

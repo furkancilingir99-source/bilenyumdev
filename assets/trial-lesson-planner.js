@@ -5,12 +5,9 @@
   var ResMock = window.TrialLessonManagerMock;
   if (!Planner || !ResMock) return;
 
-  var listEl = document.getElementById('tmPlannerList');
   var editorEl = document.getElementById('tmPlannerEditor');
-  var newBtn = document.getElementById('tmPlannerNewBtn');
   var toastEl = document.getElementById('tmPlannerToast');
 
-  var selectedId = null;
   var draft = null;
   var slotEditor = { dayOffset: 0, slot: null };
 
@@ -81,29 +78,6 @@
     toastEl.hidden = false;
     clearTimeout(showToast._t);
     showToast._t = setTimeout(function () { toastEl.hidden = true; }, 2800);
-  }
-
-  function renderList() {
-    if (!listEl) return;
-    var lessons = Planner.getPlannedLessons();
-    if (!lessons.length) {
-      listEl.innerHTML = '<p class="tm-planner-empty">Henüz planlanmış deneme dersi yok. Yeni ders planlayarak başlayın.</p>';
-      return;
-    }
-    listEl.innerHTML = lessons.map(function (l) {
-      var teacher = Planner.getTeacherById(l.teacherId);
-      var active = selectedId === l.id ? ' is-active' : '';
-      var conflicts = Planner.checkConflicts(l);
-      return (
-        '<button type="button" class="tm-planner-card' + active + '" data-lesson-id="' + escapeHtml(l.id) + '">' +
-          (conflicts.length ? '<span class="tm-planner-card-warn" title="Çakışma">!</span>' : '') +
-          '<span class="tm-planner-card-subject">' + escapeHtml(l.subject) + '</span>' +
-          '<span class="tm-planner-card-meta">' + escapeHtml(l.grade) + ' · ' + escapeHtml(teacher ? teacher.name : '—') + '</span>' +
-          '<span class="tm-planner-card-slot">' + escapeHtml(l.slotLabel) + '</span>' +
-          '<span class="tm-planner-card-count">' + l.studentIds.length + ' öğrenci</span>' +
-        '</button>'
-      );
-    }).join('');
   }
 
   function renderSlotPicker() {
@@ -187,8 +161,13 @@
     editorEl.innerHTML =
       '<div class="tm-planner-editor-inner">' +
         '<header class="tm-planner-editor-head">' +
-          '<h2 class="tm-planner-editor-title">' + (isEdit ? 'Dersi Düzenle' : 'Yeni Deneme Dersi Planla') + '</h2>' +
-          '<p class="tm-planner-editor-sub">Branş, sınıf ve öğretmen seçin; uygun öğrencileri ekleyerek sınıf oluşturun.</p>' +
+          '<div class="tm-planner-editor-head-row">' +
+            '<div>' +
+              '<h2 class="tm-planner-editor-title">' + (isEdit ? 'Dersi Düzenle' : 'Yeni Deneme Dersi Planla') + '</h2>' +
+              '<p class="tm-planner-editor-sub">Branş, sınıf ve öğretmen seçin; uygun öğrencileri ekleyerek sınıf oluşturun.</p>' +
+            '</div>' +
+            '<a class="tm-panel-link" href="deneme-dersi-yoneticisi-planlanmis-dersler.html">Planlanmış derslere git →</a>' +
+          '</div>' +
         '</header>' +
         '<div class="tm-planner-form-grid">' +
           '<label class="tm-filter-field">' +
@@ -237,30 +216,22 @@
       '</div>';
   }
 
-  function refresh() {
-    renderList();
-    renderEditor();
-  }
-
-  function selectLesson(id) {
-    selectedId = id;
-    if (!id) {
+  function loadLesson(id) {
+    var lesson = Planner.getPlannedLessonById(id);
+    if (!lesson) {
       draft = emptyDraft();
       slotEditor = { dayOffset: 0, slot: null };
     } else {
-      var lesson = Planner.getPlannedLessonById(id);
-      if (!lesson) return;
       draft = draftFromLesson(lesson);
       initSlotFromDraft();
     }
-    refresh();
+    renderEditor();
   }
 
   function startNew() {
-    selectedId = null;
     draft = emptyDraft();
     slotEditor = { dayOffset: 0, slot: null };
-    refresh();
+    renderEditor();
   }
 
   function collectStudentIds() {
@@ -290,23 +261,15 @@
       return;
     }
     showToast('Deneme dersi kaydedildi.');
-    selectedId = result.lesson.id;
     draft = draftFromLesson(result.lesson);
     initSlotFromDraft();
-    refresh();
+    if (history.replaceState) {
+      history.replaceState(null, '', 'deneme-dersi-yoneticisi-ders-planla.html?edit=' + encodeURIComponent(result.lesson.id));
+    }
+    renderEditor();
   }
 
   function wireEvents() {
-    if (newBtn) newBtn.addEventListener('click', startNew);
-
-    if (listEl) {
-      listEl.addEventListener('click', function (e) {
-        var card = e.target.closest('[data-lesson-id]');
-        if (!card) return;
-        selectLesson(card.getAttribute('data-lesson-id'));
-      });
-    }
-
     if (editorEl) {
       editorEl.addEventListener('change', function (e) {
         if (!draft) return;
@@ -341,7 +304,7 @@
           return;
         }
         if (e.target.closest('#tmPlanCancel')) {
-          if (selectedId) selectLesson(selectedId);
+          if (draft.id) loadLesson(draft.id);
           else startNew();
           return;
         }
@@ -349,7 +312,7 @@
           if (draft.id && confirm('Bu deneme dersini silmek istediğine emin misin?')) {
             Planner.deletePlannedLesson(draft.id);
             showToast('Ders silindi.');
-            startNew();
+            window.location.href = 'deneme-dersi-yoneticisi-planlanmis-dersler.html';
           }
           return;
         }
@@ -372,7 +335,13 @@
   }
 
   function init() {
-    startNew();
+    var params = new URLSearchParams(window.location.search);
+    var editId = params.get('edit');
+    if (editId && Planner.getPlannedLessonById(editId)) {
+      loadLesson(editId);
+    } else {
+      startNew();
+    }
     wireEvents();
   }
 

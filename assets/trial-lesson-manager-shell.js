@@ -1,6 +1,6 @@
 /**
  * Deneme Dersi Yöneticisi paneli — ortak üst bar ve sol navigasyon.
- * body[data-trial-manager-active] ile aktif menü: dashboard | rezervasyonlar | ders-planla
+ * body[data-trial-manager-active] ile aktif menü: dashboard | rezervasyonlar | ders-planla | planlanmis-dersler
  */
 (function (global) {
   'use strict';
@@ -14,11 +14,13 @@
   var ICON_CHEVRON = '<svg class="hud-player-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
 
   var ICON_PLAN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>';
+  var ICON_LIST = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>';
 
   var NAV_ITEMS = [
     { key: 'dashboard', href: 'deneme-dersi-yoneticisi-dashboard.html', title: 'Merkez', label: 'Merkez', icon: ICON_HOME },
     { key: 'rezervasyonlar', href: 'deneme-dersi-yoneticisi-rezervasyonlar.html', title: 'Rezervasyonlar', label: 'Rezervasyonlar', icon: ICON_CAL, labelWrap: true },
-    { key: 'ders-planla', href: 'deneme-dersi-yoneticisi-ders-planla.html', title: 'Ders Planla', label: 'Ders<br>Planla', icon: ICON_PLAN, labelWrap: true }
+    { key: 'ders-planla', href: 'deneme-dersi-yoneticisi-ders-planla.html', title: 'Ders Planla', label: 'Ders<br>Planla', icon: ICON_PLAN, labelWrap: true },
+    { key: 'planlanmis-dersler', href: 'deneme-dersi-yoneticisi-planlanmis-dersler.html', title: 'Planlanmış Dersler', label: 'Planlanmış<br>Dersler', icon: ICON_LIST, labelWrap: true }
   ];
 
   function getActiveKey() {
