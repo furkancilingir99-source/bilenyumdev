@@ -37,6 +37,8 @@
     var el = document.getElementById('asmResultsTopMeta');
     if (el) el.textContent = label || '';
   }
+
+  function welcomeDashboardBtn(className) {
     return '<a href="ogrenci-dashboard.html?assessment=done" class="asm-btn asm-btn-primary' + (className ? ' ' + className : '') + '">Dashboard\'a Hoşgeldin ' + ICON_ARROW + '</a>';
   }
 
