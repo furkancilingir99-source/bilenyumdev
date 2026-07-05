@@ -30,6 +30,8 @@
   var currentPage = 1;
   var dateRange = { start: null, end: null };
   var openDatePop = null;
+  var currentDrawerId = null;
+  var slotEditor = { open: false, dayOffset: 0, slot: null, parentConfirmed: false };
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -391,7 +393,10 @@
           '<td class="tm-cell-contact">' + escapeHtml(r.phone) + '</td>' +
           '<td class="tm-cell-contact"><a href="mailto:' + escapeHtml(r.email) + '">' + escapeHtml(r.email) + '</a></td>' +
           '<td class="tm-cell-date">' + escapeHtml(formatCreatedAt(r.createdAt)) + '</td>' +
-          '<td>' + escapeHtml(r.slotLabel) + '</td>' +
+          '<td>' +
+            (slotWasUpdated(r) ? '<span class="tm-table-slot-badge" title="Veli onayı ile güncellendi">↻</span> ' : '') +
+            escapeHtml(r.slotLabel) +
+          '</td>' +
           '<td><span class="tm-status ' + statusClass(r.status) + '">' + escapeHtml(Mock.STATUS_LABELS[r.status] || r.status) + '</span></td>' +
         '</tr>'
       );
@@ -400,9 +405,74 @@
     renderPagination(meta);
   }
 
+  function canEditSlot(r) {
+    return r && r.status !== 'completed' && r.status !== 'cancelled';
+  }
+
+  function slotWasUpdated(r) {
+    return !!(r.slotUpdatedAt && r.requestedSlotLabel && r.slotLabel !== r.requestedSlotLabel);
+  }
+
+  function renderSlotEditor(r) {
+    var open = slotEditor.open;
+    var slots = Mock.getOpenLessonSlots();
+    var full = slots.fullByDay[slotEditor.dayOffset] || {};
+
+    var dayNav = slots.days.map(function (d) {
+      var active = d.offset === slotEditor.dayOffset ? ' is-active' : '';
+      return (
+        '<button type="button" class="tm-slot-day' + active + '" data-slot-day="' + d.offset + '">' +
+          '<strong>' + escapeHtml(d.label) + '</strong>' +
+          '<small>' + escapeHtml(d.date) + '</small>' +
+        '</button>'
+      );
+    }).join('');
+
+    var slotGrid = slots.times.map(function (t) {
+      var isFull = !!full[t];
+      var isSel = !isFull && slotEditor.slot === t;
+      var cls = 'tm-slot' + (isFull ? ' is-full' : '') + (isSel ? ' is-selected' : '');
+      return (
+        '<button type="button" class="' + cls + '" data-slot-time="' + escapeHtml(t) + '"' + (isFull ? ' disabled' : '') + '>' +
+          escapeHtml(t) +
+          '<span class="tm-slot-badge' + (isFull ? ' is-full' : ' is-free') + '">' + (isFull ? 'Dolu' : 'Müsait') + '</span>' +
+        '</button>'
+      );
+    }).join('');
+
+    return (
+      '<div class="tm-slot-editor' + (open ? ' is-open' : '') + '" id="tmSlotEditor">' +
+        '<p class="tm-slot-editor-hint">' +
+          'Veli ile iletişim kurduktan sonra açık ders saatlerinden mutabık kalınan slotu seçin. ' +
+          'Kaydetmeden önce veli onayını işaretleyin.' +
+        '</p>' +
+        (open
+          ? '<div class="tm-slot-editor-panel">' +
+              '<div class="tm-slot-day-nav" role="tablist">' + dayNav + '</div>' +
+              '<div class="tm-slot-grid">' + slotGrid + '</div>' +
+              '<label class="tm-slot-parent-check">' +
+                '<input type="checkbox" id="tmSlotParentConfirm"' + (slotEditor.parentConfirmed ? ' checked' : '') + '>' +
+                '<span>Veli ile görüşülüp yeni ders tarihi onaylandı</span>' +
+              '</label>' +
+              '<div class="tm-slot-editor-actions">' +
+                '<button type="button" class="tm-slot-btn tm-slot-btn--ghost" id="tmSlotCancel">Vazgeç</button>' +
+                '<button type="button" class="tm-slot-btn tm-slot-btn--primary" id="tmSlotSave" disabled>Kaydet</button>' +
+              '</div>' +
+            '</div>'
+          : '<button type="button" class="tm-slot-edit-toggle" id="tmSlotEditToggle">Ders tarihini güncelle</button>') +
+      '</div>'
+    );
+  }
+
   function renderDrawerDetail(r) {
     if (!drawerBody || !drawerTitle) return;
     drawerTitle.textContent = studentName(r);
+    var editable = canEditSlot(r);
+    var updated = slotWasUpdated(r);
+    var requestedNote = updated
+      ? '<div class="tm-slot-requested"><span class="tm-slot-requested-label">İlk talep</span> ' + escapeHtml(r.requestedSlotLabel) + '</div>'
+      : '';
+
     drawerBody.innerHTML =
       '<div class="tm-detail-card is-student">' +
         '<div class="tm-detail-card-head">' +
@@ -432,16 +502,114 @@
           '<h4 class="tm-detail-card-title">Rezervasyon</h4>' +
         '</div>' +
         '<dl class="tm-detail-dl">' +
-          '<div><dt>Kayıt tarihi</dt><dd>' + escapeHtml(formatCreatedAt(r.createdAt)) + '</dd></div>' +
-          '<div><dt>Ders tarihi / saat</dt><dd>' + escapeHtml(r.slotLabel) + '</dd></div>' +
-          '<div><dt>Durum</dt><dd><span class="tm-status ' + statusClass(r.status) + '">' + escapeHtml(Mock.STATUS_LABELS[r.status] || r.status) + '</span></dd></div>' +
+          '<div><dt>Kayıt tarihi</dt><dd class="tm-detail-readonly">' + escapeHtml(formatCreatedAt(r.createdAt)) + '</dd></div>' +
+          '<div class="tm-detail-slot-row"><dt>Ders tarihi / saat</dt><dd>' +
+            requestedNote +
+            '<div class="tm-slot-current">' +
+              (updated ? '<span class="tm-slot-updated-badge">Veli onayı ile güncellendi</span>' : '') +
+              '<strong id="tmDrawerSlotLabel">' + escapeHtml(r.slotLabel) + '</strong>' +
+              (r.slotUpdatedAt ? '<small class="tm-slot-updated-at">Son güncelleme: ' + escapeHtml(formatCreatedAt(r.slotUpdatedAt)) + '</small>' : '') +
+            '</div>' +
+            (editable ? renderSlotEditor(r) : '<p class="tm-slot-locked">Tamamlanan veya iptal edilen rezervasyonlarda ders tarihi değiştirilemez.</p>') +
+          '</dd></div>' +
+          '<div><dt>Durum</dt><dd><span class="tm-status ' + statusClass(r.status) + '" id="tmDrawerStatus">' + escapeHtml(Mock.STATUS_LABELS[r.status] || r.status) + '</span></dd></div>' +
         '</dl>' +
       '</div>';
+
+    if (editable && slotEditor.open) {
+      syncSlotSaveButton();
+    }
+  }
+
+  function syncSlotSaveButton() {
+    var saveBtn = document.getElementById('tmSlotSave');
+    var confirmCb = document.getElementById('tmSlotParentConfirm');
+    if (!saveBtn) return;
+    var confirmed = confirmCb && confirmCb.checked;
+    var hasSlot = !!slotEditor.slot;
+    saveBtn.disabled = !(confirmed && hasSlot);
+  }
+
+  function refreshAllRows() {
+    allRows = Mock.getReservations();
+  }
+
+  function saveSlotUpdate() {
+    if (!currentDrawerId) return;
+    var confirmCb = document.getElementById('tmSlotParentConfirm');
+    if (!confirmCb || !confirmCb.checked || !slotEditor.slot) return;
+
+    var label = Mock.buildSlotLabel(slotEditor.dayOffset, slotEditor.slot);
+    Mock.updateReservationSlot(currentDrawerId, {
+      slotLabel: label,
+      slotConfirmedByParent: true
+    });
+    refreshAllRows();
+    slotEditor.open = false;
+    slotEditor.slot = null;
+    slotEditor.parentConfirmed = false;
+    var r = Mock.getReservationById(currentDrawerId);
+    renderDrawerDetail(r);
+    applyFilters(false);
+  }
+
+  function bindDrawerSlotEvents() {
+    if (!drawerBody) return;
+
+    drawerBody.addEventListener('click', function (e) {
+      var toggle = e.target.closest('#tmSlotEditToggle');
+      if (toggle) {
+        slotEditor.open = true;
+        slotEditor.dayOffset = 0;
+        slotEditor.slot = null;
+        slotEditor.parentConfirmed = false;
+        renderDrawerDetail(Mock.getReservationById(currentDrawerId));
+        return;
+      }
+
+      var cancelBtn = e.target.closest('#tmSlotCancel');
+      if (cancelBtn) {
+        slotEditor.open = false;
+        slotEditor.slot = null;
+        renderDrawerDetail(Mock.getReservationById(currentDrawerId));
+        return;
+      }
+
+      var saveBtn = e.target.closest('#tmSlotSave');
+      if (saveBtn) {
+        saveSlotUpdate();
+        return;
+      }
+
+      var dayBtn = e.target.closest('[data-slot-day]');
+      if (dayBtn) {
+        slotEditor.dayOffset = parseInt(dayBtn.getAttribute('data-slot-day'), 10);
+        slotEditor.slot = null;
+        renderDrawerDetail(Mock.getReservationById(currentDrawerId));
+        return;
+      }
+
+      var slotBtn = e.target.closest('[data-slot-time]');
+      if (slotBtn && !slotBtn.disabled) {
+        slotEditor.slot = slotBtn.getAttribute('data-slot-time');
+        renderDrawerDetail(Mock.getReservationById(currentDrawerId));
+        return;
+      }
+    });
+
+    drawerBody.addEventListener('change', function (e) {
+      if (e.target.id === 'tmSlotParentConfirm') {
+        slotEditor.parentConfirmed = e.target.checked;
+        syncSlotSaveButton();
+      }
+    });
   }
 
   function openDrawer(id) {
     var r = Mock.getReservationById(id);
     if (!r || !drawer) return;
+    currentDrawerId = id;
+    slotEditor = { open: false, dayOffset: 0, slot: null, parentConfirmed: false };
     renderDrawerDetail(r);
     drawer.classList.add('is-open');
     drawer.setAttribute('aria-hidden', 'false');
@@ -453,6 +621,8 @@
     drawer.classList.remove('is-open');
     drawer.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    currentDrawerId = null;
+    slotEditor = { open: false, dayOffset: 0, slot: null, parentConfirmed: false };
   }
 
   function applyFilters(resetPage) {
@@ -519,6 +689,7 @@
 
     initDatePicker('tmResDateStartBtn', 'tmResDateStartPop', 'start');
     initDatePicker('tmResDateEndBtn', 'tmResDateEndPop', 'end');
+    bindDrawerSlotEvents();
   }
 
   function init() {

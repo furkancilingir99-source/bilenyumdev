@@ -44,6 +44,8 @@
       phone: '0505 778 44 12',
       email: 'zeynep.demir@outlook.com',
       slotLabel: 'Salı, 8 Tem · 11:30',
+      requestedSlotLabel: 'Salı, 8 Tem · 11:30',
+      slotConfirmedByParent: false,
       status: 'pending',
       createdAt: '2026-07-04T19:30:00+03:00'
     },
@@ -238,13 +240,83 @@
     cancelled: 'İptal'
   };
 
+  var SLOT_TIMES = ['10:00', '11:30', '13:00', '14:30', '16:00', '17:30', '19:00', '20:30'];
+  var DAY_NAMES = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+  var MONTH_SHORT = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+  var FULL_SLOTS = {
+    0: { '13:00': 1, '17:30': 1 },
+    1: { '10:00': 1, '19:00': 1 },
+    2: { '14:30': 1, '20:30': 1 },
+    3: { '11:30': 1, '13:00': 1, '20:30': 1 }
+  };
+
+  function normalizeReservation(r) {
+    if (!r.requestedSlotLabel) r.requestedSlotLabel = r.slotLabel;
+    if (r.slotConfirmedByParent === undefined) r.slotConfirmedByParent = r.status === 'confirmed';
+    return r;
+  }
+
+  function nextOpenDays(count) {
+    var arr = [];
+    var today = new Date();
+    for (var i = 0; i < count; i++) {
+      var d = new Date(today);
+      d.setDate(today.getDate() + i);
+      arr.push({
+        label: i === 0 ? 'Bugün' : DAY_NAMES[d.getDay()],
+        date: d.getDate() + ' ' + MONTH_SHORT[d.getMonth()],
+        full: DAY_NAMES[d.getDay()] + ', ' + d.getDate() + ' ' + MONTH_SHORT[d.getMonth()],
+        offset: i
+      });
+    }
+    return arr;
+  }
+
+  function buildSlotLabel(dayOffset, time) {
+    var days = nextOpenDays(4);
+    var day = days[dayOffset] || days[0];
+    var prefix = day.offset === 0 ? 'Bugün' : day.full.split(',')[0] + ', ' + day.date;
+    return prefix + ' · ' + time;
+  }
+
+  function getOpenLessonSlots() {
+    return {
+      days: nextOpenDays(4),
+      times: SLOT_TIMES.slice(),
+      fullByDay: FULL_SLOTS
+    };
+  }
+
+  function updateReservationSlot(id, payload) {
+    for (var i = 0; i < RESERVATIONS.length; i++) {
+      if (RESERVATIONS[i].id !== id) continue;
+      var r = RESERVATIONS[i];
+      normalizeReservation(r);
+      if (payload.slotLabel && payload.slotLabel !== r.slotLabel) {
+        if (!r.slotUpdatedAt) r.requestedSlotLabel = r.requestedSlotLabel || r.slotLabel;
+        r.slotLabel = payload.slotLabel;
+        r.slotUpdatedAt = new Date().toISOString();
+      }
+      if (payload.slotConfirmedByParent !== undefined) {
+        r.slotConfirmedByParent = !!payload.slotConfirmedByParent;
+      }
+      if (payload.status) {
+        r.status = payload.status;
+      } else if (r.slotConfirmedByParent && r.status === 'pending') {
+        r.status = 'confirmed';
+      }
+      return normalizeReservation(r);
+    }
+    return null;
+  }
+
   function getReservations() {
-    return RESERVATIONS.slice();
+    return RESERVATIONS.map(normalizeReservation);
   }
 
   function getReservationById(id) {
     for (var i = 0; i < RESERVATIONS.length; i++) {
-      if (RESERVATIONS[i].id === id) return RESERVATIONS[i];
+      if (RESERVATIONS[i].id === id) return normalizeReservation(RESERVATIONS[i]);
     }
     return null;
   }
@@ -281,6 +353,9 @@
     getReservations: getReservations,
     getReservationById: getReservationById,
     getFilterOptions: getFilterOptions,
+    getOpenLessonSlots: getOpenLessonSlots,
+    buildSlotLabel: buildSlotLabel,
+    updateReservationSlot: updateReservationSlot,
     getStats: getStats,
     STATUS_LABELS: STATUS_LABELS
   };

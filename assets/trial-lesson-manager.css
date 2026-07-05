@@ -834,3 +834,234 @@
 .tm-detail-dl a:hover {
   text-decoration: underline;
 }
+
+.tm-detail-readonly {
+  color: var(--ink-dark-2, #5c567a);
+}
+
+.tm-detail-slot-row dd {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tm-slot-requested {
+  font-size: 12px;
+  color: var(--ink-dark-2, #5c567a);
+}
+
+.tm-slot-requested-label {
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  margin-right: 4px;
+}
+
+.tm-slot-current {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tm-slot-current strong {
+  font-size: 14px;
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-slot-updated-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(14, 165, 183, 0.14);
+  color: #0369a1;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.tm-slot-updated-at {
+  font-size: 11px;
+  color: var(--ink-dark-2, #5c567a);
+}
+
+.tm-slot-locked {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-dark-2, #5c567a);
+}
+
+.tm-slot-editor-hint {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-dark-2, #5c567a);
+}
+
+.tm-slot-edit-toggle {
+  align-self: flex-start;
+  padding: 8px 14px;
+  border: 1px solid rgba(14, 165, 183, 0.35);
+  border-radius: 10px;
+  background: rgba(14, 165, 183, 0.1);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  color: #0284c7;
+  cursor: pointer;
+}
+
+.tm-slot-edit-toggle:hover {
+  background: rgba(14, 165, 183, 0.16);
+}
+
+.tm-slot-editor-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(14, 165, 183, 0.2);
+}
+
+.tm-slot-day-nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.tm-slot-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(168, 164, 240, 0.24);
+  background: #fff;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.tm-slot-day strong {
+  font-size: 11px;
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-slot-day small {
+  font-size: 10px;
+  color: var(--ink-dark-2, #5c567a);
+}
+
+.tm-slot-day.is-active {
+  border-color: rgba(14, 165, 183, 0.45);
+  background: rgba(14, 165, 183, 0.12);
+}
+
+.tm-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.tm-slot {
+  position: relative;
+  padding: 10px 8px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(168, 164, 240, 0.24);
+  background: #fff;
+  font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--brand-navy, #28265a);
+  cursor: pointer;
+}
+
+.tm-slot.is-selected {
+  border-color: rgba(14, 165, 183, 0.55);
+  background: rgba(14, 165, 183, 0.12);
+  box-shadow: 0 0 0 2px rgba(14, 165, 183, 0.15);
+}
+
+.tm-slot.is-full {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.tm-slot-badge {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', system-ui, sans-serif);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.tm-slot-badge.is-free { color: #047857; }
+.tm-slot-badge.is-full { color: #64748b; }
+
+.tm-slot-parent-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand-navy, #28265a);
+  cursor: pointer;
+}
+
+.tm-slot-parent-check input {
+  margin-top: 2px;
+  accent-color: #0284c7;
+}
+
+.tm-slot-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.tm-slot-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.tm-slot-btn--ghost {
+  background: rgba(62, 58, 142, 0.08);
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-slot-btn--primary {
+  background: linear-gradient(135deg, #0284c7, #0ea5b7);
+  color: #fff;
+}
+
+.tm-slot-btn--primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tm-table-slot-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(14, 165, 183, 0.16);
+  color: #0284c7;
+  font-size: 11px;
+  font-weight: 800;
+  vertical-align: middle;
+}
+
+@media (max-width: 420px) {
+  .tm-slot-day-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
