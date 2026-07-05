@@ -1,11 +1,12 @@
 /**
- * Öğretmenler listesi
+ * Öğretmen uygunluğu — salt okunur profil, operasyonel notlar
  */
 (function () {
   'use strict';
 
   var Store = (window.TMBridge && window.TMBridge.store()) || window.TMStore;
   var U = window.TMUtils;
+  var SL = window.TMStatusLabels;
   var Drawer = window.TMDetailDrawer;
   var Export = window.TMExportUtils;
   var QuickMsg = window.TMQuickMessage;
@@ -19,41 +20,8 @@
   var paginationEl = document.getElementById('tmTeachersPagination');
   var pageSizeSelect = document.getElementById('tmTeachersPageSize');
   var exportBtn = document.getElementById('tmTeachersExport');
-  var createBtn = document.getElementById('tmTeachersCreate');
   var page = 1;
   var today = Store.todayKey();
-
-  function openCreateTeacher() {
-    if (!Form || !Perms || !Perms.guard('create')) return;
-    Form.open({
-      title: 'Yeni öğretmen',
-      fields: [
-        { type: 'text', name: 'firstName', label: 'Ad', value: '', required: true },
-        { type: 'text', name: 'lastName', label: 'Soyad', value: '', required: true },
-        { type: 'text', name: 'phone', label: 'Telefon', value: '', required: true },
-        { type: 'text', name: 'email', label: 'E-posta', value: '', required: false },
-        {
-          type: 'select',
-          name: 'lessonTypeId',
-          label: 'Branş',
-          value: 'lt-mat',
-          options: Store.getLessonTypes().map(function (lt) { return { value: lt.id, label: lt.name }; })
-        },
-        { type: 'textarea', name: 'notes', label: 'Not', value: '', rows: 3, required: false }
-      ],
-      submitLabel: 'Oluştur',
-      onSubmit: function (data) {
-        var result = Store.createTeacher(data);
-        if (!result.ok) U.notifyError(result.error);
-        else {
-          U.notifySuccess('Öğretmen oluşturuldu.');
-          if (window.TMOnSessionChange) window.TMOnSessionChange();
-          render();
-          openDetail(result.teacher);
-        }
-      }
-    });
-  }
 
   function branchLabel(t) {
     return t.branchLessonTypeIds.map(function (id) {
@@ -62,21 +30,26 @@
     }).join(', ');
   }
 
-  function openEditTeacher(t) {
-    if (!Form || !Perms || !Perms.guard('edit')) return;
+  function dayOfWeek(dateStr) {
+    var p = dateStr.split('-');
+    return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)).getDay();
+  }
+
+  function openOperationalNotes(t) {
+    if (!Form || !Perms.guard('editTeacherOperational')) return;
     Form.open({
-      title: 'Öğretmen düzenle',
+      title: 'Operasyon notları',
+      description: 'Öğretmen profil bilgileri Ana Admin Panel\'den gelir. Yalnızca deneme dersi operasyon notları düzenlenebilir.',
       fields: [
-        { type: 'text', name: 'phone', label: 'Telefon', value: t.phone, required: true },
-        { type: 'text', name: 'email', label: 'E-posta', value: t.email },
-        { type: 'textarea', name: 'notes', label: 'Not', value: t.notes || '', rows: 3 }
+        { type: 'textarea', name: 'informedNote', label: 'Bilgilendirme notu', value: t.informedNote || '', rows: 2 },
+        { type: 'textarea', name: 'trialLessonNotes', label: 'Deneme dersi özel notu', value: t.trialLessonNotes || '', rows: 3 }
       ],
       onSubmit: function (data) {
-        var result = Store.updateTeacher(t.id, data);
+        var result = Store.updateTeacherOperationalNotes(t.id, data);
         if (!result.ok) U.notifyError(result.error);
         else {
-          U.notifySuccess('Öğretmen güncellendi.');
-          if (window.TMOnSessionChange) window.TMOnSessionChange();
+          U.notifySuccess('Operasyon notları kaydedildi.');
+          openDetail(result.teacher);
           render();
         }
       }
@@ -85,127 +58,120 @@
 
   function openDetail(t) {
     if (!Drawer) return;
-    var sessions = Store.getSessionsForTeacher(t.id);
+    var teacher = Store.getTeacherById(t.id) || t;
+    var sessions = Store.getSessionsForTeacher(teacher.id);
     var upcoming = sessions.filter(function (s) { return s.date >= today && s.status !== 'cancelled'; });
-    function dayOfWeek(dateStr) {
-      var p = dateStr.split('-');
-      return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)).getDay();
-    }
+    var todaySessions = sessions.filter(function (s) { return s.date === today && s.status !== 'cancelled'; });
+    var trialSessions = sessions.filter(function (s) { return s.status !== 'cancelled'; });
     Drawer.open({
-      title: U.fullName(t.firstName, t.lastName),
-      subtitle: branchLabel(t),
-      tabs: [{ label: 'Bilgi' }, { label: 'Yaklaşan dersler' }, { label: 'Müsaitlik' }],
+      title: U.fullName(teacher.firstName, teacher.lastName),
+      subtitle: branchLabel(teacher) + ' · ' + SL.teacherTypeLabel(teacher.teacherType),
+      tabs: [
+        { label: 'Bilgi' },
+        { label: 'Yaklaşan dersler' },
+        { label: 'Müsaitlik' },
+        { label: 'Deneme dersleri' },
+        { label: 'Bilgilendirme' }
+      ],
       onTab: function (idx, body) {
         if (idx === 0) {
           var todayDow = dayOfWeek(today);
-          var todaySlots = (t.availability || []).filter(function (a) {
+          var todaySlots = (teacher.availability || []).filter(function (a) {
             return a.dayOfWeek === todayDow && a.isAvailable;
           });
           var previewText = todaySlots.length
             ? todaySlots.map(function (a) { return a.startTime + '–' + a.endTime; }).join(', ')
             : 'Bugün müsait değil';
           body.innerHTML =
+            '<p class="tm-source-notice">' + SL.dataSourceBadge(teacher.source || 'admin_panel') + '</p>' +
             '<div class="tm-detail-actions" style="margin-bottom:12px">' +
               (QuickMsg ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-wa-teacher>WhatsApp</button> ' : '') +
-              '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-edit-teacher data-tm-require="edit">Düzenle</button>' +
+              '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-op-notes data-tm-require="edit-teacher-operational">Operasyon notu</button>' +
             '</div>' +
             '<div class="tm-detail-grid">' +
-            '<div><div class="tm-detail-cell-label">Telefon</div><div class="tm-detail-cell-value">' + U.escapeHtml(t.phone) + '</div></div>' +
-            '<div><div class="tm-detail-cell-label">E-posta</div><div class="tm-detail-cell-value">' + U.escapeHtml(t.email) + '</div></div>' +
-            '<div><div class="tm-detail-cell-label">Dashboard</div><div class="tm-detail-cell-value">' + (t.dashboardEnabled ? 'Aktif' : 'Kapalı') + '</div></div>' +
-            '<div><div class="tm-detail-cell-label">Bugün müsaitlik</div><div class="tm-detail-cell-value">' + U.escapeHtml(previewText) + '</div></div></div>';
+            '<div><div class="tm-detail-cell-label">Ad soyad</div><div class="tm-detail-cell-value">' + U.escapeHtml(U.fullName(teacher.firstName, teacher.lastName)) + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Telefon</div><div class="tm-detail-cell-value">' + U.escapeHtml(teacher.phone) + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">E-posta</div><div class="tm-detail-cell-value">' + U.escapeHtml(teacher.email) + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Öğretmen tipi</div><div class="tm-detail-cell-value">' + SL.teacherTypeBadge(teacher.teacherType || 'branch') + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Branş</div><div class="tm-detail-cell-value">' + U.escapeHtml(branchLabel(teacher)) + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Dashboard</div><div class="tm-detail-cell-value">' + (teacher.dashboardEnabled ? 'Aktif' : 'Kapalı') + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Bugünkü ders</div><div class="tm-detail-cell-value">' + todaySessions.length + ' ders</div></div>' +
+            '<div><div class="tm-detail-cell-label">Bugün müsaitlik</div><div class="tm-detail-cell-value">' + U.escapeHtml(previewText) + '</div></div>' +
+            (teacher.informedNote ? '<div><div class="tm-detail-cell-label">Bilgilendirme notu</div><div class="tm-detail-cell-value">' + U.escapeHtml(teacher.informedNote) + '</div></div>' : '') +
+            (teacher.trialLessonNotes ? '<div><div class="tm-detail-cell-label">Deneme dersi notu</div><div class="tm-detail-cell-value">' + U.escapeHtml(teacher.trialLessonNotes) + '</div></div>' : '') +
+            '</div>';
           var waBtn = body.querySelector('[data-wa-teacher]');
           if (waBtn && QuickMsg) {
             waBtn.addEventListener('click', function () {
               var next = upcoming[0] || sessions[0];
               var lt = next ? Store.getLessonTypeById(next.lessonTypeId) : null;
               QuickMsg.openForTeacher({
-                teacherName: U.fullName(t.firstName, t.lastName),
+                teacherName: U.fullName(teacher.firstName, teacher.lastName),
                 date: next ? U.formatDateKey(next.date) : '—',
                 time: next ? next.startTime : '—',
-                lessonType: lt ? lt.name : branchLabel(t),
+                lessonType: lt ? lt.name : branchLabel(teacher),
                 studentCount: next ? next.enrolledStudentIds.length : 0,
-                phone: t.phone,
-                email: t.email
+                phone: teacher.phone,
+                email: teacher.email
               });
             });
           }
-          body.querySelector('[data-edit-teacher]') && body.querySelector('[data-edit-teacher]').addEventListener('click', function () {
-            openEditTeacher(Store.getTeacherById(t.id) || t);
+          body.querySelector('[data-op-notes]') && body.querySelector('[data-op-notes]').addEventListener('click', function () {
+            openOperationalNotes(Store.getTeacherById(teacher.id) || teacher);
           });
         } else if (idx === 1) {
           body.innerHTML = upcoming.length ? '<table class="tm-inner-table"><tbody>' + upcoming.map(function (s) {
             var lt = Store.getLessonTypeById(s.lessonTypeId);
-            return '<tr data-session-row="' + s.id + '" style="cursor:pointer"><td>' + U.formatDateKey(s.date) + ' ' + s.startTime + '</td><td>' + (lt ? lt.name : '') + '</td><td>' + s.enrolledStudentIds.length + '/20</td></tr>';
+            return '<tr data-session-row="' + s.id + '" style="cursor:pointer"><td>' + U.formatDateKey(s.date) + ' ' + s.startTime + '</td><td>' + (lt ? lt.name : '') + '</td><td>' + s.enrolledStudentIds.length + '/20</td><td>' + (s.teacherInformed ? 'Bilgilendirildi' : '—') + '</td></tr>';
           }).join('') + '</tbody></table>' : '<p class="tm-empty">Yaklaşan ders yok.</p>';
           body.querySelectorAll('[data-session-row]').forEach(function (row) {
             row.addEventListener('click', function () {
               if (window.TMSessionDetail) window.TMSessionDetail.open(row.getAttribute('data-session-row'));
             });
           });
+        } else if (idx === 2) {
+          renderAvailabilityTab(body, teacher);
+        } else if (idx === 3) {
+          body.innerHTML = trialSessions.length ? '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Ders</th><th>Durum</th><th>Bilgi</th></tr></thead><tbody>' +
+            trialSessions.slice(0, 20).map(function (s) {
+              var lt = Store.getLessonTypeById(s.lessonTypeId);
+              return '<tr data-session-row="' + s.id + '" style="cursor:pointer"><td>' + U.formatDateKey(s.date) + ' ' + s.startTime + '</td><td>' + (lt ? lt.name : '') + '</td><td>' + SL.sessionBadge(s.status) + '</td><td>' + (s.teacherInformed ? '✓' : '—') + '</td></tr>';
+            }).join('') + '</tbody></table>' : '<p class="tm-empty">Atanmış deneme dersi yok.</p>';
+          body.querySelectorAll('[data-session-row]').forEach(function (row) {
+            row.addEventListener('click', function () {
+              if (window.TMSessionDetail) window.TMSessionDetail.open(row.getAttribute('data-session-row'));
+            });
+          });
         } else {
-          renderAvailabilityTab(body, Store.getTeacherById(t.id) || t);
+          var informedSessions = sessions.filter(function (s) { return s.teacherInformed; });
+          var commLogs = Store.getCommunicationLogs().filter(function (l) {
+            return l.teacherId === teacher.id || (l.summary && l.summary.indexOf(teacher.lastName) >= 0);
+          });
+          body.innerHTML =
+            '<p class="tm-form-desc">Öğretmen bilgilendirildi işaretleri ders oturumları üzerinden yönetilir.</p>' +
+            (informedSessions.length ? '<h4 style="margin:12px 0 6px;font-size:13px">Bilgilendirilen dersler</h4><ul class="tm-plain-list">' +
+              informedSessions.slice(0, 8).map(function (s) {
+                return '<li>' + U.formatDateKey(s.date) + ' ' + s.startTime + ' — ' + U.escapeHtml(s.title) + '</li>';
+              }).join('') + '</ul>' : '<p class="tm-empty">Henüz bilgilendirme kaydı yok.</p>') +
+            (commLogs.length ? '<h4 style="margin:12px 0 6px;font-size:13px">İletişim geçmişi</h4>' + commLogs.slice(0, 5).map(function (l) {
+              return '<p style="font-size:12px;margin:4px 0">' + U.formatDateTime(l.createdAt) + ' — ' + U.escapeHtml(l.summary) + '</p>';
+            }).join('') : '');
         }
+        if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(body);
       }
     });
   }
 
-  function availabilitySlots(teacher) {
-    var map = {};
-    (teacher.availability || []).forEach(function (a) { map[a.dayOfWeek] = a; });
-    var slots = [];
-    for (var d = 0; d <= 6; d++) {
-      slots.push(map[d] || {
-        id: teacher.id + '-av-' + d,
-        teacherId: teacher.id,
-        dayOfWeek: d,
-        startTime: '11:00',
-        endTime: '15:00',
-        isAvailable: false
-      });
-    }
-    return slots;
-  }
-
   function renderAvailabilityTab(body, teacher) {
     var shortDays = ['Paz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct'];
-    var canEdit = !window.TMPermissions || window.TMPermissions.can('edit');
-    var slots = availabilitySlots(teacher);
+    var slots = (teacher.availability || []).slice().sort(function (a, b) { return a.dayOfWeek - b.dayOfWeek; });
     body.innerHTML =
-      (canEdit ? '<div class="tm-detail-actions" style="margin-bottom:12px"><button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-save-avail data-tm-require="edit">Kaydet</button></div>' : '') +
-      '<table class="tm-inner-table tm-avail-table"><thead><tr><th>Gün</th><th>Başlangıç</th><th>Bitiş</th><th>Müsait</th></tr></thead><tbody>' +
+      '<p class="tm-form-desc">Müsaitlik bilgileri Ana Admin Panel\'den gelir; bu ekranda düzenlenemez.</p>' +
+      '<table class="tm-inner-table"><thead><tr><th>Gün</th><th>Saat</th><th>Durum</th></tr></thead><tbody>' +
       slots.map(function (a) {
-        return '<tr data-dow="' + a.dayOfWeek + '">' +
-          '<td>' + shortDays[a.dayOfWeek] + '</td>' +
-          '<td><input type="time" class="tm-dg-control" data-avail-start value="' + U.escapeHtml(a.startTime) + '"' + (canEdit ? '' : ' disabled') + '></td>' +
-          '<td><input type="time" class="tm-dg-control" data-avail-end value="' + U.escapeHtml(a.endTime) + '"' + (canEdit ? '' : ' disabled') + '></td>' +
-          '<td><input type="checkbox" data-avail-on' + (a.isAvailable ? ' checked' : '') + (canEdit ? '' : ' disabled') + '></td></tr>';
+        return '<tr><td>' + shortDays[a.dayOfWeek] + '</td><td>' + a.startTime + '–' + a.endTime + '</td><td>' + (a.isAvailable ? 'Müsait' : 'Değil') + '</td></tr>';
       }).join('') +
       '</tbody></table>';
-    var saveBtn = body.querySelector('[data-save-avail]');
-    if (saveBtn) {
-      saveBtn.addEventListener('click', function () {
-        if (window.TMPermissions && !window.TMPermissions.guard('edit')) return;
-        var next = [];
-        body.querySelectorAll('tr[data-dow]').forEach(function (row) {
-          var dow = parseInt(row.getAttribute('data-dow'), 10);
-          next.push({
-            dayOfWeek: dow,
-            startTime: row.querySelector('[data-avail-start]').value || '11:00',
-            endTime: row.querySelector('[data-avail-end]').value || '15:00',
-            isAvailable: row.querySelector('[data-avail-on]').checked
-          });
-        });
-        var res = Store.updateTeacherAvailability(teacher.id, next);
-        if (!res.ok) {
-          if (U.notifyError) U.notifyError(res.error);
-          return;
-        }
-        if (window.TMToast) window.TMToast.show('Müsaitlik kaydedildi.', 'success');
-        renderAvailabilityTab(body, res.teacher);
-        render();
-      });
-    }
   }
 
   function filtered() {
@@ -229,25 +195,25 @@
     var loading = document.getElementById('tmTeachersLoading');
     var wrap = document.getElementById('tmTeachersTableWrap');
     try {
-    var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
-    var p = U.paginate(filtered(), page, pageSize);
-    if (countEl) countEl.textContent = p.total + ' öğretmen';
-    tbody.innerHTML = p.items.map(function (t) {
-      var todayCount = Store.getSessionsForTeacher(t.id).filter(function (s) { return s.date === today && s.status !== 'cancelled'; }).length;
-      return '<tr><td>' + U.escapeHtml(U.fullName(t.firstName, t.lastName)) + '</td>' +
-        '<td>' + U.escapeHtml(branchLabel(t)) + '</td>' +
-        '<td>' + U.escapeHtml(t.phone) + '</td><td>' + U.escapeHtml(t.email) + '</td>' +
-        '<td>' + todayCount + '</td><td>' + weekCount(t.id) + '</td>' +
-        '<td>' + (t.isActive ? 'Müsait' : 'Pasif') + '</td>' +
-        '<td>' + (t.dashboardEnabled ? 'Evet' : 'Hayır') + '</td>' +
-        '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + t.id + '">Detay</button></td></tr>';
-    }).join('');
-    U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
-    tbody.querySelectorAll('[data-detail]').forEach(function (btn) {
-      btn.addEventListener('click', function () { openDetail(Store.getTeacherById(btn.getAttribute('data-detail'))); });
-    });
-    if (loading) loading.hidden = true;
-    if (wrap) wrap.hidden = false;
+      var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
+      var p = U.paginate(filtered(), page, pageSize);
+      if (countEl) countEl.textContent = p.total + ' öğretmen';
+      tbody.innerHTML = p.items.map(function (t) {
+        var todayCount = Store.getSessionsForTeacher(t.id).filter(function (s) { return s.date === today && s.status !== 'cancelled'; }).length;
+        return '<tr><td>' + U.escapeHtml(U.fullName(t.firstName, t.lastName)) + '</td>' +
+          '<td>' + SL.teacherTypeBadge(t.teacherType || 'branch') + '</td>' +
+          '<td>' + U.escapeHtml(branchLabel(t)) + '</td>' +
+          '<td>' + U.escapeHtml(t.phone) + '</td>' +
+          '<td>' + todayCount + '</td><td>' + weekCount(t.id) + '</td>' +
+          '<td>' + (t.dashboardEnabled ? 'Evet' : 'Hayır') + '</td>' +
+          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + t.id + '">Detay</button></td></tr>';
+      }).join('');
+      U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
+      tbody.querySelectorAll('[data-detail]').forEach(function (btn) {
+        btn.addEventListener('click', function () { openDetail(Store.getTeacherById(btn.getAttribute('data-detail'))); });
+      });
+      if (loading) loading.hidden = true;
+      if (wrap) wrap.hidden = false;
     } catch (err) {
       if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
       console.error(err);
@@ -257,10 +223,9 @@
   if (searchInput) searchInput.addEventListener('input', U.debounce(function () { page = 1; render(); }, 200));
   if (pageSizeSelect) pageSizeSelect.addEventListener('change', function () { page = 1; render(); });
   if (exportBtn && Export) exportBtn.addEventListener('click', function () {
-    if (window.TMPermissions && !window.TMPermissions.guard('export')) return;
-    Export.exportTable('ogretmenler.csv', filtered(), [{ key: 'firstName', label: 'Ad' }, { key: 'email', label: 'E-posta' }]);
+    if (Perms && !Perms.guard('export')) return;
+    Export.exportTable('ogretmen-uygunluk.csv', filtered(), [{ key: 'firstName', label: 'Ad' }, { key: 'email', label: 'E-posta' }]);
   });
-  if (createBtn) createBtn.addEventListener('click', openCreateTeacher);
   window.TMOnSessionChange = render;
   render();
   var openId = U.qs('id');

@@ -1,5 +1,5 @@
 /**
- * Öğrenciler listesi
+ * Deneme dersi öğrenci takip ekranı
  */
 (function () {
   'use strict';
@@ -19,72 +19,7 @@
   var paginationEl = document.getElementById('tmStudentsPagination');
   var pageSizeSelect = document.getElementById('tmStudentsPageSize');
   var exportBtn = document.getElementById('tmStudentsExport');
-  var createBtn = document.getElementById('tmStudentsCreate');
   var page = 1;
-
-  function openCreateStudent() {
-    if (!Form || !Perms || !Perms.guard('create')) return;
-    var parents = Store.getParents();
-    Form.open({
-      title: 'Yeni öğrenci',
-      description: 'Mevcut veli seçin veya yeni veli bilgilerini doldurun.',
-      fields: [
-        {
-          type: 'select',
-          name: 'parentId',
-          label: 'Veli',
-          value: '',
-          options: [{ value: '', label: '— Yeni veli oluştur —' }].concat(parents.map(function (p) {
-            return { value: p.id, label: U.fullName(p.firstName, p.lastName) + ' · ' + p.phone };
-          }))
-        },
-        { type: 'text', name: 'parentFirstName', label: 'Veli adı (yeni)', value: '', required: false },
-        { type: 'text', name: 'parentLastName', label: 'Veli soyadı (yeni)', value: '', required: false },
-        { type: 'text', name: 'parentPhone', label: 'Veli telefon (yeni)', value: '', required: false },
-        { type: 'text', name: 'parentEmail', label: 'Veli e-posta (yeni)', value: '', required: false },
-        { type: 'text', name: 'firstName', label: 'Öğrenci adı', value: '', required: true },
-        { type: 'text', name: 'lastName', label: 'Öğrenci soyadı', value: '', required: true },
-        { type: 'text', name: 'age', label: 'Yaş', value: '11' },
-        {
-          type: 'select',
-          name: 'grade',
-          label: 'Sınıf',
-          value: Store.getGrades()[0],
-          options: Store.getGrades().map(function (g) { return { value: g, label: g }; })
-        },
-        {
-          type: 'select',
-          name: 'level',
-          label: 'Seviye',
-          value: Store.getLevels()[0],
-          options: Store.getLevels().map(function (l) { return { value: l, label: l }; })
-        },
-        {
-          type: 'select',
-          name: 'requestedLessonTypeId',
-          label: 'Talep edilen ders',
-          value: 'lt-mat',
-          options: Store.getLessonTypes().map(function (lt) { return { value: lt.id, label: lt.name }; })
-        },
-        { type: 'textarea', name: 'notes', label: 'Not', value: '', rows: 2, required: false }
-      ],
-      submitLabel: 'Oluştur',
-      onSubmit: function (data) {
-        if (!data.parentId && (!data.parentFirstName || !data.parentPhone)) {
-          U.notifyError('Veli seçin veya yeni veli adı ve telefon girin.');
-          return;
-        }
-        var result = Store.createStudent(data);
-        if (!result.ok) U.notifyError(result.error);
-        else {
-          U.notifySuccess('Öğrenci oluşturuldu.');
-          if (window.TMOnSessionChange) window.TMOnSessionChange();
-          render();
-          openDetail(result.student);
-        }
-      }
-    });
-  }
 
   function currentReservation(studentId) {
     var res = Store.getReservationsForStudent(studentId).filter(function (r) {
@@ -93,55 +28,93 @@
     return res[0] || null;
   }
 
-  function openEditStudent(st) {
-    if (!Form || !Perms || !Perms.guard('edit')) return;
+  function openCorrectStudent(st) {
+    if (!Form || !Perms.guard('editApplicationStudent')) return;
     Form.open({
-      title: 'Öğrenci düzenle',
+      title: 'Başvuru öğrenci bilgisini düzelt',
+      description: 'Başvuru formundan gelen bilgilerde operasyonel düzeltme. Ders türü değişirse uyumluluk kontrolleri yapılır.',
       fields: [
         { type: 'text', name: 'firstName', label: 'Ad', value: st.firstName, required: true },
         { type: 'text', name: 'lastName', label: 'Soyad', value: st.lastName, required: true },
         { type: 'text', name: 'age', label: 'Yaş', value: String(st.age) },
-        { type: 'text', name: 'grade', label: 'Sınıf', value: st.grade },
-        { type: 'text', name: 'level', label: 'Seviye', value: st.level },
-        { type: 'textarea', name: 'notes', label: 'Not', value: st.notes || '', rows: 3 }
+        {
+          type: 'select',
+          name: 'grade',
+          label: 'Sınıf',
+          value: st.grade,
+          options: Store.getGrades().map(function (g) { return { value: g, label: g }; })
+        },
+        {
+          type: 'select',
+          name: 'level',
+          label: 'Seviye',
+          value: st.level,
+          options: Store.getLevels().map(function (l) { return { value: l, label: l }; })
+        },
+        {
+          type: 'select',
+          name: 'requestedLessonTypeId',
+          label: 'İstenen ders türü',
+          value: st.requestedLessonTypeId,
+          options: Store.getLessonTypes().map(function (lt) { return { value: lt.id, label: lt.name }; })
+        },
+        { type: 'textarea', name: 'notes', label: 'Operasyon notu', value: st.notes || '', rows: 3 }
       ],
       onSubmit: function (data) {
-        var result = Store.updateStudent(st.id, data);
-        if (!result.ok) U.notifyError(result.error);
-        else {
-          U.notifySuccess('Öğrenci güncellendi.');
-          if (window.TMOnSessionChange) window.TMOnSessionChange();
-          render();
+        var result = Store.updateApplicationStudentInfo(st.id, data);
+        if (!result.ok) {
+          U.notifyError(result.error);
+          return;
         }
+        if (result.warnings && result.warnings.length) {
+          result.warnings.forEach(function (w) { if (U.notifyError) U.notifyError(w); });
+        }
+        U.notifySuccess('Başvuru öğrenci bilgisi güncellendi.');
+        if (window.TMOnSessionChange) window.TMOnSessionChange();
+        openDetail(result.student);
+        render();
       }
     });
   }
 
   function openDetail(st) {
     if (!Drawer) return;
-    var lt = Store.getLessonTypeById(st.requestedLessonTypeId);
-    var parents = st.parentIds.map(function (pid) { return Store.getParentById(pid); }).filter(Boolean);
-    var resHistory = Store.getReservationsForStudent(st.id);
+    var student = Store.getStudentById(st.id) || st;
+    var lt = Store.getLessonTypeById(student.requestedLessonTypeId);
+    var parents = student.parentIds.map(function (pid) { return Store.getParentById(pid); }).filter(Boolean);
+    var resHistory = Store.getReservationsForStudent(student.id);
+    var reqId = student.applicationRequestId;
     Drawer.open({
-      title: U.fullName(st.firstName, st.lastName),
-      subtitle: st.grade + ' · ' + (lt ? lt.name : ''),
-      tabs: [{ label: 'Profil' }, { label: 'Rezervasyonlar' }, { label: 'Geçmiş' }],
+      title: U.fullName(student.firstName, student.lastName),
+      subtitle: student.grade + ' · ' + (lt ? lt.name : ''),
+      tabs: [{ label: 'Başvuru' }, { label: 'Rezervasyonlar' }, { label: 'İletişim' }],
       onTab: function (idx, body) {
         if (idx === 0) {
-          body.innerHTML = '<div class="tm-detail-grid">' +
-            '<div><div class="tm-detail-cell-label">Yaş</div><div class="tm-detail-cell-value">' + st.age + '</div></div>' +
-            '<div><div class="tm-detail-cell-label">Seviye</div><div class="tm-detail-cell-value">' + U.escapeHtml(st.level) + '</div></div>' +
-            '<div><div class="tm-detail-cell-label">Durum</div><div class="tm-detail-cell-value">' + SL.studentBadge(st.status) + '</div></div>' +
-            '<div><div class="tm-detail-cell-label">Veli</div><div class="tm-detail-cell-value">' + parents.map(function (p) { return U.escapeHtml(U.fullName(p.firstName, p.lastName)); }).join(', ') + '</div></div></div>' +
-            (st.status === 'attended' || st.status === 'confirmed' ?
-              '<div class="tm-detail-actions" style="margin-top:12px"><button type="button" class="tm-btn tm-btn--primary" data-enroll="' + st.id + '" data-tm-require="edit">Kayda dönüştür</button></div>' : '') +
-            '<div class="tm-detail-actions" style="margin-top:8px"><button type="button" class="tm-btn tm-btn--ghost" data-edit-student data-tm-require="edit">Bilgileri düzenle</button></div>';
-          body.querySelector('[data-edit-student]') && body.querySelector('[data-edit-student]').addEventListener('click', function () {
-            openEditStudent(Store.getStudentById(st.id) || st);
+          body.innerHTML =
+            '<p class="tm-source-notice">' + SL.dataSourceBadge(student.source || 'trial_lesson_application') + '</p>' +
+            '<div class="tm-detail-actions tm-detail-actions--wrap" style="margin-bottom:12px">' +
+              (reqId ? '<a class="tm-btn tm-btn--sm tm-btn--ghost" href="deneme-dersi-yoneticisi-rezervasyonlar.html?id=' + encodeURIComponent(reqId) + '">Başvuru detayı</a> ' : '') +
+              '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-correct-student data-tm-require="edit-application-student">Başvuru bilgisini düzelt</button> ' +
+              (student.status === 'attended' || student.status === 'confirmed' ?
+                '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-enroll="' + student.id + '" data-tm-require="edit">Kayıt oldu</button>' : '') +
+            '</div>' +
+            '<div class="tm-detail-grid">' +
+            '<div><div class="tm-detail-cell-label">Ad soyad</div><div class="tm-detail-cell-value">' + U.escapeHtml(U.fullName(student.firstName, student.lastName)) + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Yaş</div><div class="tm-detail-cell-value">' + student.age + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Sınıf / Seviye</div><div class="tm-detail-cell-value">' + U.escapeHtml(student.grade) + ' · ' + U.escapeHtml(student.level) + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">İstenen ders</div><div class="tm-detail-cell-value">' + (lt ? lt.name : '—') + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Durum</div><div class="tm-detail-cell-value">' + SL.studentBadge(student.status) + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Veli</div><div class="tm-detail-cell-value">' + parents.map(function (p) {
+              return '<a class="tm-panel-link" href="deneme-dersi-yoneticisi-veliler.html?id=' + encodeURIComponent(p.id) + '">' + U.escapeHtml(U.fullName(p.firstName, p.lastName)) + '</a>';
+            }).join(', ') + '</div></div>' +
+            (student.notes ? '<div><div class="tm-detail-cell-label">Operasyon notu</div><div class="tm-detail-cell-value">' + U.escapeHtml(student.notes) + '</div></div>' : '') +
+            '</div>';
+          body.querySelector('[data-correct-student]') && body.querySelector('[data-correct-student]').addEventListener('click', function () {
+            openCorrectStudent(Store.getStudentById(student.id) || student);
           });
           body.querySelector('[data-enroll]') && body.querySelector('[data-enroll]').addEventListener('click', function () {
-            if (window.TMPermissions && !window.TMPermissions.guard('edit')) return;
-            var result = Store.convertStudentToEnrollment(st.id);
+            if (!Perms.guard('edit')) return;
+            var result = Store.convertStudentToEnrollment(student.id);
             if (!result.ok) U.notifyError(result.error);
             else {
               U.notifySuccess('Öğrenci kayda dönüştürüldü.');
@@ -149,18 +122,24 @@
               render();
             }
           });
-          if (window.TMPermissions && window.TMPermissions.applyPageChrome) {
-            window.TMPermissions.applyPageChrome(body);
-          }
+          if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(body);
         } else if (idx === 1) {
-          body.innerHTML = resHistory.length ? '<table class="tm-inner-table"><thead><tr><th>Rezervasyon</th><th>Durum</th><th>Link</th></tr></thead><tbody>' +
+          body.innerHTML = resHistory.length ? '<table class="tm-inner-table"><thead><tr><th>Rezervasyon</th><th>Durum</th><th>Link</th><th></th></tr></thead><tbody>' +
             resHistory.map(function (r) {
               var s = Store.getSessionById(r.sessionId);
-              return '<tr><td>' + (s ? U.formatDateKey(s.date) + ' ' + s.startTime : r.sessionId) + '</td><td>' + SL.reservationBadge(r.status) + '</td><td>' + (r.linkSent ? 'Evet' : 'Hayır') + '</td></tr>';
+              return '<tr><td>' + (s ? U.formatDateKey(s.date) + ' ' + s.startTime : r.sessionId) + '</td><td>' + SL.reservationBadge(r.status) + '</td><td>' + (r.linkSent ? 'Evet' : 'Hayır') + '</td><td>' +
+                (s ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-open-session="' + s.id + '">Ders</button>' : '') + '</td></tr>';
             }).join('') + '</tbody></table>' : '<p class="tm-empty">Rezervasyon yok.</p>';
+          body.querySelectorAll('[data-open-session]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              if (window.TMSessionDetail) window.TMSessionDetail.open(btn.getAttribute('data-open-session'));
+            });
+          });
         } else {
-          var logs = Store.getCommunicationLogs().filter(function (l) { return l.studentId === st.id; });
-          body.innerHTML = logs.length ? logs.map(function (l) { return '<p>' + U.formatDateTime(l.createdAt) + ' — ' + U.escapeHtml(l.summary) + '</p>'; }).join('') : '<p class="tm-empty">İletişim kaydı yok.</p>';
+          var logs = Store.getCommunicationLogs().filter(function (l) { return l.studentId === student.id; });
+          body.innerHTML = logs.length ? logs.map(function (l) {
+            return '<p style="font-size:13px;margin:6px 0">' + U.formatDateTime(l.createdAt) + ' — ' + U.escapeHtml(l.summary) + '</p>';
+          }).join('') : '<p class="tm-empty">İletişim kaydı yok.</p>';
         }
       }
     });
@@ -177,39 +156,39 @@
     var loading = document.getElementById('tmStudentsLoading');
     var wrap = document.getElementById('tmStudentsTableWrap');
     try {
-    var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
-    var p = U.paginate(filtered(), page, pageSize);
-    if (countEl) countEl.textContent = p.total + ' öğrenci';
-    tbody.innerHTML = p.items.map(function (st) {
-      var lt = Store.getLessonTypeById(st.requestedLessonTypeId);
-      var pa = st.parentIds[0] ? Store.getParentById(st.parentIds[0]) : null;
-      var cur = currentReservation(st.id);
-      var sess = cur ? Store.getSessionById(cur.sessionId) : null;
-      return '<tr data-id="' + st.id + '" style="cursor:pointer">' +
-        '<td>' + U.escapeHtml(U.fullName(st.firstName, st.lastName)) + '</td>' +
-        '<td>' + st.age + '</td><td>' + U.escapeHtml(st.grade) + '</td><td>' + U.escapeHtml(st.level) + '</td>' +
-        '<td>' + (lt ? lt.name : '—') + '</td>' +
-        '<td>' + (pa ? U.escapeHtml(U.fullName(pa.firstName, pa.lastName)) : '—') + '</td>' +
-        '<td>' + (pa ? U.escapeHtml(pa.phone) : '—') + '</td>' +
-        '<td>' + (sess ? U.formatDateKey(sess.date) + ' ' + sess.startTime : '—') + '</td>' +
-        '<td>' + SL.studentBadge(st.status) + '</td>' +
-        '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + st.id + '">Detay</button></td></tr>';
-    }).join('');
-    U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
-    tbody.querySelectorAll('[data-detail]').forEach(function (btn) {
-      btn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        openDetail(Store.getStudentById(btn.getAttribute('data-detail')));
+      var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
+      var p = U.paginate(filtered(), page, pageSize);
+      if (countEl) countEl.textContent = p.total + ' öğrenci';
+      tbody.innerHTML = p.items.map(function (st) {
+        var lt = Store.getLessonTypeById(st.requestedLessonTypeId);
+        var pa = st.parentIds[0] ? Store.getParentById(st.parentIds[0]) : null;
+        var cur = currentReservation(st.id);
+        var sess = cur ? Store.getSessionById(cur.sessionId) : null;
+        return '<tr data-id="' + st.id + '" style="cursor:pointer">' +
+          '<td>' + U.escapeHtml(U.fullName(st.firstName, st.lastName)) + '</td>' +
+          '<td>' + st.age + '</td><td>' + U.escapeHtml(st.grade) + '</td><td>' + U.escapeHtml(st.level) + '</td>' +
+          '<td>' + (lt ? lt.name : '—') + '</td>' +
+          '<td>' + (pa ? U.escapeHtml(U.fullName(pa.firstName, pa.lastName)) : '—') + '</td>' +
+          '<td>' + (pa ? U.escapeHtml(pa.phone) : '—') + '</td>' +
+          '<td>' + (sess ? U.formatDateKey(sess.date) + ' ' + sess.startTime : '—') + '</td>' +
+          '<td>' + SL.studentBadge(st.status) + '</td>' +
+          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + st.id + '">Detay</button></td></tr>';
+      }).join('');
+      U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
+      tbody.querySelectorAll('[data-detail]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          openDetail(Store.getStudentById(btn.getAttribute('data-detail')));
+        });
       });
-    });
-    tbody.querySelectorAll('tr[data-id]').forEach(function (tr) {
-      tr.addEventListener('click', function (e) {
-        if (e.target.closest('button')) return;
-        openDetail(Store.getStudentById(tr.getAttribute('data-id')));
+      tbody.querySelectorAll('tr[data-id]').forEach(function (tr) {
+        tr.addEventListener('click', function (e) {
+          if (e.target.closest('button')) return;
+          openDetail(Store.getStudentById(tr.getAttribute('data-id')));
+        });
       });
-    });
-    if (loading) loading.hidden = true;
-    if (wrap) wrap.hidden = false;
+      if (loading) loading.hidden = true;
+      if (wrap) wrap.hidden = false;
     } catch (err) {
       if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
       console.error(err);
@@ -219,12 +198,11 @@
   if (searchInput) searchInput.addEventListener('input', U.debounce(function () { page = 1; render(); }, 200));
   if (pageSizeSelect) pageSizeSelect.addEventListener('change', function () { page = 1; render(); });
   if (exportBtn && Export) exportBtn.addEventListener('click', function () {
-    if (window.TMPermissions && !window.TMPermissions.guard('export')) return;
+    if (Perms && !Perms.guard('export')) return;
     Export.exportTable('ogrenciler.csv', filtered(), [
       { key: 'firstName', label: 'Ad' }, { key: 'lastName', label: 'Soyad' }, { key: 'grade', label: 'Sınıf' }, { key: 'status', label: 'Durum' }
     ]);
   });
-  if (createBtn) createBtn.addEventListener('click', openCreateStudent);
   window.TMOnSessionChange = render;
   render();
   var openId = U.qs('id');

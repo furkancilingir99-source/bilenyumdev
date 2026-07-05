@@ -198,7 +198,10 @@
     markAllApprovedLinksSent: callStore('markAllApprovedLinksSent'),
     markBulkLinksSentForSession: callStore('markBulkLinksSentForSession'),
     moveReservationToSession: callStore('moveReservationToSession'),
-    updateTeacherAvailability: callStore('updateTeacherAvailability')
+    updateTeacherAvailability: callStore('updateTeacherAvailability'),
+    updateTeacherOperationalNotes: callStore('updateTeacherOperationalNotes'),
+    updateApplicationContactInfo: callStore('updateApplicationContactInfo'),
+    updateApplicationStudentInfo: callStore('updateApplicationStudentInfo')
   };
 
   global.TMData = global.TMApi;

@@ -147,14 +147,18 @@
       }
       return {
         id: id,
+        source: 'admin_panel',
         firstName: t[0],
         lastName: t[1],
         phone: '053' + String(i + 2) + ' ' + String(100 + i * 11) + ' ' + String(20 + i),
         email: t[0].toLowerCase() + '.' + t[1].toLowerCase().replace('ç', 'c').replace('ğ', 'g').replace('ı', 'i').replace('ö', 'o').replace('ş', 's').replace('ü', 'u') + '@bilenyum.com',
+        teacherType: i % 4 === 0 ? 'pdr' : 'branch',
         branchLessonTypeIds: [t[2]],
         availability: avail,
         dashboardEnabled: true,
-        isActive: true
+        isActive: true,
+        trialLessonNotes: '',
+        informedNote: ''
       };
     });
   }
@@ -178,6 +182,7 @@
 
       parents.push({
         id: pid,
+        source: 'trial_lesson_application',
         firstName: pFirst,
         lastName: pLast,
         phone: '05' + String(30 + (i % 50)).padStart(2, '0') + ' ' + String(100 + i * 3) + ' ' + String(10 + (i % 89)).padStart(2, '0'),
@@ -191,6 +196,7 @@
       var usedTrial = i % 17 === 0 ? [lessonTypeId] : [];
       students.push({
         id: sid,
+        source: 'trial_lesson_application',
         firstName: STUDENT_FIRST[i % STUDENT_FIRST.length],
         lastName: STUDENT_LAST[i % STUDENT_LAST.length],
         age: age,
@@ -208,6 +214,7 @@
     parents[0].studentIds.push('student-56');
     students.push({
       id: 'student-56',
+      source: 'trial_lesson_application',
       firstName: 'Deniz',
       lastName: 'Yılmaz',
       age: 12,
@@ -478,6 +485,31 @@
     currentUserId: CURRENT_USER_ID
   };
 
+  function ensureDataSourceMetadata() {
+    state.teachers.forEach(function (t) {
+      if (!t.source) t.source = 'admin_panel';
+      if (!t.teacherType) t.teacherType = 'branch';
+      if (t.trialLessonNotes === undefined) t.trialLessonNotes = '';
+      if (t.informedNote === undefined) t.informedNote = '';
+    });
+    state.parents.forEach(function (pa) {
+      if (!pa.source) pa.source = 'trial_lesson_application';
+    });
+    state.students.forEach(function (st) {
+      if (!st.source) st.source = 'trial_lesson_application';
+      if (!st.applicationRequestId) {
+        var res = state.reservations.find(function (r) { return r.studentId === st.id && r.requestId; });
+        if (res) st.applicationRequestId = res.requestId;
+        else {
+          var req = state.requests.find(function (rq) {
+            return rq.studentFirstName === st.firstName && rq.studentLastName === st.lastName;
+          });
+          if (req) st.applicationRequestId = req.id;
+        }
+      }
+    });
+  }
+
   function initState() {
     state.teachers = buildTeachers();
     var ps = buildParentsAndStudents();
@@ -490,10 +522,14 @@
     state.reservations = buildReservations(state.students, state.sessions, state.requests);
     state.communicationLogs = buildCommunicationLogs(state.reservations);
     state.auditLogs = buildAuditLogs(state.sessions, state.reservations);
+    ensureDataSourceMetadata();
   }
 
   if (!loadPersistedState()) initState();
-  else touch();
+  else {
+    ensureDataSourceMetadata();
+    touch();
+  }
 
   function find(arr, id) {
     return arr.find(function (x) { return x.id === id; }) || null;
@@ -1166,6 +1202,117 @@
     return { ok: true, parent: pa };
   }
 
+  function guardTrialManagerEntityCreate() {
+    var user = find(state.users, state.currentUserId);
+    if (user && user.role === 'trial_lesson_manager') {
+      return { ok: false, error: 'Deneme Dersi Yöneticisi bu kaynağı oluşturamaz. Veriler Ana Admin Panel veya başvuru formundan gelir.' };
+    }
+    return { ok: true };
+  }
+
+  function updateApplicationContactInfo(parentId, patch) {
+    var pa = find(state.parents, parentId);
+    if (!pa) return { ok: false, error: 'Veli bulunamadı.' };
+    if (pa.source && pa.source !== 'trial_lesson_application') {
+      return { ok: false, error: 'Bu veli kaydı başvuru formu dışından gelmiş görünüyor.' };
+    }
+    var changes = [];
+    if (patch.phone !== undefined && String(patch.phone).trim() !== pa.phone) {
+      pa.phone = String(patch.phone).trim();
+      changes.push('telefon');
+    }
+    if (patch.email !== undefined && String(patch.email).trim() !== pa.email) {
+      pa.email = String(patch.email).trim();
+      changes.push('e-posta');
+    }
+    if (patch.notes !== undefined) pa.notes = patch.notes;
+    if (patch.preferredChannels && Array.isArray(patch.preferredChannels)) {
+      pa.preferredChannels = patch.preferredChannels.slice();
+      changes.push('iletişim kanalı');
+    } else if (patch.preferredChannel) {
+      pa.preferredChannels = [patch.preferredChannel];
+      changes.push('iletişim kanalı');
+    }
+    pa.updatedAt = new Date().toISOString();
+    if (!changes.length && patch.notes === undefined) {
+      return { ok: false, error: 'Değişiklik yapılmadı.' };
+    }
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'parent',
+        entityId: parentId,
+        action: 'application_contact_corrected',
+        description: changes.length
+          ? ('Veli ' + changes.join(' ve ') + ' bilgisi başvuru iletişim düzeltmesi kapsamında güncellendi.')
+          : 'Veli iletişim notu başvuru düzeltmesi kapsamında güncellendi.'
+      });
+    }
+    touch();
+    return { ok: true, parent: pa };
+  }
+
+  function updateApplicationStudentInfo(studentId, patch) {
+    var st = find(state.students, studentId);
+    if (!st) return { ok: false, error: 'Öğrenci bulunamadı.' };
+    if (st.source && st.source !== 'trial_lesson_application') {
+      return { ok: false, error: 'Bu öğrenci kaydı başvuru formu dışından gelmiş görünüyor.' };
+    }
+    var warnings = [];
+    var nextLessonType = patch.requestedLessonTypeId || st.requestedLessonTypeId;
+    if (patch.requestedLessonTypeId && patch.requestedLessonTypeId !== st.requestedLessonTypeId) {
+      if (Rules && Rules.hasStudentAlreadyUsedFreeTrialForLessonType(studentId, patch.requestedLessonTypeId)) {
+        return { ok: false, error: 'Öğrenci bu ders türünde daha önce ücretsiz deneme dersi almış.' };
+      }
+      var activeRes = state.reservations.find(function (r) {
+        return r.studentId === studentId && (r.status === 'confirmed' || r.status === 'pending');
+      });
+      if (activeRes) {
+        var sess = find(state.sessions, activeRes.sessionId);
+        if (sess && sess.lessonTypeId !== patch.requestedLessonTypeId) {
+          warnings.push('Mevcut atanmış ders yeni ders türüyle uyumsuz — ders değişikliği gerekebilir.');
+        }
+        if (sess && Rules && !Rules.isTeacherEligibleForLessonType(sess.teacherId, patch.requestedLessonTypeId)) {
+          warnings.push('Mevcut öğretmen yeni ders türüne uygun değil.');
+        }
+      }
+    }
+    if (patch.firstName) st.firstName = String(patch.firstName).trim();
+    if (patch.lastName) st.lastName = String(patch.lastName).trim();
+    if (patch.grade) st.grade = String(patch.grade).trim();
+    if (patch.level) st.level = String(patch.level).trim();
+    if (patch.age !== undefined && patch.age !== '') st.age = parseInt(patch.age, 10) || st.age;
+    if (patch.requestedLessonTypeId) st.requestedLessonTypeId = patch.requestedLessonTypeId;
+    if (patch.notes !== undefined) st.notes = patch.notes;
+    st.updatedAt = new Date().toISOString();
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'student',
+        entityId: studentId,
+        action: 'application_student_corrected',
+        description: 'Başvuru öğrenci bilgisi operasyonel düzeltme kapsamında güncellendi.'
+      });
+    }
+    touch();
+    return { ok: true, student: st, warnings: warnings };
+  }
+
+  function updateTeacherOperationalNotes(teacherId, patch) {
+    var t = find(state.teachers, teacherId);
+    if (!t) return { ok: false, error: 'Öğretmen bulunamadı.' };
+    if (patch.trialLessonNotes !== undefined) t.trialLessonNotes = patch.trialLessonNotes;
+    if (patch.informedNote !== undefined) t.informedNote = patch.informedNote;
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'teacher',
+        entityId: teacherId,
+        action: 'operational_note_updated',
+        description: 'Deneme dersi operasyon notları güncellendi.'
+      });
+    }
+    touch();
+    return { ok: true, teacher: t };
+  }
+
   function updateTeacher(teacherId, patch) {
     var t = find(state.teachers, teacherId);
     if (!t) return { ok: false, error: 'Öğretmen bulunamadı.' };
@@ -1443,12 +1590,15 @@
   }
 
   function createParent(draft) {
+    var denied = guardTrialManagerEntityCreate();
+    if (!denied.ok) return denied;
     if (!draft || !draft.firstName || !draft.lastName || !draft.phone) {
       return { ok: false, error: 'Veli adı, soyadı ve telefon zorunludur.' };
     }
     var id = nextId('parent', state.parents);
     var pa = {
       id: id,
+      source: draft.source || 'trial_lesson_application',
       firstName: String(draft.firstName).trim(),
       lastName: String(draft.lastName).trim(),
       phone: String(draft.phone).trim(),
@@ -1473,6 +1623,8 @@
   }
 
   function createStudent(draft) {
+    var denied = guardTrialManagerEntityCreate();
+    if (!denied.ok) return denied;
     if (!draft || !draft.firstName || !draft.lastName) {
       return { ok: false, error: 'Öğrenci adı ve soyadı zorunludur.' };
     }
@@ -1493,6 +1645,7 @@
     var id = nextId('student', state.students);
     var st = {
       id: id,
+      source: draft.source || 'trial_lesson_application',
       firstName: String(draft.firstName).trim(),
       lastName: String(draft.lastName).trim(),
       age: parseInt(draft.age, 10) || 11,
@@ -1522,6 +1675,8 @@
   }
 
   function createTeacher(draft) {
+    var denied = guardTrialManagerEntityCreate();
+    if (!denied.ok) return denied;
     if (!draft || !draft.firstName || !draft.lastName || !draft.phone) {
       return { ok: false, error: 'Öğretmen adı, soyadı ve telefon zorunludur.' };
     }
@@ -1540,15 +1695,19 @@
     }
     var t = {
       id: id,
+      source: 'admin_panel',
       firstName: String(draft.firstName).trim(),
       lastName: String(draft.lastName).trim(),
       phone: String(draft.phone).trim(),
       email: String(draft.email || '').trim(),
+      teacherType: draft.teacherType || 'branch',
       branchLessonTypeIds: [ltId],
       availability: avail,
       dashboardEnabled: true,
       isActive: true,
-      notes: draft.notes || ''
+      notes: draft.notes || '',
+      trialLessonNotes: '',
+      informedNote: ''
     };
     state.teachers.push(t);
     if (Audit) {
@@ -1746,6 +1905,9 @@
     updateParent: updateParent,
     updateTeacher: updateTeacher,
     updateTeacherAvailability: updateTeacherAvailability,
+    updateTeacherOperationalNotes: updateTeacherOperationalNotes,
+    updateApplicationContactInfo: updateApplicationContactInfo,
+    updateApplicationStudentInfo: updateApplicationStudentInfo,
     createStudent: createStudent,
     createParent: createParent,
     createTeacher: createTeacher,

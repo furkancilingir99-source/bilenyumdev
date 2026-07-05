@@ -24,8 +24,18 @@
    */
 
   /**
+   * @typedef {'admin_panel'|'trial_lesson_application'} DataSource
+   */
+
+  /**
+   * @typedef {'branch'|'pdr'} TeacherType
+   */
+
+  /**
    * @typedef {Object} Student
    * @property {string} id
+   * @property {DataSource} [source]
+   * @property {string} [applicationRequestId]
    * @property {string} firstName
    * @property {string} lastName
    * @property {number} age
@@ -47,6 +57,7 @@
   /**
    * @typedef {Object} ParentGuardian
    * @property {string} id
+   * @property {DataSource} [source]
    * @property {string} firstName
    * @property {string} lastName
    * @property {string} phone
@@ -72,6 +83,10 @@
   /**
    * @typedef {Object} Teacher
    * @property {string} id
+   * @property {DataSource} [source]
+   * @property {TeacherType} [teacherType]
+   * @property {string} [trialLessonNotes]
+   * @property {string} [informedNote]
    * @property {string} firstName
    * @property {string} lastName
    * @property {string} phone

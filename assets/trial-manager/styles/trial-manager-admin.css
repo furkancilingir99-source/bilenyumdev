@@ -1267,3 +1267,20 @@ body.tm-admin-body .tm-dg-toolbar-row--filters .tm-dg-control[type="date"] {
     flex-direction: column;
   }
 }
+
+.tm-source-notice {
+  margin: 0 0 12px;
+  font-size: 12px;
+}
+
+.tm-detail-actions--wrap {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tm-plain-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: #334155;
+}

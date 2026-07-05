@@ -96,9 +96,22 @@
     viewer: 'Gözlemci'
   };
 
+  var DATA_SOURCE = {
+    admin_panel: { label: 'Ana Admin Panel', badge: 'tm-badge--purple' },
+    trial_lesson_application: { label: 'Ücretsiz Deneme Başvurusu', badge: 'tm-badge--blue' }
+  };
+
+  var TEACHER_TYPE = {
+    branch: { label: 'Branş Öğretmeni', badge: 'tm-badge--blue' },
+    pdr: { label: 'PDR / Rehberlik', badge: 'tm-badge--green' }
+  };
+
   var AUDIT_ACTION = {
     created: 'Oluşturuldu',
     updated: 'Güncellendi',
+    application_contact_corrected: 'Başvuru iletişimi düzeltildi',
+    application_student_corrected: 'Başvuru öğrenci bilgisi düzeltildi',
+    operational_note_updated: 'Operasyon notu güncellendi',
     cancelled: 'İptal edildi',
     rescheduled: 'Yeniden planlandı',
     teacher_changed: 'Öğretmen değiştirildi',
@@ -150,8 +163,14 @@
     COMM_CHANNEL: COMM_CHANNEL,
     COMM_RESULT: COMM_RESULT,
     USER_ROLE: USER_ROLE,
+    DATA_SOURCE: DATA_SOURCE,
+    TEACHER_TYPE: TEACHER_TYPE,
     AUDIT_ACTION: AUDIT_ACTION,
     AUDIT_ENTITY: AUDIT_ENTITY,
+    dataSourceBadge: function (s) { return badgeHtml(DATA_SOURCE, s); },
+    dataSourceLabel: function (s) { return label(DATA_SOURCE, s); },
+    teacherTypeBadge: function (t) { return badgeHtml(TEACHER_TYPE, t); },
+    teacherTypeLabel: function (t) { return label(TEACHER_TYPE, t); },
     auditActionLabel: function (a) { return label(AUDIT_ACTION, a); },
     auditEntityLabel: function (e) { return label(AUDIT_ENTITY, e); },
     userRoleLabel: function (r) { return label(USER_ROLE, r); },

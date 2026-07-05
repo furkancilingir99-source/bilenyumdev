@@ -1,17 +1,46 @@
 /**
- * Mevcut kullanıcı yetki kontrolü
+ * Mevcut kullanıcı yetki kontrolü — Deneme Dersi Yöneticisi veri kaynağı sınırları
  */
 (function (global) {
   'use strict';
+
+  var ENTITY_CREATE_ACTIONS = {
+    createTeacher: true,
+    createParent: true,
+    createStudent: true,
+    deleteTeacher: true,
+    deleteParent: true,
+    deleteStudent: true
+  };
+
+  var PROFILE_EDIT_ACTIONS = {
+    editTeacherProfile: true,
+    editTeacherAvailability: true
+  };
 
   function user() {
     return global.TMStore ? global.TMStore.getCurrentUser() : null;
   }
 
+  function isSuperAdmin(u) {
+    return u && u.role === 'super_admin';
+  }
+
+  function isTrialManager(u) {
+    return u && u.role === 'trial_lesson_manager';
+  }
+
   function can(action) {
     var u = user();
     if (!u || !u.isActive) return false;
-    if (u.role === 'super_admin') return true;
+    if (isSuperAdmin(u)) return true;
+
+    if (isTrialManager(u)) {
+      if (ENTITY_CREATE_ACTIONS[action] || PROFILE_EDIT_ACTIONS[action]) return false;
+      if (action === 'editApplicationContact' || action === 'editApplicationStudent') return u.canEdit;
+      if (action === 'editTeacherOperational') return u.canEdit;
+    }
+
     if (action === 'view') return u.canView;
     if (action === 'create') return u.canCreate;
     if (action === 'edit') return u.canEdit;
@@ -63,11 +92,17 @@
       document.body.classList.toggle('tm-viewer-mode', u.role === 'viewer');
     }
 
-    disableIfNoPermission('#tmSimulateRequest, #tmRequestsSimulate', 'create', scope);
+    disableIfNoPermission('#tmSimulateRequest, #tmRequestsSimulate', 'create', undefined, scope);
     disableIfNoPermission('#tmResetMock', 'edit', undefined, scope);
+    disableIfNoPermission('#tmTeachersCreate', 'createTeacher', 'Öğretmen kaydı Ana Admin Panel\'den gelir', scope);
+    disableIfNoPermission('#tmParentsCreate', 'createParent', 'Veli kaydı başvuru formundan gelir', scope);
+    disableIfNoPermission('#tmStudentsCreate', 'createStudent', 'Öğrenci kaydı başvuru formundan gelir', scope);
     disableIfNoPermission('[data-tm-require="create"]', 'create', undefined, scope);
     disableIfNoPermission('[data-tm-require="edit"]', 'edit', undefined, scope);
     disableIfNoPermission('[data-tm-require="cancel"]', 'cancel', undefined, scope);
+    disableIfNoPermission('[data-tm-require="edit-application-contact"]', 'editApplicationContact', undefined, scope);
+    disableIfNoPermission('[data-tm-require="edit-application-student"]', 'editApplicationStudent', undefined, scope);
+    disableIfNoPermission('[data-tm-require="edit-teacher-operational"]', 'editTeacherOperational', undefined, scope);
 
     scope.querySelectorAll('[data-tm-export]').forEach(function (el) {
       if (!can('export')) {
