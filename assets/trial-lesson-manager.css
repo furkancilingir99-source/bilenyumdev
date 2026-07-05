@@ -1332,8 +1332,126 @@
   color: #64748b;
 }
 
+.tm-applicant-picker-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.tm-applicant-filter-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.tm-applicant-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: 10px 12px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+.tm-applicant-filter-clear {
+  align-self: end;
+  margin-bottom: 2px;
+}
+
+.tm-applicant-name-btn {
+  display: block;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  color: var(--brand-navy, #28265a);
+  font: inherit;
+}
+
+.tm-applicant-name-btn:hover strong {
+  color: #0284c7;
+  text-decoration: underline;
+}
+
+.tm-applicant-name-btn strong {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.tm-applicant-detail-grid {
+  margin-bottom: 16px;
+}
+
+.tm-applicant-detail-actions {
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(62, 58, 142, 0.1);
+}
+
+.tm-applicant-detail-actions-title {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-applicant-detail-selected-note,
+.tm-applicant-detail-warn {
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tm-applicant-detail-warn {
+  color: #b45309;
+}
+
+.tm-action-link.is-danger {
+  color: #b91c1c;
+  border-color: rgba(220, 38, 38, 0.25);
+}
+
+.tm-action-link.is-danger:hover {
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.tm-teacher-card-contacts {
+  margin-top: 12px;
+}
+
+@media (max-width: 960px) {
+  .tm-applicant-filter-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .tm-applicant-search {
   margin-bottom: 12px;
+}
+
+.tm-applicant-picker-meta {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.tm-teacher-card-contacts {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(62, 58, 142, 0.1);
+}
+
+.tm-action-link.is-danger {
+  color: #b91c1c;
+  border-color: rgba(220, 38, 38, 0.25);
+  background: rgba(220, 38, 38, 0.06);
+}
+
+.tm-action-link.is-danger:hover {
+  background: rgba(220, 38, 38, 0.12);
+  border-color: rgba(220, 38, 38, 0.4);
 }
 
 .tm-applicant-table-wrap {

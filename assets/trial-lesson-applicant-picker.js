@@ -78,8 +78,7 @@
     return '<span class="tm-applicant-slot is-warn">Tercih farklı — veli ile görüşün</span>';
   }
 
-  function contactActions(applicant, ctx, inputAttr) {
-    var attr = inputAttr || 'data-student-id';
+  function contactActions(applicant, ctx) {
     var parentMsg = buildParentSlotMessage(applicant, ctx);
     var wa = whatsAppUrl(applicant.phone, parentMsg);
     var mail = mailtoUrl(
@@ -155,28 +154,165 @@
     );
   }
 
+  function applyApplicantFilters(applicants, opts, selectedIds) {
+    var list = applicants.slice();
+    var filters = (opts && opts.filters) || {};
+    var q = (opts && opts.searchQuery || '').trim().toLowerCase();
+
+    if (q) {
+      list = list.filter(function (a) {
+        var hay = [
+          a.reservationId, a.name, a.parent, a.phone, a.email,
+          a.preferredSlot, a.statusLabel, a.grade, a.subject
+        ].join(' ').toLowerCase();
+        return hay.indexOf(q) !== -1;
+      });
+    }
+
+    if (filters.status && filters.status !== 'all') {
+      list = list.filter(function (a) { return a.status === filters.status; });
+    }
+
+    if (filters.slotMatch && filters.slotMatch !== 'all') {
+      if (filters.slotMatch === 'matches') {
+        list = list.filter(function (a) { return a.slotMatchesLesson; });
+      } else if (filters.slotMatch === 'needs-contact') {
+        list = list.filter(function (a) { return a.needsParentContact; });
+      } else if (filters.slotMatch === 'confirmed-slot') {
+        list = list.filter(function (a) { return a.slotMatchesLesson && a.slotConfirmedByParent; });
+      } else if (filters.slotMatch === 'conflict') {
+        list = list.filter(function (a) { return a.hasConflict; });
+      }
+    }
+
+    if (filters.selection && filters.selection !== 'all') {
+      if (filters.selection === 'selected') {
+        list = list.filter(function (a) { return selectedIds.indexOf(a.reservationId) !== -1; });
+      } else if (filters.selection === 'unselected') {
+        list = list.filter(function (a) { return selectedIds.indexOf(a.reservationId) === -1; });
+      }
+    }
+
+    return list;
+  }
+
   function filterApplicants(applicants, query) {
-    var q = (query || '').trim().toLowerCase();
-    if (!q) return applicants;
-    return applicants.filter(function (a) {
-      var hay = [
-        a.reservationId, a.name, a.parent, a.phone, a.email,
-        a.preferredSlot, a.statusLabel
-      ].join(' ').toLowerCase();
-      return hay.indexOf(q) !== -1;
-    });
+    return applyApplicantFilters(applicants, { searchQuery: query }, []);
+  }
+
+  function defaultApplicantFilters() {
+    return { status: 'all', slotMatch: 'all', selection: 'all' };
+  }
+
+  function renderApplicantFilters(opts) {
+    opts = opts || {};
+    var filters = opts.filters || defaultApplicantFilters();
+    var prefix = opts.filterPrefix || 'tmApplicant';
+    return (
+      '<div class="tm-applicant-filter-grid">' +
+        '<label class="tm-filter-field">' +
+          '<span class="tm-filter-field-label">Başvuru durumu</span>' +
+          '<select class="tm-filter-select tm-applicant-filter" id="' + prefix + 'FilterStatus" data-applicant-filter="status">' +
+            '<option value="all"' + (filters.status === 'all' ? ' selected' : '') + '>Tümü</option>' +
+            '<option value="pending"' + (filters.status === 'pending' ? ' selected' : '') + '>Onay bekliyor</option>' +
+            '<option value="confirmed"' + (filters.status === 'confirmed' ? ' selected' : '') + '>Onaylandı</option>' +
+            '<option value="completed"' + (filters.status === 'completed' ? ' selected' : '') + '>Tamamlandı</option>' +
+          '</select>' +
+        '</label>' +
+        '<label class="tm-filter-field">' +
+          '<span class="tm-filter-field-label">Slot durumu</span>' +
+          '<select class="tm-filter-select tm-applicant-filter" id="' + prefix + 'FilterSlot" data-applicant-filter="slotMatch">' +
+            '<option value="all"' + (filters.slotMatch === 'all' ? ' selected' : '') + '>Tümü</option>' +
+            '<option value="matches"' + (filters.slotMatch === 'matches' ? ' selected' : '') + '>Ders slotu ile uyumlu</option>' +
+            '<option value="confirmed-slot"' + (filters.slotMatch === 'confirmed-slot' ? ' selected' : '') + '>Veli onaylı slot</option>' +
+            '<option value="needs-contact"' + (filters.slotMatch === 'needs-contact' ? ' selected' : '') + '>Veli görüşmesi gerekli</option>' +
+            '<option value="conflict"' + (filters.slotMatch === 'conflict' ? ' selected' : '') + '>Çakışma var</option>' +
+          '</select>' +
+        '</label>' +
+        '<label class="tm-filter-field">' +
+          '<span class="tm-filter-field-label">Derse seçim</span>' +
+          '<select class="tm-filter-select tm-applicant-filter" id="' + prefix + 'FilterSelection" data-applicant-filter="selection">' +
+            '<option value="all"' + (filters.selection === 'all' ? ' selected' : '') + '>Tümü</option>' +
+            '<option value="selected"' + (filters.selection === 'selected' ? ' selected' : '') + '>Derse seçilmiş</option>' +
+            '<option value="unselected"' + (filters.selection === 'unselected' ? ' selected' : '') + '>Henüz seçilmemiş</option>' +
+          '</select>' +
+        '</label>' +
+        '<button type="button" class="tm-date-clear tm-applicant-filter-clear" id="' + prefix + 'FilterClear"' + (
+          filters.status === 'all' && filters.slotMatch === 'all' && filters.selection === 'all' ? ' hidden' : ''
+        ) + '>Filtreleri temizle</button>' +
+      '</div>'
+    );
+  }
+
+  function renderApplicantDetailBody(applicant, ctx, isSelected) {
+    ctx = ctx || {};
+    var statusLabel = applicant.statusLabel || applicant.status || '—';
+    return (
+      '<div class="tm-applicant-detail">' +
+        '<div class="tm-detail-grid tm-applicant-detail-grid">' +
+          '<div class="tm-detail-card is-student">' +
+            '<div class="tm-detail-card-head"><span class="tm-detail-card-icon" aria-hidden="true">🎓</span><h4 class="tm-detail-card-title">Öğrenci</h4></div>' +
+            '<dl class="tm-detail-dl">' +
+              '<div><dt>Ad Soyad</dt><dd><strong>' + escapeHtml(applicant.name) + '</strong></dd></div>' +
+              '<div><dt>Sınıf</dt><dd>' + escapeHtml(applicant.grade) + '</dd></div>' +
+              '<div><dt>Branş</dt><dd>' + escapeHtml(applicant.subject) + '</dd></div>' +
+              '<div><dt>Rezervasyon ID</dt><dd><span class="tm-record-id">' + escapeHtml(applicant.reservationId) + '</span></dd></div>' +
+              '<div><dt>Başvuru durumu</dt><dd><span class="tm-status is-' + escapeHtml(applicant.status) + '">' + escapeHtml(statusLabel) + '</span></dd></div>' +
+            '</dl>' +
+          '</div>' +
+          '<div class="tm-detail-card is-parent">' +
+            '<div class="tm-detail-card-head"><span class="tm-detail-card-icon" aria-hidden="true">👤</span><h4 class="tm-detail-card-title">Veli</h4></div>' +
+            '<dl class="tm-detail-dl">' +
+              '<div><dt>Ad Soyad</dt><dd><strong>' + escapeHtml(applicant.parent) + '</strong></dd></div>' +
+              '<div><dt>Telefon</dt><dd><a href="tel:' + phoneDigits(applicant.phone) + '">' + escapeHtml(applicant.phone) + '</a></dd></div>' +
+              '<div><dt>E-posta</dt><dd><a href="mailto:' + escapeHtml(applicant.email) + '">' + escapeHtml(applicant.email) + '</a></dd></div>' +
+            '</dl>' +
+          '</div>' +
+          '<div class="tm-detail-card is-slot">' +
+            '<div class="tm-detail-card-head"><span class="tm-detail-card-icon" aria-hidden="true">🗓</span><h4 class="tm-detail-card-title">Slot & planlama</h4></div>' +
+            '<dl class="tm-detail-dl">' +
+              '<div><dt>Tercih slotu</dt><dd>' + escapeHtml(applicant.preferredSlot) + '</dd></div>' +
+              (applicant.requestedSlotLabel && applicant.requestedSlotLabel !== applicant.preferredSlot
+                ? '<div><dt>İlk tercih</dt><dd>' + escapeHtml(applicant.requestedSlotLabel) + '</dd></div>' : '') +
+              '<div><dt>Planlanan ders slotu</dt><dd>' + escapeHtml(ctx.lessonSlotLabel || '—') + '</dd></div>' +
+              '<div><dt>Slot durumu</dt><dd>' + slotBadge(applicant, ctx.lessonSlotLabel) + '</dd></div>' +
+              '<div><dt>Veli slot onayı</dt><dd>' + (applicant.slotConfirmedByParent ? 'Alındı' : 'Bekleniyor') + '</dd></div>' +
+              (applicant.otherLessons && applicant.otherLessons.length
+                ? '<div><dt>Diğer dersler</dt><dd>' + escapeHtml(applicant.otherLessons.join(', ')) + '</dd></div>' : '') +
+              (applicant.hasConflict
+                ? '<div><dt>Çakışma</dt><dd class="tm-planner-student-warn">' + escapeHtml(applicant.conflictMsg) + '</dd></div>' : '') +
+            '</dl>' +
+          '</div>' +
+        '</div>' +
+        '<section class="tm-applicant-detail-actions">' +
+          '<h4 class="tm-applicant-detail-actions-title">Veli iletişim & koordinasyon</h4>' +
+          contactActions(applicant, ctx) +
+        '</section>' +
+        (isSelected
+          ? '<p class="tm-applicant-detail-selected-note">Bu öğrenci derse <strong>eklenmiş</strong> durumda.</p>'
+          : (applicant.hasConflict
+            ? '<p class="tm-applicant-detail-warn">Çakışma nedeniyle derse eklenemez.</p>'
+            : '')) +
+      '</div>'
+    );
+  }
+
+  function findApplicantById(applicants, id) {
+    for (var i = 0; i < applicants.length; i++) {
+      if (applicants[i].reservationId === id) return applicants[i];
+    }
+    return null;
   }
 
   function renderApplicantTable(applicants, selectedIds, opts) {
     opts = opts || {};
-    var inputAttr = opts.inputAttr || 'data-student-id';
     var ctx = {
       subject: opts.subject,
       grade: opts.grade,
       lessonSlotLabel: opts.lessonSlotLabel,
       lessonId: opts.lessonId
     };
-    var filtered = filterApplicants(applicants, opts.searchQuery);
+    var filtered = applyApplicantFilters(applicants, opts, selectedIds);
 
     if (!applicants.length) {
       return '<p class="tm-planner-students-hint">Bu branş ve sınıf için uygun başvuru (rezervasyon) bulunamadı.</p>';
@@ -186,7 +322,7 @@
     }
 
     return (
-      '<div class="tm-res-table-wrap tm-applicant-table-wrap">' +
+      '<div class="tm-res-table-wrap tm-applicant-table-wrap" data-applicant-table>' +
         '<table class="tm-detail-table tm-res-table--rich tm-applicant-table">' +
           '<thead><tr>' +
             '<th class="tm-col-check"></th>' +
@@ -203,12 +339,12 @@
                 '<tr class="tm-applicant-row' + rowCls + '">' +
                   '<td class="tm-col-check">' +
                     '<label class="tm-applicant-check">' +
-                      '<input type="checkbox" ' + inputAttr + '="' + escapeHtml(a.reservationId) + '"' +
+                      '<input type="checkbox" class="tm-applicant-cb" value="' + escapeHtml(a.reservationId) + '"' +
                         (checked ? ' checked' : '') + (disabled ? ' disabled' : '') + '>' +
                     '</label>' +
                   '</td>' +
                   '<td><span class="tm-record-id">' + escapeHtml(a.reservationId) + '</span></td>' +
-                  '<td><strong>' + escapeHtml(a.name) + '</strong><small>' + escapeHtml(a.grade) + '</small></td>' +
+                  '<td><button type="button" class="tm-applicant-name-btn" data-view-applicant="' + escapeHtml(a.reservationId) + '"><strong>' + escapeHtml(a.name) + '</strong></button><small>' + escapeHtml(a.grade) + '</small></td>' +
                   '<td>' + escapeHtml(a.parent) + '</td>' +
                   '<td class="tm-cell-contact">' +
                     '<a href="tel:' + phoneDigits(a.phone) + '">' + escapeHtml(a.phone) + '</a>' +
@@ -220,7 +356,7 @@
                     (a.otherLessons && a.otherLessons.length ? '<small class="tm-applicant-other">Diğer ders: ' + escapeHtml(a.otherLessons.join(', ')) + '</small>' : '') +
                   '</td>' +
                   '<td><span class="tm-status is-' + escapeHtml(a.status) + '">' + escapeHtml(a.statusLabel || a.status) + '</span></td>' +
-                  '<td>' + contactActions(a, ctx, inputAttr) + '</td>' +
+                  '<td>' + contactActions(a, ctx) + '</td>' +
                 '</tr>'
               );
             }).join('') +
@@ -250,15 +386,32 @@
       )
       : '';
 
+    var filteredCount = applyApplicantFilters(applicants, opts, selectedIds).length;
+
     return (
-      '<div class="tm-applicant-picker">' +
-        '<p class="tm-applicant-picker-hint">Derse katılacak öğrencileri mevcut başvurular (rezervasyonlar) arasından seçin. Slot uyuşmazlığında veli ile iletişim kurup onay alın; öğretmeni bilgilendirmek için koordinasyon panelini kullanın.</p>' +
+      '<div class="tm-applicant-picker" data-applicant-picker>' +
+        '<p class="tm-applicant-picker-hint">Başvuruları filtreleyin; öğrenci adına tıklayarak veli ve iletişim detaylarını görün. Derse eklemek için satırın solundaki kutuyu işaretleyin.</p>' +
         renderParentCoordinationAlert(applicants, selectedIds, opts.lessonSlotLabel) +
         (opts.teacher ? renderTeacherCoordination(opts.teacher, ctx) : '') +
+        renderApplicantFilters(opts) +
         searchHtml +
+        '<div class="tm-applicant-picker-meta">' +
+          '<span class="tm-planner-section-count" data-applicant-count>' + selectedIds.length + ' seçili</span>' +
+          '<span class="tm-applicant-filter-count">' + filteredCount + ' / ' + applicants.length + ' başvuru</span>' +
+        '</div>' +
         renderApplicantTable(applicants, selectedIds, opts) +
       '</div>'
     );
+  }
+
+  function readFiltersFromContainer(container, prefix) {
+    var filters = defaultApplicantFilters();
+    if (!container) return filters;
+    container.querySelectorAll('[data-applicant-filter]').forEach(function (el) {
+      var key = el.getAttribute('data-applicant-filter');
+      if (key && el.value) filters[key] = el.value;
+    });
+    return filters;
   }
 
   function confirmParentSlot(reservationId, slotLabel) {
@@ -270,14 +423,24 @@
     });
   }
 
-  function collectSelectedIds(container, inputAttr) {
-    var attr = inputAttr || 'data-student-id';
+  function collectSelectedIds(container) {
     var ids = [];
     if (!container) return ids;
-    container.querySelectorAll('[' + attr + ']:checked').forEach(function (cb) {
-      ids.push(cb.getAttribute(attr));
+    container.querySelectorAll('input.tm-applicant-cb:checked').forEach(function (cb) {
+      if (cb.value) ids.push(cb.value);
     });
     return ids;
+  }
+
+  function updatePickerSelectionUI(container, selectedCount) {
+    if (!container) return;
+    var countEl = container.querySelector('[data-applicant-count]');
+    if (countEl) countEl.textContent = selectedCount + ' seçili';
+    container.querySelectorAll('.tm-applicant-row').forEach(function (row) {
+      var cb = row.querySelector('input.tm-applicant-cb');
+      if (!cb) return;
+      row.classList.toggle('is-selected', cb.checked);
+    });
   }
 
   global.TrialLessonApplicantPicker = {
@@ -287,12 +450,19 @@
     buildTeacherLessonMessage: buildTeacherLessonMessage,
     whatsAppUrl: whatsAppUrl,
     filterApplicants: filterApplicants,
+    applyApplicantFilters: applyApplicantFilters,
+    defaultApplicantFilters: defaultApplicantFilters,
+    readFiltersFromContainer: readFiltersFromContainer,
+    renderApplicantFilters: renderApplicantFilters,
+    renderApplicantDetailBody: renderApplicantDetailBody,
+    findApplicantById: findApplicantById,
     renderApplicantTable: renderApplicantTable,
     renderPickerSection: renderPickerSection,
     renderTeacherCoordination: renderTeacherCoordination,
     renderParentCoordinationAlert: renderParentCoordinationAlert,
     renderContactActions: contactActions,
     confirmParentSlot: confirmParentSlot,
-    collectSelectedIds: collectSelectedIds
+    collectSelectedIds: collectSelectedIds,
+    updatePickerSelectionUI: updatePickerSelectionUI
   };
 })(typeof window !== 'undefined' ? window : this);

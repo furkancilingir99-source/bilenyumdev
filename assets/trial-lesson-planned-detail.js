@@ -12,6 +12,12 @@
   var lessonId = null;
   var modalStudentIds = [];
   var modalApplicantSearch = '';
+  var modalApplicantFilters = null;
+
+  function getModalApplicantFilters() {
+    if (!modalApplicantFilters) modalApplicantFilters = Picker.defaultApplicantFilters();
+    return modalApplicantFilters;
+  }
 
   var MONTHS = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
 
@@ -41,6 +47,24 @@
     return 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(id);
   }
 
+  function removeStudent(reservationId) {
+    var l = Planner.getEnrichedPlannedLesson(lessonId);
+    if (!l) return;
+    var name = '';
+    l.students.forEach(function (s) {
+      if (s.reservationId === reservationId) name = s.name;
+    });
+    if (!confirm((name || reservationId) + ' dersten çıkarılsın mı?')) return;
+    var nextIds = l.studentIds.filter(function (id) { return id !== reservationId; });
+    var result = Planner.updatePlannedLessonStudents(lessonId, nextIds);
+    if (!result.ok) {
+      showToast(result.error || 'Öğrenci çıkarılamadı.');
+      return;
+    }
+    showToast((name || 'Öğrenci') + ' dersten çıkarıldı.');
+    renderPage(Planner.getEnrichedPlannedLesson(lessonId));
+  }
+
   function renderStudentsTable(students, lesson) {
     if (!students.length) {
       return '<p class="tm-planned-no-students">Bu derse henüz öğrenci eklenmemiş. Başvurulardan öğrenci eklemek için düzenle butonunu kullanın.</p>';
@@ -55,7 +79,7 @@
       '<div class="tm-res-table-wrap">' +
         '<table class="tm-detail-table tm-res-table--rich">' +
           '<thead><tr>' +
-            '<th>Rezervasyon ID</th><th>Öğrenci</th><th>Veli</th><th>İletişim</th><th>Tercih slotu</th><th>Slot durumu</th><th>Başvuru</th><th>Veli / koordinasyon</th>' +
+            '<th>Rezervasyon ID</th><th>Öğrenci</th><th>Veli</th><th>İletişim</th><th>Tercih slotu</th><th>Slot durumu</th><th>Başvuru</th><th>Veli / koordinasyon</th><th>İşlem</th>' +
           '</tr></thead>' +
           '<tbody>' +
             students.map(function (s) {
@@ -64,7 +88,7 @@
               return (
                 '<tr>' +
                   '<td><span class="tm-record-id">' + escapeHtml(s.reservationId) + '</span></td>' +
-                  '<td><strong>' + escapeHtml(s.name) + '</strong><small>' + escapeHtml(s.grade) + '</small></td>' +
+                  '<td><button type="button" class="tm-applicant-name-btn" data-view-applicant-inline="' + escapeHtml(s.reservationId) + '"><strong>' + escapeHtml(s.name) + '</strong></button><small>' + escapeHtml(s.grade) + '</small></td>' +
                   '<td>' + escapeHtml(s.parent) + '</td>' +
                   '<td class="tm-cell-contact">' +
                     '<a href="tel:' + escapeHtml(String(s.phone).replace(/\s/g, '')) + '">' + escapeHtml(s.phone) + '</a>' +
@@ -77,7 +101,8 @@
                       : '<span class="tm-applicant-slot is-warn">Veli onayı / slot kontrolü</span>') +
                   '</td>' +
                   '<td><span class="tm-status is-' + escapeHtml(s.status) + '">' + escapeHtml(statusLabel) + '</span></td>' +
-                  '<td>' + Picker.renderContactActions(applicant, ctx, 'data-detail-student') + '</td>' +
+                  '<td>' + Picker.renderContactActions(applicant, ctx) + '</td>' +
+                  '<td><button type="button" class="tm-action-link is-danger" data-remove-student="' + escapeHtml(s.reservationId) + '">Dersten çıkar</button></td>' +
                 '</tr>'
               );
             }).join('') +
@@ -107,10 +132,66 @@
     );
   }
 
+  function pickerOpts(l, searchQuery) {
+    return {
+      subject: l.subject,
+      grade: l.grade,
+      lessonSlotLabel: l.slotLabel,
+      lessonId: l.id,
+      teacher: Planner.getTeacherById(l.teacherId),
+      searchQuery: searchQuery,
+      searchId: 'tmModalApplicantSearch',
+      filterPrefix: 'tmModalApplicant',
+      filters: getModalApplicantFilters(),
+      showSearch: true
+    };
+  }
+
+  function getApplicantsForLesson(l) {
+    return Planner.getEligibleStudents(l.subject, l.grade, l.id, l.slotDateKey, l.slotTime, l.slotLabel);
+  }
+
+  function openApplicantDetailModal(reservationId, l) {
+    var applicant = Picker.findApplicantById(getApplicantsForLesson(l), reservationId);
+    if (!applicant) return;
+    var ctx = { subject: l.subject, grade: l.grade, lessonSlotLabel: l.slotLabel, lessonId: l.id };
+    var isSelected = modalStudentIds.indexOf(reservationId) !== -1;
+    var canToggle = isSelected || !applicant.hasConflict;
+
+    Modal.open({
+      title: applicant.name,
+      subtitle: applicant.reservationId + ' · ' + applicant.grade,
+      body: Picker.renderApplicantDetailBody(applicant, ctx, isSelected),
+      foot:
+        '<button type="button" class="tm-planner-btn is-ghost" id="tmApplicantDetailBack">← Listeye dön</button>' +
+        '<button type="button" class="tm-planner-btn is-ghost" data-tm-modal-close>Kapat</button>' +
+        (canToggle
+          ? '<button type="button" class="tm-planner-btn is-primary" id="tmApplicantDetailToggle">' + (isSelected ? 'Dersten çıkar' : 'Derse ekle') + '</button>'
+          : '') +
+        '<a class="tm-planner-btn is-ghost" href="' + reservationDetailUrl(applicant.reservationId) + '">Rezervasyon detayı</a>'
+    });
+
+    var backBtn = document.getElementById('tmApplicantDetailBack');
+    if (backBtn) backBtn.addEventListener('click', function () { openStudentsModal(); });
+
+    var toggleBtn = document.getElementById('tmApplicantDetailToggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function () {
+        if (isSelected) {
+          modalStudentIds = modalStudentIds.filter(function (id) { return id !== reservationId; });
+        } else {
+          modalStudentIds = modalStudentIds.concat([reservationId]);
+        }
+        openStudentsModal();
+      });
+    }
+  }
+
   function renderPage(l) {
     if (!root) return;
     var desc = Planner.describeLessonId(l.id);
     var conflicts = renderConflictsBlock(l);
+    var teacher = Planner.getTeacherById(l.teacherId);
 
     root.innerHTML =
       '<nav class="tm-breadcrumb">' +
@@ -139,7 +220,7 @@
         l.slotLabel
       ) +
       Picker.renderTeacherCoordination(
-        { name: l.teacherName, phone: l.teacherPhone, email: l.teacherEmail },
+        teacher || { name: l.teacherName, phone: l.teacherPhone, email: l.teacherEmail },
         { subject: l.subject, grade: l.grade, lessonSlotLabel: l.slotLabel, lessonId: l.id, studentNames: l.students.map(function (s) { return s.name; }) }
       ) +
       '<div class="tm-detail-grid">' +
@@ -161,6 +242,13 @@
             (l.teacherPhone ? '<div><dt>Telefon</dt><dd><a href="tel:' + escapeHtml(String(l.teacherPhone).replace(/\s/g, '')) + '">' + escapeHtml(l.teacherPhone) + '</a></dd></div>' : '') +
             (l.teacherEmail ? '<div><dt>E-posta</dt><dd><a href="mailto:' + escapeHtml(l.teacherEmail) + '">' + escapeHtml(l.teacherEmail) + '</a></dd></div>' : '') +
           '</dl>' +
+          (teacher && (teacher.phone || teacher.email)
+            ? '<div class="tm-applicant-contacts tm-teacher-card-contacts">' +
+                (teacher.phone ? '<a class="tm-contact-chip" href="tel:' + String(teacher.phone).replace(/\s/g, '') + '">Ara</a>' : '') +
+                (teacher.email ? '<a class="tm-contact-chip" href="mailto:' + escapeHtml(teacher.email) + '">E-posta</a>' : '') +
+                (teacher.phone ? '<a class="tm-contact-chip is-wa" href="' + escapeHtml(Picker.whatsAppUrl(teacher.phone, Picker.buildTeacherLessonMessage(teacher, { subject: l.subject, grade: l.grade, lessonSlotLabel: l.slotLabel, lessonId: l.id, studentNames: l.students.map(function (s) { return s.name; }) }))) + '" target="_blank" rel="noopener">WhatsApp</a>' : '') +
+              '</div>'
+            : '') +
         '</div>' +
         '<div class="tm-detail-card is-reservation">' +
           '<div class="tm-detail-card-head"><span class="tm-detail-card-icon" aria-hidden="true">🗓</span><h4 class="tm-detail-card-title">Planlama</h4></div>' +
@@ -192,6 +280,32 @@
       });
     });
 
+    root.querySelectorAll('[data-view-applicant-inline]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var applicant = Picker.findApplicantById(l.students.map(function (s) {
+          return Object.assign({ statusLabel: ResMock.STATUS_LABELS[s.status] || s.status }, s);
+        }), btn.getAttribute('data-view-applicant-inline'));
+        if (!applicant) applicant = Picker.findApplicantById(getApplicantsForLesson(l), btn.getAttribute('data-view-applicant-inline'));
+        if (!applicant) return;
+        var ctx = { subject: l.subject, grade: l.grade, lessonSlotLabel: l.slotLabel, lessonId: l.id };
+        var isSelected = true;
+        Modal.open({
+          title: applicant.name,
+          subtitle: applicant.reservationId,
+          body: Picker.renderApplicantDetailBody(applicant, ctx, isSelected),
+          foot:
+            '<button type="button" class="tm-planner-btn is-ghost" data-tm-modal-close>Kapat</button>' +
+            '<a class="tm-planner-btn is-ghost" href="' + reservationDetailUrl(applicant.reservationId) + '">Rezervasyon detayı</a>'
+        });
+      });
+    });
+
+    root.querySelectorAll('[data-remove-student]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        removeStudent(btn.getAttribute('data-remove-student'));
+      });
+    });
+
     ['tmOpenStudentsModal', 'tmOpenStudentsModal2'].forEach(function (id) {
       var btn = document.getElementById(id);
       if (btn) btn.addEventListener('click', openStudentsModal);
@@ -200,17 +314,8 @@
 
   function renderStudentsModalBody(l) {
     var applicants = Planner.getEligibleStudents(l.subject, l.grade, l.id, l.slotDateKey, l.slotTime, l.slotLabel);
-    var teacher = Planner.getTeacherById(l.teacherId);
-    return Picker.renderPickerSection(applicants, modalStudentIds, {
-      subject: l.subject,
-      grade: l.grade,
-      lessonSlotLabel: l.slotLabel,
-      lessonId: l.id,
-      teacher: teacher,
-      searchQuery: modalApplicantSearch,
-      searchId: 'tmModalApplicantSearch',
-      inputAttr: 'data-modal-student-id'
-    }) + renderConflictsBlock(l, modalStudentIds);
+    return Picker.renderPickerSection(applicants, modalStudentIds, pickerOpts(l, modalApplicantSearch)) +
+      renderConflictsBlock(l, modalStudentIds);
   }
 
   function refreshStudentsModalBody(l) {
@@ -218,43 +323,65 @@
     if (body) body.innerHTML = renderStudentsModalBody(l);
   }
 
-  function handleModalConfirmSlot(btn) {
-    var updated = Picker.confirmParentSlot(btn.getAttribute('data-confirm-slot'), btn.getAttribute('data-slot-label'));
-    if (!updated) {
-      showToast('Slot onayı kaydedilemedi.');
-      return;
-    }
-    showToast('Veli slot onayı kaydedildi.');
-    var l = Planner.getEnrichedPlannedLesson(lessonId);
-    refreshStudentsModalBody(l);
-  }
-
-  function bindStudentsModalEvents(l) {
+  function bindStudentsModalEvents() {
     var modal = document.getElementById('tmModal');
     var body = modal ? modal.querySelector('[data-tm-modal-body]') : null;
     if (!modal || !body || modal.dataset.studentsBound) return;
     modal.dataset.studentsBound = '1';
 
     body.addEventListener('change', function (e) {
-      if (!e.target.matches('[data-modal-student-id]')) return;
-      modalStudentIds = Picker.collectSelectedIds(body, 'data-modal-student-id');
-      refreshStudentsModalBody(Planner.getEnrichedPlannedLesson(lessonId));
+      if (e.target.matches('input.tm-applicant-cb')) {
+        modalStudentIds = Picker.collectSelectedIds(body);
+        Picker.updatePickerSelectionUI(body, modalStudentIds.length);
+        var lesson = Planner.getEnrichedPlannedLesson(lessonId);
+        var conflictsEl = body.querySelector('.tm-planner-conflicts');
+        var conflictsHtml = renderConflictsBlock(lesson, modalStudentIds);
+        if (conflictsEl) {
+          if (conflictsHtml) conflictsEl.outerHTML = conflictsHtml;
+          else conflictsEl.remove();
+        } else if (conflictsHtml) {
+          body.insertAdjacentHTML('beforeend', conflictsHtml);
+        }
+        return;
+      }
+      if (e.target.matches('.tm-applicant-filter')) {
+        modalApplicantFilters = Picker.readFiltersFromContainer(body, 'tmModalApplicant');
+        refreshStudentsModalBody(Planner.getEnrichedPlannedLesson(lessonId));
+      }
     });
+
     body.addEventListener('input', function (e) {
       if (e.target.id !== 'tmModalApplicantSearch') return;
       modalApplicantSearch = e.target.value;
       refreshStudentsModalBody(Planner.getEnrichedPlannedLesson(lessonId));
     });
+
     body.addEventListener('click', function (e) {
+      if (e.target.closest('#tmModalApplicantFilterClear')) {
+        modalApplicantFilters = Picker.defaultApplicantFilters();
+        refreshStudentsModalBody(Planner.getEnrichedPlannedLesson(lessonId));
+        return;
+      }
+      var viewBtn = e.target.closest('[data-view-applicant]');
+      if (viewBtn) {
+        openApplicantDetailModal(viewBtn.getAttribute('data-view-applicant'), Planner.getEnrichedPlannedLesson(lessonId));
+        return;
+      }
       var confirmBtn = e.target.closest('[data-confirm-slot]');
       if (!confirmBtn) return;
       e.preventDefault();
-      handleModalConfirmSlot(confirmBtn);
+      var updated = Picker.confirmParentSlot(confirmBtn.getAttribute('data-confirm-slot'), confirmBtn.getAttribute('data-slot-label'));
+      if (!updated) {
+        showToast('Slot onayı kaydedilemedi.');
+        return;
+      }
+      showToast('Veli slot onayı kaydedildi.');
+      refreshStudentsModalBody(Planner.getEnrichedPlannedLesson(lessonId));
     });
 
     modal.addEventListener('click', function (e) {
       if (!e.target.closest('#tmModalStudentsSave')) return;
-      modalStudentIds = Picker.collectSelectedIds(body, 'data-modal-student-id');
+      modalStudentIds = Picker.collectSelectedIds(body);
       var result = Planner.updatePlannedLessonStudents(lessonId, modalStudentIds);
       if (!result.ok) {
         showToast(result.error || 'Kaydedilemedi.');
@@ -272,7 +399,8 @@
     if (!l) return;
     modalStudentIds = l.studentIds.slice();
     modalApplicantSearch = '';
-    bindStudentsModalEvents(l);
+    modalApplicantFilters = Picker.defaultApplicantFilters();
+    bindStudentsModalEvents();
     Modal.open({
       title: 'Başvurulardan öğrenci seç',
       subtitle: l.id + ' · ' + l.subject + ' · ' + l.grade + ' · ' + l.slotLabel,

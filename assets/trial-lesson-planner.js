@@ -14,6 +14,17 @@
   var slotEditor = { dayOffset: 0, slot: null };
   var applicantSearch = '';
   var modalApplicantSearch = '';
+  var applicantFilters = null;
+  var modalApplicantFilters = null;
+
+  function getApplicantFilters(isModal) {
+    if (isModal) {
+      if (!modalApplicantFilters) modalApplicantFilters = Picker.defaultApplicantFilters();
+      return modalApplicantFilters;
+    }
+    if (!applicantFilters) applicantFilters = Picker.defaultApplicantFilters();
+    return applicantFilters;
+  }
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -130,7 +141,7 @@
     return draft.teacherId ? Planner.getTeacherById(draft.teacherId) : null;
   }
 
-  function pickerOpts(searchQuery, inputAttr) {
+  function pickerOpts(searchQuery, isModal) {
     return {
       subject: draft.subject,
       grade: draft.grade,
@@ -138,10 +149,26 @@
       lessonId: draft.id,
       teacher: getTeacher(),
       searchQuery: searchQuery,
-      searchId: inputAttr === 'data-modal-student-id' ? 'tmModalApplicantSearch' : 'tmApplicantSearch',
-      inputAttr: inputAttr || 'data-student-id',
+      searchId: isModal ? 'tmModalApplicantSearch' : 'tmApplicantSearch',
+      filterPrefix: isModal ? 'tmModalApplicant' : 'tmApplicant',
+      filters: getApplicantFilters(!!isModal),
       showSearch: true
     };
+  }
+
+  function renderTeacherContactCard() {
+    var teacher = getTeacher();
+    if (!teacher || !draft.teacherId) return '';
+    return Picker.renderTeacherCoordination(teacher, {
+      subject: draft.subject,
+      grade: draft.grade,
+      lessonSlotLabel: draft.slotLabel,
+      lessonId: draft.id,
+      studentNames: draft.studentIds.map(function (sid) {
+        var r = ResMock.getReservationById(sid);
+        return r ? r.studentFirstName + ' ' + r.studentLastName : sid;
+      })
+    });
   }
 
   function renderStudents() {
@@ -151,7 +178,89 @@
     if (!draft.slotLabel) {
       return '<p class="tm-planner-students-hint">Başvuru eşleştirmesi için ders tarihi / saat seçin.</p>';
     }
-    return Picker.renderPickerSection(getApplicants(), draft.studentIds, pickerOpts(applicantSearch));
+    return Picker.renderPickerSection(getApplicants(), draft.studentIds, pickerOpts(applicantSearch, false));
+  }
+
+  function replaceApplicantPicker(container, isModal) {
+    if (!container) return;
+    var picker = container.querySelector('[data-applicant-picker]');
+    var html = Picker.renderPickerSection(
+      getApplicants(),
+      draft.studentIds,
+      pickerOpts(isModal ? modalApplicantSearch : applicantSearch, isModal)
+    );
+    if (picker) {
+      var wrap = document.createElement('div');
+      wrap.innerHTML = html;
+      picker.replaceWith(wrap.firstElementChild);
+    }
+    var countEl = container.querySelector('.tm-planner-section-count');
+    if (countEl) countEl.textContent = draft.studentIds.length + ' seçili';
+  }
+
+  function refreshInlineApplicantPicker() {
+    replaceApplicantPicker(editorEl, false);
+  }
+
+  function openApplicantDetail(reservationId, fromModal) {
+    if (!Modal) return;
+    var applicant = Picker.findApplicantById(getApplicants(), reservationId);
+    if (!applicant) return;
+    var ctx = {
+      subject: draft.subject,
+      grade: draft.grade,
+      lessonSlotLabel: draft.slotLabel,
+      lessonId: draft.id
+    };
+    var isSelected = draft.studentIds.indexOf(reservationId) !== -1;
+    var canToggle = isSelected || !applicant.hasConflict;
+
+    Modal.open({
+      title: applicant.name,
+      subtitle: applicant.reservationId + ' · ' + applicant.grade + ' · ' + applicant.subject,
+      body: Picker.renderApplicantDetailBody(applicant, ctx, isSelected),
+      foot:
+        (fromModal ? '<button type="button" class="tm-planner-btn is-ghost" id="tmApplicantDetailBack">← Listeye dön</button>' : '') +
+        '<button type="button" class="tm-planner-btn is-ghost" data-tm-modal-close>Kapat</button>' +
+        (canToggle
+          ? '<button type="button" class="tm-planner-btn is-primary" id="tmApplicantDetailToggle">' + (isSelected ? 'Dersten çıkar' : 'Derse ekle') + '</button>'
+          : '') +
+        '<a class="tm-planner-btn is-ghost" href="' + Picker.reservationDetailUrl(applicant.reservationId) + '">Rezervasyon detayı</a>'
+    });
+
+    var backBtn = document.getElementById('tmApplicantDetailBack');
+    if (backBtn) {
+      backBtn.addEventListener('click', function () { openApplicantModal(); });
+    }
+
+    var body = document.querySelector('[data-tm-modal-body]');
+    if (body) {
+      body.addEventListener('click', function detailClick(e) {
+        var confirmBtn = e.target.closest('[data-confirm-slot]');
+        if (!confirmBtn) return;
+        e.preventDefault();
+        handleConfirmSlot(confirmBtn);
+        openApplicantDetail(reservationId, fromModal);
+      }, { once: true });
+    }
+
+    var toggleBtn = document.getElementById('tmApplicantDetailToggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function () {
+        if (isSelected) {
+          draft.studentIds = draft.studentIds.filter(function (id) { return id !== reservationId; });
+          showToast(applicant.name + ' dersten çıkarıldı.');
+        } else {
+          draft.studentIds = draft.studentIds.concat([reservationId]);
+          showToast(applicant.name + ' derse eklendi.');
+        }
+        if (fromModal) {
+          openApplicantModal();
+        } else {
+          renderEditor();
+        }
+      });
+    }
   }
 
   function renderConflicts() {
@@ -231,11 +340,13 @@
             '<select class="tm-filter-select" id="tmPlanTeacher"' + (!draft.subject ? ' disabled' : '') + '>' +
               '<option value="">Seçin</option>' +
               teachers.map(function (t) {
-                return '<option value="' + escapeHtml(t.id) + '"' + (draft.teacherId === t.id ? ' selected' : '') + '>' + escapeHtml(t.name) + '</option>';
+                var contact = t.phone ? ' · ' + t.phone : '';
+                return '<option value="' + escapeHtml(t.id) + '"' + (draft.teacherId === t.id ? ' selected' : '') + '>' + escapeHtml(t.name) + escapeHtml(contact) + '</option>';
               }).join('') +
             '</select>' +
           '</label>' +
         '</div>' +
+        renderTeacherContactCard() +
         renderSlotPicker() +
         '<section class="tm-planner-students-section">' +
           '<div class="tm-planner-section-head">' +
@@ -276,9 +387,8 @@
   }
 
   function collectStudentIds(fromModal) {
-    var attr = fromModal ? 'data-modal-student-id' : 'data-student-id';
     var root = fromModal ? document.querySelector('[data-tm-modal-body]') : editorEl;
-    return Picker.collectSelectedIds(root, attr);
+    return Picker.collectSelectedIds(root);
   }
 
   function handleConfirmSlot(btn) {
@@ -299,7 +409,28 @@
   function refreshModalApplicantBody() {
     var body = document.querySelector('[data-tm-modal-body]');
     if (!body) return;
-    body.innerHTML = Picker.renderPickerSection(getApplicants(), draft.studentIds, pickerOpts(modalApplicantSearch, 'data-modal-student-id'));
+    body.innerHTML = Picker.renderPickerSection(
+      getApplicants(),
+      draft.studentIds,
+      pickerOpts(modalApplicantSearch, true)
+    );
+  }
+
+  function handleApplicantFilterChange(isModal) {
+    var container = isModal ? document.querySelector('[data-tm-modal-body]') : editorEl;
+    if (!container) return;
+    var filters = Picker.readFiltersFromContainer(container, isModal ? 'tmModalApplicant' : 'tmApplicant');
+    if (isModal) modalApplicantFilters = filters;
+    else applicantFilters = filters;
+    if (isModal) refreshModalApplicantBody();
+    else refreshInlineApplicantPicker();
+  }
+
+  function clearApplicantFilters(isModal) {
+    if (isModal) modalApplicantFilters = Picker.defaultApplicantFilters();
+    else applicantFilters = Picker.defaultApplicantFilters();
+    if (isModal) refreshModalApplicantBody();
+    else refreshInlineApplicantPicker();
   }
 
   function bindModalApplicantEvents() {
@@ -309,16 +440,31 @@
     modal.dataset.applicantBound = '1';
 
     body.addEventListener('change', function (e) {
-      if (!e.target.matches('[data-modal-student-id]')) return;
-      draft.studentIds = collectStudentIds(true);
-      refreshModalApplicantBody();
+      if (e.target.matches('input.tm-applicant-cb')) {
+        draft.studentIds = collectStudentIds(true);
+        Picker.updatePickerSelectionUI(body, draft.studentIds.length);
+        return;
+      }
+      if (e.target.matches('.tm-applicant-filter')) {
+        handleApplicantFilterChange(true);
+      }
     });
     body.addEventListener('input', function (e) {
-      if (e.target.id !== 'tmModalApplicantSearch') return;
-      modalApplicantSearch = e.target.value;
-      refreshModalApplicantBody();
+      if (e.target.id === 'tmModalApplicantSearch') {
+        modalApplicantSearch = e.target.value;
+        refreshModalApplicantBody();
+      }
     });
     body.addEventListener('click', function (e) {
+      if (e.target.closest('#tmModalApplicantFilterClear')) {
+        clearApplicantFilters(true);
+        return;
+      }
+      var viewBtn = e.target.closest('[data-view-applicant]');
+      if (viewBtn) {
+        openApplicantDetail(viewBtn.getAttribute('data-view-applicant'), true);
+        return;
+      }
       var confirmBtn = e.target.closest('[data-confirm-slot]');
       if (!confirmBtn) return;
       e.preventDefault();
@@ -344,7 +490,7 @@
     Modal.open({
       title: 'Başvurulardan öğrenci seç',
       subtitle: (draft.id || 'Yeni ders') + ' · ' + draft.subject + ' · ' + draft.grade + ' · ' + (draft.slotLabel || '—'),
-      body: Picker.renderPickerSection(getApplicants(), draft.studentIds, pickerOpts(modalApplicantSearch, 'data-modal-student-id')),
+      body: Picker.renderPickerSection(getApplicants(), draft.studentIds, pickerOpts(modalApplicantSearch, true)),
       foot:
         '<button type="button" class="tm-planner-btn is-ghost" data-tm-modal-close>Vazgeç</button>' +
         '<button type="button" class="tm-planner-btn is-primary" id="tmModalApplicantSave">Seçimi uygula</button>'
@@ -399,9 +545,15 @@
           renderEditor();
           return;
         }
-        if (e.target.matches('[data-student-id]')) {
+        if (e.target.matches('input.tm-applicant-cb')) {
           draft.studentIds = collectStudentIds(false);
-          renderEditor();
+          Picker.updatePickerSelectionUI(editorEl, draft.studentIds.length);
+          var countEl = editorEl.querySelector('.tm-planner-section-count');
+          if (countEl) countEl.textContent = draft.studentIds.length + ' seçili';
+          return;
+        }
+        if (e.target.matches('.tm-applicant-filter')) {
+          handleApplicantFilterChange(false);
           return;
         }
       });
@@ -410,12 +562,21 @@
         if (!draft) return;
         if (e.target.id === 'tmApplicantSearch') {
           applicantSearch = e.target.value;
-          renderEditor();
+          refreshInlineApplicantPicker();
         }
       });
 
       editorEl.addEventListener('click', function (e) {
         if (!draft) return;
+        if (e.target.closest('#tmApplicantFilterClear')) {
+          clearApplicantFilters(false);
+          return;
+        }
+        var viewBtn = e.target.closest('[data-view-applicant]');
+        if (viewBtn) {
+          openApplicantDetail(viewBtn.getAttribute('data-view-applicant'), false);
+          return;
+        }
         var confirmBtn = e.target.closest('[data-confirm-slot]');
         if (confirmBtn) {
           e.preventDefault();
