@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Rezervasyonlar · Deneme Dersi Yöneticisi · Bilenyum</title>
+<meta name="description" content="Bilenyum — Deneme dersi rezervasyon listesi: veli, öğrenci ve iletişim bilgileri." />
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-d3-mega.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
+<link rel="stylesheet" href="assets/dashboard-polish.css">
+<link rel="stylesheet" href="assets/teacher-dashboard.css">
+<link rel="stylesheet" href="assets/trial-lesson-manager.css">
+<script src="assets/auth-tab-session.js"></script>
+<script src="assets/dashboard-switcher.js" defer></script>
+<script src="assets/trial-lesson-manager-shell.js" defer></script>
+<script src="assets/shell.js" defer></script>
+</head>
+<body data-trial-manager-active="rezervasyonlar">
+
+<div class="scene" aria-hidden="true">
+  <div class="scene-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
+<header class="hud" data-trial-manager-hud></header>
+
+<main class="stage thw-stage tm-stage">
+  <div class="stage-nav" data-trial-manager-nav></div>
+
+  <div class="tm-main-col">
+    <div class="thw-context-panel">
+      <div class="thw-page-head">
+        <h1 class="thw-page-title">Rezervasyonlar</h1>
+        <p class="thw-page-subtitle">Deneme dersi talep eden velilerin, öğrencilerin ve iletişim bilgilerinin listesi.</p>
+      </div>
+    </div>
+
+    <div id="tmResLoading" class="td-state">
+      <div class="td-skeleton"><div class="td-skeleton-bar"></div><div class="td-skeleton-bar"></div></div>
+      Rezervasyonlar yükleniyor...
+    </div>
+
+    <section class="tm-panel">
+      <div class="tm-toolbar">
+        <input type="search" class="tm-search" id="tmResSearch" placeholder="Öğrenci, veli, telefon veya e-posta ara…" aria-label="Rezervasyon ara">
+        <select class="tm-filter-select" id="tmResStatusFilter" aria-label="Durum filtresi">
+          <option value="all">Tüm durumlar</option>
+          <option value="pending">Onay bekliyor</option>
+          <option value="confirmed">Onaylandı</option>
+          <option value="completed">Tamamlandı</option>
+          <option value="cancelled">İptal</option>
+        </select>
+        <span class="tm-panel-link" id="tmResCount" aria-live="polite">—</span>
+      </div>
+
+      <p id="tmResEmpty" class="td-state" hidden>Eşleşen rezervasyon bulunamadı.</p>
+
+      <div id="tmResTableWrap" class="tm-res-table-wrap" hidden>
+        <table class="tm-res-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Öğrenci</th>
+              <th>Sınıf</th>
+              <th>Ders</th>
+              <th>Veli</th>
+              <th>Telefon</th>
+              <th>E-posta</th>
+              <th>Tarih / Saat</th>
+              <th>Durum</th>
+            </tr>
+          </thead>
+          <tbody id="tmResTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="assets/trial-lesson-manager-mock.js"></script>
+<script src="assets/trial-lesson-manager-reservations.js"></script>
+</body>
+</html>

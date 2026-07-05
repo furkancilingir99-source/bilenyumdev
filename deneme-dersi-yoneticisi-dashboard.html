@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Deneme Dersi Yöneticisi · Merkez · Bilenyum</title>
+<meta name="description" content="Bilenyum — Deneme dersi rezervasyonları kontrol merkezi." />
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-d3-mega.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
+<link rel="stylesheet" href="assets/dashboard-polish.css">
+<link rel="stylesheet" href="assets/teacher-dashboard.css">
+<link rel="stylesheet" href="assets/trial-lesson-manager.css">
+<script src="assets/auth-tab-session.js"></script>
+<script src="assets/dashboard-switcher.js" defer></script>
+<script src="assets/trial-lesson-manager-shell.js" defer></script>
+<script src="assets/shell.js" defer></script>
+</head>
+<body data-trial-manager-active="dashboard">
+
+<div class="scene" aria-hidden="true">
+  <div class="scene-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
+<header class="hud" data-trial-manager-hud></header>
+
+<main class="stage td-teacher-stage tm-stage">
+  <div class="stage-nav" data-trial-manager-nav></div>
+
+  <div class="tm-main-col">
+    <div class="thw-context-panel">
+      <div class="thw-page-head">
+        <h1 class="thw-page-title">Merkez</h1>
+        <p class="thw-page-subtitle">Ücretsiz deneme dersi rezervasyonlarını buradan takip edebilirsin.</p>
+      </div>
+    </div>
+
+    <div id="tmDashLoading" class="td-state">
+      <div class="td-skeleton"><div class="td-skeleton-bar"></div><div class="td-skeleton-bar"></div></div>
+      Özet yükleniyor...
+    </div>
+
+    <div id="tmKpiGrid" class="tm-kpi-grid" hidden></div>
+
+    <section class="tm-panel" aria-labelledby="tmRecentTitle">
+      <div class="tm-panel-head">
+        <h2 class="tm-panel-title" id="tmRecentTitle">Son Rezervasyonlar</h2>
+        <a href="deneme-dersi-yoneticisi-rezervasyonlar.html" class="tm-panel-link">Tümünü gör →</a>
+      </div>
+      <div id="tmRecentWrap"></div>
+    </section>
+  </div>
+</main>
+
+<script src="assets/trial-lesson-manager-mock.js"></script>
+<script src="assets/trial-lesson-manager-dashboard.js"></script>
+</body>
+</html>

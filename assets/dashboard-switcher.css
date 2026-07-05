@@ -82,6 +82,11 @@
   border-color: rgba(14, 165, 183, 0.35);
 }
 
+.db-switch-btn.is-trial-manager.is-active {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  border-color: rgba(139, 92, 246, 0.35);
+}
+
 .db-switch-btn.is-website.is-active {
   background: linear-gradient(135deg, #f59e0b, #d97706);
   border-color: rgba(245, 158, 11, 0.35);
@@ -90,6 +95,7 @@
 .db-switch-btn.is-veli:not(.is-active):hover { color: var(--brand-magenta, #e6087b); }
 .db-switch-btn.is-student:not(.is-active):hover { color: var(--brand-purple, #3e3a8e); }
 .db-switch-btn.is-teacher:not(.is-active):hover { color: #0284c7; }
+.db-switch-btn.is-trial-manager:not(.is-active):hover { color: #6d28d9; }
 .db-switch-btn.is-website:not(.is-active):hover { color: #d97706; }
 
 /* Website — sol sabit dikey menü */
@@ -189,9 +195,15 @@
   border-color: rgba(14, 165, 183, 0.35);
 }
 
+.site-rail-btn.is-trial-manager.is-active {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  border-color: rgba(139, 92, 246, 0.35);
+}
+
 .site-rail-btn.is-veli:not(.is-active):hover { color: var(--brand-magenta, #e6087b); }
 .site-rail-btn.is-student:not(.is-active):hover { color: var(--brand-purple, #3e3a8e); }
 .site-rail-btn.is-teacher:not(.is-active):hover { color: #0284c7; }
+.site-rail-btn.is-trial-manager:not(.is-active):hover { color: #6d28d9; }
 .site-rail-btn.is-website:not(.is-active):hover { color: #d97706; }
 
 @media (max-width: 900px) {

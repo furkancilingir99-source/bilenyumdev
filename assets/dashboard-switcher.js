@@ -33,6 +33,15 @@
       '<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>' +
     '</svg>';
 
+  var ICON_TRIAL_MANAGER =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<rect x="3" y="4" width="18" height="18" rx="2"/>' +
+      '<line x1="16" y1="2" x2="16" y2="6"/>' +
+      '<line x1="8" y1="2" x2="8" y2="6"/>' +
+      '<line x1="3" y1="10" x2="21" y2="10"/>' +
+      '<path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>' +
+    '</svg>';
+
   var WEBSITE_PAGES = {
     '': true,
     'index.html': true,
@@ -54,7 +63,8 @@
     { key: 'website', href: '/', label: 'Website', short: 'Website', icon: ICON_WEBSITE, cls: 'is-website' },
     { key: 'veli', href: 'veli-dashboard.html', label: 'Veli Dashboard', short: 'Veli', icon: ICON_VELI, cls: 'is-veli' },
     { key: 'student', href: 'ogrenci-dashboard.html', label: 'Öğrenci Dashboard', short: 'Öğrenci', icon: ICON_STUDENT, cls: 'is-student' },
-    { key: 'teacher', href: 'ogretmen-dashboard.html', label: 'Öğretmen Dashboard', short: 'Öğretmen', icon: ICON_TEACHER, cls: 'is-teacher' }
+    { key: 'teacher', href: 'ogretmen-dashboard.html', label: 'Öğretmen Dashboard', short: 'Öğretmen', icon: ICON_TEACHER, cls: 'is-teacher' },
+    { key: 'trial-manager', href: 'deneme-dersi-yoneticisi-dashboard.html', label: 'Deneme Dersi Yöneticisi', short: 'D.D. Yön.', icon: ICON_TRIAL_MANAGER, cls: 'is-trial-manager' }
   ];
 
   function pageName() {
@@ -72,9 +82,11 @@
 
   function detectPersona() {
     if (isWebsitePage()) return 'website';
+    if (document.body && document.body.getAttribute('data-trial-manager-active') !== null) return 'trial-manager';
     if (document.body && document.body.getAttribute('data-teacher-active') !== null) return 'teacher';
     if (document.body && document.body.classList.contains('is-veli-parent')) return 'veli';
     var file = pageName().toLowerCase();
+    if (/^deneme-dersi-yoneticisi-/.test(file)) return 'trial-manager';
     if (/^ogretmen-/.test(file)) return 'teacher';
     if (/^veli-/.test(file)) return 'veli';
     return 'student';

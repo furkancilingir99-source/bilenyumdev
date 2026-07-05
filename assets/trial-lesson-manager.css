@@ -1,0 +1,212 @@
+/* Deneme Dersi Yöneticisi — sayfa stilleri */
+
+.tm-stage {
+  grid-template-columns: auto 1fr;
+}
+
+.tm-main-col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.tm-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.tm-kpi-card {
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(168, 164, 240, 0.22);
+  box-shadow: 0 4px 18px rgba(40, 38, 90, 0.06);
+}
+
+.tm-kpi-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-dark-2, #5c567a);
+  margin-bottom: 6px;
+}
+
+.tm-kpi-value {
+  font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--brand-navy, #28265a);
+  line-height: 1.1;
+}
+
+.tm-kpi-card.is-pending .tm-kpi-value { color: #d97706; }
+.tm-kpi-card.is-today .tm-kpi-value { color: #0284c7; }
+.tm-kpi-card.is-confirmed .tm-kpi-value { color: #059669; }
+
+.tm-panel {
+  padding: 20px 22px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(168, 164, 240, 0.22);
+  box-shadow: 0 6px 24px rgba(40, 38, 90, 0.07);
+}
+
+.tm-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tm-panel-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-panel-link {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand-purple, #3e3a8e);
+  text-decoration: none;
+}
+
+.tm-panel-link:hover { text-decoration: underline; }
+
+.tm-res-table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(168, 164, 240, 0.18);
+}
+
+.tm-res-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.tm-res-table th,
+.tm-res-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(168, 164, 240, 0.12);
+  white-space: nowrap;
+}
+
+.tm-res-table th {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-dark-2, #5c567a);
+  background: rgba(62, 58, 142, 0.04);
+}
+
+.tm-res-table tbody tr:hover {
+  background: rgba(62, 58, 142, 0.03);
+}
+
+.tm-res-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tm-cell-name strong {
+  display: block;
+  font-weight: 800;
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-cell-name small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--ink-dark-2, #5c567a);
+}
+
+.tm-cell-contact a {
+  color: var(--brand-purple, #3e3a8e);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.tm-cell-contact a:hover { text-decoration: underline; }
+
+.tm-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.tm-status.is-pending {
+  background: rgba(245, 158, 11, 0.14);
+  color: #b45309;
+}
+
+.tm-status.is-confirmed {
+  background: rgba(16, 185, 129, 0.14);
+  color: #047857;
+}
+
+.tm-status.is-completed {
+  background: rgba(14, 165, 183, 0.14);
+  color: #0369a1;
+}
+
+.tm-status.is-cancelled {
+  background: rgba(148, 163, 184, 0.18);
+  color: #64748b;
+}
+
+.tm-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.tm-search {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(168, 164, 240, 0.28);
+  background: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-search:focus {
+  outline: none;
+  border-color: rgba(91, 84, 201, 0.55);
+  box-shadow: 0 0 0 3px rgba(91, 84, 201, 0.12);
+}
+
+.tm-filter-select {
+  padding: 10px 32px 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(168, 164, 240, 0.28);
+  background: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-navy, #28265a);
+}
+
+@media (max-width: 1100px) {
+  .tm-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .tm-kpi-grid { grid-template-columns: 1fr; }
+}
