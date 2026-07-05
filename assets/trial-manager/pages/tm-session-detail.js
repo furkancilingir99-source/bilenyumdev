@@ -130,8 +130,15 @@
   }
 
   function renderAttendance(d) {
-    if (d.session.status !== 'completed' && d.session.date >= Store.todayKey()) {
-      return '<p class="tm-empty">Ders tamamlandıktan sonra katılım girilebilir. Dersi tamamlamak için sonuçları kaydedin.</p>';
+    if (d.session.status === 'cancelled') {
+      return '<p class="tm-empty">İptal edilmiş ders için katılım girilemez.</p>';
+    }
+    var today = Store.todayKey();
+    if (d.session.status !== 'completed' && d.session.date > today) {
+      return '<p class="tm-empty">Gelecek dersler için henüz katılım girilemez.</p>';
+    }
+    if (!d.participants.length) {
+      return '<p class="tm-empty">Katılımcı yok — önce rezervasyon oluşturun.</p>';
     }
     var readOnly = global.TMPermissions && !global.TMPermissions.can('edit');
     var rows = d.participants.map(function (p) {

@@ -210,6 +210,126 @@
     });
   }
 
+  function rowActions(x, i) {
+    var parts = [];
+    if (x.phone) {
+      parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-wa-idx="' + i + '">WhatsApp</button>');
+    }
+    if (x.reservation) {
+      var rid = x.reservation.id;
+      var reqId = x.reservation.requestId;
+      if (activeTab === 'pending' || activeTab === 'today') {
+        parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-act-approve="' + i + '" data-tm-require="edit">Onayladı</button>');
+        parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-act-unreach="' + i + '" data-tm-require="edit">Ulaşılamadı</button>');
+        parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-act-call="' + i + '" data-tm-require="edit">Tekrar ara</button>');
+      }
+      if (activeTab === 'link') {
+        parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-act-link="' + i + '" data-tm-require="edit">Link gönderildi</button>');
+      }
+      if (activeTab === 'unreachable') {
+        parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-act-call="' + i + '" data-tm-require="edit">Tekrar ara</button>');
+        parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-act-approve="' + i + '" data-tm-require="edit">Onayladı</button>');
+      }
+      if (activeTab === 'call_again') {
+        parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-act-approve="' + i + '" data-tm-require="edit">Onayladı</button>');
+      }
+      if (reqId && activeTab !== 'all') {
+        parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-act-request="' + reqId + '">Talep</button>');
+      }
+      if (activeTab !== 'all') {
+        parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '" data-tm-require="edit">Kayıt ekle</button>');
+      }
+    } else if (x.session && x.role === 'Öğretmen') {
+      if (activeTab === 'teacher') {
+        parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-act-inform="' + i + '" data-tm-require="edit">Bilgilendirildi</button>');
+        parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-act-session="' + x.session.id + '">Ders</button>');
+      }
+    }
+    if (activeTab === 'all') {
+      parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '" data-tm-require="edit">Kayıt ekle</button>');
+    }
+    return parts.join(' ');
+  }
+
+  function bindRowActions() {
+    tbody.querySelectorAll('[data-log-idx]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var idx = parseInt(btn.getAttribute('data-log-idx'), 10);
+        if (lastItems[idx]) openLogForm(lastItems[idx]);
+      });
+    });
+    tbody.querySelectorAll('[data-wa-idx]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var idx = parseInt(btn.getAttribute('data-wa-idx'), 10);
+        if (lastItems[idx]) openWhatsApp(lastItems[idx]);
+      });
+    });
+    tbody.querySelectorAll('[data-act-approve]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (Perms && !Perms.guard('edit')) return;
+        var row = lastItems[parseInt(btn.getAttribute('data-act-approve'), 10)];
+        if (!row || !row.reservation || !row.reservation.requestId) return;
+        var result = Store.approveParentForRequest(row.reservation.requestId);
+        if (!result.ok) U.notifyError(result.error);
+        else { U.notifySuccess('Veli onayı kaydedildi.'); if (window.TMOnSessionChange) window.TMOnSessionChange(); render(); }
+      });
+    });
+    tbody.querySelectorAll('[data-act-unreach]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (Perms && !Perms.guard('edit')) return;
+        var row = lastItems[parseInt(btn.getAttribute('data-act-unreach'), 10)];
+        if (!row || !row.reservation) return;
+        Store.updateParentApproval(row.reservation.id, 'unreachable');
+        U.notifySuccess('Ulaşılamadı işaretlendi.');
+        if (window.TMOnSessionChange) window.TMOnSessionChange();
+        render();
+      });
+    });
+    tbody.querySelectorAll('[data-act-call]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (Perms && !Perms.guard('edit')) return;
+        var row = lastItems[parseInt(btn.getAttribute('data-act-call'), 10)];
+        if (!row || !row.reservation) return;
+        Store.updateParentApproval(row.reservation.id, 'call_again');
+        U.notifySuccess('Tekrar aranacak işaretlendi.');
+        if (window.TMOnSessionChange) window.TMOnSessionChange();
+        render();
+      });
+    });
+    tbody.querySelectorAll('[data-act-link]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (Perms && !Perms.guard('edit')) return;
+        var row = lastItems[parseInt(btn.getAttribute('data-act-link'), 10)];
+        if (!row || !row.reservation) return;
+        var result = Store.markLinkSent(row.reservation.id);
+        if (!result.ok) U.notifyError(result.error);
+        else { U.notifySuccess('Link gönderildi işaretlendi.'); if (window.TMOnSessionChange) window.TMOnSessionChange(); render(); }
+      });
+    });
+    tbody.querySelectorAll('[data-act-inform]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (Perms && !Perms.guard('edit')) return;
+        var row = lastItems[parseInt(btn.getAttribute('data-act-inform'), 10)];
+        if (!row || !row.session) return;
+        Store.markTeacherInformed(row.session.id);
+        U.notifySuccess('Öğretmen bilgilendirildi.');
+        if (window.TMOnSessionChange) window.TMOnSessionChange();
+        render();
+      });
+    });
+    tbody.querySelectorAll('[data-act-session]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (window.TMSessionDetail) window.TMSessionDetail.open(btn.getAttribute('data-act-session'));
+      });
+    });
+    tbody.querySelectorAll('[data-act-request]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (window.TMRequestDrawer) window.TMRequestDrawer.open(btn.getAttribute('data-act-request'));
+        else window.location.href = 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(btn.getAttribute('data-act-request'));
+      });
+    });
+  }
+
   function renderTabs() {
     if (!tabsEl) return;
     tabsEl.innerHTML = TAB_DEFS.map(function (t) {
@@ -250,25 +370,14 @@
         var stName = x.student ? U.fullName(x.student.firstName, x.student.lastName) : '—';
         var sessLabel = x.session ? U.formatDateKey(x.session.date) + ' ' + x.session.startTime : '—';
         var result = x.reservation ? SL.parentApprovalLabel(x.reservation.parentApprovalStatus) : 'Bilgilendirilmedi';
-        var waBtn = x.phone ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-wa-idx="' + i + '">WhatsApp</button>' : '';
+        var actions = rowActions(x, i);
         return '<tr><td>' + U.escapeHtml(x.person) + '</td><td>' + x.role + '</td><td>' + U.escapeHtml(stName) + '</td><td>' + U.escapeHtml(sessLabel) + '</td>' +
           '<td>' + U.escapeHtml(x.phone) + '</td><td>—</td><td>' + U.escapeHtml(result) + '</td><td>—</td><td>—</td><td>' + U.escapeHtml(resp) + '</td>' +
-          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '" data-tm-require="edit">Kayıt ekle</button> ' + waBtn + '</td></tr>';
+          '<td style="white-space:nowrap">' + actions + '</td></tr>';
       }).join('');
     }
     U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
-    tbody.querySelectorAll('[data-log-idx]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var idx = parseInt(btn.getAttribute('data-log-idx'), 10);
-        if (lastItems[idx]) openLogForm(lastItems[idx]);
-      });
-    });
-    tbody.querySelectorAll('[data-wa-idx]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var idx = parseInt(btn.getAttribute('data-wa-idx'), 10);
-        if (lastItems[idx]) openWhatsApp(lastItems[idx]);
-      });
-    });
+    bindRowActions();
     if (loading) loading.hidden = true;
     if (wrap) wrap.hidden = false;
     if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(tbody);

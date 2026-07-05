@@ -110,7 +110,8 @@
       });
     });
     tbody.querySelectorAll('tr[data-id]').forEach(function (tr) {
-      tr.addEventListener('click', function () {
+      tr.addEventListener('click', function (e) {
+        if (e.target.closest('a, button')) return;
         if (window.TMSessionDetail) window.TMSessionDetail.open(tr.getAttribute('data-id'));
       });
     });

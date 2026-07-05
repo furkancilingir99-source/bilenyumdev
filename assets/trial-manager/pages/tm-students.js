@@ -107,6 +107,12 @@
         openDetail(Store.getStudentById(btn.getAttribute('data-detail')));
       });
     });
+    tbody.querySelectorAll('tr[data-id]').forEach(function (tr) {
+      tr.addEventListener('click', function (e) {
+        if (e.target.closest('button')) return;
+        openDetail(Store.getStudentById(tr.getAttribute('data-id')));
+      });
+    });
     if (loading) loading.hidden = true;
     if (wrap) wrap.hidden = false;
     } catch (err) {

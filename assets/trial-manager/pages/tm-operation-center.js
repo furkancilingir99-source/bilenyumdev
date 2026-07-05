@@ -111,14 +111,14 @@
       var st = Store.getStudentById(r.studentId);
       items.push({
         text: 'Veli onayı: ' + (st ? U.fullName(st.firstName, st.lastName) : r.id),
-        href: reservationDetailHref(r)
+        requestId: r.requestId
       });
     });
     m.linkNotSent.slice(0, 3).forEach(function (r) {
       var st = Store.getStudentById(r.studentId);
       items.push({
         text: 'Link gönderilmedi: ' + (st ? U.fullName(st.firstName, st.lastName) : r.id),
-        href: reservationDetailHref(r)
+        requestId: r.requestId
       });
     });
     m.teacherNotInformed.slice(0, 3).forEach(function (s) {
@@ -127,7 +127,7 @@
     m.orphanRequests.slice(0, 3).forEach(function (r) {
       items.push({
         text: 'Rezervasyonsuz: ' + r.studentFirstName + ' ' + r.studentLastName,
-        href: 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(r.id)
+        requestId: r.id
       });
     });
     m.needsAttendance.slice(0, 3).forEach(function (s) {
@@ -145,8 +145,20 @@
       if (it.sessionId) {
         return '<li class="tm-action-item"><span>' + U.escapeHtml(it.text) + '</span><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-session="' + it.sessionId + '">Aç</button></li>';
       }
+      if (it.requestId) {
+        return '<li class="tm-action-item"><span>' + U.escapeHtml(it.text) + '</span>' +
+          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-open-request="' + it.requestId + '">Aç</button>' +
+          '<a href="deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(it.requestId) + '" class="tm-panel-link" style="margin-left:8px">Tam sayfa</a></li>';
+      }
       return '<li class="tm-action-item"><span>' + U.escapeHtml(it.text) + '</span><a href="' + it.href + '" class="tm-panel-link">Git →</a></li>';
     }).join('');
+    list.querySelectorAll('[data-open-request]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var rid = btn.getAttribute('data-open-request');
+        if (global.TMRequestDrawer) global.TMRequestDrawer.open(rid);
+        else window.location.href = 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(rid);
+      });
+    });
     list.querySelectorAll('[data-session]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (window.TMSessionDetail) window.TMSessionDetail.open(btn.getAttribute('data-session'));

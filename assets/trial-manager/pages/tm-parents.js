@@ -50,20 +50,28 @@
     Drawer.open({
       title: U.fullName(pa.firstName, pa.lastName),
       subtitle: pa.phone,
-      body: '<div class="tm-detail-actions" style="margin-bottom:12px">' +
-        '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-wa-parent>WhatsApp</button>' +
-        '</div>' +
-        '<div class="tm-detail-grid">' +
-        '<div><div class="tm-detail-cell-label">E-posta</div><div class="tm-detail-cell-value">' + U.escapeHtml(pa.email) + '</div></div>' +
-        '<div><div class="tm-detail-cell-label">Öğrenciler</div><div class="tm-detail-cell-value">' + students.map(function (s) { return U.escapeHtml(U.fullName(s.firstName, s.lastName)); }).join(', ') + '</div></div></div>' +
-        '<h4 style="margin:16px 0 8px;font-size:13px">Rezervasyonlar</h4>' +
-        (res.length ? '<table class="tm-inner-table"><tbody>' + res.slice(0, 10).map(function (r) {
-          var s = Store.getSessionById(r.sessionId);
-          return '<tr><td>' + (s ? U.formatDateKey(s.date) : r.id) + '</td><td>' + r.status + '</td></tr>';
-        }).join('') + '</tbody></table>' : '<p class="tm-empty">Rezervasyon yok.</p>')
+      tabs: [{ label: 'İletişim' }, { label: 'Rezervasyonlar' }],
+      onTab: function (idx, body) {
+        if (idx === 0) {
+          body.innerHTML =
+            '<div class="tm-detail-actions" style="margin-bottom:12px">' +
+              '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-wa-parent>WhatsApp</button>' +
+            '</div>' +
+            '<div class="tm-detail-grid">' +
+            '<div><div class="tm-detail-cell-label">E-posta</div><div class="tm-detail-cell-value">' + U.escapeHtml(pa.email) + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Öğrenciler</div><div class="tm-detail-cell-value">' + students.map(function (s) { return U.escapeHtml(U.fullName(s.firstName, s.lastName)); }).join(', ') + '</div></div></div>';
+          body.querySelector('[data-wa-parent]').addEventListener('click', function () { openParentWhatsApp(pa); });
+        } else {
+          body.innerHTML = res.length ? '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Durum</th><th>Onay</th></tr></thead><tbody>' + res.slice(0, 10).map(function (r) {
+            var s = Store.getSessionById(r.sessionId);
+            return '<tr><td>' + (s ? U.formatDateKey(s.date) + ' ' + s.startTime : r.id) + '</td><td>' + SL.reservationBadge(r.status) + '</td><td>' + SL.parentApprovalBadge(r.parentApprovalStatus) + '</td></tr>';
+          }).join('') + '</tbody></table>' : '<p class="tm-empty">Rezervasyon yok.</p>';
+        }
+        if (window.TMPermissions && window.TMPermissions.applyPageChrome) {
+          window.TMPermissions.applyPageChrome(body);
+        }
+      }
     });
-    var waBtn = document.querySelector('#tmDetailDrawer [data-wa-parent]');
-    if (waBtn) waBtn.addEventListener('click', function () { openParentWhatsApp(pa); });
   }
 
   function filtered() {
@@ -87,7 +95,7 @@
       var linkSent = res.some(function (r) { return r.linkSent; });
       var callAgain = res.some(function (r) { return r.parentApprovalStatus === 'call_again'; });
       var approval = active.length ? SL.parentApprovalBadge(active[0].parentApprovalStatus) : '—';
-      return '<tr><td>' + U.escapeHtml(U.fullName(pa.firstName, pa.lastName)) + '</td>' +
+      return '<tr data-id="' + pa.id + '" style="cursor:pointer"><td>' + U.escapeHtml(U.fullName(pa.firstName, pa.lastName)) + '</td>' +
         '<td>' + U.escapeHtml(pa.phone) + '</td><td>' + U.escapeHtml(pa.email) + '</td>' +
         '<td>' + pa.studentIds.length + '</td>' +
         '<td>' + (lastComm ? U.formatDateTime(lastComm.createdAt) : '—') + '</td>' +
@@ -98,7 +106,16 @@
     }).join('');
     U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
     tbody.querySelectorAll('[data-detail]').forEach(function (btn) {
-      btn.addEventListener('click', function () { openDetail(Store.getParentById(btn.getAttribute('data-detail'))); });
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        openDetail(Store.getParentById(btn.getAttribute('data-detail')));
+      });
+    });
+    tbody.querySelectorAll('tr[data-id]').forEach(function (tr) {
+      tr.addEventListener('click', function (e) {
+        if (e.target.closest('button')) return;
+        openDetail(Store.getParentById(tr.getAttribute('data-id')));
+      });
     });
     if (loading) loading.hidden = true;
     if (wrap) wrap.hidden = false;

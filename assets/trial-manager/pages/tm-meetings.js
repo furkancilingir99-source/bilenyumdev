@@ -63,7 +63,7 @@
       var s = r.session;
       var lt = r.detail.lessonType;
       var teacher = r.detail.teacher;
-      return '<tr><td>' + U.formatDateKey(s.date) + '</td><td>' + s.startTime + '</td>' +
+      return '<tr data-id="' + s.id + '" style="cursor:pointer"><td>' + U.formatDateKey(s.date) + '</td><td>' + s.startTime + '</td>' +
         '<td>' + (lt ? lt.name : '—') + '</td>' +
         '<td>' + (teacher ? U.escapeHtml(U.fullName(teacher.firstName, teacher.lastName)) : '—') + '</td>' +
         '<td><code style="font-size:11px">' + U.escapeHtml(r.meeting.meetingId) + '</code></td>' +
@@ -78,8 +78,15 @@
     }).join('');
     U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
     tbody.querySelectorAll('[data-session]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
         if (window.TMSessionDetail) window.TMSessionDetail.open(btn.getAttribute('data-session'), 2);
+      });
+    });
+    tbody.querySelectorAll('tr[data-id]').forEach(function (tr) {
+      tr.addEventListener('click', function (e) {
+        if (e.target.closest('button')) return;
+        if (window.TMSessionDetail) window.TMSessionDetail.open(tr.getAttribute('data-id'), 2);
       });
     });
     tbody.querySelectorAll('[data-copy-url]').forEach(function (btn) {

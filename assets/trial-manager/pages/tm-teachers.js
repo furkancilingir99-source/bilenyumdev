@@ -8,6 +8,7 @@
   var U = window.TMUtils;
   var Drawer = window.TMDetailDrawer;
   var Export = window.TMExportUtils;
+  var QuickMsg = window.TMQuickMessage;
   if (!Store) return;
 
   var tbody = document.getElementById('tmTeachersBody');
@@ -36,15 +37,40 @@
       tabs: [{ label: 'Bilgi' }, { label: 'Yaklaşan dersler' }, { label: 'Müsaitlik' }],
       onTab: function (idx, body) {
         if (idx === 0) {
-          body.innerHTML = '<div class="tm-detail-grid">' +
+          body.innerHTML =
+            '<div class="tm-detail-actions" style="margin-bottom:12px">' +
+              (QuickMsg ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-wa-teacher>WhatsApp</button>' : '') +
+            '</div>' +
+            '<div class="tm-detail-grid">' +
             '<div><div class="tm-detail-cell-label">Telefon</div><div class="tm-detail-cell-value">' + U.escapeHtml(t.phone) + '</div></div>' +
             '<div><div class="tm-detail-cell-label">E-posta</div><div class="tm-detail-cell-value">' + U.escapeHtml(t.email) + '</div></div>' +
             '<div><div class="tm-detail-cell-label">Dashboard</div><div class="tm-detail-cell-value">' + (t.dashboardEnabled ? 'Aktif' : 'Kapalı') + '</div></div></div>';
+          var waBtn = body.querySelector('[data-wa-teacher]');
+          if (waBtn && QuickMsg) {
+            waBtn.addEventListener('click', function () {
+              var next = upcoming[0] || sessions[0];
+              var lt = next ? Store.getLessonTypeById(next.lessonTypeId) : null;
+              QuickMsg.openForTeacher({
+                teacherName: U.fullName(t.firstName, t.lastName),
+                date: next ? U.formatDateKey(next.date) : '—',
+                time: next ? next.startTime : '—',
+                lessonType: lt ? lt.name : branchLabel(t),
+                studentCount: next ? next.enrolledStudentIds.length : 0,
+                phone: t.phone,
+                email: t.email
+              });
+            });
+          }
         } else if (idx === 1) {
           body.innerHTML = upcoming.length ? '<table class="tm-inner-table"><tbody>' + upcoming.map(function (s) {
             var lt = Store.getLessonTypeById(s.lessonTypeId);
-            return '<tr><td>' + U.formatDateKey(s.date) + ' ' + s.startTime + '</td><td>' + (lt ? lt.name : '') + '</td><td>' + s.enrolledStudentIds.length + '/20</td></tr>';
+            return '<tr data-session-row="' + s.id + '" style="cursor:pointer"><td>' + U.formatDateKey(s.date) + ' ' + s.startTime + '</td><td>' + (lt ? lt.name : '') + '</td><td>' + s.enrolledStudentIds.length + '/20</td></tr>';
           }).join('') + '</tbody></table>' : '<p class="tm-empty">Yaklaşan ders yok.</p>';
+          body.querySelectorAll('[data-session-row]').forEach(function (row) {
+            row.addEventListener('click', function () {
+              if (window.TMSessionDetail) window.TMSessionDetail.open(row.getAttribute('data-session-row'));
+            });
+          });
         } else {
           var days = ['Paz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct'];
           body.innerHTML = '<table class="tm-inner-table"><tbody>' + (t.availability || []).map(function (a) {
