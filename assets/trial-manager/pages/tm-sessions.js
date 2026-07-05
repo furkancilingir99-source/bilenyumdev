@@ -99,8 +99,8 @@
         '<td>' + (s.teacherInformed ? '✓' : '—') + '</td>' +
         '<td>' + SL.sessionBadge(s.status) + '</td>' +
         '<td>' + U.formatDateTime(s.updatedAt) + '</td>' +
-        '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + s.id + '">Detay</button> ' +
-        '<a class="tm-btn tm-btn--sm tm-btn--ghost" href="deneme-dersi-yoneticisi-ders-planla.html?edit=' + encodeURIComponent(s.id) + '">Düzenle</a></td></tr>';
+          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + s.id + '">Detay</button> ' +
+        '<a class="tm-btn tm-btn--sm tm-btn--ghost" href="deneme-dersi-yoneticisi-ders-planla.html?edit=' + encodeURIComponent(s.id) + '" data-tm-require="edit">Düzenle</a></td></tr>';
     }).join('');
     U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
     tbody.querySelectorAll('[data-detail]').forEach(function (btn) {
@@ -116,6 +116,9 @@
     });
     if (loading) loading.hidden = true;
     if (wrap) wrap.hidden = false;
+    if (window.TMPermissions && window.TMPermissions.applyPageChrome) {
+      window.TMPermissions.applyPageChrome(tbody);
+    }
     } catch (err) {
       if (loading) loading.textContent = 'Liste yüklenemedi: ' + err.message;
       console.error(err);

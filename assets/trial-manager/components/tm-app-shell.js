@@ -62,6 +62,7 @@
               '</span>' + ICON.chevron +
             '</button>' +
             '<div class="hud-menu" id="profileMenu" role="menu">' +
+              '<a class="hud-menu-item" href="deneme-dersi-yoneticisi-ayarlar.html" role="menuitem">Ayarlar</a>' +
               '<button type="button" class="hud-menu-item is-danger" role="menuitem">Çıkış Yap</button>' +
             '</div>' +
           '</div>' +
@@ -206,11 +207,41 @@
     var menu = document.getElementById('profileMenu');
     if (!btn || !menu || btn.dataset.inited) return;
     btn.dataset.inited = '1';
+    function closeMenu() {
+      menu.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
-      menu.classList.toggle('is-open');
+      var willOpen = !menu.classList.contains('is-open');
+      closeMenu();
+      if (willOpen) {
+        menu.classList.add('is-open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
     });
-    document.addEventListener('click', function () { menu.classList.remove('is-open'); });
+    document.addEventListener('click', function (e) {
+      if (!btn.contains(e.target) && !menu.contains(e.target)) closeMenu();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeMenu();
+    });
+    menu.addEventListener('click', function (e) {
+      var logoutBtn = e.target.closest('.hud-menu-item.is-danger');
+      if (!logoutBtn) return;
+      e.preventDefault();
+      logoutBtn.disabled = true;
+      if (global.BilenyumBrowserSession && global.BilenyumBrowserSession.clear) {
+        global.BilenyumBrowserSession.clear();
+      } else {
+        try {
+          localStorage.removeItem('bilenyum.browserSession');
+          sessionStorage.removeItem('bilenyum.tabSession');
+        } catch (err) {}
+      }
+      fetch('/api/logout', { method: 'POST', credentials: 'same-origin' })
+        .finally(function () { window.location.href = '/giris'; });
+    });
   }
 
   function initMobileMenu() {

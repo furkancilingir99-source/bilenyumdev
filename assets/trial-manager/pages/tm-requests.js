@@ -9,6 +9,7 @@
   var SL = window.TMStatusLabels;
   var Export = window.TMExportUtils;
   var Perms = window.TMPermissions;
+  var RequestDrawer = window.TMRequestDrawer;
   if (!Store) return;
 
   var tbody = document.getElementById('tmRequestsBody');
@@ -84,13 +85,24 @@
         '<td>' + (res ? SL.parentApprovalBadge(res.parentApprovalStatus) : '—') + '</td>' +
         '<td>' + SL.requestBadge(r.status) + '</td>' +
         '<td>' + (res && res.linkSent ? 'Evet' : 'Hayır') + '</td>' +
-        '<td><a class="tm-btn tm-btn--sm tm-btn--ghost" href="deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(r.id) + '">İncele</a></td></tr>';
+        '<td style="white-space:nowrap">' +
+          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-open-drawer="' + r.id + '">İncele</button> ' +
+          '<a class="tm-btn tm-btn--sm tm-btn--ghost" href="deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(r.id) + '" title="Tam sayfa detay">Tam sayfa</a>' +
+        '</td></tr>';
     }).join('');
     U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
     tbody.querySelectorAll('tr[data-req]').forEach(function (tr) {
       tr.addEventListener('click', function (e) {
-        if (e.target.closest('a')) return;
-        window.location.href = 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(tr.getAttribute('data-req'));
+        if (e.target.closest('a, button')) return;
+        var rid = tr.getAttribute('data-req');
+        if (RequestDrawer) RequestDrawer.open(rid);
+        else window.location.href = 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(rid);
+      });
+    });
+    tbody.querySelectorAll('[data-open-drawer]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (RequestDrawer) RequestDrawer.open(btn.getAttribute('data-open-drawer'));
       });
     });
     if (loading) loading.hidden = true;
@@ -134,5 +146,7 @@
     });
   }
   render();
+  var openId = U.qs('id');
+  if (openId && RequestDrawer) RequestDrawer.open(openId);
   window.TMOnSessionChange = render;
 })();

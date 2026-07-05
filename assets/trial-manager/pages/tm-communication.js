@@ -243,7 +243,7 @@
           '<td>' + U.escapeHtml(SL.COMM_RESULT[l.result] || l.result) + '</td>' +
           '<td>' + U.formatDateTime(l.createdAt) + '</td><td>' + U.escapeHtml(l.nextAction || '—') + '</td>' +
           '<td>' + U.escapeHtml(x.responsible || '—') + '</td>' +
-          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '">Kayıt ekle</button></td></tr>';
+          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '" data-tm-require="edit">Kayıt ekle</button></td></tr>';
       }).join('');
     } else {
       tbody.innerHTML = p.items.map(function (x, i) {
@@ -253,7 +253,7 @@
         var waBtn = x.phone ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-wa-idx="' + i + '">WhatsApp</button>' : '';
         return '<tr><td>' + U.escapeHtml(x.person) + '</td><td>' + x.role + '</td><td>' + U.escapeHtml(stName) + '</td><td>' + U.escapeHtml(sessLabel) + '</td>' +
           '<td>' + U.escapeHtml(x.phone) + '</td><td>—</td><td>' + U.escapeHtml(result) + '</td><td>—</td><td>—</td><td>' + U.escapeHtml(resp) + '</td>' +
-          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '">Kayıt ekle</button> ' + waBtn + '</td></tr>';
+          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '" data-tm-require="edit">Kayıt ekle</button> ' + waBtn + '</td></tr>';
       }).join('');
     }
     U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
@@ -271,6 +271,7 @@
     });
     if (loading) loading.hidden = true;
     if (wrap) wrap.hidden = false;
+    if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(tbody);
     } catch (err) {
       if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
       console.error(err);
