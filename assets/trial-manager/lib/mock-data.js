@@ -37,6 +37,37 @@
     return { ok: true };
   }
 
+  var SNAPSHOT_KEYS = ['lessonTypes', 'teachers', 'students', 'parents', 'sessions', 'meetings', 'requests', 'reservations', 'communicationLogs', 'auditLogs', 'users', 'currentUserId'];
+
+  function exportMockSnapshot() {
+    return {
+      ok: true,
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      state: JSON.parse(JSON.stringify(state))
+    };
+  }
+
+  function importMockSnapshot(payload) {
+    if (!payload || !payload.state || typeof payload.state !== 'object') {
+      return { ok: false, error: 'Geçersiz yedek dosyası.' };
+    }
+    var s = payload.state;
+    for (var i = 0; i < SNAPSHOT_KEYS.length; i++) {
+      var key = SNAPSHOT_KEYS[i];
+      if (key === 'currentUserId') {
+        if (typeof s.currentUserId !== 'string') return { ok: false, error: 'Yedekte currentUserId eksik.' };
+        continue;
+      }
+      if (!Array.isArray(s[key])) return { ok: false, error: 'Yedekte ' + key + ' alanı geçersiz.' };
+    }
+    SNAPSHOT_KEYS.forEach(function (k) {
+      if (Object.prototype.hasOwnProperty.call(s, k)) state[k] = s[k];
+    });
+    touch();
+    return { ok: true };
+  }
+
   function getMockStats() {
     var orphan = state.requests.filter(function (r) {
       if (r.status === 'rejected' || r.status === 'cancelled') return false;
@@ -1593,6 +1624,8 @@
     markAttendance: markAttendance,
     updateUserPermissions: updateUserPermissions,
     resetMockData: resetMockData,
+    exportMockSnapshot: exportMockSnapshot,
+    importMockSnapshot: importMockSnapshot,
     getMockStats: getMockStats,
     createSimulatedRequest: createSimulatedRequest,
     switchCurrentUser: switchCurrentUser,

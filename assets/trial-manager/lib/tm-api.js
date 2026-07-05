@@ -111,6 +111,8 @@
     getDataConsistencySnapshot: callStore('getDataConsistencySnapshot'),
     createSimulatedRequest: callStore('createSimulatedRequest'),
     resetMockData: callStore('resetMockData'),
+    exportMockSnapshot: callStore('exportMockSnapshot'),
+    importMockSnapshot: callStore('importMockSnapshot'),
     switchCurrentUser: callStore('switchCurrentUser'),
     updateUserPermissions: callStore('updateUserPermissions')
   };

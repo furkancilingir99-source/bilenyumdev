@@ -18,6 +18,8 @@
   var switchUserBtn = document.getElementById('tmSwitchUser');
   var apiModeEl = document.getElementById('tmApiModeLabel');
   var exportAuditBtn = document.getElementById('tmExportAudit');
+  var exportMockBtn = document.getElementById('tmExportMock');
+  var importMockInput = document.getElementById('tmImportMock');
 
   var Export = window.TMExportUtils;
   var SL = window.TMStatusLabels;
@@ -27,6 +29,48 @@
     if (!apiModeEl) return;
     var mode = Api && Api.getMode ? Api.getMode() : 'mock';
     apiModeEl.textContent = mode === 'mock' ? 'Mock (TMStore · oturum depolaması)' : 'REST API';
+  }
+
+  function exportMockJson() {
+    if (!Store.exportMockSnapshot) return;
+    if (Perms && !Perms.guard('export')) return;
+    var snap = Store.exportMockSnapshot();
+    var blob = new Blob([JSON.stringify(snap, null, 2)], { type: 'application/json;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'bilenyum-tmstore-' + new Date().toISOString().slice(0, 10) + '.json';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    if (window.TMToast) window.TMToast.show('Mock veri yedeklendi.', 'success');
+  }
+
+  function importMockJson(file) {
+    if (!file || !Store.importMockSnapshot) return;
+    if (Perms && !Perms.guard('edit')) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        var payload = JSON.parse(String(reader.result || ''));
+        var res = Store.importMockSnapshot(payload);
+        if (!res.ok) {
+          if (U.notifyError) U.notifyError(res.error);
+          return;
+        }
+        if (window.TMToast) window.TMToast.show('Mock veri yüklendi.', 'success');
+        if (window.TMOnSessionChange) window.TMOnSessionChange();
+        renderStats();
+        renderUserSelect();
+        if (Perms && Perms.applyPageChrome) Perms.applyPageChrome();
+        if (window.TMAppShell && window.TMAppShell.refreshSidebarBadges) window.TMAppShell.refreshSidebarBadges();
+      } catch (e) {
+        if (U.notifyError) U.notifyError('JSON dosyası okunamadı.');
+      }
+    };
+    reader.readAsText(file);
   }
 
   function exportAuditLog() {
@@ -101,6 +145,26 @@
 
   if (switchUserBtn) switchUserBtn.addEventListener('click', switchUser);
   if (exportAuditBtn) exportAuditBtn.addEventListener('click', exportAuditLog);
+  if (exportMockBtn) exportMockBtn.addEventListener('click', exportMockJson);
+  if (importMockInput) {
+    importMockInput.addEventListener('change', function () {
+      if (importMockInput.files && importMockInput.files[0]) {
+        var run = function () {
+          importMockJson(importMockInput.files[0]);
+          importMockInput.value = '';
+        };
+        if (Confirm) {
+          Confirm.open({
+            title: 'Mock veri yükle',
+            message: 'Mevcut oturum verisi yedek dosyasıyla değiştirilir. Devam edilsin mi?',
+            confirmLabel: 'Yükle',
+            danger: true,
+            onConfirm: run
+          });
+        } else run();
+      }
+    });
+  }
   renderUserSelect();
   renderApiMode();
 

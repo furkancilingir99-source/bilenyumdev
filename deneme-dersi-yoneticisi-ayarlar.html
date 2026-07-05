@@ -61,6 +61,11 @@
       <div class="tm-detail-actions">
         <button type="button" class="tm-btn tm-btn--primary" id="tmSimulateRequest">Web formu talebi simüle et</button>
         <button type="button" class="tm-btn tm-btn--ghost" id="tmResetMock">Mock veriyi sıfırla</button>
+        <button type="button" class="tm-btn tm-btn--ghost" id="tmExportMock" data-tm-export>Mock JSON yedekle</button>
+        <label class="tm-btn tm-btn--ghost" id="tmImportMockLabel" style="cursor:pointer;margin:0">
+          Mock JSON yükle
+          <input type="file" id="tmImportMock" accept="application/json,.json" hidden>
+        </label>
         <button type="button" class="tm-btn tm-btn--ghost" id="tmExportAudit" data-tm-export>Denetim günlüğü CSV</button>
         <a class="tm-btn tm-btn--ghost" href="deneme-dersi-yoneticisi-rezervasyonlar.html">Talepleri gör</a>
       </div>
