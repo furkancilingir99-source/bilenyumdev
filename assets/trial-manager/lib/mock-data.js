@@ -645,6 +645,40 @@
     return { ok: true };
   }
 
+  function getReservationByRequestId(requestId) {
+    return state.reservations.find(function (r) { return r.requestId === requestId; }) || null;
+  }
+
+  function approveParentForRequest(requestId) {
+    var req = find(state.requests, requestId);
+    if (!req) return { ok: false, error: 'Talep bulunamadı.' };
+    var res = getReservationByRequestId(requestId);
+    if (res) {
+      res.parentApprovalStatus = 'approved';
+      res.status = 'confirmed';
+      res.updatedAt = new Date().toISOString();
+    }
+    req.status = 'assigned';
+    req.updatedAt = new Date().toISOString();
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'trial_lesson_request',
+        entityId: requestId,
+        action: 'parent_approved',
+        description: 'Veli onayı işaretlendi.'
+      });
+    }
+    return { ok: true, request: req, reservation: res };
+  }
+
+  function updateParentApproval(reservationId, status) {
+    var r = find(state.reservations, reservationId);
+    if (!r) return { ok: false, error: 'Rezervasyon bulunamadı.' };
+    r.parentApprovalStatus = status;
+    r.updatedAt = new Date().toISOString();
+    return { ok: true, reservation: r };
+  }
+
   function updateUserPermissions(userId, perms) {
     var user = find(state.users, userId);
     if (!user) return { ok: false };
@@ -740,6 +774,9 @@
     getMeetingById: function (id) { return find(state.meetings, id); },
     getRequestById: function (id) { return find(state.requests, id); },
     getReservationById: function (id) { return find(state.reservations, id); },
+    getReservationByRequestId: getReservationByRequestId,
+    approveParentForRequest: approveParentForRequest,
+    updateParentApproval: updateParentApproval,
     getMeetingBySessionId: function (sessionId) {
       var s = find(state.sessions, sessionId);
       return s ? find(state.meetings, s.onlineMeetingId) : null;

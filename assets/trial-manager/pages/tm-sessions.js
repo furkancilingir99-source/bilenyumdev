@@ -59,6 +59,8 @@
 
   function render() {
     if (!tbody) return;
+    var loading = document.getElementById('tmSessionsLoading');
+    var wrap = document.getElementById('tmSessionsTableWrap');
     try {
     var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
     var all = filtered();
@@ -93,10 +95,12 @@
         if (window.TMSessionDetail) window.TMSessionDetail.open(tr.getAttribute('data-id'));
       });
     });
-    var loading = document.getElementById('tmSessionsLoading');
-    var wrap = document.getElementById('tmSessionsTableWrap');
     if (loading) loading.hidden = true;
     if (wrap) wrap.hidden = false;
+    } catch (err) {
+      if (loading) loading.textContent = 'Liste yüklenemedi: ' + err.message;
+      console.error(err);
+    }
   }
 
   if (searchInput) searchInput.addEventListener('input', U.debounce(function () { page = 1; render(); }, 200));

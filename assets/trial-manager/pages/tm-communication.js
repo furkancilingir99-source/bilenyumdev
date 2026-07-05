@@ -7,6 +7,7 @@
   var Store = window.TMStore;
   var U = window.TMUtils;
   var SL = window.TMStatusLabels;
+  var Form = window.TMFormDialog;
   if (!Store) return;
 
   var tbody = document.getElementById('tmCommBody');
@@ -15,6 +16,7 @@
   var page = 1;
   var paginationEl = document.getElementById('tmCommPagination');
   var pageSizeSelect = document.getElementById('tmCommPageSize');
+  var lastItems = [];
 
   var TAB_DEFS = [
     { id: 'today', label: 'Bugün aranacaklar' },
@@ -81,6 +83,50 @@
     });
   }
 
+  function channelOptions() {
+    return Object.keys(SL.COMM_CHANNEL).map(function (k) {
+      return { value: k, label: SL.COMM_CHANNEL[k] };
+    });
+  }
+
+  function resultOptions() {
+    return Object.keys(SL.COMM_RESULT).map(function (k) {
+      return { value: k, label: SL.COMM_RESULT[k] };
+    });
+  }
+
+  function openLogForm(rowCtx) {
+    if (!Form) return;
+    Form.open({
+      title: 'İletişim kaydı ekle',
+      fields: [
+        { type: 'select', name: 'channel', label: 'Kanal', options: channelOptions(), value: 'phone' },
+        { type: 'select', name: 'result', label: 'Sonuç', options: resultOptions(), value: 'message_sent' },
+        { type: 'textarea', name: 'summary', label: 'Özet', rows: 4, required: true },
+        { type: 'text', name: 'nextAction', label: 'Sonraki aksiyon', required: false }
+      ],
+      onSubmit: function (data) {
+        var entry = {
+          summary: data.summary,
+          channel: data.channel,
+          result: data.result,
+          nextAction: data.nextAction || ''
+        };
+        if (rowCtx.reservation) {
+          entry.reservationId = rowCtx.reservation.id;
+          entry.sessionId = rowCtx.session ? rowCtx.session.id : rowCtx.reservation.sessionId;
+          entry.parentId = rowCtx.parent ? rowCtx.parent.id : rowCtx.reservation.parentId;
+          entry.studentId = rowCtx.student ? rowCtx.student.id : rowCtx.reservation.studentId;
+        } else if (rowCtx.session) {
+          entry.sessionId = rowCtx.session.id;
+          entry.teacherId = rowCtx.teacher ? rowCtx.teacher.id : rowCtx.session.teacherId;
+        }
+        Store.addCommunicationLog(entry);
+        render();
+      }
+    });
+  }
+
   function renderTabs() {
     if (!tabsEl) return;
     tabsEl.innerHTML = TAB_DEFS.map(function (t) {
@@ -101,6 +147,7 @@
     var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '15', 10);
     var items = filterTab(taskRows());
     var p = U.paginate(items, page, pageSize);
+    lastItems = p.items;
     if (activeTab === 'all') {
       tbody.innerHTML = p.items.map(function (x) {
         var l = x.log;
@@ -110,26 +157,26 @@
           '<td>' + U.formatDateTime(l.createdAt) + '</td><td>' + U.escapeHtml(l.nextAction || '—') + '</td><td>—</td><td>—</td></tr>';
       }).join('');
     } else {
-      tbody.innerHTML = p.items.map(function (x) {
+      tbody.innerHTML = p.items.map(function (x, i) {
         var stName = x.student ? U.fullName(x.student.firstName, x.student.lastName) : '—';
         var sessLabel = x.session ? U.formatDateKey(x.session.date) + ' ' + x.session.startTime : '—';
         var result = x.reservation ? SL.parentApprovalLabel(x.reservation.parentApprovalStatus) : 'Bilgilendirilmedi';
         return '<tr><td>' + U.escapeHtml(x.person) + '</td><td>' + x.role + '</td><td>' + U.escapeHtml(stName) + '</td><td>' + U.escapeHtml(sessLabel) + '</td>' +
           '<td>' + U.escapeHtml(x.phone) + '</td><td>—</td><td>' + U.escapeHtml(result) + '</td><td>—</td><td>—</td><td>Elif Y.</td>' +
-          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log="' + (x.reservation ? x.reservation.id : x.session.id) + '">Kayıt ekle</button></td></tr>';
+          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '">Kayıt ekle</button></td></tr>';
       }).join('');
     }
     U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
-    tbody.querySelectorAll('[data-log]').forEach(function (btn) {
+    tbody.querySelectorAll('[data-log-idx]').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        var summary = prompt('İletişim özeti:');
-        if (!summary) return;
-        Store.addCommunicationLog({ summary: summary, channel: 'phone', result: 'message_sent', reservationId: btn.getAttribute('data-log') });
-        render();
+        var idx = parseInt(btn.getAttribute('data-log-idx'), 10);
+        if (lastItems[idx]) openLogForm(lastItems[idx]);
       });
     });
-    document.getElementById('tmCommLoading').hidden = true;
-    document.getElementById('tmCommTableWrap').hidden = false;
+    var loading = document.getElementById('tmCommLoading');
+    var wrap = document.getElementById('tmCommTableWrap');
+    if (loading) loading.hidden = true;
+    if (wrap) wrap.hidden = false;
   }
 
   renderTabs();

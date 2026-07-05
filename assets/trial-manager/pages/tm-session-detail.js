@@ -9,6 +9,8 @@
   var SL = global.TMStatusLabels;
   var Drawer = global.TMDetailDrawer;
   var Confirm = global.TMConfirmDialog;
+  var Form = global.TMFormDialog;
+  var QuickMsg = global.TMQuickMessage;
   var Msg = global.TMMessageTemplates;
   var Rules = global.TMSchedulingRules;
 
@@ -73,7 +75,10 @@
         '<td>' + SL.parentApprovalBadge(r.parentApprovalStatus) + '</td>' +
         '<td>' + (r.linkSent ? '<span class="tm-badge tm-badge--green">Gönderildi</span>' : '<span class="tm-badge tm-badge--orange">Hayır</span>') + '</td>' +
         '<td>' + SL.reservationBadge(r.status) + '</td>' +
-        '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-link-sent="' + r.id + '">Link gönderildi</button></td>' +
+        '<td style="white-space:nowrap">' +
+          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-wa-parent="' + r.id + '">WhatsApp</button> ' +
+          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-link-sent="' + r.id + '">Link gönderildi</button>' +
+        '</td>' +
       '</tr>';
     }).join('');
     return '<table class="tm-inner-table"><thead><tr><th>Öğrenci</th><th>Sınıf</th><th>Veli</th><th>Telefon</th><th>Veli onay</th><th>Link</th><th>Durum</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
@@ -206,12 +211,36 @@
       });
     }
     if (idx === 1) {
+      bodyEl.querySelectorAll('[data-wa-parent]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var rid = btn.getAttribute('data-wa-parent');
+          var p = d.participants.find(function (x) { return x.reservation.id === rid; });
+          if (!p || !p.parent || !QuickMsg || !d.meeting) return;
+          QuickMsg.openForParent({
+            parentName: U.fullName(p.parent.firstName, p.parent.lastName),
+            studentName: U.fullName(p.student.firstName, p.student.lastName),
+            lessonType: d.lessonType.name,
+            date: U.formatDateKey(d.session.date),
+            time: d.session.startTime,
+            meetingUrl: d.meeting.meetingUrl,
+            meetingId: d.meeting.meetingId,
+            passcode: d.meeting.passcode,
+            phone: p.parent.phone,
+            email: p.parent.email
+          });
+        });
+      });
       bodyEl.querySelectorAll('[data-link-sent]').forEach(function (btn) {
         btn.addEventListener('click', function () {
           var res = Store.markLinkSent(btn.getAttribute('data-link-sent'));
           if (!res.ok) alert(res.error);
           else renderTab(1, bodyEl);
         });
+      });
+    }
+    if (idx === 3) {
+      bodyEl.querySelector('[data-add-comm]') && bodyEl.querySelector('[data-add-comm]').addEventListener('click', function () {
+        openCommForm(d, bodyEl, idx);
       });
     }
     if (idx === 2) {
@@ -257,49 +286,103 @@
   }
 
   function showTeacherPicker(d) {
+    if (!Form) return;
     var eligible = Store.getTeachers().filter(function (t) {
       return t.isActive && Rules.isTeacherEligibleForLessonType(t.id, d.session.lessonTypeId) &&
         t.id !== d.session.teacherId &&
         !Rules.hasTeacherConflict(t.id, d.session.date, d.session.startTime, d.session.endTime, d.session.id);
     });
     if (!eligible.length) { alert('Uygun öğretmen bulunamadı.'); return; }
-    var names = eligible.map(function (t) { return U.fullName(t.firstName, t.lastName); });
-    var choice = prompt('Yeni öğretmen seçin (numara):\n' + names.map(function (n, i) { return (i + 1) + '. ' + n; }).join('\n'));
-    var idx = parseInt(choice, 10) - 1;
-    if (isNaN(idx) || !eligible[idx]) return;
-    var newT = eligible[idx];
-    var affected = Rules.getAffectedPeopleForSessionChange(d.session.id);
-    var affNames = [U.fullName(d.teacher.firstName, d.teacher.lastName), U.fullName(newT.firstName, newT.lastName)];
-    Confirm.open({
+    Form.open({
       title: 'Öğretmen değiştir',
-      current: U.fullName(d.teacher.firstName, d.teacher.lastName),
-      next: U.fullName(newT.firstName, newT.lastName),
-      affected: affNames,
-      warning: 'Online link aynı kalacak. Öğretmen bilgilendirme sıfırlanabilir.',
-      onConfirm: function (reason) {
-        var res = Store.changeSessionTeacher(d.session.id, newT.id, reason);
-        if (!res.ok) alert(res.error);
-        else open(currentSessionId);
-        if (global.TMOnSessionChange) global.TMOnSessionChange();
+      description: 'Ders için uygun öğretmenler listelenmiştir.',
+      fields: [{
+        type: 'select',
+        name: 'teacherId',
+        label: 'Yeni öğretmen',
+        options: eligible.map(function (t) {
+          return { value: t.id, label: U.fullName(t.firstName, t.lastName) };
+        })
+      }],
+      submitLabel: 'Devam',
+      onSubmit: function (data) {
+        var newT = eligible.find(function (t) { return t.id === data.teacherId; });
+        if (!newT) return;
+        var affNames = [U.fullName(d.teacher.firstName, d.teacher.lastName), U.fullName(newT.firstName, newT.lastName)];
+        Confirm.open({
+          title: 'Öğretmen değiştir',
+          current: U.fullName(d.teacher.firstName, d.teacher.lastName),
+          next: U.fullName(newT.firstName, newT.lastName),
+          affected: affNames,
+          warning: 'Online link aynı kalacak. Öğretmen bilgilendirme sıfırlanabilir.',
+          onConfirm: function (reason) {
+            var res = Store.changeSessionTeacher(d.session.id, newT.id, reason);
+            if (!res.ok) alert(res.error);
+            else open(currentSessionId);
+            if (global.TMOnSessionChange) global.TMOnSessionChange();
+          }
+        });
       }
     });
   }
 
   function showReschedule(d) {
-    var newDate = prompt('Yeni tarih (YYYY-MM-DD):', d.session.date);
-    if (!newDate) return;
-    var newTime = prompt('Yeni saat (11:00, 12:00, 13:00, 14:00):', d.session.startTime);
-    if (!newTime) return;
-    Confirm.open({
+    if (!Form) return;
+    var slots = Rules.HOURLY_SLOTS || ['11:00', '12:00', '13:00', '14:00'];
+    Form.open({
       title: 'Saat değiştir',
-      current: U.formatDateKey(d.session.date) + ' ' + d.session.startTime,
-      next: U.formatDateKey(newDate) + ' ' + newTime,
-      warning: 'Dersteki tüm veliler bilgilendirilmelidir.',
-      onConfirm: function (reason) {
-        var res = Store.rescheduleSession(d.session.id, newDate, newTime, reason);
-        if (!res.ok) alert(res.error);
-        else open(currentSessionId);
-        if (global.TMOnSessionChange) global.TMOnSessionChange();
+      fields: [
+        { type: 'date', name: 'date', label: 'Yeni tarih', value: d.session.date },
+        {
+          type: 'select',
+          name: 'time',
+          label: 'Yeni saat',
+          value: d.session.startTime,
+          options: slots.map(function (s) { return { value: s, label: s }; })
+        }
+      ],
+      submitLabel: 'Devam',
+      onSubmit: function (data) {
+        if (!data.date || !data.time) return;
+        Confirm.open({
+          title: 'Saat değiştir',
+          current: U.formatDateKey(d.session.date) + ' ' + d.session.startTime,
+          next: U.formatDateKey(data.date) + ' ' + data.time,
+          warning: 'Dersteki tüm veliler bilgilendirilmelidir.',
+          onConfirm: function (reason) {
+            var res = Store.rescheduleSession(d.session.id, data.date, data.time, reason);
+            if (!res.ok) alert(res.error);
+            else open(currentSessionId);
+            if (global.TMOnSessionChange) global.TMOnSessionChange();
+          }
+        });
+      }
+    });
+  }
+
+  function openCommForm(d, bodyEl, idx) {
+    if (!Form) return;
+    var channelOpts = Object.keys(SL.COMM_CHANNEL).map(function (k) {
+      return { value: k, label: SL.COMM_CHANNEL[k] };
+    });
+    var resultOpts = Object.keys(SL.COMM_RESULT).map(function (k) {
+      return { value: k, label: SL.COMM_RESULT[k] };
+    });
+    Form.open({
+      title: 'İletişim kaydı ekle',
+      fields: [
+        { type: 'select', name: 'channel', label: 'Kanal', options: channelOpts, value: 'phone' },
+        { type: 'select', name: 'result', label: 'Sonuç', options: resultOpts, value: 'message_sent' },
+        { type: 'textarea', name: 'summary', label: 'Özet', rows: 4, required: true }
+      ],
+      onSubmit: function (data) {
+        Store.addCommunicationLog({
+          sessionId: d.session.id,
+          channel: data.channel,
+          result: data.result,
+          summary: data.summary
+        });
+        renderTab(idx, bodyEl);
       }
     });
   }
@@ -327,5 +410,14 @@
     if (opts) Drawer.open(opts);
   }
 
-  global.TMSessionDetail = { open: open };
+  function renderTabAt(bodyEl, sessionId, tabIndex) {
+    if (!bodyEl || !Store) return;
+    currentSessionId = sessionId;
+    activeTab = tabIndex || 0;
+    renderTab(activeTab, bodyEl);
+  }
+
+  var TAB_LABELS = ['Özet', 'Katılımcılar', 'Online Link', 'İletişim', 'Katılım', 'Geçmiş'];
+
+  global.TMSessionDetail = { open: open, renderTabAt: renderTabAt, tabLabels: TAB_LABELS };
 })(typeof window !== 'undefined' ? window : this);

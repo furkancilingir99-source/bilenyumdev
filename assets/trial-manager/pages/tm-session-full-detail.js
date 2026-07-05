@@ -1,5 +1,5 @@
 /**
- * Tam sayfa ders detayı (drawer genişlet hedefi)
+ * Tam sayfa ders detayı
  */
 (function () {
   'use strict';
@@ -7,6 +7,7 @@
   var Store = window.TMStore;
   var U = window.TMUtils;
   var SL = window.TMStatusLabels;
+  var Detail = window.TMSessionDetail;
   var id = U.qs('id');
   if (!Store || !id) return;
 
@@ -14,15 +15,15 @@
   var d = Store.getSessionWithDetails(id);
   if (!d || !root) return;
 
-  var tabs = ['Özet', 'Katılımcılar', 'Online Link', 'İletişim', 'Katılım', 'Geçmiş'];
-  var active = 0;
+  var tabs = Detail && Detail.tabLabels ? Detail.tabLabels : ['Özet', 'Katılımcılar', 'Online Link', 'İletişim', 'Katılım', 'Geçmiş'];
+  var active = parseInt(U.qs('tab') || '0', 10) || 0;
 
   function render() {
     root.innerHTML =
       '<div class="tm-admin-header">' +
         '<div class="tm-admin-header-main">' +
           '<h1 class="tm-admin-header-title">' + U.escapeHtml(d.lessonType.name) + ' · ' + U.formatDateKey(d.session.date) + '</h1>' +
-          '<p class="tm-admin-header-meta">' + d.session.startTime + '–' + d.session.endTime + ' · ' + SL.sessionLabel(d.session.status) + '</p>' +
+          '<p class="tm-admin-header-meta">' + d.session.startTime + ' – ' + d.session.endTime + ' · ' + SL.sessionLabel(d.session.status) + '</p>' +
         '</div>' +
         '<div class="tm-admin-header-actions">' +
           '<button type="button" class="tm-btn tm-btn--ghost" id="tmOpenDrawer">Drawer\'da aç</button>' +
@@ -35,29 +36,27 @@
       '<div id="tmFullBody" class="tm-panel" style="padding:20px;margin-top:12px"></div>';
 
     document.getElementById('tmOpenDrawer').addEventListener('click', function () {
-      if (window.TMSessionDetail) {
-        window.TMSessionDetail.open(id, active);
-        window.history.back();
-      }
+      if (Detail) Detail.open(id, active);
     });
     document.getElementById('tmFullTabs').querySelectorAll('[data-i]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         active = parseInt(btn.getAttribute('data-i'), 10);
-        render();
+        document.getElementById('tmFullTabs').querySelectorAll('.tm-drawer-tab').forEach(function (b, i) {
+          b.classList.toggle('is-active', i === active);
+        });
+        paintBody();
       });
     });
+    paintBody();
+  }
+
+  function paintBody() {
     var body = document.getElementById('tmFullBody');
-    if (window.TMSessionDetail) {
-      /* Reuse tab render via temporary hook */
-      var detailModule = window.TMSessionDetail;
-      detailModule.open(id, active);
-      setTimeout(function () {
-        var drBody = document.querySelector('[data-dr-body]');
-        if (drBody) body.innerHTML = drBody.innerHTML;
-        if (window.TMDetailDrawer) window.TMDetailDrawer.close();
-      }, 50);
+    if (!body) return;
+    if (Detail && Detail.renderTabAt) {
+      Detail.renderTabAt(body, id, active);
     } else {
-      body.innerHTML = '<p>Detay modülü yüklenemedi.</p>';
+      body.innerHTML = '<p class="tm-empty">Detay modülü yüklenemedi.</p>';
     }
   }
 
