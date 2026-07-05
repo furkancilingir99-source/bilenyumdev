@@ -29,4 +29,5 @@ build/
 .env.*.local
 
 .vercel
+.netlify
 .env*

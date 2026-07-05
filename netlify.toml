@@ -1,0 +1,30 @@
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/login"
+  to = "/giris"
+  status = 302
+
+[[redirects]]
+  from = "/login.html"
+  to = "/giris"
+  status = 302
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/ogrenci-dashboard"
+  status = 301
+
+[[redirects]]
+  from = "/dashboard.html"
+  to = "/ogrenci-dashboard"
+  status = 301
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Download-Options = "noopen"

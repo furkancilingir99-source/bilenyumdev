@@ -1,4 +1,4 @@
-import { sendListStub } from './lib/stub.mjs';
+import { sendListStub } from '../trial-manager/lib/stub.mjs';
 
 function emptyMetrics() {
   return {
@@ -81,31 +81,30 @@ var LIST_ROUTES = {
   'communication-logs': ['communication-logs', 'communicationLogs']
 };
 
-export default async function handler(req, res) {
-  var resource = req.query.resource;
-
+export function handleTrialManagerRoute(res, req, resource) {
   if (resource === 'health') {
     if (req.method !== 'GET') {
       res.statusCode = 405;
       res.end(JSON.stringify({ ok: false, error: 'Yalnızca GET desteklenir.' }));
-      return;
+      return true;
     }
     sendHealth(res);
-    return;
+    return true;
   }
 
   if (resource === 'metrics') {
     sendMetrics(res, req);
-    return;
+    return true;
   }
 
   var route = LIST_ROUTES[resource];
   if (route) {
     sendListStub(res, req, route[0], route[1]);
-    return;
+    return true;
   }
 
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.statusCode = 404;
   res.end(JSON.stringify({ ok: false, error: 'Bilinmeyen trial-manager uç noktası: ' + resource }));
+  return true;
 }
