@@ -1269,6 +1269,124 @@
     return { ok: true };
   }
 
+  function moveReservationToSession(reservationId, newSessionId, reason, options) {
+    options = options || {};
+    if (!reason || !String(reason).trim()) {
+      return { ok: false, error: 'Değişiklik nedeni zorunludur.' };
+    }
+    if (!options.parentApproved) {
+      return { ok: false, error: 'Veli onayı işaretlenmeden taşınamaz.' };
+    }
+    var res = find(state.reservations, reservationId);
+    if (!res) return { ok: false, error: 'Rezervasyon bulunamadı.' };
+    if (res.status === 'cancelled' || res.status === 'rescheduled') {
+      return { ok: false, error: 'Bu rezervasyon taşınamaz.' };
+    }
+    var oldSession = find(state.sessions, res.sessionId);
+    var newSession = find(state.sessions, newSessionId);
+    if (!oldSession || !newSession) return { ok: false, error: 'Ders bulunamadı.' };
+    if (oldSession.id === newSession.id) return { ok: false, error: 'Öğrenci zaten bu derste.' };
+    if (newSession.status === 'cancelled' || newSession.status === 'completed') {
+      return { ok: false, error: 'Hedef ders uygun değil.' };
+    }
+    if (newSession.lessonTypeId !== res.lessonTypeId) {
+      return { ok: false, error: 'Ders türü uyuşmuyor.' };
+    }
+    if (Rules && Rules.getSessionRemainingCapacity(newSessionId) <= 0) {
+      return { ok: false, error: 'Hedef dersin kapasitesi dolu.' };
+    }
+    if (Rules) {
+      var check = Rules.canAssignStudentToSession(res.studentId, newSessionId);
+      if (!check.allowed) return { ok: false, error: check.reason };
+    }
+    var student = find(state.students, res.studentId);
+    var parent = find(state.parents, res.parentId);
+    var reasonText = String(reason).trim();
+
+    res.status = 'rescheduled';
+    res.changeReason = reasonText;
+    res.updatedAt = new Date().toISOString();
+    var sidx = oldSession.enrolledStudentIds.indexOf(res.studentId);
+    if (sidx >= 0) oldSession.enrolledStudentIds.splice(sidx, 1);
+    var ridx = oldSession.reservationIds.indexOf(res.id);
+    if (ridx >= 0) oldSession.reservationIds.splice(ridx, 1);
+    oldSession.updatedAt = new Date().toISOString();
+
+    var newResId = nextId('res', state.reservations);
+    var newRes = {
+      id: newResId,
+      requestId: res.requestId,
+      studentId: res.studentId,
+      parentId: res.parentId,
+      sessionId: newSessionId,
+      lessonTypeId: res.lessonTypeId,
+      status: res.parentApprovalStatus === 'approved' ? 'confirmed' : 'pending',
+      parentApprovalStatus: res.parentApprovalStatus,
+      linkSent: false,
+      teacherInformed: newSession.teacherInformed,
+      communicationLogIds: [],
+      enrolled: false,
+      changeReason: reasonText,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    state.reservations.push(newRes);
+    newSession.enrolledStudentIds.push(res.studentId);
+    newSession.reservationIds.push(newResId);
+    newSession.updatedAt = new Date().toISOString();
+
+    if (res.requestId) {
+      var req = find(state.requests, res.requestId);
+      if (req) {
+        req.selectedSessionId = newSessionId;
+        req.status = req.status === 'new' ? 'assigned' : req.status;
+        req.updatedAt = new Date().toISOString();
+      }
+    }
+    if (student && student.status !== 'enrolled') {
+      student.status = 'scheduled';
+      student.updatedAt = new Date().toISOString();
+    }
+
+    if (Audit) {
+      var stName = student ? student.firstName + ' ' + student.lastName : res.studentId;
+      Audit.append(state, {
+        entityType: 'reservation',
+        entityId: res.id,
+        action: 'rescheduled',
+        description: stName + ' başka derse taşındı.',
+        reason: reasonText,
+        previousValue: { sessionId: oldSession.id },
+        newValue: { sessionId: newSessionId, reservationId: newResId }
+      });
+      Audit.append(state, {
+        entityType: 'trial_lesson_session',
+        entityId: oldSession.id,
+        action: 'student_removed',
+        description: stName + ' dersten taşındı.',
+        reason: reasonText
+      });
+      Audit.append(state, {
+        entityType: 'trial_lesson_session',
+        entityId: newSessionId,
+        action: 'student_assigned',
+        description: stName + ' derse taşındı.',
+        reason: reasonText,
+        newValue: { studentId: res.studentId, reservationId: newResId }
+      });
+    }
+    touch();
+    return {
+      ok: true,
+      oldReservation: res,
+      newReservation: newRes,
+      student: student,
+      parent: parent,
+      oldSession: oldSession,
+      newSession: newSession
+    };
+  }
+
   function getDataConsistencySnapshot() {
     var metrics = getOperationMetrics();
     var enrolledStudents = state.students.filter(function (s) { return s.status === 'enrolled'; }).length;
@@ -1604,6 +1722,7 @@
     getEligibleStudentsForSession: getEligibleStudentsForSession,
     addStudentToSession: addStudentToSession,
     removeStudentFromSession: removeStudentFromSession,
+    moveReservationToSession: moveReservationToSession,
     getDataConsistencySnapshot: getDataConsistencySnapshot,
     markBulkLinksSentForSession: markBulkLinksSentForSession,
     markAllApprovedLinksSent: markAllApprovedLinksSent,

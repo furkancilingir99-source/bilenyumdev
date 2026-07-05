@@ -167,7 +167,8 @@
     switchCurrentUser: callStore('switchCurrentUser'),
     updateUserPermissions: callStore('updateUserPermissions'),
     markAllApprovedLinksSent: callStore('markAllApprovedLinksSent'),
-    markBulkLinksSentForSession: callStore('markBulkLinksSentForSession')
+    markBulkLinksSentForSession: callStore('markBulkLinksSentForSession'),
+    moveReservationToSession: callStore('moveReservationToSession')
   };
 
   global.TMData = global.TMApi;

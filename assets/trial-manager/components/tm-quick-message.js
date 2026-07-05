@@ -81,5 +81,25 @@
     showChooser(opts.teacherName, opts.phone, opts.email, text, 'Deneme dersi öğretmen bilgilendirme');
   }
 
-  global.TMQuickMessage = { openForParent: openForParent, openForTeacher: openForTeacher, show: showChooser };
+  function openReschedule(opts) {
+    if (!Msg || !opts) return;
+    var text = Msg.reschedule({
+      parentName: opts.parentName,
+      studentName: opts.studentName,
+      lessonType: opts.lessonType,
+      newDate: opts.newDate,
+      newTime: opts.newTime,
+      meetingUrl: opts.meetingUrl,
+      meetingId: opts.meetingId,
+      passcode: opts.passcode
+    });
+    showChooser(opts.parentName, opts.phone, opts.email, text, 'Deneme dersi planı güncellendi');
+  }
+
+  global.TMQuickMessage = {
+    openForParent: openForParent,
+    openForTeacher: openForTeacher,
+    openReschedule: openReschedule,
+    show: showChooser
+  };
 })(typeof window !== 'undefined' ? window : this);

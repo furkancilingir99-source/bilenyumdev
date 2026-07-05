@@ -184,6 +184,8 @@
     var wrap = document.getElementById('tmDashAlerts');
     if (!wrap) return;
     var alerts = [];
+    var R = window.TMSchedulingRules;
+    var conflictKeys = {};
     Store.getSessions().forEach(function (s) {
       if (s.status === 'cancelled') return;
       if (s.enrolledStudentIds.length >= 20) {
@@ -192,6 +194,30 @@
       var teacher = Store.getTeacherById(s.teacherId);
       if (teacher && !RulesEligible(s)) {
         alerts.push({ msg: 'Branş uyumsuzluğu: ' + s.title, type: 'danger', sessionId: s.id });
+      }
+      if (R && R.hasTeacherConflict(s.teacherId, s.date, s.startTime, s.endTime, s.id)) {
+        var ckey = s.teacherId + '|' + s.date + '|' + s.startTime;
+        if (!conflictKeys[ckey]) {
+          conflictKeys[ckey] = true;
+          var tName = teacher ? U.fullName(teacher.firstName, teacher.lastName) : s.teacherId;
+          alerts.push({
+            msg: 'Öğretmen çakışması: ' + tName + ' · ' + U.formatDateKey(s.date) + ' ' + s.startTime,
+            type: 'danger',
+            sessionId: s.id
+          });
+        }
+      }
+    });
+    Store.getReservations().forEach(function (r) {
+      if (r.status === 'cancelled') return;
+      var pa = Store.getParentById(r.parentId);
+      if (pa && (!pa.phone || !pa.email)) {
+        var st = Store.getStudentById(r.studentId);
+        alerts.push({
+          msg: 'Eksik veli iletişim: ' + (st ? U.fullName(st.firstName, st.lastName) : r.studentId),
+          type: 'warn',
+          sessionId: r.sessionId
+        });
       }
     });
     if (!alerts.length) { wrap.innerHTML = '<p class="tm-empty">Çakışma veya uyarı yok.</p>'; return; }

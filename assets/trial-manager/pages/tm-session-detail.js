@@ -76,6 +76,9 @@
       var removeBtn = sessionActive && r.status !== 'cancelled'
         ? ' <button type="button" class="tm-btn tm-btn--sm tm-btn--danger" data-remove-res="' + r.id + '" data-tm-require="cancel">Çıkar</button>'
         : '';
+      var moveBtn = sessionActive && r.status !== 'cancelled' && r.status !== 'rescheduled'
+        ? ' <button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-move-res="' + r.id + '" data-tm-require="edit">Dersi değiştir</button>'
+        : '';
       return '<tr>' +
         '<td>' + U.escapeHtml(st ? U.fullName(st.firstName, st.lastName) : '—') + '</td>' +
         '<td>' + U.escapeHtml(st ? st.grade : '—') + '</td>' +
@@ -87,6 +90,7 @@
         '<td style="white-space:nowrap">' +
           '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-wa-parent="' + r.id + '">WhatsApp</button> ' +
           '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-link-sent="' + r.id + '" data-tm-require="edit">Link gönderildi</button>' +
+          moveBtn +
           removeBtn +
         '</td>' +
       '</tr>';
@@ -252,6 +256,11 @@
       bodyEl.querySelector('[data-add-participant]') && bodyEl.querySelector('[data-add-participant]').addEventListener('click', function () {
         showAddStudentPicker(d);
       });
+      bodyEl.querySelectorAll('[data-move-res]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          showMoveReservation(d, btn.getAttribute('data-move-res'));
+        });
+      });
       bodyEl.querySelectorAll('[data-remove-res]').forEach(function (btn) {
         btn.addEventListener('click', function () {
           if (global.TMPermissions && !global.TMPermissions.guard('cancel')) return;
@@ -407,6 +416,104 @@
           if (global.TMOnSessionChange) global.TMOnSessionChange();
           open(currentSessionId, 1);
         }
+      }
+    });
+  }
+
+  function showMoveReservation(d, reservationId) {
+    if (!Form || !Confirm) return;
+    if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
+    var res = Store.getReservationById(reservationId);
+    if (!res) return;
+    var participant = d.participants.find(function (p) { return p.reservation.id === reservationId; });
+    var sessions = Store.getAvailableSessionsForLessonType(d.session.lessonTypeId)
+      .filter(function (s) { return s.id !== d.session.id; });
+    if (!sessions.length) {
+      U.notifyError('Uygun alternatif ders bulunamadı.');
+      return;
+    }
+    var st = participant ? participant.student : Store.getStudentById(res.studentId);
+    var stName = st ? U.fullName(st.firstName, st.lastName) : 'Öğrenci';
+    Form.open({
+      title: 'Dersi değiştir',
+      description: stName + ' için yeni ders seçin. Veli onayı ve değişiklik nedeni zorunludur.',
+      fields: [
+        {
+          type: 'select',
+          name: 'sessionId',
+          label: 'Yeni ders',
+          options: sessions.map(function (s) {
+            var lt = Store.getLessonTypeById(s.lessonTypeId);
+            var rem = Rules.getSessionRemainingCapacity(s.id);
+            return {
+              value: s.id,
+              label: U.formatDateKey(s.date) + ' ' + s.startTime + ' · ' + (lt ? lt.name : '') + ' (boş: ' + rem + ')'
+            };
+          })
+        },
+        { type: 'checkbox', name: 'parentApproved', label: 'Veli onayı alındı', value: res.parentApprovalStatus === 'approved' },
+        { type: 'textarea', name: 'reason', label: 'Değişiklik nedeni', rows: 3, required: true }
+      ],
+      submitLabel: 'Devam',
+      onSubmit: function (data) {
+        if (!data.parentApproved) {
+          U.notifyError('Veli onayı işaretlenmeden taşınamaz.');
+          return;
+        }
+        if (!data.reason || !String(data.reason).trim()) {
+          U.notifyError('Değişiklik nedeni zorunludur.');
+          return;
+        }
+        var target = Store.getSessionById(data.sessionId);
+        if (!target) return;
+        var oldTeacher = d.teacher;
+        var newTeacher = Store.getTeacherById(target.teacherId);
+        var affected = [];
+        if (st) affected.push('Öğrenci: ' + stName);
+        if (participant && participant.parent) {
+          affected.push('Veli: ' + U.fullName(participant.parent.firstName, participant.parent.lastName));
+        }
+        if (oldTeacher) affected.push('Eski öğretmen: ' + U.fullName(oldTeacher.firstName, oldTeacher.lastName));
+        if (newTeacher) affected.push('Yeni öğretmen: ' + U.fullName(newTeacher.firstName, newTeacher.lastName));
+        affected.push('Eski ders: ' + U.formatDateKey(d.session.date) + ' ' + d.session.startTime);
+        affected.push('Yeni ders: ' + U.formatDateKey(target.date) + ' ' + target.startTime);
+        Confirm.open({
+          title: 'Dersi değiştir',
+          current: U.formatDateKey(d.session.date) + ' ' + d.session.startTime,
+          next: U.formatDateKey(target.date) + ' ' + target.startTime,
+          affected: affected,
+          warning: 'Eski rezervasyon geçmişte kalır. Yeni derste link yeniden gönderilmelidir.',
+          danger: false,
+          confirmLabel: 'Taşı',
+          onConfirm: function () {
+            var result = Store.moveReservationToSession(reservationId, data.sessionId, data.reason, {
+              parentApproved: true
+            });
+            if (!result.ok) {
+              U.notifyError(result.error);
+              return;
+            }
+            U.notifySuccess(stName + ' yeni derse taşındı.');
+            if (QuickMsg && participant && participant.parent && result.newSession) {
+              var meeting = Store.getMeetingBySessionId(result.newSession.id);
+              var lt = Store.getLessonTypeById(result.newSession.lessonTypeId);
+              QuickMsg.openReschedule({
+                parentName: U.fullName(participant.parent.firstName, participant.parent.lastName),
+                studentName: stName,
+                lessonType: lt ? lt.name : 'Deneme dersi',
+                newDate: U.formatDateKey(result.newSession.date),
+                newTime: result.newSession.startTime,
+                meetingUrl: meeting ? meeting.meetingUrl : '',
+                meetingId: meeting ? meeting.meetingId : '',
+                passcode: meeting ? meeting.passcode : '',
+                phone: participant.parent.phone,
+                email: participant.parent.email
+              });
+            }
+            if (global.TMOnSessionChange) global.TMOnSessionChange();
+            open(currentSessionId, 1);
+          }
+        });
       }
     });
   }

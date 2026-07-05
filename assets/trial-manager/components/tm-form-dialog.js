@@ -56,6 +56,11 @@
         (f.required !== false ? ' required' : '') + '>' +
         (f.value || '') + '</textarea></label>';
     }
+    if (f.type === 'checkbox') {
+      return '<label class="tm-form-field tm-form-check" for="' + id + '">' +
+        '<input type="checkbox" id="' + id + '" name="' + f.name + '"' + (f.value ? ' checked' : '') + '> ' +
+        f.label + '</label>';
+    }
     return '<label class="tm-form-field" for="' + id + '">' + f.label +
       '<input class="tm-dg-control" type="' + (f.type || 'text') + '" id="' + id + '" name="' + f.name + '" value="' +
       (f.value || '').replace(/"/g, '&quot;') + '"' + (f.required !== false ? ' required' : '') + '></label>';
@@ -75,7 +80,7 @@
       var data = {};
       (opts.fields || []).forEach(function (f) {
         var inp = form.querySelector('[name="' + f.name + '"]');
-        if (inp) data[f.name] = inp.value;
+        if (inp) data[f.name] = inp.type === 'checkbox' ? inp.checked : inp.value;
       });
       close();
       if (opts.onSubmit) opts.onSubmit(data);
