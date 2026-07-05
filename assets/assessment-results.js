@@ -308,8 +308,7 @@
     );
   }
 
-  function renderSubjectTable(placement, title, showFormula) {
-    if (showFormula === undefined) showFormula = true;
+  function renderSubjectTable(placement, title) {
     return (
       '<section class="asm-res-card">' +
         '<h2 class="asm-res-card-title">' + title + '</h2>' +
@@ -328,9 +327,6 @@
             '</tr></tfoot>' +
           '</table>' +
         '</div>' +
-        (showFormula
-          ? '<p class="asm-res-formula">Net = Doğru − (Yanlış ÷ 3) · 3 yanlış 1 doğruyu götürür. Deneme puanı toplam net üzerinden 500\'e ölçeklenir.</p>'
-          : '') +
       '</section>'
     );
   }
@@ -468,7 +464,7 @@
         updateResultsTopbar(examName);
         root.innerHTML =
           renderDenemeHero(denemePlacement, student, examName) +
-          renderSubjectTable(denemePlacement, 'Ders Bazlı Sonuçlar', false) +
+          renderSubjectTable(denemePlacement, 'Ders Bazlı Sonuçlar') +
           renderDenemeActions();
         bindFinishVideosButton('asmDenemeVideosBtn', denemeQuestions, denemeRaw);
         return;
@@ -558,7 +554,7 @@
     });
   }
 
-  function renderCompactSubjectTable(placement, showFormula) {
+  function renderCompactSubjectTable(placement) {
     return (
       '<div class="asm-finish-table-wrap">' +
         '<table class="asm-finish-table">' +
@@ -585,7 +581,6 @@
             '<td class="is-net"><strong>' + Scoring.fmtNet(placement.totalNet) + '</strong></td>' +
           '</tr></tfoot>' +
         '</table>' +
-        (showFormula ? '<p class="asm-finish-formula">Net = Doğru − (Yanlış ÷ 3)</p>' : '') +
       '</div>'
     );
   }
@@ -604,7 +599,7 @@
     var scoreVal = placement.placementScore;
     var scoreLbl = 'Deneme Puanı / 500';
     var scoreBlock = '';
-    var tableBlock = renderCompactSubjectTable(placement, false);
+    var tableBlock = renderCompactSubjectTable(placement);
 
     if (status.allDone && combinedData && combinedData.combined && combinedData.clan) {
       scoreVal = combinedData.combined.combined500;
@@ -657,7 +652,7 @@
         '<span class="asm-finish-score-val">' + placement.placementScore + '</span>' +
         '<span class="asm-finish-score-lbl">Deneme Puanı / 500</span>' +
       '</div>' +
-      renderCompactSubjectTable(placement, false) +
+      renderCompactSubjectTable(placement) +
       '<div class="asm-finish-actions">' +
         renderDenemeFinishActions() +
       '</div>' +
