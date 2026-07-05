@@ -55,6 +55,18 @@
     );
   }
 
+  function parentContactMessage(data) {
+    var slot = (data.date && data.date !== '—' && data.time && data.time !== '—')
+      ? 'Planlanan ders: ' + data.date + ' saat ' + data.time + '\n\n'
+      : '';
+    return (
+      'Merhaba ' + data.parentName + ',\n\n' +
+      data.studentName + ' için ücretsiz online ' + data.lessonType + ' deneme dersi talebiniz alınmıştır.\n\n' +
+      slot +
+      'Detayları görüşmek için sizinle iletişime geçiyoruz.\n\nİyi günler dileriz.'
+    );
+  }
+
   function whatsappUrl(phone, text) {
     var digits = String(phone || '').replace(/\D/g, '');
     if (digits.indexOf('0') === 0) digits = '90' + digits.slice(1);
@@ -69,6 +81,7 @@
 
   global.TMMessageTemplates = {
     parentTrial: parentTrialMessage,
+    parentContact: parentContactMessage,
     reschedule: rescheduleMessage,
     cancel: cancelMessage,
     teacherInfo: teacherInfoMessage,

@@ -8,6 +8,8 @@
   var U = window.TMUtils;
   var SL = window.TMStatusLabels;
   var Form = window.TMFormDialog;
+  var Perms = window.TMPermissions;
+  var QuickMsg = window.TMQuickMessage;
   if (!Store) return;
 
   var tbody = document.getElementById('tmCommBody');
@@ -28,6 +30,11 @@
     { id: 'all', label: 'Tüm geçmiş' }
   ];
 
+  function responsibleLabel() {
+    var u = Store.getCurrentUser();
+    return u ? U.fullName(u.firstName, u.lastName) : '—';
+  }
+
   function taskRows() {
     var rows = [];
     Store.getReservations().forEach(function (r) {
@@ -42,7 +49,8 @@
         session: sess,
         person: U.fullName(pa.firstName, pa.lastName),
         role: 'Veli',
-        phone: pa.phone
+        phone: pa.phone,
+        email: pa.email
       });
     });
     Store.getSessions().filter(function (s) { return !s.teacherInformed && s.status !== 'cancelled'; }).forEach(function (s) {
@@ -54,6 +62,7 @@
         person: U.fullName(t.firstName, t.lastName),
         role: 'Öğretmen',
         phone: t.phone,
+        email: t.email,
         reservation: null
       });
     });
@@ -73,12 +82,14 @@
     return Store.getCommunicationLogs().map(function (l) {
       var pa = l.parentId ? Store.getParentById(l.parentId) : null;
       var t = l.teacherId ? Store.getTeacherById(l.teacherId) : null;
+      var creator = l.createdByUserId ? Store.getUsers().find(function (u) { return u.id === l.createdByUserId; }) : null;
       return {
         log: l,
         person: pa ? U.fullName(pa.firstName, pa.lastName) : (t ? U.fullName(t.firstName, t.lastName) : '—'),
         role: pa ? 'Veli' : 'Öğretmen',
         phone: pa ? pa.phone : (t ? t.phone : '—'),
-        reservation: null
+        reservation: null,
+        responsible: creator ? U.fullName(creator.firstName, creator.lastName) : '—'
       };
     });
   }
@@ -97,6 +108,7 @@
 
   function openLogForm(rowCtx) {
     if (!Form) return;
+    if (Perms && !Perms.guard('edit')) return;
     Form.open({
       title: 'İletişim kaydı ekle',
       fields: [
@@ -122,8 +134,44 @@
           entry.teacherId = rowCtx.teacher ? rowCtx.teacher.id : rowCtx.session.teacherId;
         }
         Store.addCommunicationLog(entry);
+        if (window.TMOnSessionChange) window.TMOnSessionChange();
+        U.notifySuccess('İletişim kaydı eklendi.');
         render();
       }
+    });
+  }
+
+  function openWhatsApp(row) {
+    if (!QuickMsg || !row.phone) return;
+    if (row.role === 'Öğretmen' && row.teacher && row.session) {
+      var lt = Store.getLessonTypeById(row.session.lessonTypeId);
+      var enrolled = row.session.enrolledStudentIds ? row.session.enrolledStudentIds.length : 0;
+      QuickMsg.openForTeacher({
+        teacherName: U.fullName(row.teacher.firstName, row.teacher.lastName),
+        date: U.formatDateKey(row.session.date),
+        time: row.session.startTime,
+        lessonType: lt ? lt.name : '—',
+        studentCount: enrolled,
+        phone: row.teacher.phone,
+        email: row.teacher.email
+      });
+      return;
+    }
+    if (!row.parent) return;
+    var sess = row.session;
+    var meeting = sess ? Store.getMeetingBySessionId(sess.id) : null;
+    var lt2 = sess ? Store.getLessonTypeById(sess.lessonTypeId) : null;
+    QuickMsg.openForParent({
+      parentName: U.fullName(row.parent.firstName, row.parent.lastName),
+      studentName: row.student ? U.fullName(row.student.firstName, row.student.lastName) : '—',
+      lessonType: lt2 ? lt2.name : 'Deneme dersi',
+      date: sess ? U.formatDateKey(sess.date) : '—',
+      time: sess ? sess.startTime : '—',
+      meetingUrl: meeting ? meeting.meetingUrl : '',
+      meetingId: meeting ? meeting.meetingId : '',
+      passcode: meeting ? meeting.passcode : '',
+      phone: row.parent.phone,
+      email: row.parent.email
     });
   }
 
@@ -151,24 +199,26 @@
     var items = filterTab(taskRows());
     var p = U.paginate(items, page, pageSize);
     lastItems = p.items;
+    var resp = responsibleLabel();
     if (activeTab === 'all') {
-      tbody.innerHTML = p.items.map(function (x) {
+      tbody.innerHTML = p.items.map(function (x, i) {
         var l = x.log;
         return '<tr><td>' + U.escapeHtml(x.person) + '</td><td>' + x.role + '</td><td>—</td><td>—</td><td>' + U.escapeHtml(x.phone) + '</td>' +
           '<td>' + U.escapeHtml(SL.COMM_CHANNEL[l.channel] || l.channel) + '</td>' +
           '<td>' + U.escapeHtml(SL.COMM_RESULT[l.result] || l.result) + '</td>' +
-          '<td>' + U.formatDateTime(l.createdAt) + '</td><td>' + U.escapeHtml(l.nextAction || '—') + '</td><td>—</td><td>—</td></tr>';
+          '<td>' + U.formatDateTime(l.createdAt) + '</td><td>' + U.escapeHtml(l.nextAction || '—') + '</td>' +
+          '<td>' + U.escapeHtml(x.responsible || '—') + '</td>' +
+          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '">Kayıt ekle</button></td></tr>';
       }).join('');
     } else {
       tbody.innerHTML = p.items.map(function (x, i) {
         var stName = x.student ? U.fullName(x.student.firstName, x.student.lastName) : '—';
         var sessLabel = x.session ? U.formatDateKey(x.session.date) + ' ' + x.session.startTime : '—';
         var result = x.reservation ? SL.parentApprovalLabel(x.reservation.parentApprovalStatus) : 'Bilgilendirilmedi';
+        var waBtn = x.phone ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-wa-idx="' + i + '">WhatsApp</button>' : '';
         return '<tr><td>' + U.escapeHtml(x.person) + '</td><td>' + x.role + '</td><td>' + U.escapeHtml(stName) + '</td><td>' + U.escapeHtml(sessLabel) + '</td>' +
-          '<td>' + U.escapeHtml(x.phone) + '</td><td>—</td><td>' + U.escapeHtml(result) + '</td><td>—</td><td>—</td><td>Elif Y.</td>' +
-          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '">Kayıt ekle</button> ' +
-          (x.phone && x.role === 'Veli' ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-wa-idx="' + i + '">WhatsApp</button>' : '') +
-        '</td></tr>';
+          '<td>' + U.escapeHtml(x.phone) + '</td><td>—</td><td>' + U.escapeHtml(result) + '</td><td>—</td><td>—</td><td>' + U.escapeHtml(resp) + '</td>' +
+          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '">Kayıt ekle</button> ' + waBtn + '</td></tr>';
       }).join('');
     }
     U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
@@ -181,24 +231,7 @@
     tbody.querySelectorAll('[data-wa-idx]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var idx = parseInt(btn.getAttribute('data-wa-idx'), 10);
-        var row = lastItems[idx];
-        if (!row || !row.parent || !window.TMQuickMessage) return;
-        var sess = row.session;
-        var meeting = sess ? Store.getMeetingBySessionId(sess.id) : null;
-        if (!meeting) { U.notifyError('Bu kayıt için meeting bilgisi yok.'); return; }
-        var lt = sess ? Store.getLessonTypeById(sess.lessonTypeId) : null;
-        window.TMQuickMessage.openForParent({
-          parentName: U.fullName(row.parent.firstName, row.parent.lastName),
-          studentName: row.student ? U.fullName(row.student.firstName, row.student.lastName) : '—',
-          lessonType: lt ? lt.name : '—',
-          date: sess ? U.formatDateKey(sess.date) : '—',
-          time: sess ? sess.startTime : '—',
-          meetingUrl: meeting.meetingUrl,
-          meetingId: meeting.meetingId,
-          passcode: meeting.passcode,
-          phone: row.parent.phone,
-          email: row.parent.email
-        });
+        if (lastItems[idx]) openWhatsApp(lastItems[idx]);
       });
     });
     if (loading) loading.hidden = true;
@@ -209,6 +242,7 @@
     }
   }
 
+  window.TMOnSessionChange = render;
   renderTabs();
   render();
 })();

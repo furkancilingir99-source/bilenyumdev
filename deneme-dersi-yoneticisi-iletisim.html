@@ -27,6 +27,16 @@
     <div class="tm-page-head"><h1 class="tm-page-title">İletişim Takibi</h1><p class="tm-page-sub">Aranacak veliler, onay bekleyenler, link gönderilecekler ve iletişim geçmişi.</p></div>
     <section class="tm-panel tm-panel--datagrid">
       <div class="tm-comm-tabs" id="tmCommTabs"></div>
+      <header class="tm-dg-toolbar" style="border-top:1px solid #e2e8f0">
+        <div class="tm-dg-toolbar-row">
+          <span class="tm-dg-spacer"></span>
+          <select class="tm-dg-control tm-dg-select tm-dg-select--narrow" id="tmCommPageSize">
+            <option value="15" selected>15</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+      </header>
       <div id="tmCommLoading" class="td-state">Yükleniyor…</div>
       <div id="tmCommTableWrap" class="tm-res-table-wrap" hidden>
         <table class="tm-res-table"><thead><tr>
@@ -41,9 +51,9 @@
 <script src="assets/trial-manager/lib/mock-data.js"></script>
 <script src="assets/trial-manager/lib/scheduling-rules.js"></script>
 <script src="assets/trial-manager/lib/message-templates.js"></script>
-<script src="assets/trial-manager/lib/message-templates.js"></script>
 <script src="assets/trial-manager/components/tm-utils.js"></script>
 <script src="assets/trial-manager/components/tm-toast.js"></script>
+<script src="assets/trial-manager/components/tm-permissions.js"></script>
 <script src="assets/trial-manager/components/tm-form-dialog.js"></script>
 <script src="assets/trial-manager/components/tm-quick-message.js"></script>
 <script src="assets/trial-manager/components/tm-app-shell.js"></script>

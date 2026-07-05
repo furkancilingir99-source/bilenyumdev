@@ -48,7 +48,11 @@
             if (window.TMPermissions && !window.TMPermissions.guard('edit')) return;
             var result = Store.convertStudentToEnrollment(st.id);
             if (!result.ok) U.notifyError(result.error);
-            else U.notifySuccess('Öğrenci kayda dönüştürüldü.');
+            else {
+              U.notifySuccess('Öğrenci kayda dönüştürüldü.');
+              if (window.TMOnSessionChange) window.TMOnSessionChange();
+              render();
+            }
           });
         } else if (idx === 1) {
           body.innerHTML = resHistory.length ? '<table class="tm-inner-table"><thead><tr><th>Rezervasyon</th><th>Durum</th><th>Link</th></tr></thead><tbody>' +
@@ -111,6 +115,7 @@
   if (searchInput) searchInput.addEventListener('input', U.debounce(function () { page = 1; render(); }, 200));
   if (pageSizeSelect) pageSizeSelect.addEventListener('change', function () { page = 1; render(); });
   if (exportBtn && Export) exportBtn.addEventListener('click', function () {
+    if (window.TMPermissions && !window.TMPermissions.guard('export')) return;
     Export.exportTable('ogrenciler.csv', filtered(), [
       { key: 'firstName', label: 'Ad' }, { key: 'lastName', label: 'Soyad' }, { key: 'grade', label: 'Sınıf' }, { key: 'status', label: 'Durum' }
     ]);

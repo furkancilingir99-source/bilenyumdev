@@ -14,6 +14,14 @@
   var id = U.qs('id');
   if (!Store || !id) return;
 
+  function guard(action) {
+    return !Perms || Perms.guard(action);
+  }
+
+  function notifyChange() {
+    if (window.TMOnSessionChange) window.TMOnSessionChange();
+  }
+
   function req() { return Store.getRequestById(id); }
 
   function paint() {
@@ -29,6 +37,7 @@
     var sess = r.selectedSessionId ? Store.getSessionById(r.selectedSessionId) : (res ? Store.getSessionById(res.sessionId) : null);
     var meeting = sess ? Store.getMeetingBySessionId(sess.id) : null;
     var rejected = r.status === 'rejected' || r.status === 'cancelled';
+    var orphan = Store.isOrphanRequest ? Store.isOrphanRequest(id) : !res;
 
     root.innerHTML =
       '<div class="tm-admin-header">' +
@@ -37,10 +46,11 @@
           '<p class="tm-admin-header-meta">' + r.id + ' · ' + SL.requestLabel(r.status) + ' · Talep: ' + U.formatDateTime(r.createdAt) + '</p>' +
         '</div>' +
         '<div class="tm-admin-header-actions">' +
-          (meeting ? '<button type="button" class="tm-btn tm-btn--primary" id="tmWaParent">Veliye WhatsApp</button>' : '') +
+          (QuickMsg ? '<button type="button" class="tm-btn tm-btn--primary" id="tmWaParent">Veliye ulaş (WhatsApp)</button>' : '') +
           '<a class="tm-btn tm-btn--ghost" href="deneme-dersi-yoneticisi-rezervasyonlar.html">← Listeye dön</a>' +
         '</div>' +
       '</div>' +
+      (orphan && !rejected ? '<p class="tm-alert-row" style="margin-top:12px">Bu talep için henüz rezervasyon oluşturulmadı. Derse atayıp rezervasyon oluşturun.</p>' : '') +
       '<nav class="tm-drawer-tabs" id="tmReqTabs">' +
         '<button type="button" class="tm-drawer-tab is-active" data-tab="info">Talep bilgisi</button>' +
         '<button type="button" class="tm-drawer-tab" data-tab="comm">İletişim</button>' +
@@ -69,17 +79,17 @@
     showTab('info');
 
     var waBtn = document.getElementById('tmWaParent');
-    if (waBtn && meeting && QuickMsg) {
+    if (waBtn && QuickMsg) {
       waBtn.addEventListener('click', function () {
         QuickMsg.openForParent({
           parentName: r.parentFirstName + ' ' + r.parentLastName,
           studentName: r.studentFirstName + ' ' + r.studentLastName,
-          lessonType: lt ? lt.name : '—',
+          lessonType: lt ? lt.name : 'Deneme dersi',
           date: sess ? U.formatDateKey(sess.date) : '—',
           time: sess ? sess.startTime : '—',
-          meetingUrl: meeting.meetingUrl,
-          meetingId: meeting.meetingId,
-          passcode: meeting.passcode,
+          meetingUrl: meeting ? meeting.meetingUrl : '',
+          meetingId: meeting ? meeting.meetingId : '',
+          passcode: meeting ? meeting.passcode : '',
           phone: r.parentPhone,
           email: r.parentEmail
         });
@@ -149,7 +159,7 @@
   }
 
   function openCommForm(r, res, sess) {
-    if (!Form || !Perms.guard('edit')) return;
+    if (!Form || !guard('edit')) return;
     var channelOpts = Object.keys(SL.COMM_CHANNEL).map(function (k) {
       return { value: k, label: SL.COMM_CHANNEL[k] };
     });
@@ -176,13 +186,14 @@
           studentId: res ? res.studentId : undefined
         });
         U.notifySuccess('İletişim kaydı eklendi.');
+        notifyChange();
         paint();
       }
     });
   }
 
   function openAssignSession(r) {
-    if (!Form || !Perms.guard('edit')) return;
+    if (!Form || !guard('edit')) return;
     var sessions = Store.getAvailableSessionsForLessonType(r.requestedLessonTypeId);
     if (!sessions.length) {
       U.notifyError('Uygun ders bulunamadı. Önce ders planlayın.');
@@ -210,6 +221,7 @@
         if (!result.ok) U.notifyError(result.error);
         else {
           U.notifySuccess('Talep derse atandı.');
+          notifyChange();
           paint();
         }
       }
@@ -223,11 +235,12 @@
     var createBtn = body.querySelector('#tmCreateRes');
     if (createBtn) {
       createBtn.onclick = function () {
-        if (!Perms.guard('create')) return;
+        if (!guard('create')) return;
         var result = Store.createReservationFromRequest(id);
         if (!result.ok) U.notifyError(result.error);
         else {
           U.notifySuccess('Rezervasyon oluşturuldu.');
+          notifyChange();
           paint();
         }
       };
@@ -236,20 +249,21 @@
     var approveBtn = body.querySelector('#tmApproveParent');
     if (approveBtn) {
       approveBtn.onclick = function () {
-        if (!Perms.guard('edit')) return;
+        if (!guard('edit')) return;
         if (!res) { U.notifyError('Henüz rezervasyon oluşturulmamış.'); return; }
         var result = Store.approveParentForRequest(id);
         if (!result.ok) U.notifyError(result.error);
-        else { U.notifySuccess('Veli onayı kaydedildi.'); paint(); }
+        else { U.notifySuccess('Veli onayı kaydedildi.'); notifyChange(); paint(); }
       };
     }
 
     var unreach = body.querySelector('#tmUnreachable');
     if (unreach && res) {
       unreach.onclick = function () {
-        if (!Perms.guard('edit')) return;
+        if (!guard('edit')) return;
         Store.updateParentApproval(res.id, 'unreachable');
         U.notifySuccess('Ulaşılamadı olarak işaretlendi.');
+        notifyChange();
         paint();
       };
     }
@@ -257,9 +271,10 @@
     var callAgain = body.querySelector('#tmCallAgain');
     if (callAgain && res) {
       callAgain.onclick = function () {
-        if (!Perms.guard('edit')) return;
+        if (!guard('edit')) return;
         Store.updateParentApproval(res.id, 'call_again');
         U.notifySuccess('Tekrar aranacak olarak işaretlendi.');
+        notifyChange();
         paint();
       };
     }
@@ -267,24 +282,24 @@
     var linkBtn = body.querySelector('#tmMarkLink');
     if (linkBtn && res) {
       linkBtn.onclick = function () {
-        if (!Perms.guard('edit')) return;
+        if (!guard('edit')) return;
         var result = Store.markLinkSent(res.id);
         if (!result.ok) U.notifyError(result.error);
-        else { U.notifySuccess('Link gönderildi işaretlendi.'); paint(); }
+        else { U.notifySuccess('Link gönderildi işaretlendi.'); notifyChange(); paint(); }
       };
     }
 
     var rejectBtn = body.querySelector('#tmRejectReq');
     if (rejectBtn && Confirm) {
       rejectBtn.onclick = function () {
-        if (!Perms.guard('cancel')) return;
+        if (!guard('cancel')) return;
         Confirm.open({
           title: 'Talebi reddet',
           warning: 'Bağlı rezervasyon varsa iptal edilecektir.',
           onConfirm: function (reason) {
             var result = Store.rejectRequest(id, reason);
             if (!result.ok) U.notifyError(result.error);
-            else { U.notifySuccess('Talep reddedildi.'); paint(); }
+            else { U.notifySuccess('Talep reddedildi.'); notifyChange(); paint(); }
           }
         });
       };

@@ -9,7 +9,8 @@
 
   function openForParent(opts) {
     if (!Msg || !opts) return;
-    var text = Msg.parentTrial({
+    var hasMeeting = opts.meetingUrl && opts.meetingId;
+    var text = hasMeeting ? Msg.parentTrial({
       parentName: opts.parentName,
       studentName: opts.studentName,
       lessonType: opts.lessonType,
@@ -18,8 +19,14 @@
       meetingUrl: opts.meetingUrl,
       meetingId: opts.meetingId,
       passcode: opts.passcode
+    }) : Msg.parentContact({
+      parentName: opts.parentName,
+      studentName: opts.studentName,
+      lessonType: opts.lessonType,
+      date: opts.date,
+      time: opts.time
     });
-    showChooser(opts.parentName, opts.phone, opts.email, text, 'Ücretsiz deneme dersi bilgisi');
+    showChooser(opts.parentName, opts.phone, opts.email, text, hasMeeting ? 'Ücretsiz deneme dersi bilgisi' : 'Deneme dersi iletişimi');
   }
 
   function showChooser(name, phone, email, text, subject) {

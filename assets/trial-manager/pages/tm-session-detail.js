@@ -179,6 +179,7 @@
     });
     if (idx === 0) {
       bodyEl.querySelector('[data-act="cancel"]') && bodyEl.querySelector('[data-act="cancel"]').addEventListener('click', function () {
+        if (global.TMPermissions && !global.TMPermissions.guard('cancel')) return;
         var affected = Rules.getAffectedPeopleForSessionChange(d.session.id);
         var names = [];
         if (d.teacher) names.push('Öğretmen: ' + U.fullName(d.teacher.firstName, d.teacher.lastName));
@@ -199,7 +200,9 @@
         });
       });
       bodyEl.querySelector('[data-act="inform-teacher"]') && bodyEl.querySelector('[data-act="inform-teacher"]').addEventListener('click', function () {
+        if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
         Store.markTeacherInformed(d.session.id);
+        if (global.TMOnSessionChange) global.TMOnSessionChange();
         renderTab(0, bodyEl);
       });
       bodyEl.querySelector('[data-act="change-teacher"]') && bodyEl.querySelector('[data-act="change-teacher"]').addEventListener('click', function () {
@@ -220,6 +223,7 @@
         if (!result.ok) U.notifyError(result.error || 'İşlem başarısız.');
         else {
           U.notifySuccess(result.count + ' veli için link gönderildi işaretlendi.');
+          if (global.TMOnSessionChange) global.TMOnSessionChange();
           renderTab(1, bodyEl);
         }
       });
@@ -227,16 +231,16 @@
         btn.addEventListener('click', function () {
           var rid = btn.getAttribute('data-wa-parent');
           var p = d.participants.find(function (x) { return x.reservation.id === rid; });
-          if (!p || !p.parent || !QuickMsg || !d.meeting) return;
+          if (!p || !p.parent || !QuickMsg) return;
           QuickMsg.openForParent({
             parentName: U.fullName(p.parent.firstName, p.parent.lastName),
             studentName: U.fullName(p.student.firstName, p.student.lastName),
             lessonType: d.lessonType.name,
             date: U.formatDateKey(d.session.date),
             time: d.session.startTime,
-            meetingUrl: d.meeting.meetingUrl,
-            meetingId: d.meeting.meetingId,
-            passcode: d.meeting.passcode,
+            meetingUrl: d.meeting ? d.meeting.meetingUrl : '',
+            meetingId: d.meeting ? d.meeting.meetingId : '',
+            passcode: d.meeting ? d.meeting.passcode : '',
             phone: p.parent.phone,
             email: p.parent.email
           });
@@ -244,9 +248,13 @@
       });
       bodyEl.querySelectorAll('[data-link-sent]').forEach(function (btn) {
         btn.addEventListener('click', function () {
+          if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
           var res = Store.markLinkSent(btn.getAttribute('data-link-sent'));
           if (!res.ok) U.notifyError(res.error);
-          else renderTab(1, bodyEl);
+          else {
+            if (global.TMOnSessionChange) global.TMOnSessionChange();
+            renderTab(1, bodyEl);
+          }
         });
       });
     }
@@ -257,11 +265,13 @@
     }
     if (idx === 2) {
       bodyEl.querySelector('[data-refresh-passcode]') && bodyEl.querySelector('[data-refresh-passcode]').addEventListener('click', function () {
+        if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
         Confirm.open({
           title: 'Şifre yenile',
           warning: 'Yeni şifre oluşturulacak. Velilere tekrar göndermeniz gerekebilir.',
           onConfirm: function (reason) {
             Store.refreshMeetingPasscode(d.meeting.id, reason);
+            if (global.TMOnSessionChange) global.TMOnSessionChange();
             renderTab(2, bodyEl);
           }
         });
@@ -292,6 +302,7 @@
     }
     if (idx === 4) {
       bodyEl.querySelector('[data-save-attendance]') && bodyEl.querySelector('[data-save-attendance]').addEventListener('click', function () {
+        if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
         var results = [];
         bodyEl.querySelectorAll('tr[data-res]').forEach(function (tr) {
           results.push({
@@ -311,6 +322,7 @@
 
   function showTeacherPicker(d) {
     if (!Form) return;
+    if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
     var eligible = Store.getTeachers().filter(function (t) {
       return t.isActive && Rules.isTeacherEligibleForLessonType(t.id, d.session.lessonTypeId) &&
         t.id !== d.session.teacherId &&
@@ -352,6 +364,7 @@
 
   function showReschedule(d) {
     if (!Form) return;
+    if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
     var slots = Rules.HOURLY_SLOTS || ['11:00', '12:00', '13:00', '14:00'];
     Form.open({
       title: 'Saat değiştir',
@@ -386,6 +399,7 @@
 
   function openCommForm(d, bodyEl, idx) {
     if (!Form) return;
+    if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
     var channelOpts = Object.keys(SL.COMM_CHANNEL).map(function (k) {
       return { value: k, label: SL.COMM_CHANNEL[k] };
     });
@@ -406,6 +420,7 @@
           result: data.result,
           summary: data.summary
         });
+        if (global.TMOnSessionChange) global.TMOnSessionChange();
         renderTab(idx, bodyEl);
       }
     });

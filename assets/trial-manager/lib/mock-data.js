@@ -561,8 +561,12 @@
     var session = find(state.sessions, sessionId);
     if (!session) return { ok: false, error: 'Ders bulunamadı.' };
     if (!reason || !reason.trim()) return { ok: false, error: 'Değişiklik nedeni zorunludur.' };
+    if (!Rules) return { ok: false, error: 'Planlama kuralları yüklenemedi.' };
     if (!Rules.isTeacherEligibleForLessonType(newTeacherId, session.lessonTypeId)) {
       return { ok: false, error: 'Öğretmen branş uyumsuz.' };
+    }
+    if (!Rules.isTeacherAvailable(newTeacherId, session.date, session.startTime, session.endTime)) {
+      return { ok: false, error: 'Öğretmen bu saatte müsait değil.' };
     }
     if (Rules.hasTeacherConflict(newTeacherId, session.date, session.startTime, session.endTime, sessionId)) {
       return { ok: false, error: 'Öğretmen aynı saatte başka derste.' };
@@ -590,9 +594,16 @@
     var session = find(state.sessions, sessionId);
     if (!session) return { ok: false, error: 'Ders bulunamadı.' };
     if (!reason || !reason.trim()) return { ok: false, error: 'Değişiklik nedeni zorunludur.' };
+    if (!Rules) return { ok: false, error: 'Planlama kuralları yüklenemedi.' };
     var newEnd = Rules.addMinutes(newStartTime, 50);
     if (!Rules.isValidTrialLessonDuration(newStartTime, newEnd)) {
       return { ok: false, error: 'Geçersiz saat aralığı.' };
+    }
+    if (Rules.hasSessionSlotConflict(newDate, session.lessonTypeId, newStartTime, sessionId)) {
+      return { ok: false, error: 'Aynı tarih ve saatte bu ders türünde başka oturum var.' };
+    }
+    if (!Rules.isTeacherAvailable(session.teacherId, newDate, newStartTime, newEnd)) {
+      return { ok: false, error: 'Öğretmen yeni saatte müsait değil.' };
     }
     if (Rules.hasTeacherConflict(session.teacherId, newDate, newStartTime, newEnd, sessionId)) {
       return { ok: false, error: 'Öğretmen çakışması.' };
@@ -738,6 +749,12 @@
 
   function getReservationByRequestId(requestId) {
     return state.reservations.find(function (r) { return r.requestId === requestId; }) || null;
+  }
+
+  function isOrphanRequest(requestId) {
+    var req = find(state.requests, requestId);
+    if (!req || req.status === 'rejected' || req.status === 'cancelled') return false;
+    return !getReservationByRequestId(requestId);
   }
 
   function approveParentForRequest(requestId) {
@@ -1056,7 +1073,7 @@
     Object.keys(perms).forEach(function (k) { if (k in user) user[k] = perms[k]; });
     if (Audit) {
       Audit.append(state, {
-        entityType: 'student',
+        entityType: 'user',
         entityId: userId,
         action: 'permission_changed',
         description: 'Kullanıcı yetkileri güncellendi.',
@@ -1104,6 +1121,9 @@
       });
     });
     var enrolled = state.students.filter(function (s) { return s.status === 'enrolled'; });
+    var orphanRequests = state.requests.filter(function (r) {
+      return isOrphanRequest(r.id);
+    });
     var studentCountToday = 0;
     todaySessions.forEach(function (s) { studentCountToday += s.enrolledStudentIds.length; });
 
@@ -1116,11 +1136,13 @@
       cancelledCount: cancelled.length,
       needsAttendanceCount: needsAttendance.length,
       conversionCount: enrolled.length,
+      orphanRequestCount: orphanRequests.length,
       todaySessions: todaySessions,
       pendingApproval: pendingApproval,
       linkNotSent: linkNotSent,
       teacherNotInformed: teacherNotInformed,
-      needsAttendance: needsAttendance
+      needsAttendance: needsAttendance,
+      orphanRequests: orphanRequests
     };
   }
 
@@ -1146,6 +1168,7 @@
     getRequestById: function (id) { return find(state.requests, id); },
     getReservationById: function (id) { return find(state.reservations, id); },
     getReservationByRequestId: getReservationByRequestId,
+    isOrphanRequest: isOrphanRequest,
     approveParentForRequest: approveParentForRequest,
     updateParentApproval: updateParentApproval,
     createReservationFromRequest: createReservationFromRequest,

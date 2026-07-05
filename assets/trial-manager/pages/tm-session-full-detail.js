@@ -12,13 +12,27 @@
   if (!Store || !id) return;
 
   var root = document.getElementById('tmFullDetail');
-  var d = Store.getSessionWithDetails(id);
-  if (!d || !root) return;
-
   var tabs = Detail && Detail.tabLabels ? Detail.tabLabels : ['Özet', 'Katılımcılar', 'Online Link', 'İletişim', 'Katılım', 'Geçmiş'];
   var active = parseInt(U.qs('tab') || '0', 10) || 0;
 
+  function sessionDetails() {
+    return Store.getSessionWithDetails(id);
+  }
+
+  function refreshHeader(d) {
+    var titleEl = document.querySelector('#tmFullDetail .tm-admin-header-title');
+    var metaEl = document.querySelector('#tmFullDetail .tm-admin-header-meta');
+    if (!d || !titleEl) return;
+    titleEl.textContent = d.lessonType.name + ' · ' + U.formatDateKey(d.session.date);
+    if (metaEl) {
+      metaEl.textContent = d.session.startTime + ' – ' + d.session.endTime + ' · ' + SL.sessionLabel(d.session.status);
+    }
+  }
+
   function render() {
+    var d = sessionDetails();
+    if (!d || !root) return;
+
     root.innerHTML =
       '<div class="tm-admin-header">' +
         '<div class="tm-admin-header-main">' +
@@ -53,12 +67,19 @@
   function paintBody() {
     var body = document.getElementById('tmFullBody');
     if (!body) return;
+    var d = sessionDetails();
+    refreshHeader(d);
     if (Detail && Detail.renderTabAt) {
       Detail.renderTabAt(body, id, active);
     } else {
       body.innerHTML = '<p class="tm-empty">Detay modülü yüklenemedi.</p>';
     }
   }
+
+  window.TMOnSessionChange = function () {
+    refreshHeader(sessionDetails());
+    paintBody();
+  };
 
   render();
 })();

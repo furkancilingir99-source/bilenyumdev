@@ -20,11 +20,12 @@
       statsEl.innerHTML =
         metric(m.todaySessionCount, 'Bugünkü ders', 'deneme-dersi-yoneticisi-planlanmis-dersler.html') +
         metric(m.todayStudentCount, 'Bugünkü öğrenci', 'deneme-dersi-yoneticisi-planlanmis-dersler.html') +
-        metric(m.pendingApprovalCount, 'Onay bekleyen', 'deneme-dersi-yoneticisi-rezervasyonlar.html', 'warn') +
-        metric(m.linkNotSentCount, 'Link gönderilmemiş', 'deneme-dersi-yoneticisi-online-linkler.html', 'warn') +
-        metric(m.teacherNotInformedCount, 'Öğretmen bilgilendirilmemiş', 'deneme-dersi-yoneticisi-planlanmis-dersler.html', 'warn') +
-        metric(m.cancelledCount, 'İptal edilen ders', '', 'danger') +
-        metric(m.needsAttendanceCount, 'Katılım girilmemiş', 'deneme-dersi-yoneticisi-planlanmis-dersler.html', 'warn') +
+        metric(m.pendingApprovalCount, 'Onay bekleyen', 'deneme-dersi-yoneticisi-iletisim.html', 'warn') +
+        metric(m.linkNotSentCount, 'Link gönderilmemiş', 'deneme-dersi-yoneticisi-online-linkler.html?status=not_sent', 'warn') +
+        metric(m.orphanRequestCount, 'Rezervasyonsuz talep', 'deneme-dersi-yoneticisi-rezervasyonlar.html?filter=orphan', 'warn') +
+        metric(m.teacherNotInformedCount, 'Öğretmen bilgilendirilmemiş', 'deneme-dersi-yoneticisi-iletisim.html', 'warn') +
+        metric(m.cancelledCount, 'İptal edilen ders', 'deneme-dersi-yoneticisi-planlanmis-dersler.html?status=cancelled', 'danger') +
+        metric(m.needsAttendanceCount, 'Katılım girilmemiş', 'deneme-dersi-yoneticisi-planlanmis-dersler.html?needsAttendance=1', 'warn') +
         metric(m.conversionCount, 'Kayıta dönüşüm', 'deneme-dersi-yoneticisi-ogrenciler.html');
     }
 
@@ -112,6 +113,12 @@
     m.teacherNotInformed.slice(0, 3).forEach(function (s) {
       items.push({ text: 'Öğretmen bilgilendir: ' + s.title, href: '#', sessionId: s.id });
     });
+    m.orphanRequests.slice(0, 3).forEach(function (r) {
+      items.push({
+        text: 'Rezervasyonsuz: ' + r.studentFirstName + ' ' + r.studentLastName,
+        href: 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(r.id)
+      });
+    });
     if (!items.length) {
       if (panel) panel.hidden = true;
       return;
@@ -136,14 +143,24 @@
     var alerts = [];
     Store.getSessions().forEach(function (s) {
       if (s.status === 'cancelled') return;
-      if (s.enrolledStudentIds.length >= 20) alerts.push({ msg: 'Kapasite dolu: ' + s.title, type: 'warn' });
+      if (s.enrolledStudentIds.length >= 20) {
+        alerts.push({ msg: 'Kapasite dolu: ' + s.title, type: 'warn', sessionId: s.id });
+      }
       var teacher = Store.getTeacherById(s.teacherId);
-      if (teacher && !RulesEligible(s)) alerts.push({ msg: 'Branş uyumsuzluğu: ' + s.title, type: 'danger' });
+      if (teacher && !RulesEligible(s)) {
+        alerts.push({ msg: 'Branş uyumsuzluğu: ' + s.title, type: 'danger', sessionId: s.id });
+      }
     });
     if (!alerts.length) { wrap.innerHTML = '<p class="tm-empty">Çakışma veya uyarı yok.</p>'; return; }
     wrap.innerHTML = alerts.slice(0, 8).map(function (a) {
-      return '<div class="tm-alert-row' + (a.type === 'danger' ? ' is-danger' : '') + '">' + U.escapeHtml(a.msg) + '</div>';
+      var btn = a.sessionId ? ' <button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-alert-session="' + a.sessionId + '">Detay</button>' : '';
+      return '<div class="tm-alert-row' + (a.type === 'danger' ? ' is-danger' : '') + '">' + U.escapeHtml(a.msg) + btn + '</div>';
     }).join('');
+    wrap.querySelectorAll('[data-alert-session]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (window.TMSessionDetail) window.TMSessionDetail.open(btn.getAttribute('data-alert-session'));
+      });
+    });
   }
 
   function RulesEligible(s) {

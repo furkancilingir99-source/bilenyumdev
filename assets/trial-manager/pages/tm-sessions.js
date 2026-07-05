@@ -20,6 +20,15 @@
   var exportBtn = document.getElementById('tmSessionsExport');
 
   var page = 1;
+  var needsAttendanceFilter = false;
+
+  function initFromUrl() {
+    var st = U.qs('status');
+    if (st && statusFilter && statusFilter.querySelector('option[value="' + st + '"]')) {
+      statusFilter.value = st;
+    }
+    if (U.qs('needsAttendance') === '1') needsAttendanceFilter = true;
+  }
 
   function rowData(s) {
     var d = Store.getSessionWithDetails(s.id);
@@ -54,6 +63,16 @@
     });
     if (status !== 'all') items = items.filter(function (r) { return r.session.status === status; });
     if (type !== 'all') items = items.filter(function (r) { return r.session.lessonTypeId === type; });
+    if (needsAttendanceFilter) {
+      var today = Store.todayKey();
+      items = items.filter(function (r) {
+        var s = r.session;
+        if (s.status === 'cancelled') return false;
+        var needs = s.status === 'completed' || (s.date < today && s.status === 'confirmed');
+        if (!needs) return false;
+        return Store.getReservationsForSession(s.id).some(function (res) { return res.status === 'confirmed'; });
+      });
+    }
     return U.sortBy(items, function (r) { return r.session.date + r.session.startTime; }, 'asc');
   }
 
@@ -119,5 +138,6 @@
   }
 
   window.TMOnSessionChange = render;
+  initFromUrl();
   render();
 })();

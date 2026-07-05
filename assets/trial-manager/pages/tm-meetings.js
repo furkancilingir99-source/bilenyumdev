@@ -8,6 +8,7 @@
   var U = window.TMUtils;
   var SL = window.TMStatusLabels;
   var Export = window.TMExportUtils;
+  var Perms = window.TMPermissions;
   if (!Store) return;
 
   var tbody = document.getElementById('tmMeetingsBody');
@@ -18,6 +19,13 @@
   var pageSizeSelect = document.getElementById('tmMeetingsPageSize');
   var exportBtn = document.getElementById('tmMeetingsExport');
   var page = 1;
+
+  function initFromUrl() {
+    var st = U.qs('status');
+    if (st && statusFilter && statusFilter.querySelector('option[value="' + st + '"]')) {
+      statusFilter.value = st;
+    }
+  }
 
   function rows() {
     return Store.getMeetings().map(function (m) {
@@ -63,12 +71,22 @@
         '<td>' + SL.meetingBadge(r.meeting.status) + '</td>' +
         '<td>' + r.sent + '</td><td>' + r.notSent + '</td>' +
         '<td>' + SL.sessionBadge(s.status) + '</td>' +
-        '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-session="' + s.id + '">Detay</button></td></tr>';
+        '<td style="white-space:nowrap">' +
+          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-copy-url="' + U.escapeHtml(r.meeting.meetingUrl) + '">Kopyala</button> ' +
+          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-session="' + s.id + '">Detay</button>' +
+        '</td></tr>';
     }).join('');
     U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
     tbody.querySelectorAll('[data-session]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (window.TMSessionDetail) window.TMSessionDetail.open(btn.getAttribute('data-session'), 2);
+      });
+    });
+    tbody.querySelectorAll('[data-copy-url]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var url = btn.getAttribute('data-copy-url');
+        if (navigator.clipboard) navigator.clipboard.writeText(url);
+        if (window.TMToast) window.TMToast.show('Link kopyalandı.', 'success');
       });
     });
     if (loading) loading.hidden = true;
@@ -83,9 +101,23 @@
   if (statusFilter) statusFilter.addEventListener('change', function () { page = 1; render(); });
   if (pageSizeSelect) pageSizeSelect.addEventListener('change', function () { page = 1; render(); });
   if (exportBtn && Export) exportBtn.addEventListener('click', function () {
-    Export.exportTable('online-linkler.csv', filtered().map(function (r) { return r.meeting; }), [
-      { key: 'meetingId', label: 'Meeting ID' }, { key: 'meetingUrl', label: 'URL' }, { key: 'status', label: 'Durum' }
+    if (Perms && !Perms.guard('export')) return;
+    Export.exportTable('online-linkler.csv', filtered(), [
+      { key: 'meeting', label: 'Meeting ID', value: function (r) { return r.meeting.meetingId; } },
+      { key: 'meeting', label: 'URL', value: function (r) { return r.meeting.meetingUrl; } },
+      { key: 'session', label: 'Tarih', value: function (r) { return U.formatDateKey(r.session.date); } },
+      { key: 'session', label: 'Saat', value: function (r) { return r.session.startTime; } },
+      { key: 'detail', label: 'Ders', value: function (r) { return r.detail.lessonType ? r.detail.lessonType.name : ''; } },
+      { key: 'detail', label: 'Öğretmen', value: function (r) {
+        return r.detail.teacher ? U.fullName(r.detail.teacher.firstName, r.detail.teacher.lastName) : '';
+      }},
+      { key: 'sent', label: 'Gönderilen' },
+      { key: 'notSent', label: 'Gönderilmeyen' },
+      { key: 'meeting', label: 'Durum', value: function (r) { return r.meeting.status; } }
     ]);
   });
+
+  window.TMOnSessionChange = render;
+  initFromUrl();
   render();
 })();
