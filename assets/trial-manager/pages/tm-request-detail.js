@@ -70,6 +70,7 @@
       else if (tab === 'audit') body.innerHTML = renderAudit();
       else body.innerHTML = renderInfo(r, lt, res, sess, meeting, rejected);
       bindActions(r, lt, res, sess, meeting, rejected, body);
+      if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(body);
     }
 
     document.getElementById('tmReqTabs').querySelectorAll('[data-tab]').forEach(function (btn) {
@@ -117,14 +118,14 @@
         '<br>ID: ' + meeting.meetingId + ' · Şifre: ' + meeting.passcode + '</div>' : '') +
       (rejected ? '<p class="tm-alert-row is-danger" style="margin-top:16px">Bu talep reddedilmiş veya iptal edilmiştir.</p>' : '') +
       '<div class="tm-detail-actions" style="margin-top:16px;flex-wrap:wrap">' +
-        (!rejected ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmAssignSession">Derse ata / değiştir</button>' : '') +
-        (!res && r.selectedSessionId && !rejected ? '<button type="button" class="tm-btn tm-btn--primary" id="tmCreateRes">Rezervasyon oluştur</button>' : '') +
-        (!rejected ? '<button type="button" class="tm-btn tm-btn--primary" id="tmApproveParent"' + (!res ? ' disabled title="Önce rezervasyon oluşturun"' : '') + '>Veli onayladı</button>' : '') +
-        (!rejected ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmUnreachable"' + (!res ? ' disabled' : '') + '>Ulaşılamadı</button>' : '') +
-        (!rejected ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmCallAgain"' + (!res ? ' disabled' : '') + '>Tekrar aranacak</button>' : '') +
-        (res && !rejected ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmMarkLink">Link gönderildi</button>' : '') +
-        (!rejected ? '<button type="button" class="tm-btn tm-btn--danger" id="tmRejectReq">Talebi reddet</button>' : '') +
-        '<button type="button" class="tm-btn tm-btn--ghost" id="tmAddComm">İletişim kaydı ekle</button>' +
+        (!rejected ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmAssignSession" data-tm-require="edit">Derse ata / değiştir</button>' : '') +
+        (!res && r.selectedSessionId && !rejected ? '<button type="button" class="tm-btn tm-btn--primary" id="tmCreateRes" data-tm-require="create">Rezervasyon oluştur</button>' : '') +
+        (!rejected ? '<button type="button" class="tm-btn tm-btn--primary" id="tmApproveParent" data-tm-require="edit"' + (!res ? ' disabled title="Önce rezervasyon oluşturun"' : '') + '>Veli onayladı</button>' : '') +
+        (!rejected ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmUnreachable" data-tm-require="edit"' + (!res ? ' disabled' : '') + '>Ulaşılamadı</button>' : '') +
+        (!rejected ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmCallAgain" data-tm-require="edit"' + (!res ? ' disabled' : '') + '>Tekrar aranacak</button>' : '') +
+        (res && !rejected ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmMarkLink" data-tm-require="edit">Link gönderildi</button>' : '') +
+        (!rejected ? '<button type="button" class="tm-btn tm-btn--danger" id="tmRejectReq" data-tm-require="cancel">Talebi reddet</button>' : '') +
+        '<button type="button" class="tm-btn tm-btn--ghost" id="tmAddComm" data-tm-require="edit">İletişim kaydı ekle</button>' +
       '</div>'
     );
   }
@@ -133,7 +134,7 @@
     var logs = Store.getCommunicationLogs().filter(function (l) {
       return (res && l.reservationId === res.id) || (sess && l.sessionId === sess.id);
     });
-    var addBtn = '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmAddCommTab" style="margin-bottom:12px">Kayıt ekle</button>';
+    var addBtn = '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmAddCommTab" data-tm-require="edit" style="margin-bottom:12px">Kayıt ekle</button>';
     if (!logs.length) return addBtn + '<p class="tm-empty">Bu talep için iletişim kaydı yok.</p>';
     var rows = logs.map(function (l) {
       return '<tr><td>' + U.formatDateTime(l.createdAt) + '</td><td>' + U.escapeHtml(SL.COMM_CHANNEL[l.channel] || l.channel) +

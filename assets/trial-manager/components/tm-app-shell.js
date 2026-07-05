@@ -185,6 +185,7 @@
       document.body.insertBefore(mount, document.body.firstChild);
     }
     mount.innerHTML = renderHud();
+    refreshHudProfile();
   }
 
   function mountSidebar() {

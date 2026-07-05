@@ -12,6 +12,15 @@
   var loading = document.getElementById('tmDashLoading');
   var root = document.getElementById('tmDashRoot');
 
+  function revealActionsFromHash() {
+    if (location.hash !== '#tmDashActions') return;
+    var panel = document.getElementById('tmDashActions');
+    if (panel) {
+      panel.hidden = false;
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
   function render() {
     try {
     var m = Store.getOperationMetrics();
@@ -33,6 +42,7 @@
     renderTodayLessons(m.todaySessions);
     renderActions(m);
     renderAlerts(m);
+    revealActionsFromHash();
     if (loading) loading.hidden = true;
     if (root) root.hidden = false;
     } catch (err) {
@@ -120,6 +130,12 @@
         href: 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(r.id)
       });
     });
+    m.needsAttendance.slice(0, 3).forEach(function (s) {
+      items.push({
+        text: 'Katılım gir: ' + s.title,
+        href: 'deneme-dersi-yoneticisi-planlanmis-ders-detay.html?id=' + encodeURIComponent(s.id) + '&tab=4'
+      });
+    });
     if (!items.length) {
       if (panel) panel.hidden = true;
       return;
@@ -171,4 +187,5 @@
 
   window.TMOnSessionChange = render;
   render();
+  window.addEventListener('hashchange', revealActionsFromHash);
 })();

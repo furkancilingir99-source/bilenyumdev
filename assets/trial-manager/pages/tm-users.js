@@ -77,4 +77,5 @@
   }
 
   render();
+  window.TMOnSessionChange = render;
 })();

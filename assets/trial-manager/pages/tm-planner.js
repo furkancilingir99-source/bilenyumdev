@@ -32,13 +32,18 @@
 
   function applyPermissionUi() {
     if (!saveBtn) return;
+    saveBtn.setAttribute('data-tm-require', editId ? 'edit' : 'create');
     if (editLocked || !canSave()) {
       saveBtn.disabled = true;
+      saveBtn.setAttribute('data-force-disabled', '1');
       if (conflictEl && !editLocked) {
         conflictEl.hidden = false;
         conflictEl.textContent = 'Bu işlem için yetkiniz yok.';
         conflictEl.className = 'tm-alert-row is-danger';
       }
+    } else {
+      saveBtn.removeAttribute('data-force-disabled');
+      if (Perms && Perms.applyPageChrome && form) Perms.applyPageChrome(form);
     }
   }
 

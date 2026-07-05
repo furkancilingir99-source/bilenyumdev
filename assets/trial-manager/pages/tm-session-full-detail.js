@@ -74,6 +74,9 @@
     } else {
       body.innerHTML = '<p class="tm-empty">Detay modülü yüklenemedi.</p>';
     }
+    if (window.TMPermissions && window.TMPermissions.applyPageChrome) {
+      window.TMPermissions.applyPageChrome(body);
+    }
   }
 
   window.TMOnSessionChange = function () {

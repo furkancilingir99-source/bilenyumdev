@@ -48,11 +48,11 @@
       '</div>' +
       (s.notes ? '<p><strong>Not:</strong> ' + U.escapeHtml(s.notes) + '</p>' : '') +
       '<div class="tm-detail-actions">' +
-        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm" data-act="change-teacher">Öğretmen değiştir</button>' +
-        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm" data-act="reschedule">Saat değiştir</button>' +
-        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm" data-act="inform-teacher">Öğretmeni bilgilendir</button>' +
-        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm" data-act="attendance">Katılım gir</button>' +
-        '<button type="button" class="tm-btn tm-btn--danger tm-btn--sm" data-act="cancel">Dersi iptal et</button>' +
+        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm" data-act="change-teacher" data-tm-require="edit">Öğretmen değiştir</button>' +
+        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm" data-act="reschedule" data-tm-require="edit">Saat değiştir</button>' +
+        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm" data-act="inform-teacher" data-tm-require="edit">Öğretmeni bilgilendir</button>' +
+        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm" data-act="attendance" data-tm-require="edit">Katılım gir</button>' +
+        '<button type="button" class="tm-btn tm-btn--danger tm-btn--sm" data-act="cancel" data-tm-require="cancel">Dersi iptal et</button>' +
       '</div>'
     );
   }
@@ -78,12 +78,12 @@
         '<td>' + SL.reservationBadge(r.status) + '</td>' +
         '<td style="white-space:nowrap">' +
           '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-wa-parent="' + r.id + '">WhatsApp</button> ' +
-          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-link-sent="' + r.id + '">Link gönderildi</button>' +
+          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-link-sent="' + r.id + '" data-tm-require="edit">Link gönderildi</button>' +
         '</td>' +
       '</tr>';
     }).join('');
     return (notSent ? '<p class="tm-alert-row" style="margin-bottom:8px">Onaylı ancak link gönderilmemiş: ' + notSent + ' veli</p>' +
-      '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-bulk-link style="margin-bottom:12px">Tüm onaylılara link gönderildi işaretle</button>' : '') +
+      '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-bulk-link data-tm-require="edit" style="margin-bottom:12px">Tüm onaylılara link gönderildi işaretle</button>' : '') +
       '<table class="tm-inner-table"><thead><tr><th>Öğrenci</th><th>Sınıf</th><th>Veli</th><th>Telefon</th><th>Veli onay</th><th>Link</th><th>Durum</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
@@ -108,7 +108,7 @@
       '</div>' +
       '<div class="tm-detail-actions">' +
         '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-wa-teacher>Öğretmen WhatsApp</button>' +
-        '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-refresh-passcode>Şifre yenile</button>' +
+        '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-refresh-passcode data-tm-require="edit">Şifre yenile</button>' +
       '</div>'
     );
   }
@@ -120,21 +120,28 @@
 
   function renderCommunication(d) {
     var logs = Store.getCommunicationLogs().filter(function (l) { return l.sessionId === d.session.id; });
-    if (!logs.length) return '<p class="tm-empty">İletişim kaydı yok.</p><button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-add-comm>İletişim kaydı ekle</button>';
+    if (!logs.length) return '<p class="tm-empty">İletişim kaydı yok.</p><button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-add-comm data-tm-require="edit">İletişim kaydı ekle</button>';
     var rows = logs.map(function (l) {
       return '<tr><td>' + U.formatDateTime(l.createdAt) + '</td><td>' + U.escapeHtml(SL.COMM_CHANNEL[l.channel] || l.channel) +
         '</td><td>' + U.escapeHtml(SL.COMM_RESULT[l.result] || l.result) + '</td><td>' + U.escapeHtml(l.summary) + '</td></tr>';
     }).join('');
     return '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Kanal</th><th>Sonuç</th><th>Özet</th></tr></thead><tbody>' + rows + '</tbody></table>' +
-      '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-add-comm style="margin-top:12px">İletişim kaydı ekle</button>';
+      '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-add-comm data-tm-require="edit" style="margin-top:12px">İletişim kaydı ekle</button>';
   }
 
   function renderAttendance(d) {
     if (d.session.status !== 'completed' && d.session.date >= Store.todayKey()) {
       return '<p class="tm-empty">Ders tamamlandıktan sonra katılım girilebilir. Dersi tamamlamak için sonuçları kaydedin.</p>';
     }
+    var readOnly = global.TMPermissions && !global.TMPermissions.can('edit');
     var rows = d.participants.map(function (p) {
       var r = p.reservation;
+      if (readOnly) {
+        return '<tr><td>' + U.escapeHtml(p.student ? U.fullName(p.student.firstName, p.student.lastName) : '') + '</td>' +
+          '<td>' + U.escapeHtml(SL.reservationLabel(r.status)) + '</td>' +
+          '<td>' + (r.enrolled ? 'Evet' : 'Hayır') + '</td>' +
+          '<td>' + U.escapeHtml(r.notes || '—') + '</td></tr>';
+      }
       return '<tr data-res="' + r.id + '">' +
         '<td>' + U.escapeHtml(p.student ? U.fullName(p.student.firstName, p.student.lastName) : '') + '</td>' +
         '<td><select class="tm-dg-control" data-att-status><option value="attended"' + (r.status === 'attended' ? ' selected' : '') + '>Katıldı</option><option value="no_show"' + (r.status === 'no_show' ? ' selected' : '') + '>Gelmedi</option></select></td>' +
@@ -142,8 +149,12 @@
         '<td><input type="text" class="tm-dg-control" data-att-note value="' + U.escapeHtml(r.notes || '') + '" placeholder="Not"></td>' +
       '</tr>';
     }).join('');
+    if (readOnly) {
+      return '<table class="tm-inner-table"><thead><tr><th>Öğrenci</th><th>Katılım</th><th>Kayıt oldu</th><th>Not</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+        '<p class="tm-empty" style="margin-top:12px">Gözlemci modu: katılım düzenlenemez.</p>';
+    }
     return '<table class="tm-inner-table"><thead><tr><th>Öğrenci</th><th>Katılım</th><th>Kayıt oldu</th><th>Not</th></tr></thead><tbody>' + rows + '</tbody></table>' +
-      '<button type="button" class="tm-btn tm-btn--primary" data-save-attendance style="margin-top:12px">Katılım sonuçlarını kaydet</button>';
+      '<button type="button" class="tm-btn tm-btn--primary" data-save-attendance data-tm-require="edit" style="margin-top:12px">Katılım sonuçlarını kaydet</button>';
   }
 
   function renderAudit(d) {
@@ -171,6 +182,9 @@
     else html = renderAudit(d);
     bodyEl.innerHTML = html;
     bindTabActions(bodyEl, d, idx);
+    if (global.TMPermissions && global.TMPermissions.applyPageChrome) {
+      global.TMPermissions.applyPageChrome(bodyEl);
+    }
   }
 
   function bindTabActions(bodyEl, d, idx) {

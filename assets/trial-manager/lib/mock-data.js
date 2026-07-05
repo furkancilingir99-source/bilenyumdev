@@ -726,6 +726,14 @@
     session.teacherInformedAt = new Date().toISOString();
     session.teacherInformedByUserId = state.currentUserId;
     session.updatedAt = new Date().toISOString();
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'trial_lesson_session',
+        entityId: sessionId,
+        action: 'teacher_informed',
+        description: 'Öğretmen bilgilendirildi olarak işaretlendi.'
+      });
+    }
     touch();
     return { ok: true, session: session };
   }
@@ -986,7 +994,7 @@
       Audit.append(state, {
         entityType: 'trial_lesson_request',
         entityId: requestId,
-        action: 'parent_rejected',
+        action: 'request_rejected',
         description: 'Talep reddedildi.',
         reason: reason
       });

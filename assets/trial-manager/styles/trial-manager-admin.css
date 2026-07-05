@@ -184,9 +184,14 @@ body.tm-admin-body .player-clan {
 }
 
 button.is-perm-disabled,
-.tm-viewer-mode button.is-perm-disabled {
+.tm-viewer-mode button.is-perm-disabled,
+a.is-perm-disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+a.is-perm-disabled {
+  pointer-events: none;
 }
 
 .tm-admin-main {

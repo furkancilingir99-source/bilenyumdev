@@ -10,10 +10,12 @@
   var Form = window.TMFormDialog;
   var Perms = window.TMPermissions;
   var QuickMsg = window.TMQuickMessage;
+  var Export = window.TMExportUtils;
   if (!Store) return;
 
   var tbody = document.getElementById('tmCommBody');
   var tabsEl = document.getElementById('tmCommTabs');
+  var exportBtn = document.getElementById('tmCommExport');
   var activeTab = 'all';
   var page = 1;
   var paginationEl = document.getElementById('tmCommPagination');
@@ -175,6 +177,39 @@
     });
   }
 
+  function exportRows() {
+    var items = filterTab(taskRows());
+    if (activeTab === 'all') {
+      return items.map(function (x) {
+        var l = x.log;
+        return {
+          person: x.person,
+          role: x.role,
+          phone: x.phone,
+          channel: SL.COMM_CHANNEL[l.channel] || l.channel,
+          result: SL.COMM_RESULT[l.result] || l.result,
+          createdAt: U.formatDateTime(l.createdAt),
+          nextAction: l.nextAction || '',
+          responsible: x.responsible || ''
+        };
+      });
+    }
+    return items.map(function (x) {
+      var stName = x.student ? U.fullName(x.student.firstName, x.student.lastName) : '—';
+      var sessLabel = x.session ? U.formatDateKey(x.session.date) + ' ' + x.session.startTime : '—';
+      var result = x.reservation ? SL.parentApprovalLabel(x.reservation.parentApprovalStatus) : 'Bilgilendirilmedi';
+      return {
+        person: x.person,
+        role: x.role,
+        student: stName,
+        session: sessLabel,
+        phone: x.phone,
+        result: result,
+        responsible: responsibleLabel()
+      };
+    });
+  }
+
   function renderTabs() {
     if (!tabsEl) return;
     tabsEl.innerHTML = TAB_DEFS.map(function (t) {
@@ -243,6 +278,35 @@
   }
 
   window.TMOnSessionChange = render;
+  if (exportBtn && Export) {
+    exportBtn.addEventListener('click', function () {
+      if (Perms && !Perms.guard('export')) return;
+      var tab = TAB_DEFS.find(function (t) { return t.id === activeTab; });
+      var suffix = tab ? tab.id : 'liste';
+      if (activeTab === 'all') {
+        Export.exportTable('iletisim-gecmisi-' + suffix + '.csv', exportRows(), [
+          { key: 'person', label: 'Kişi' },
+          { key: 'role', label: 'Rol' },
+          { key: 'phone', label: 'Telefon' },
+          { key: 'channel', label: 'Kanal' },
+          { key: 'result', label: 'Sonuç' },
+          { key: 'createdAt', label: 'Tarih' },
+          { key: 'nextAction', label: 'Sonraki aksiyon' },
+          { key: 'responsible', label: 'Sorumlu' }
+        ]);
+      } else {
+        Export.exportTable('iletisim-gorevleri-' + suffix + '.csv', exportRows(), [
+          { key: 'person', label: 'Kişi' },
+          { key: 'role', label: 'Rol' },
+          { key: 'student', label: 'Öğrenci' },
+          { key: 'session', label: 'Ders' },
+          { key: 'phone', label: 'Telefon' },
+          { key: 'result', label: 'Durum' },
+          { key: 'responsible', label: 'Sorumlu' }
+        ]);
+      }
+    });
+  }
   renderTabs();
   render();
 })();

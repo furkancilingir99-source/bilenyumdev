@@ -27,54 +27,75 @@
     return false;
   }
 
-  function disableIfNoPermission(selector, action, label) {
-    document.querySelectorAll(selector).forEach(function (el) {
+  function disableIfNoPermission(selector, action, label, root) {
+    var scope = root || document;
+    scope.querySelectorAll(selector).forEach(function (el) {
       if (!can(action)) {
-        el.disabled = true;
-        el.setAttribute('aria-disabled', 'true');
+        if (el.tagName === 'A') {
+          el.setAttribute('aria-disabled', 'true');
+          el.setAttribute('tabindex', '-1');
+        } else {
+          el.disabled = true;
+          el.setAttribute('aria-disabled', 'true');
+        }
         el.title = label || 'Bu işlem için yetkiniz yok';
         el.classList.add('is-perm-disabled');
+      } else {
+        el.classList.remove('is-perm-disabled');
+        if (el.getAttribute('data-tm-require')) {
+          el.removeAttribute('aria-disabled');
+          if (el.tagName === 'A') {
+            el.removeAttribute('tabindex');
+          } else if (!el.hasAttribute('data-force-disabled')) {
+            el.disabled = false;
+          }
+        }
       }
     });
   }
 
-  function applyPageChrome() {
+  function applyPageChrome(root) {
     var u = user();
     if (!u) return;
+    var scope = root || document;
 
-    document.body.classList.toggle('tm-viewer-mode', u.role === 'viewer');
+    if (!root) {
+      document.body.classList.toggle('tm-viewer-mode', u.role === 'viewer');
+    }
 
-    disableIfNoPermission('#tmSimulateRequest, #tmRequestsSimulate', 'create');
-    disableIfNoPermission('#tmResetMock', 'edit');
-    disableIfNoPermission('#tmPlanSave', 'create');
-    disableIfNoPermission('[data-tm-require="create"]', 'create');
-    disableIfNoPermission('[data-tm-require="edit"]', 'edit');
-    disableIfNoPermission('[data-tm-require="cancel"]', 'cancel');
+    disableIfNoPermission('#tmSimulateRequest, #tmRequestsSimulate', 'create', scope);
+    disableIfNoPermission('#tmResetMock', 'edit', undefined, scope);
+    disableIfNoPermission('[data-tm-require="create"]', 'create', undefined, scope);
+    disableIfNoPermission('[data-tm-require="edit"]', 'edit', undefined, scope);
+    disableIfNoPermission('[data-tm-require="cancel"]', 'cancel', undefined, scope);
 
-    document.querySelectorAll('[data-tm-export]').forEach(function (el) {
+    scope.querySelectorAll('[data-tm-export]').forEach(function (el) {
       if (!can('export')) {
         el.disabled = true;
         el.title = 'Dışa aktarma yetkiniz yok';
+        el.classList.add('is-perm-disabled');
       }
     });
 
-    var banner = document.getElementById('tmViewerBanner');
-    if (u.role === 'viewer') {
-      if (!banner) {
-        banner = document.createElement('div');
-        banner.id = 'tmViewerBanner';
-        banner.className = 'tm-viewer-banner';
-        banner.setAttribute('role', 'status');
-        var main = document.querySelector('.tm-admin-main');
-        if (main) main.insertBefore(banner, main.firstChild);
+    if (!root) {
+      var banner = document.getElementById('tmViewerBanner');
+      if (u.role === 'viewer') {
+        if (!banner) {
+          banner = document.createElement('div');
+          banner.id = 'tmViewerBanner';
+          banner.className = 'tm-viewer-banner';
+          banner.setAttribute('role', 'status');
+          var main = document.querySelector('.tm-admin-main');
+          if (main) main.insertBefore(banner, main.firstChild);
+        }
+        banner.textContent = 'Gözlemci modu: kayıt oluşturamaz veya düzenleyemezsiniz. Dışa aktarım ve görüntüleme açıktır.';
+      } else if (banner) {
+        banner.remove();
       }
-      banner.textContent = 'Gözlemci modu: kayıt oluşturamaz veya düzenleyemezsiniz. Dışa aktarım ve görüntüleme açıktır.';
-    } else if (banner) {
-      banner.remove();
-    }
 
-    if (global.TMAppShell && global.TMAppShell.refreshHudProfile) {
-      global.TMAppShell.refreshHudProfile();
+      if (global.TMAppShell && global.TMAppShell.refreshHudProfile) {
+        global.TMAppShell.refreshHudProfile();
+      }
     }
   }
 
