@@ -72,11 +72,11 @@
   }
 
   var TEACHERS = [
-    { id: 't1', name: 'Furkan Çilingir', subjects: ['Matematik'] },
-    { id: 't2', name: 'Zeynep Arslan', subjects: ['Matematik', 'Fen Bilimleri'] },
-    { id: 't3', name: 'Mehmet Koç', subjects: ['Türkçe'] },
-    { id: 't4', name: 'Elif Yıldız', subjects: ['İngilizce', 'Sosyal Bilgiler'] },
-    { id: 't5', name: 'Can Demir', subjects: ['Fen Bilimleri'] }
+    { id: 't1', name: 'Furkan Çilingir', subjects: ['Matematik'], phone: '0532 410 22 18', email: 'furkan.cilingir@bilenyum.com' },
+    { id: 't2', name: 'Zeynep Arslan', subjects: ['Matematik', 'Fen Bilimleri'], phone: '0533 221 44 90', email: 'zeynep.arslan@bilenyum.com' },
+    { id: 't3', name: 'Mehmet Koç', subjects: ['Türkçe'], phone: '0534 880 12 55', email: 'mehmet.koc@bilenyum.com' },
+    { id: 't4', name: 'Elif Yıldız', subjects: ['İngilizce', 'Sosyal Bilgiler'], phone: '0535 902 33 71', email: 'elif.yildiz@bilenyum.com' },
+    { id: 't5', name: 'Can Demir', subjects: ['Fen Bilimleri'], phone: '0536 114 77 02', email: 'can.demir@bilenyum.com' }
   ];
 
   var PLANNED_LESSONS = [
@@ -249,14 +249,25 @@
     return dateKey + '|' + time;
   }
 
-  function getEligibleStudents(subject, grade, excludeLessonId, dateKey, time) {
+  function getEligibleStudents(subject, grade, excludeLessonId, dateKey, time, lessonSlotLabel) {
+    var ResMock = global.TrialLessonManagerMock;
+    var statusLabels = ResMock ? ResMock.STATUS_LABELS : {};
     return getReservationStore().filter(function (r) {
       if (r.status === 'cancelled' || r.status === 'completed') return false;
       if (subject && r.subject !== subject) return false;
       if (grade && r.grade !== grade) return false;
       return true;
     }).map(function (r) {
+      var normalized = ResMock ? ResMock.getReservationById(r.id) : r;
+      if (normalized) r = normalized;
       var conflict = findStudentConflict(r.id, dateKey, time, excludeLessonId);
+      var otherLessons = PLANNED_LESSONS.filter(function (lesson) {
+        if (excludeLessonId && lesson.id === excludeLessonId) return false;
+        return lesson.studentIds.indexOf(r.id) !== -1;
+      }).map(function (lesson) {
+        return lesson.subject + ' · ' + lesson.slotLabel;
+      });
+      var slotMatches = lessonSlotLabel ? r.slotLabel === lessonSlotLabel : null;
       return {
         reservationId: r.id,
         name: r.studentFirstName + ' ' + r.studentLastName,
@@ -264,9 +275,17 @@
         subject: r.subject,
         parent: r.parentFirstName + ' ' + r.parentLastName,
         phone: r.phone,
+        email: r.email,
         preferredSlot: r.slotLabel,
+        requestedSlotLabel: r.requestedSlotLabel || r.slotLabel,
+        slotConfirmedByParent: !!r.slotConfirmedByParent,
+        status: r.status,
+        statusLabel: statusLabels[r.status] || r.status,
         hasConflict: conflict.length > 0,
-        conflictMsg: conflict.length ? conflict[0].message : ''
+        conflictMsg: conflict.length ? conflict[0].message : '',
+        otherLessons: otherLessons,
+        slotMatchesLesson: slotMatches,
+        needsParentContact: !!lessonSlotLabel && (r.slotLabel !== lessonSlotLabel || !r.slotConfirmedByParent)
       };
     });
   }
@@ -407,9 +426,15 @@
           phone: '—',
           email: '—',
           preferredSlot: '—',
-          status: 'unknown'
+          requestedSlotLabel: '—',
+          slotConfirmedByParent: false,
+          status: 'unknown',
+          slotMatchesLesson: null,
+          needsParentContact: false,
+          otherLessons: []
         };
       }
+      var slotMatches = lesson.slotLabel ? r.slotLabel === lesson.slotLabel : null;
       return {
         reservationId: r.id,
         name: r.studentFirstName + ' ' + r.studentLastName,
@@ -419,7 +444,12 @@
         phone: r.phone,
         email: r.email,
         preferredSlot: r.slotLabel,
-        status: r.status
+        requestedSlotLabel: r.requestedSlotLabel || r.slotLabel,
+        slotConfirmedByParent: !!r.slotConfirmedByParent,
+        status: r.status,
+        slotMatchesLesson: slotMatches,
+        needsParentContact: !!lesson.slotLabel && (r.slotLabel !== lesson.slotLabel || !r.slotConfirmedByParent),
+        otherLessons: []
       };
     });
   }
@@ -435,6 +465,8 @@
       teacherId: lesson.teacherId,
       teacherName: teacher ? teacher.name : '—',
       teacherSubjects: teacher ? teacher.subjects.slice() : [],
+      teacherPhone: teacher ? teacher.phone : '',
+      teacherEmail: teacher ? teacher.email : '',
       slotLabel: lesson.slotLabel,
       slotDateKey: lesson.slotDateKey,
       slotTime: lesson.slotTime,

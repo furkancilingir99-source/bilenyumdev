@@ -37,7 +37,7 @@
     <div class="thw-context-panel">
       <div class="thw-page-head">
         <h1 class="thw-page-title">Ders Planla</h1>
-        <p class="thw-page-subtitle">Branş, sınıf ve öğretmen seçerek yeni deneme dersi oluşturun; uygun öğrencileri ekleyin ve çakışmaları önleyin.</p>
+        <p class="thw-page-subtitle">Branş, sınıf ve öğretmen seçerek deneme dersi oluşturun; öğrencileri mevcut başvurular arasından seçin, veli ve öğretmen ile koordinasyon kurun.</p>
       </div>
     </div>
 
@@ -47,8 +47,26 @@
 
 <div class="tm-planner-toast" id="tmPlannerToast" role="status" aria-live="polite" hidden></div>
 
+<div class="tm-modal" id="tmModal" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="tm-modal-overlay" data-tm-modal-close></div>
+  <div class="tm-modal-panel tm-modal-panel--wide">
+    <button type="button" class="tm-modal-close" data-tm-modal-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <header class="tm-modal-head">
+      <span class="tm-modal-eyebrow">BAŞVURULAR</span>
+      <h2 class="tm-modal-title" data-tm-modal-title>Öğrenci seçimi</h2>
+      <p class="tm-modal-sub" data-tm-modal-sub hidden></p>
+    </header>
+    <div class="tm-modal-body" data-tm-modal-body></div>
+    <footer class="tm-modal-foot" data-tm-modal-foot></footer>
+  </div>
+</div>
+
 <script src="assets/trial-lesson-manager-mock.js"></script>
 <script src="assets/trial-lesson-planner-mock.js"></script>
+<script src="assets/trial-lesson-manager-modal.js"></script>
+<script src="assets/trial-lesson-applicant-picker.js"></script>
 <script src="assets/trial-lesson-planner.js"></script>
 </body>
 </html>
