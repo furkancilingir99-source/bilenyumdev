@@ -144,6 +144,9 @@
 
   function render() {
     if (!tbody) return;
+    var loading = document.getElementById('tmCommLoading');
+    var wrap = document.getElementById('tmCommTableWrap');
+    try {
     var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '15', 10);
     var items = filterTab(taskRows());
     var p = U.paginate(items, page, pageSize);
@@ -173,10 +176,12 @@
         if (lastItems[idx]) openLogForm(lastItems[idx]);
       });
     });
-    var loading = document.getElementById('tmCommLoading');
-    var wrap = document.getElementById('tmCommTableWrap');
     if (loading) loading.hidden = true;
     if (wrap) wrap.hidden = false;
+    } catch (err) {
+      if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
+      console.error(err);
+    }
   }
 
   renderTabs();

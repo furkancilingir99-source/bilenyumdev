@@ -64,6 +64,9 @@
 
   function render() {
     if (!tbody) return;
+    var loading = document.getElementById('tmStudentsLoading');
+    var wrap = document.getElementById('tmStudentsTableWrap');
+    try {
     var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
     var p = U.paginate(filtered(), page, pageSize);
     if (countEl) countEl.textContent = p.total + ' öğrenci';
@@ -89,8 +92,12 @@
         openDetail(Store.getStudentById(btn.getAttribute('data-detail')));
       });
     });
-    document.getElementById('tmStudentsLoading').hidden = true;
-    document.getElementById('tmStudentsTableWrap').hidden = false;
+    if (loading) loading.hidden = true;
+    if (wrap) wrap.hidden = false;
+    } catch (err) {
+      if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
+      console.error(err);
+    }
   }
 
   if (searchInput) searchInput.addEventListener('input', U.debounce(function () { page = 1; render(); }, 200));

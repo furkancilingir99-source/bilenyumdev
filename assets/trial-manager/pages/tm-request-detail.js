@@ -95,7 +95,8 @@
       '</div>' +
       (meeting ? '<div class="tm-link-box" style="margin-top:16px"><strong>Online link</strong><br>' + U.escapeHtml(meeting.meetingUrl) + '<br>ID: ' + meeting.meetingId + ' · Şifre: ' + meeting.passcode + '</div>' : '') +
       '<div class="tm-detail-actions" style="margin-top:16px">' +
-        '<button type="button" class="tm-btn tm-btn--primary" id="tmApproveParent">Veli onayladı</button>' +
+        (!res && req.selectedSessionId ? '<button type="button" class="tm-btn tm-btn--primary" id="tmCreateRes">Rezervasyon oluştur</button>' : '') +
+        '<button type="button" class="tm-btn tm-btn--primary" id="tmApproveParent"' + (!res ? ' disabled title="Önce rezervasyon oluşturun"' : '') + '>Veli onayladı</button>' +
         '<button type="button" class="tm-btn tm-btn--ghost" id="tmUnreachable">Ulaşılamadı</button>' +
         '<button type="button" class="tm-btn tm-btn--ghost" id="tmCallAgain">Tekrar aranacak</button>' +
         (res ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmMarkLink">Link gönderildi</button>' : '') +
@@ -120,6 +121,14 @@
   }
 
   function bindActions(req, res, sess, meeting, body) {
+    var createBtn = body.querySelector('#tmCreateRes');
+    if (createBtn) {
+      createBtn.onclick = function () {
+        var r = Store.createReservationFromRequest(id);
+        if (!r.ok) alert(r.error);
+        else paint();
+      };
+    }
     var approveBtn = body.querySelector('#tmApproveParent') || document.getElementById('tmApproveParent');
     if (approveBtn) {
       approveBtn.onclick = function () {

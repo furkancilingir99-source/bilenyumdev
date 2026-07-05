@@ -40,13 +40,17 @@
 
   function render() {
     if (!tbody) return;
+    var loading = document.getElementById('tmRequestsLoading');
+    var wrap = document.getElementById('tmRequestsTableWrap');
+    try {
     var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
     var all = filtered();
     var p = U.paginate(all, page, pageSize);
     if (countEl) countEl.textContent = p.total + ' talep';
     tbody.innerHTML = p.items.map(function (r) {
       var lt = Store.getLessonTypeById(r.requestedLessonTypeId);
-      var res = Store.getReservations().find(function (x) { return x.requestId === r.id; });
+      var res = Store.getReservationByRequestId ? Store.getReservationByRequestId(r.id) :
+        Store.getReservations().find(function (x) { return x.requestId === r.id; });
       return '<tr>' +
         '<td>' + U.formatDateTime(r.createdAt) + '</td>' +
         '<td>' + U.escapeHtml(r.studentFirstName + ' ' + r.studentLastName) + '</td>' +
@@ -62,10 +66,12 @@
         '<td><a class="tm-btn tm-btn--sm tm-btn--ghost" href="deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(r.id) + '">İncele</a></td></tr>';
     }).join('');
     U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
-    var loading = document.getElementById('tmRequestsLoading');
-    var wrap = document.getElementById('tmRequestsTableWrap');
     if (loading) loading.hidden = true;
     if (wrap) wrap.hidden = false;
+    } catch (err) {
+      if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
+      console.error(err);
+    }
   }
 
   if (searchInput) searchInput.addEventListener('input', U.debounce(function () { page = 1; render(); }, 200));

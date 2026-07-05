@@ -73,6 +73,9 @@
 
   function render() {
     if (!tbody) return;
+    var loading = document.getElementById('tmTeachersLoading');
+    var wrap = document.getElementById('tmTeachersTableWrap');
+    try {
     var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
     var p = U.paginate(filtered(), page, pageSize);
     if (countEl) countEl.textContent = p.total + ' öğretmen';
@@ -90,8 +93,12 @@
     tbody.querySelectorAll('[data-detail]').forEach(function (btn) {
       btn.addEventListener('click', function () { openDetail(Store.getTeacherById(btn.getAttribute('data-detail'))); });
     });
-    document.getElementById('tmTeachersLoading').hidden = true;
-    document.getElementById('tmTeachersTableWrap').hidden = false;
+    if (loading) loading.hidden = true;
+    if (wrap) wrap.hidden = false;
+    } catch (err) {
+      if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
+      console.error(err);
+    }
   }
 
   if (searchInput) searchInput.addEventListener('input', U.debounce(function () { page = 1; render(); }, 200));

@@ -6,6 +6,7 @@
 
   var Store = window.TMStore;
   var U = window.TMUtils;
+  var SL = window.TMStatusLabels;
   var Drawer = window.TMDetailDrawer;
   var Export = window.TMExportUtils;
   if (!Store) return;
@@ -44,6 +45,9 @@
 
   function render() {
     if (!tbody) return;
+    var loading = document.getElementById('tmParentsLoading');
+    var wrap = document.getElementById('tmParentsTableWrap');
+    try {
     var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
     var p = U.paginate(filtered(), page, pageSize);
     if (countEl) countEl.textContent = p.total + ' veli';
@@ -53,11 +57,12 @@
       var lastComm = Store.getCommunicationLogs().find(function (l) { return l.parentId === pa.id; });
       var linkSent = res.some(function (r) { return r.linkSent; });
       var callAgain = res.some(function (r) { return r.parentApprovalStatus === 'call_again'; });
+      var approval = active.length ? SL.parentApprovalBadge(active[0].parentApprovalStatus) : '—';
       return '<tr><td>' + U.escapeHtml(U.fullName(pa.firstName, pa.lastName)) + '</td>' +
         '<td>' + U.escapeHtml(pa.phone) + '</td><td>' + U.escapeHtml(pa.email) + '</td>' +
         '<td>' + pa.studentIds.length + '</td>' +
         '<td>' + (lastComm ? U.formatDateTime(lastComm.createdAt) : '—') + '</td>' +
-        '<td>' + (active.length ? active[0].parentApprovalStatus : '—') + '</td>' +
+        '<td>' + approval + '</td>' +
         '<td>' + (callAgain ? 'Evet' : 'Hayır') + '</td>' +
         '<td>' + (linkSent ? 'Evet' : 'Hayır') + '</td>' +
         '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + pa.id + '">Detay</button></td></tr>';
@@ -66,8 +71,12 @@
     tbody.querySelectorAll('[data-detail]').forEach(function (btn) {
       btn.addEventListener('click', function () { openDetail(Store.getParentById(btn.getAttribute('data-detail'))); });
     });
-    document.getElementById('tmParentsLoading').hidden = true;
-    document.getElementById('tmParentsTableWrap').hidden = false;
+    if (loading) loading.hidden = true;
+    if (wrap) wrap.hidden = false;
+    } catch (err) {
+      if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
+      console.error(err);
+    }
   }
 
   if (searchInput) searchInput.addEventListener('input', U.debounce(function () { page = 1; render(); }, 200));

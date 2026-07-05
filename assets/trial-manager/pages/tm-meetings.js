@@ -45,6 +45,9 @@
 
   function render() {
     if (!tbody) return;
+    var loading = document.getElementById('tmMeetingsLoading');
+    var wrap = document.getElementById('tmMeetingsTableWrap');
+    try {
     var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
     var p = U.paginate(filtered(), page, pageSize);
     if (countEl) countEl.textContent = p.total + ' link';
@@ -68,8 +71,12 @@
         if (window.TMSessionDetail) window.TMSessionDetail.open(btn.getAttribute('data-session'), 2);
       });
     });
-    document.getElementById('tmMeetingsLoading').hidden = true;
-    document.getElementById('tmMeetingsTableWrap').hidden = false;
+    if (loading) loading.hidden = true;
+    if (wrap) wrap.hidden = false;
+    } catch (err) {
+      if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
+      console.error(err);
+    }
   }
 
   if (searchInput) searchInput.addEventListener('input', U.debounce(function () { page = 1; render(); }, 200));

@@ -62,5 +62,17 @@
     document.body.classList.add('tm-drawer-open');
   }
 
-  global.TMQuickMessage = { openForParent: openForParent, show: showChooser };
+  function openForTeacher(opts) {
+    if (!Msg || !opts) return;
+    var text = Msg.teacherInfo({
+      teacherName: opts.teacherName,
+      date: opts.date,
+      time: opts.time,
+      lessonType: opts.lessonType,
+      studentCount: opts.studentCount
+    });
+    showChooser(opts.teacherName, opts.phone, opts.email, text, 'Deneme dersi öğretmen bilgilendirme');
+  }
+
+  global.TMQuickMessage = { openForParent: openForParent, openForTeacher: openForTeacher, show: showChooser };
 })(typeof window !== 'undefined' ? window : this);

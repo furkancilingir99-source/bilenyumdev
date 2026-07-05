@@ -255,15 +255,27 @@
         });
       });
       bodyEl.querySelector('[data-wa-teacher]') && bodyEl.querySelector('[data-wa-teacher]').addEventListener('click', function () {
-        if (!d.teacher || !Msg) return;
-        var text = Msg.teacherInfo({
-          teacherName: U.fullName(d.teacher.firstName, d.teacher.lastName),
-          date: U.formatDateKey(d.session.date),
-          time: d.session.startTime,
-          lessonType: d.lessonType.name,
-          studentCount: d.session.enrolledStudentIds.length
-        });
-        window.open(Msg.whatsappUrl(d.teacher.phone, text), '_blank');
+        if (!d.teacher) return;
+        if (QuickMsg) {
+          QuickMsg.openForTeacher({
+            teacherName: U.fullName(d.teacher.firstName, d.teacher.lastName),
+            date: U.formatDateKey(d.session.date),
+            time: d.session.startTime,
+            lessonType: d.lessonType.name,
+            studentCount: d.session.enrolledStudentIds.length,
+            phone: d.teacher.phone,
+            email: d.teacher.email
+          });
+        } else if (Msg) {
+          var text = Msg.teacherInfo({
+            teacherName: U.fullName(d.teacher.firstName, d.teacher.lastName),
+            date: U.formatDateKey(d.session.date),
+            time: d.session.startTime,
+            lessonType: d.lessonType.name,
+            studentCount: d.session.enrolledStudentIds.length
+          });
+          window.open(Msg.whatsappUrl(d.teacher.phone, text), '_blank');
+        }
       });
     }
     if (idx === 4) {

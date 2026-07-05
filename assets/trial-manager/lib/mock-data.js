@@ -679,6 +679,116 @@
     return { ok: true, reservation: r };
   }
 
+  function findStudentForRequest(req) {
+    return state.students.find(function (st) {
+      return st.firstName === req.studentFirstName && st.lastName === req.studentLastName;
+    }) || null;
+  }
+
+  function findParentForRequest(req) {
+    var digits = String(req.parentPhone || '').replace(/\D/g, '');
+    return state.parents.find(function (p) {
+      return String(p.phone || '').replace(/\D/g, '') === digits;
+    }) || null;
+  }
+
+  function createReservationFromRequest(requestId) {
+    var req = find(state.requests, requestId);
+    if (!req) return { ok: false, error: 'Talep bulunamadı.' };
+    var existing = getReservationByRequestId(requestId);
+    if (existing) return { ok: true, reservation: existing, created: false };
+    if (!req.selectedSessionId) return { ok: false, error: 'Talepte seçili ders yok.' };
+    var session = find(state.sessions, req.selectedSessionId);
+    if (!session) return { ok: false, error: 'Seçili ders bulunamadı.' };
+    if (session.status === 'cancelled') return { ok: false, error: 'Seçili ders iptal edilmiş.' };
+
+    var student = findStudentForRequest(req);
+    var parent = findParentForRequest(req);
+
+    if (!parent) {
+      var pSeq = state.parents.length + 1;
+      var pid = 'parent-' + String(pSeq).padStart(4, '0');
+      parent = {
+        id: pid,
+        firstName: req.parentFirstName,
+        lastName: req.parentLastName,
+        phone: req.parentPhone,
+        email: req.parentEmail,
+        studentIds: [],
+        preferredChannels: ['phone', 'whatsapp'],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      state.parents.push(parent);
+    }
+
+    if (!student) {
+      var sSeq = state.students.length + 1;
+      var sid = 'student-' + String(sSeq).padStart(4, '0');
+      student = {
+        id: sid,
+        firstName: req.studentFirstName,
+        lastName: req.studentLastName,
+        age: req.studentAge,
+        grade: req.studentGrade,
+        level: req.studentLevel,
+        requestedLessonTypeId: req.requestedLessonTypeId,
+        parentIds: [parent.id],
+        status: 'awaiting_assignment',
+        hasUsedFreeTrialForLessonTypeIds: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      state.students.push(student);
+      if (parent.studentIds.indexOf(student.id) < 0) parent.studentIds.push(student.id);
+    } else if (parent.studentIds.indexOf(student.id) < 0) {
+      parent.studentIds.push(student.id);
+      if (student.parentIds.indexOf(parent.id) < 0) student.parentIds.push(parent.id);
+    }
+
+    if (Rules) {
+      var check = Rules.canAssignStudentToSession(student.id, session.id);
+      if (!check.allowed) return { ok: false, error: check.reason };
+    }
+
+    var rSeq = state.reservations.length + 1;
+    var rid = 'res-' + String(rSeq).padStart(4, '0');
+    var reservation = {
+      id: rid,
+      requestId: requestId,
+      studentId: student.id,
+      parentId: parent.id,
+      sessionId: session.id,
+      lessonTypeId: session.lessonTypeId,
+      status: 'pending',
+      parentApprovalStatus: 'not_called',
+      linkSent: false,
+      teacherInformed: session.teacherInformed,
+      communicationLogIds: [],
+      enrolled: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    state.reservations.push(reservation);
+    session.enrolledStudentIds.push(student.id);
+    session.reservationIds.push(rid);
+    session.updatedAt = new Date().toISOString();
+    if (req.status === 'new' || req.status === 'reviewing') {
+      req.status = 'assigned';
+    }
+    req.updatedAt = new Date().toISOString();
+
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'reservation',
+        entityId: rid,
+        action: 'student_assigned',
+        description: 'Talepten rezervasyon oluşturuldu.'
+      });
+    }
+    return { ok: true, reservation: reservation, created: true };
+  }
+
   function updateUserPermissions(userId, perms) {
     var user = find(state.users, userId);
     if (!user) return { ok: false };
@@ -777,6 +887,7 @@
     getReservationByRequestId: getReservationByRequestId,
     approveParentForRequest: approveParentForRequest,
     updateParentApproval: updateParentApproval,
+    createReservationFromRequest: createReservationFromRequest,
     getMeetingBySessionId: function (sessionId) {
       var s = find(state.sessions, sessionId);
       return s ? find(state.meetings, s.onlineMeetingId) : null;
