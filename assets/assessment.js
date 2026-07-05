@@ -41,7 +41,7 @@
   function devResetForTesting() {
     if (!DEV_RESET_ON_RELOAD) return;
     var page = currentPage();
-    var resetPages = ['ogrenci-dashboard.html', 'program.html', 'odevler.html', 'tekrarlar.html', 'deneme-sinavlari.html', 'performans.html'];
+    var resetPages = ['ogrenci-dashboard.html', 'program.html', 'ogrenci-odevler.html', 'tekrarlar.html', 'deneme-sinavlari.html', 'performans.html'];
     if (resetPages.indexOf(page) === -1) return;
 
     var placementDone = lsGet(KEYS.placement) === '1';
@@ -233,7 +233,7 @@
     return false;
   }
 
-  var STUDENT_PAGES = ['ogrenci-dashboard.html', 'program.html', 'odevler.html', 'tekrarlar.html', 'deneme-sinavlari.html', 'performans.html'];
+  var STUDENT_PAGES = ['ogrenci-dashboard.html', 'program.html', 'ogrenci-odevler.html', 'tekrarlar.html', 'deneme-sinavlari.html', 'performans.html'];
 
   function currentPage() {
     var name = (location.pathname.split('/').pop() || '').toLowerCase();
@@ -548,7 +548,7 @@
   var PAGE_SELECTORS = {
     'ogrenci-dashboard.html': '.stage > .d3-card, .stage > .d3-stack',
     'program.html':   '.prog-page',
-    'odevler.html':   '.ov-page:not(.tk-page)',
+    'ogrenci-odevler.html':   '.ov-page:not(.tk-page)',
     'tekrarlar.html': '.tk-page',
     'deneme-sinavlari.html':  '.sn-page > .sn-section',
     'performans.html': '.perf-page'

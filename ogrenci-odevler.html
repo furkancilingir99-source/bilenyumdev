@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Program — Bilenyum</title>
-<meta name="description" content="Bilenyum — haftalık ve aylık ders programı, sınav takvimi ve etkinlik planlayıcı." />
+<title>Ödevlerim — Bilenyum</title>
+<meta name="description" content="Bilenyum — ödev takip, derse göre filtreleme, teslim tarihleri ve ödev analitiği." />
 <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%233e3a8e'/%3E%3Ctext x='50' y='65' text-anchor='middle' font-family='Inter,system-ui,sans-serif' font-size='62' font-weight='900' fill='white' letter-spacing='-3'%3Eb%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2986,7 +2986,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 .d3-drawer-close:hover { background: rgba(255,255,255,0.18); }
 .d3-drawer-close svg { width: 16px; height: 16px; }
 
-.d3-drawer-head { display: flex; align-items: center; gap: 14px; padding: 0 44px 16px 0; margin-bottom: 4px; border-bottom: 1px dashed rgba(168,164,240,0.22); }
+.d3-drawer-head { display: flex; align-items: center; gap: 14px; padding-right: 44px; }
 /* Çıplak 3D emoji — kutu bg yok, sadece drop-shadow + ders bazlı renkli glow */
 .d3-drawer-icon {
   width: 56px; height: 56px;
@@ -3003,9 +3003,6 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 .d3-drawer[data-subject="fen"] { --drawer-glow: rgba(109,212,158,0.55); }
 .d3-drawer[data-subject="trk"] { --drawer-glow: rgba(74,214,255,0.55); }
 .d3-drawer[data-subject="ing"] { --drawer-glow: rgba(255,154,74,0.55); }
-.d3-drawer[data-subject="sos"] { --drawer-glow: rgba(168,164,240,0.55); }
-.d3-drawer[data-subject="din"] { --drawer-glow: rgba(94,155,232,0.55); }
-.d3-drawer[data-subject="exam"] { --drawer-glow: rgba(255,122,74,0.55); }
 .d3-drawer-meta { flex: 1; min-width: 0; }
 .d3-drawer-eyebrow {
   display: block;
@@ -3022,44 +3019,6 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   line-height: 1.2;
   margin: 0;
 }
-.d3-drawer-att-chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  margin-top: 10px; padding: 5px 10px; border-radius: 999px;
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-size: 11px; font-weight: 700;
-}
-.d3-drawer-att-chip[hidden] { display: none; }
-.d3-drawer-att-chip.is-attended { background: rgba(46,168,106,0.12); color: #2a8a5a; }
-.d3-drawer-att-chip.is-absent { background: rgba(220,38,38,0.10); color: #b91c1c; }
-.d3-drawer-att-chip.is-upcoming { background: var(--brand-purple-08); color: var(--brand-purple); }
-.d3-drawer-eyebrow-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 2px;
-}
-.d3-drawer-format-hint {
-  margin: 8px 0 0;
-  padding: 10px 12px;
-  border-radius: 12px;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--ink-dark-1, #5c567a);
-  background: rgba(168, 164, 240, 0.08);
-  border-left: 3px solid rgba(168, 164, 240, 0.45);
-}
-.d3-drawer-format-hint.is-kid {
-  border-left-color: rgba(124, 58, 237, 0.55);
-  background: rgba(124, 58, 237, 0.08);
-  color: #5b21b6;
-}
-.d3-drawer-format-hint.is-rud {
-  border-left-color: rgba(16, 185, 129, 0.42);
-  background: rgba(16, 185, 129, 0.08);
-  color: #047857;
-}
-.d3-drawer-format-hint[hidden] { display: none !important; }
 .d3-drawer-section { display: flex; flex-direction: column; gap: 8px; }
 .d3-drawer-label {
   font-family: 'JetBrains Mono', monospace;
@@ -3152,144 +3111,6 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   transition: transform 0.15s;
 }
 .d3-drawer-cta:hover { transform: translateY(-2px); }
-
-.d3-drawer-footer {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-top: 4px;
-}
-.d3-drawer-replay-block {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.d3-drawer-replay-block[hidden] { display: none; }
-.d3-drawer-missed-alert {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: rgba(220,38,38,0.12);
-  border: 1px solid rgba(220,38,38,0.32);
-}
-.d3-drawer-missed-alert svg {
-  width: 18px; height: 18px;
-  flex-shrink: 0;
-  color: #ff9a9a;
-  margin-top: 1px;
-}
-.d3-drawer-missed-alert p {
-  margin: 0;
-  font-size: 13.5px;
-  font-weight: 700;
-  line-height: 1.45;
-  color: rgba(255,220,220,0.95);
-  letter-spacing: -0.01em;
-}
-.d3-drawer-replay-btn {
-  width: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  background: rgba(74,214,255,0.12);
-  border: 1px solid rgba(74,214,255,0.38);
-  color: white;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: -0.005em;
-  cursor: pointer;
-  transition: background 0.18s, border-color 0.18s, transform 0.15s;
-}
-.d3-drawer-replay-btn:hover {
-  background: rgba(74,214,255,0.22);
-  border-color: rgba(74,214,255,0.55);
-  transform: translateY(-1px);
-}
-.d3-drawer-replay-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
-.d3-drawer-cta.is-waiting,
-.d3-drawer-cta.is-past {
-  width: 100%;
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: 10px;
-  padding: 16px;
-  border-radius: 14px;
-  font-size: 14.5px; font-weight: 700;
-  letter-spacing: -0.005em;
-  cursor: default;
-  opacity: 1;
-  box-shadow: none;
-  transform: none;
-  margin-top: 0;
-}
-.d3-drawer-cta.is-waiting {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(168,164,240,0.22);
-  color: rgba(255,255,255,0.75);
-}
-.d3-drawer-cta.is-past {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.40);
-  cursor: not-allowed;
-}
-.d3-drawer-cta.is-active {
-  width: 100%;
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: 10px;
-  padding: 16px;
-  border-radius: 14px;
-  cursor: pointer;
-  opacity: 1;
-  margin-top: 0;
-  background: linear-gradient(135deg, var(--p-brand), var(--p-brand-deep));
-  border-color: transparent;
-  color: white;
-  box-shadow: 0 20px 40px -12px rgba(229,4,123,0.70), inset 0 2px 0 rgba(255,255,255,0.30);
-}
-.d3-drawer-cta.is-active:hover { transform: translateY(-2px); }
-.d3-drawer-cta .cta-label { font-weight: 700; }
-.d3-drawer-cta .cta-time {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px; font-weight: 800;
-  letter-spacing: 0.04em;
-  padding: 3px 9px;
-  border-radius: 7px;
-  background: rgba(168,164,240,0.12);
-  border: 1px solid rgba(168,164,240,0.20);
-  font-feature-settings: "tnum";
-}
-.d3-drawer-cta.is-active .cta-time {
-  background: rgba(255,255,255,0.18);
-  border-color: rgba(255,255,255,0.28);
-  color: white;
-}
-.d3-drawer-cta.is-active svg { width: 16px; height: 16px; flex-shrink: 0; }
-
-.d3-drawer-kazanim {
-  display: flex; flex-direction: column; gap: 6px;
-  padding-top: 12px;
-  margin-top: 12px;
-  border-top: 1px dashed rgba(168,164,240,0.22);
-}
-.d3-drawer-kazanim[hidden] { display: none; }
-.d3-drawer-kazanim-tag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; font-weight: 800;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: rgba(255,216,74,0.90);
-}
-.d3-drawer-kazanim-text {
-  font-size: 14px; line-height: 1.55;
-  color: rgba(255,255,255,0.88);
-  font-weight: 500;
-}
 
 /* ===== Drawer — gamified dark redesign ===== */
 .d3-drawer-overlay { background: rgba(8,5,28,0.55); }
@@ -4062,8 +3883,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   .d3-card-profile,
   .d3-stack,
   .d3-card-hero,
-  .d3-card-program,
-  .prog-wrap {
+  .d3-card-program {
     grid-column: auto !important;
     grid-row: auto !important;
   }
@@ -4102,46 +3922,10 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 /* ============ PROGRAM PAGE — haftalık/aylık calendar ======== */
 /* ============================================================ */
 
-/* Ana sayfa sarmalayıcı — başlık kutunun dışında */
-.prog-wrap {
+/* Ana sayfa container — stage'in kalan tüm alanını kaplar */
+.prog-page {
   grid-column: 2 / 5;
   grid-row: 1 / 3;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-width: 0;
-  min-height: 0;
-  padding: 6px 2px 18px;
-  overflow: hidden;
-}
-
-/* Bölüm başlığı — Analiz Özetin / sn-section-head ile aynı dil */
-.prog-section-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-  padding: 4px 4px 0;
-}
-.prog-section-title {
-  margin: 0;
-  font-family: var(--font-display, 'Montserrat', 'Poppins', sans-serif);
-  font-size: 17px;
-  font-weight: 800;
-  color: var(--brand-navy, white);
-  letter-spacing: -0.015em;
-  flex-shrink: 0;
-}
-.prog-section-line {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, var(--brand-purple-18, rgba(168,164,240,0.20)), transparent);
-}
-
-/* Ana sayfa container — takvim kutusu */
-.prog-page {
-  flex: 1;
-  min-height: 0;
   display: flex; flex-direction: column;
   background: rgba(20, 18, 52, 0.55);
   backdrop-filter: blur(14px) saturate(160%);
@@ -4152,6 +3936,1619 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   min-height: 0; min-width: 0;
   overflow: hidden;
   box-shadow: 0 14px 30px -14px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07);
+}
+
+/* ============ ÖDEV SAYFASI · v2 (Hero + Smart Sections) ============ */
+.ov-page {
+  grid-column: 2 / 5;
+  grid-row: 1 / 3;
+  min-width: 0; min-height: 0;
+  display: flex; flex-direction: column;
+  gap: 16px;
+  padding: 6px 2px 18px;
+  overflow-y: auto;
+}
+.ov-page::-webkit-scrollbar { width: 6px; }
+.ov-page::-webkit-scrollbar-thumb { background: rgba(168,164,240,0.30); border-radius: 3px; }
+
+/* ---- Toolbar ---- */
+.ov-toolbar {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 16px;
+  background: rgba(20,18,52,0.42);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(168,164,240,0.18);
+  border-radius: 16px;
+  flex-wrap: wrap;
+}
+/* Toolbar sağ grup: durum dropdown + ders chip'leri */
+.ov-filters {
+  display: flex; align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+/* Durum filtresi dropdown */
+.ov-status-filter { position: relative; flex-shrink: 0; }
+.ov-status-filter-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(168,164,240,0.28);
+  border-radius: 999px;
+  color: rgba(255,255,255,0.90);
+  font-size: 12px; font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+.ov-status-filter-btn:hover { background: rgba(255,255,255,0.10); border-color: rgba(168,164,240,0.45); }
+.ov-status-filter-btn svg { width: 12px; height: 12px; transition: transform 0.18s; }
+.ov-status-filter.is-open .ov-status-filter-btn svg { transform: rotate(180deg); }
+.ov-status-filter-menu {
+  position: absolute;
+  top: calc(100% + 7px); left: 0;
+  min-width: 168px;
+  padding: 6px;
+  background: rgba(20,18,52,0.97);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(168,164,240,0.24);
+  border-radius: 13px;
+  box-shadow: 0 20px 44px -10px rgba(0,0,0,0.60);
+  opacity: 0; visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.18s, transform 0.18s, visibility 0.18s;
+  z-index: 40;
+}
+.ov-status-filter.is-open .ov-status-filter-menu {
+  opacity: 1; visibility: visible; transform: translateY(0);
+}
+.ov-status-filter-item {
+  display: block; width: 100%;
+  padding: 8px 11px;
+  background: transparent; border: none;
+  color: rgba(255,255,255,0.80);
+  font-size: 12.5px; font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  font-family: inherit;
+}
+.ov-status-filter-item:hover { background: rgba(255,255,255,0.06); color: white; }
+.ov-status-filter-item.is-active {
+  background: linear-gradient(135deg, rgba(229,4,123,0.20), rgba(229,4,123,0.08));
+  color: #ff8fc4;
+}
+.ov-week {
+  display: flex; align-items: center;
+  gap: 10px;
+}
+.ov-week-btn {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(168,164,240,0.20);
+  color: rgba(255,255,255,0.75);
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+}
+.ov-week-btn:hover { background: rgba(74,214,255,0.18); color: white; border-color: rgba(74,214,255,0.45); }
+.ov-week-btn svg { width: 14px; height: 14px; }
+.ov-week-label {
+  display: flex; flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  padding: 0 8px;
+  text-align: center;
+}
+.ov-week-eyebrow {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+.ov-week-range {
+  font-size: 14px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.01em;
+}
+.ov-week-range-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ov-week-cal-btn {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(168,164,240,0.20);
+  color: rgba(255,255,255,0.75);
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+}
+.ov-week-cal-btn:hover,
+.ov-week-cal-btn.is-open {
+  background: rgba(74,214,255,0.18);
+  color: white;
+  border-color: rgba(74,214,255,0.45);
+}
+.ov-week-cal-btn svg { width: 15px; height: 15px; }
+.ov-week { position: relative; }
+.ov-week[hidden] { display: none !important; }
+.ov-week-picker {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 36px;
+  z-index: 220;
+  min-width: 300px;
+  max-width: min(340px, calc(100vw - 32px));
+  max-height: 340px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  background: linear-gradient(165deg, rgba(28, 24, 68, 0.98), rgba(14, 10, 40, 0.99));
+  border: 1px solid rgba(168,164,240,0.28);
+  box-shadow: 0 24px 48px -12px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04) inset;
+}
+.ov-week-picker[hidden] { display: none !important; }
+.ov-week-picker-head {
+  padding: 14px 16px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.48);
+  border-bottom: 1px solid rgba(168,164,240,0.12);
+  flex-shrink: 0;
+}
+.ov-week-picker-list {
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ov-week-picker-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: white;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.ov-week-picker-item:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(168,164,240,0.16);
+}
+.ov-week-picker-item.is-active {
+  background: rgba(229,4,123,0.14);
+  border-color: rgba(229,4,123,0.42);
+}
+.ov-week-picker-item strong {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.ov-week-picker-item span {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+}
+.ov-week-picker-item.is-active span { color: rgba(255,255,255,0.72); }
+
+.ov-subj-chips {
+  display: flex; align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.ov-subj-chip {
+  display: inline-flex; align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(168,164,240,0.16);
+  border-radius: 999px;
+  color: rgba(255,255,255,0.72);
+  font-family: inherit;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+}
+.ov-subj-chip:hover { background: rgba(255,255,255,0.10); color: white; transform: translateY(-1px); }
+.ov-subj-chip.is-active {
+  background: linear-gradient(135deg, rgba(229,4,123,0.18), rgba(229,4,123,0.08));
+  border-color: rgba(229,4,123,0.50);
+  color: white;
+  box-shadow: 0 0 14px -4px rgba(229,4,123,0.50);
+}
+.ov-subj-chip[data-subj]:not([data-subj="all"]).is-active {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--c) 22%, transparent), color-mix(in srgb, var(--c) 8%, transparent));
+  border-color: color-mix(in srgb, var(--c) 50%, transparent);
+  box-shadow: 0 0 14px -4px var(--c);
+}
+.ov-subj-chip-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--c, #fff);
+}
+
+/* ---- Hero + Stats row ---- */
+.ov-hero-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 292px;
+  gap: 16px;
+  align-items: stretch;
+}
+@media (max-width: 1100px) {
+  .ov-hero-row { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Hero carousel — gecikmis odevler */
+.ov-hero-carousel {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 100%;
+}
+.ov-hero-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+}
+.ov-hero-viewport {
+  flex: 1 1 auto;
+  overflow: hidden;
+  border-radius: 22px;
+  min-width: 0;
+  position: relative;
+}
+.ov-hero-track {
+  display: flex;
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.ov-hero-track .ov-hero {
+  flex: 0 0 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.ov-hero-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(20, 18, 52, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  transition: background 0.18s, border-color 0.18s, transform 0.18s, opacity 0.18s, box-shadow 0.18s;
+}
+.ov-hero-nav svg { width: 18px; height: 18px; pointer-events: none; stroke-width: 2.5; }
+.ov-hero-nav.is-prev { left: 14px; }
+.ov-hero-nav.is-next { right: 14px; }
+.ov-hero-nav:hover:not(:disabled) {
+  background: rgba(62, 58, 142, 0.92);
+  border-color: rgba(168, 164, 240, 0.55);
+  transform: translateY(-50%) scale(1.04);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.34);
+}
+.ov-hero-nav:disabled { opacity: 0.28; cursor: default; pointer-events: none; }
+.ov-hero-carousel-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 22px;
+}
+.ov-hero-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.ov-hero-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: none;
+  padding: 0;
+  background: rgba(168,164,240,0.28);
+  cursor: pointer;
+  transition: width 0.22s ease, background 0.22s ease;
+}
+.ov-hero-dot.is-active {
+  width: 22px;
+  background: rgba(255,122,74,0.85);
+}
+.ov-hero-carousel-count {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+.ov-hero-carousel.is-single .ov-hero-nav,
+.ov-hero-carousel.is-single .ov-hero-carousel-meta { display: none; }
+@media (max-width: 1100px) {
+  .ov-hero-nav.is-prev { left: 10px; }
+  .ov-hero-nav.is-next { right: 10px; }
+}
+
+/* HERO — large focus card */
+.ov-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  padding: 26px 28px 22px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)),
+    rgba(20,18,52,0.78);
+  border: 1px solid rgba(168,164,240,0.22);
+  box-shadow:
+    0 30px 64px -28px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.07);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.ov-hero:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--ov-c, var(--p-aqua, #4ad6ff)) 50%, rgba(168,164,240,0.30));
+}
+.ov-hero-glow {
+  position: absolute;
+  top: -120px; right: -120px;
+  width: 360px; height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--ov-c, #ff6dc6) 38%, transparent) 0%, transparent 65%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+.ov-hero-pattern {
+  position: absolute;
+  bottom: -40px; left: -20px;
+  width: 280px; height: 200px;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--ov-c, #ff6dc6) 22%, transparent) 0%, transparent 60%);
+  filter: blur(34px);
+  pointer-events: none;
+}
+.ov-hero[data-subject="mat"] { --ov-c: #ff6dc6; }
+.ov-hero[data-subject="fen"] { --ov-c: #6dd49e; }
+.ov-hero[data-subject="trk"] { --ov-c: #4ad6ff; }
+.ov-hero[data-subject="ing"] { --ov-c: #ff9a4a; }
+.ov-hero[data-subject="sos"] { --ov-c: #a8a4f0; }
+.ov-hero[data-subject="din"] { --ov-c: #5e9be8; }
+
+.ov-hero-body {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.ov-hero-head {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ov-hero-eyebrow {
+  display: inline-flex; align-items: center;
+  gap: 8px;
+  font-size: 11px; font-weight: 800;
+  letter-spacing: 0.10em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--ov-c, #4ad6ff) 75%, white);
+}
+.ov-hero-pulse {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--ov-c, #ff6dc6);
+  animation: ovPulse 1.6s ease-in-out infinite;
+}
+@keyframes ovPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.78); }
+}
+.ov-hero-subject {
+  display: inline-flex; align-items: center;
+  gap: 7px;
+  padding: 5px 11px 5px 7px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  font-size: 12px; font-weight: 700;
+  color: white;
+}
+.ov-hero-subject-icon {
+  font-size: 14px;
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--ov-c, #ff6dc6) 24%, transparent);
+  border-radius: 50%;
+}
+.ov-hero-title {
+  font-size: 28px; font-weight: 800;
+  line-height: 1.18;
+  color: white;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+.ov-hero-desc {
+  font-size: 14px; line-height: 1.55;
+  color: rgba(255,255,255,0.72);
+  margin: 0;
+  max-width: 78ch;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ov-hero-meta {
+  display: flex; align-items: center;
+  gap: 22px;
+  padding: 14px 0 4px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.ov-hero-teacher {
+  display: inline-flex; align-items: center;
+  gap: 10px;
+}
+.ov-hero-teacher-ava {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1.5px solid color-mix(in srgb, var(--ov-c, #ff6dc6) 50%, rgba(255,255,255,0.25));
+  flex-shrink: 0;
+  box-shadow: 0 0 12px -4px var(--ov-c, transparent);
+}
+.ov-hero-teacher-ava img { width: 100%; height: 100%; object-fit: cover; }
+.ov-hero-teacher-text { display: flex; flex-direction: column; gap: 1px; }
+.ov-hero-teacher-label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.10em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+.ov-hero-teacher-text strong {
+  font-size: 13px; font-weight: 700;
+  color: white;
+  letter-spacing: -0.005em;
+}
+.ov-hero-countdown {
+  display: flex; flex-direction: column; gap: 2px;
+  padding-left: 22px;
+  border-left: 1px solid rgba(255,255,255,0.08);
+}
+.ov-hero-countdown-label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.10em; text-transform: uppercase;
+  color: rgba(255,255,255,0.50);
+}
+.ov-hero-countdown-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px; font-weight: 800;
+  color: var(--ov-c, white);
+  letter-spacing: 0.02em;
+  font-feature-settings: "tnum";
+}
+.ov-hero-foot {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 6px;
+}
+.ov-hero-xp {
+  display: inline-flex; align-items: center;
+  gap: 8px;
+  padding: 7px 13px 7px 10px;
+  background: linear-gradient(135deg, rgba(255,216,74,0.18), rgba(214,151,10,0.10));
+  border: 1px solid rgba(255,216,74,0.36);
+  border-radius: 999px;
+  color: #ffd84a;
+  font-size: 12.5px; font-weight: 700;
+}
+.ov-hero-xp svg { width: 14px; height: 14px; }
+.ov-hero-xp strong { font-weight: 800; }
+.ov-hero-cta {
+  display: inline-flex; align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--ov-c, var(--p-brand)) 0%, color-mix(in srgb, var(--ov-c, var(--p-brand)) 65%, #1a1133) 100%);
+  border: none;
+  color: white;
+  font-family: inherit;
+  font-size: 13.5px; font-weight: 800;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  box-shadow:
+    0 18px 30px -14px color-mix(in srgb, var(--ov-c, var(--p-brand)) 60%, transparent),
+    inset 0 2px 0 rgba(255,255,255,0.18);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.ov-hero-cta:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 22px 36px -14px color-mix(in srgb, var(--ov-c, var(--p-brand)) 65%, transparent),
+    inset 0 2px 0 rgba(255,255,255,0.22);
+}
+.ov-hero-cta svg { width: 16px; height: 16px; }
+
+/* Hero — geciken durumu */
+.ov-hero.is-overdue { --ov-c: #ff7a4a; }
+.ov-hero.is-overdue .ov-hero-eyebrow { color: #ffb380; }
+/* Hero — boş durum */
+.ov-hero.is-empty {
+  cursor: default;
+  text-align: center;
+  padding: 38px 28px;
+  background: rgba(20,18,52,0.50);
+}
+.ov-hero.is-empty:hover { transform: none; }
+
+/* ---- Stats (sağ sidebar, 2x2 grid) ---- */
+.ov-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  height: 100%;
+  min-height: 100%;
+  align-self: stretch;
+}
+.ov-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 0;
+  height: 100%;
+  padding: 18px 16px;
+  background: rgba(20,18,52,0.72);
+  border: 1px solid rgba(168,164,240,0.24);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  transition: border-color 0.18s, transform 0.18s, box-shadow 0.18s;
+}
+.ov-stat:hover {
+  transform: translateY(-2px);
+  border-color: rgba(168,164,240,0.48);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.ov-stat-icon {
+  width: 36px; height: 36px;
+  border-radius: 11px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.82);
+  flex-shrink: 0;
+}
+.ov-stat-icon svg { width: 18px; height: 18px; }
+.ov-stat--active .ov-stat-icon { background: rgba(74,214,255,0.18); color: var(--p-aqua, #4ad6ff); }
+.ov-stat--done   .ov-stat-icon { background: rgba(109,212,158,0.18); color: #6dd49e; }
+.ov-stat--xp     .ov-stat-icon { background: linear-gradient(135deg, #ff8a3a, #d44a00); color: #ffd84a; }
+.ov-stat--ontime .ov-stat-icon { background: rgba(168,164,240,0.18); color: #b6b1f6; }
+.ov-stat-body { display: flex; flex-direction: column; gap: 4px; margin-top: auto; }
+.ov-stat-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.02em;
+  font-feature-settings: "tnum";
+  line-height: 1.1;
+}
+.ov-stat-label {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  color: rgba(255,255,255,0.68);
+}
+@media (max-width: 1100px) {
+  .ov-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: auto;
+    min-height: 0;
+    height: auto;
+  }
+  .ov-stat { min-height: 112px; }
+}
+@media (max-width: 760px) {
+  .ov-stats { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---- Smart Sections ---- */
+.ov-sections {
+  display: flex; flex-direction: column;
+  gap: 18px;
+}
+.ov-section {
+  position: relative;
+  display: flex; flex-direction: column; gap: 12px;
+  border-radius: 16px;
+  padding: 14px 16px 16px;
+  background: linear-gradient(165deg, rgba(168,164,240,0.12) 0%, rgba(62,58,142,0.16) 100%);
+  border: 1px solid rgba(168,164,240,0.26);
+  box-shadow: 0 10px 28px -14px rgba(20,18,52,0.55);
+  overflow: hidden;
+}
+.ov-section::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(168,164,240,0.55);
+  pointer-events: none;
+  opacity: 0.65;
+}
+.ov-section-head {
+  display: flex; align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(168,164,240,0.16);
+}
+.ov-section-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--sc-c, #4ad6ff);
+  flex-shrink: 0;
+}
+.ov-section--today .ov-section-dot { animation: ovPulse 1.6s ease-in-out infinite; }
+.ov-section--today {
+  --sc-c: #ff6dc6;
+  background: linear-gradient(165deg, rgba(230,8,123,0.10) 0%, rgba(168,164,240,0.14) 100%);
+  border-color: rgba(230,8,123,0.24);
+}
+.ov-section--active { --sc-c: #a8a4f0; }
+.ov-section--week  { --sc-c: #4ad6ff; }
+.ov-section--overdue {
+  --sc-c: #ff7a4a;
+  background: linear-gradient(165deg, rgba(255,122,74,0.10) 0%, rgba(168,164,240,0.12) 100%);
+  border-color: rgba(255,122,74,0.22);
+}
+.ov-section--done {
+  --sc-c: #6dd49e;
+  background: linear-gradient(165deg, rgba(109,212,158,0.10) 0%, rgba(168,164,240,0.12) 100%);
+  border-color: rgba(109,212,158,0.22);
+}
+.ov-section-title {
+  font-size: 14px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.005em;
+  margin: 0;
+  flex-shrink: 0;
+}
+.ov-section-count { display: none; }
+.ov-section-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(168,164,240,0.35), transparent);
+  margin-left: 4px;
+}
+
+.ov-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.ov-grid--compact {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (max-width: 1100px) {
+  .ov-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ov-grid--compact { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .ov-grid, .ov-grid--compact { grid-template-columns: 1fr; }
+}
+
+/* ---- Ödev kartı ---- */
+.ov-card {
+  position: relative;
+  display: flex; flex-direction: column;
+  gap: 12px;
+  padding: 16px 16px 14px;
+  background: rgba(20,18,52,0.60);
+  border: 1px solid rgba(168,164,240,0.18);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  overflow: hidden;
+}
+.ov-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 3px;
+  background: var(--c, #4ad6ff);
+}
+.ov-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--c, #4ad6ff) 50%, rgba(168,164,240,0.30));
+  box-shadow: 0 14px 28px -16px rgba(0,0,0,0.55), 0 0 24px -10px var(--c, transparent);
+}
+.ov-card[data-subject="mat"] { --c: #ff6dc6; }
+.ov-card[data-subject="fen"] { --c: #6dd49e; }
+.ov-card[data-subject="trk"] { --c: #4ad6ff; }
+.ov-card[data-subject="ing"] { --c: #ff9a4a; }
+.ov-card[data-subject="sos"] { --c: #a8a4f0; }
+.ov-card[data-subject="din"] { --c: #5e9be8; }
+
+.ov-card-head {
+  display: flex; align-items: center;
+  gap: 10px;
+}
+.ov-card-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--c, #4ad6ff) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c, #4ad6ff) 35%, transparent);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  color: white;
+}
+.ov-card-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.ov-card-subject-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.ov-card-subject {
+  font-size: 10.5px; font-weight: 800;
+  letter-spacing: 0.10em; text-transform: uppercase;
+  color: var(--c, #4ad6ff);
+}
+.ov-card-teacher {
+  font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,0.50);
+}
+.ov-card-due-chip {
+  flex-shrink: 0;
+  display: inline-flex; align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  font-size: 10.5px; font-weight: 700;
+  color: rgba(255,255,255,0.80);
+}
+.ov-card-due-chip svg { width: 11px; height: 11px; opacity: 0.85; }
+.ov-card-due-chip.is-urgent { background: rgba(255,154,74,0.16); border-color: rgba(255,154,74,0.42); color: #ffb380; }
+.ov-card-due-chip.is-overdue { background: rgba(255,107,107,0.16); border-color: rgba(255,107,107,0.42); color: #ff9a6a; }
+.ov-card-due-chip.is-done { background: rgba(109,212,158,0.14); border-color: rgba(109,212,158,0.36); color: #9be5bb; }
+.ov-card-week {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  background: rgba(168,164,240,0.14);
+  border: 1px solid rgba(168,164,240,0.28);
+  color: rgba(255,255,255,0.78);
+  flex-shrink: 0;
+}
+
+.ov-card-title {
+  font-size: 14.5px; font-weight: 700;
+  line-height: 1.35;
+  color: white;
+  letter-spacing: -0.005em;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ov-card-foot {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.ov-card-xp {
+  display: inline-flex; align-items: center;
+  gap: 5px;
+  padding: 3px 9px 3px 7px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255,216,74,0.16), rgba(214,151,10,0.08));
+  border: 1px solid rgba(255,216,74,0.32);
+  color: #ffd84a;
+  font-size: 11px; font-weight: 700;
+}
+.ov-card-xp svg { width: 11px; height: 11px; }
+.ov-card-go {
+  font-size: 11.5px; font-weight: 700;
+  color: rgba(255,255,255,0.65);
+  display: inline-flex; align-items: center; gap: 4px;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.ov-card:hover .ov-card-go { color: white; transform: translateX(2px); }
+.ov-card-go svg { width: 12px; height: 12px; }
+
+/* Tamamlanan kartlar — compact, faded */
+.ov-card.is-done {
+  background: rgba(20,18,52,0.40);
+  opacity: 0.78;
+  padding: 12px 14px;
+  gap: 8px;
+}
+.ov-card.is-done:hover { opacity: 1; }
+.ov-card.is-done .ov-card-title {
+  font-size: 13.5px;
+  -webkit-line-clamp: 1;
+}
+.ov-card.is-done .ov-card-foot { padding-top: 6px; }
+.ov-card.is-done .ov-card-score {
+  display: inline-flex; align-items: center;
+  gap: 5px;
+  padding: 3px 9px 3px 7px;
+  border-radius: 999px;
+  background: rgba(109,212,158,0.14);
+  border: 1px solid rgba(109,212,158,0.36);
+  color: #9be5bb;
+  font-size: 11px; font-weight: 700;
+}
+.ov-card.is-done .ov-card-score svg { width: 11px; height: 11px; }
+.ov-card-retry {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--p-brand-light, #ff9ed4);
+  letter-spacing: -0.01em;
+}
+
+/* Geciken kartlar — alert tone */
+.ov-section--overdue .ov-card {
+  border-color: rgba(255,107,107,0.30);
+  background: linear-gradient(135deg, rgba(255,107,107,0.06), rgba(20,18,52,0.65));
+}
+
+/* Boş state */
+.ov-empty {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 6px;
+  padding: 60px 24px;
+  background: rgba(20,18,52,0.45);
+  border: 1px dashed rgba(168,164,240,0.22);
+  border-radius: 18px;
+}
+.ov-empty[hidden] { display: none; }
+.ov-empty-icon { font-size: 36px; line-height: 1; opacity: 0.65; }
+.ov-empty-text {
+  font-size: 15px; font-weight: 700;
+  color: rgba(255,255,255,0.80);
+}
+.ov-empty-sub {
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.50);
+}
+
+.ov-overdue-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,122,74,0.32);
+  background: linear-gradient(135deg, rgba(255,122,74,0.12), rgba(255,107,107,0.08));
+}
+.ov-overdue-banner[hidden] { display: none !important; }
+.ov-overdue-banner strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffb380;
+  margin-bottom: 2px;
+}
+.ov-overdue-banner p {
+  margin: 0;
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.62);
+  line-height: 1.45;
+}
+.ov-overdue-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.88);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+.ov-overdue-back:hover {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,200,120,0.35);
+  color: white;
+}
+
+/* === Legacy odev-* (varsa kalanı temizle) === */
+.odev-page {
+  grid-column: 2 / 5;
+  grid-row: 1 / 3;
+  display: flex; flex-direction: column;
+  gap: 16px;
+  background: rgba(20, 18, 52, 0.55);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(168,164,240,0.18);
+  border-radius: 20px;
+  padding: 20px 22px;
+  min-height: 0; min-width: 0;
+  overflow: hidden;
+  box-shadow: 0 14px 30px -14px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07);
+}
+
+/* Toolbar: Bu haftaki Ödevlerin + hafta atlama nav (program.html prog-toolbar ile aynı) */
+.odev-toolbar {
+  display: flex; align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.odev-title-block { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.odev-eyebrow {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--p-aqua);
+}
+.odev-title {
+  margin: 0;
+  font-size: 22px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.odev-nav {
+  display: flex; align-items: center; gap: 6px;
+  flex-shrink: 0;
+}
+.odev-nav-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.85);
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+.odev-nav-btn:hover { background: rgba(74,214,255,0.18); color: white; border-color: rgba(74,214,255,0.45); }
+.odev-nav-btn svg { width: 14px; height: 14px; }
+.odev-today-btn {
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(74,214,255,0.12);
+  border: 1px solid rgba(74,214,255,0.40);
+  color: var(--p-aqua);
+  font-family: inherit;
+  font-size: 12.5px; font-weight: 800;
+  cursor: pointer;
+  letter-spacing: -0.005em;
+  transition: background 0.18s, transform 0.18s;
+}
+.odev-today-btn:hover { background: rgba(74,214,255,0.24); transform: translateY(-1px); }
+
+/* Filter row — dropdown solda, tab'lar sağda */
+.odev-filter-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.odev-tabs {
+  display: flex; align-items: center; gap: 3px;
+  padding: 3px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(168,164,240,0.18);
+  border-radius: 11px;
+  flex-shrink: 0;
+}
+.odev-tab {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.65);
+  font-family: inherit;
+  font-size: 12px; font-weight: 700;
+  cursor: pointer;
+  letter-spacing: -0.005em;
+  transition: background 0.18s, color 0.18s;
+}
+.odev-tab:hover { color: white; background: rgba(255,255,255,0.05); }
+.odev-tab.is-active {
+  background: linear-gradient(135deg, var(--p-brand), var(--p-brand-deep));
+  color: white;
+  box-shadow: 0 6px 14px -4px rgba(229,4,123,0.55), inset 0 1px 0 rgba(255,255,255,0.20);
+}
+.odev-tab-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.10);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 800;
+}
+.odev-tab.is-active .odev-tab-count { background: rgba(255,255,255,0.25); }
+
+/* Stat kart kolonu — minimal dikey stack + ince separator'lar */
+.odev-stats-col {
+  display: flex; flex-direction: column;
+  min-height: 0;
+  padding: 2px 4px;
+}
+.odev-stat {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 4px;
+  background: transparent;
+  border: none;
+  flex-shrink: 0;
+  position: relative;
+}
+/* Aralarında ince gradient separator (son hariç) */
+.odev-stat:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168,164,240,0.22), transparent);
+}
+.odev-stat-icon {
+  /* Background ve glow yok — sadece soft drop-shadow */
+  flex-shrink: 0;
+  width: 48px; height: 48px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 32px; line-height: 1;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.45));
+}
+.odev-stat-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.odev-stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+.odev-stat-value {
+  font-size: 21px; font-weight: 900;
+  color: white;
+  letter-spacing: -0.015em;
+  font-feature-settings: "tnum";
+}
+
+/* Ana grid: sol istatistik dar + sağ liste geniş */
+.odev-main-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 16px;
+  min-height: 0; min-width: 0;
+  overflow: hidden;
+}
+.odev-list-col {
+  display: flex; flex-direction: column;
+  gap: 12px;
+  min-height: 0; min-width: 0;
+  /* Dropdown btn hover'da 1px yukarı kayıyor — overflow:hidden parent için pay */
+  padding-top: 2px;
+}
+
+/* Ders seçimi dropdown */
+.odev-subj-select { position: relative; align-self: flex-start; }
+.odev-subj-select-btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 9px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(168,164,240,0.20);
+  color: white;
+  font-family: inherit;
+  font-size: 13.5px; font-weight: 700;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  min-width: 220px;
+  transition: background 0.18s, border-color 0.18s, transform 0.18s;
+}
+.odev-subj-select-btn:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(168,164,240,0.42);
+  transform: translateY(-1px);
+}
+.odev-subj-select-btn svg {
+  width: 14px; height: 14px;
+  margin-left: auto;
+  color: rgba(255,255,255,0.55);
+  transition: transform 0.2s ease;
+}
+.odev-subj-select.is-open .odev-subj-select-btn svg { transform: rotate(180deg); }
+.odev-subj-select-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  /* "Tüm Dersler" başlangıçta — gradient dot */
+  background: linear-gradient(135deg, var(--p-aqua), var(--p-brand-light));
+}
+.odev-subj-select-menu {
+  position: absolute;
+  top: calc(100% + 6px); left: 0;
+  background: rgba(20,18,52,0.96);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(168,164,240,0.25);
+  border-radius: 13px;
+  padding: 6px;
+  display: flex; flex-direction: column;
+  gap: 2px;
+  z-index: 30;
+  min-width: 220px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.18s, transform 0.18s, visibility 0.18s;
+  box-shadow: 0 18px 36px rgba(0,0,0,0.55);
+}
+.odev-subj-select.is-open .odev-subj-select-menu {
+  opacity: 1; visibility: visible; transform: translateY(0);
+}
+.odev-subj-select-item {
+  text-align: left;
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.85);
+  font-family: inherit;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+  transition: background 0.18s, color 0.18s;
+}
+.odev-subj-select-item:hover { background: rgba(255,255,255,0.07); color: white; }
+.odev-subj-select-item.is-active { background: rgba(229,4,123,0.18); color: white; }
+.odev-subj-select-item-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--c, white);
+  flex-shrink: 0;
+}
+.odev-subj-select-item-dot-all {
+  background: linear-gradient(135deg, var(--p-aqua), var(--p-brand-light));
+}
+
+/* Ödev liste — flex column (içinde grid'li section'lar) */
+.odev-list {
+  flex: 1;
+  display: flex; flex-direction: column;
+  gap: 18px;
+  /* Hover'da kartlar yukarı kayıyor + box-shadow taşıyor — kenardan padding ile alan ver */
+  padding: 6px 8px 10px 4px;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(168,164,240,0.30) transparent;
+}
+
+/* Ders section'ı — "Tüm Dersler" seçili olduğunda */
+.odev-section {
+  display: flex; flex-direction: column;
+  gap: 10px;
+}
+.odev-section-head {
+  display: flex; align-items: center; gap: 10px;
+  padding-bottom: 2px;
+}
+.odev-section-icon {
+  font-size: 22px; line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.40));
+}
+.odev-section-title {
+  margin: 0;
+  font-size: 15px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.01em;
+}
+.odev-section-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--c, rgba(255,255,255,0.15)) 22%, transparent);
+  border: 1px solid color-mix(in oklab, var(--c, rgba(255,255,255,0.2)) 40%, transparent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 800;
+  color: white;
+  letter-spacing: 0.03em;
+}
+.odev-section[data-subject="mat"] { --c: #ff6dc6; }
+.odev-section[data-subject="fen"] { --c: #6dd49e; }
+.odev-section[data-subject="trk"] { --c: #4ad6ff; }
+.odev-section[data-subject="ing"] { --c: #ff9a4a; }
+.odev-section[data-subject="sos"] { --c: #a8a4f0; }
+.odev-section[data-subject="din"] { --c: #5e9be8; }
+.odev-section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.odev-list::-webkit-scrollbar { width: 5px; }
+.odev-list::-webkit-scrollbar-thumb { background: rgba(168,164,240,0.30); border-radius: 3px; }
+.odev-list-empty {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  color: rgba(255,255,255,0.50);
+}
+/* HTML hidden attribute display: flex/grid'i override etsin */
+.odev-list-empty[hidden],
+.odev-list[hidden] { display: none !important; }
+.odev-list-empty-icon { font-size: 40px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4)); opacity: 0.6; }
+.odev-list-empty-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+/* Ödev kartı */
+.odev-card {
+  position: relative;
+  display: flex; flex-direction: column;
+  gap: 10px;
+  padding: 13px 14px;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(168,164,240,0.16);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: transform 0.18s, border-color 0.18s, background 0.18s, box-shadow 0.18s;
+  overflow: hidden;
+  --c: #a8a4f0;
+}
+.odev-card[data-subject="mat"] { --c: #ff6dc6; }
+.odev-card[data-subject="fen"] { --c: #6dd49e; }
+.odev-card[data-subject="trk"] { --c: #4ad6ff; }
+.odev-card[data-subject="ing"] { --c: #ff9a4a; }
+.odev-card[data-subject="sos"] { --c: #a8a4f0; }
+.odev-card[data-subject="din"] { --c: #5e9be8; }
+.odev-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklab, var(--c) 45%, transparent);
+  background: rgba(255,255,255,0.06);
+  box-shadow: 0 12px 24px -10px rgba(0,0,0,0.45), 0 0 18px -8px color-mix(in oklab, var(--c) 50%, transparent);
+}
+.odev-card.is-done {
+  opacity: 0.72;
+}
+.odev-card.is-done .odev-card-title { text-decoration: line-through; color: rgba(255,255,255,0.65); }
+.odev-card-head {
+  display: flex; align-items: center; gap: 11px;
+}
+.odev-card-icon {
+  /* Background ve glow yok — sadece sade drop-shadow, kartın bg'si üzerinde durur */
+  flex-shrink: 0;
+  width: 40px; height: 40px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 28px; line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.40));
+}
+.odev-card-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.odev-card-subject {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; font-weight: 800;
+  letter-spacing: 0.10em; text-transform: uppercase;
+  color: var(--c);
+}
+.odev-card-title {
+  font-size: 14px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.odev-card-foot {
+  display: flex; align-items: center; gap: 10px;
+}
+/* Minimal teslim — bg/border yok, saat SVG ikonu + metin */
+.odev-card-due {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700;
+  color: rgba(255,255,255,0.62);
+  letter-spacing: 0.02em;
+}
+.odev-card-due svg { width: 12px; height: 12px; opacity: 0.85; }
+.odev-card-due.is-urgent { color: #ffb380; }
+.odev-card-due.is-overdue { color: #ff9a6a; }
+.odev-card.is-done .odev-card-due { color: #9be5bb; }
+
+/* XP pill — dashboard-3 timeline kartı ile aynı stil */
+.odev-card-xp {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: inline-flex; align-items: center;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(255,216,74,0.12);
+  border: 1px solid rgba(255,216,74,0.32);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 800;
+  color: #ffd84a;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* ============ ANALİTİK PANELİ ============ */
+.odev-analytics {
+  display: flex; flex-direction: column;
+  gap: 16px;
+  padding: 16px 18px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(168,164,240,0.20);
+  border-radius: 16px;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(168,164,240,0.30) transparent;
+}
+.odev-analytics::-webkit-scrollbar { width: 5px; }
+.odev-analytics::-webkit-scrollbar-thumb { background: rgba(168,164,240,0.30); border-radius: 3px; }
+.odev-analytics-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 10px;
+}
+.odev-analytics-title {
+  margin: 0;
+  font-size: 15px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.01em;
+}
+.odev-analytics-period {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+.odev-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168,164,240,0.22), transparent);
+  margin: 2px 0;
+}
+
+/* Tamamlama yüzdesi — minimal ring */
+.odev-score {
+  display: flex; align-items: center; gap: 14px;
+}
+.odev-score-ring {
+  position: relative;
+  width: 78px; height: 78px;
+  flex-shrink: 0;
+}
+.odev-score-ring svg { width: 100%; height: 100%; }
+.odev-score-pct {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -0.02em;
+}
+.odev-score-pct strong {
+  font-size: 22px; font-weight: 900; color: white;
+}
+.odev-score-pct span {
+  font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.55);
+  margin-left: 2px;
+}
+.odev-score-info {
+  display: flex; flex-direction: column; gap: 3px;
+  min-width: 0;
+}
+.odev-score-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+.odev-score-meta {
+  font-size: 13px; font-weight: 700;
+  color: white;
+}
+.odev-score-meta strong { color: var(--p-aqua); font-weight: 800; }
+
+/* Analitik bölüm başlığı */
+.odev-analytics-section-title {
+  margin: 0 0 9px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.62);
+}
+.odev-analytics-section { display: flex; flex-direction: column; }
+
+/* Ders bazlı — minimal bar chart, sadece % */
+.odev-bars {
+  display: flex; flex-direction: column;
+  gap: 7px;
+}
+.odev-bar {
+  display: grid;
+  grid-template-columns: 66px 1fr 32px;
+  align-items: center;
+  gap: 9px;
+}
+.odev-bar-label {
+  font-size: 12px; font-weight: 700;
+  color: rgba(255,255,255,0.82);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.odev-bar-track {
+  height: 6px;
+  background: rgba(0,0,0,0.34);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.odev-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--bc, var(--p-brand));
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.odev-bar-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; font-weight: 800;
+  color: rgba(255,255,255,0.72);
+  text-align: right;
+  letter-spacing: 0.02em;
+}
+
+/* Bu hafta — 7 günlük dot timeline */
+.odev-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.odev-week-day {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px;
+  padding: 8px 2px;
+  border-radius: 9px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.odev-week-day.is-today { border-color: rgba(229,4,123,0.45); background: rgba(229,4,123,0.07); }
+.odev-week-day-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 800;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: rgba(255,255,255,0.50);
+}
+.odev-week-day.is-today .odev-week-day-label { color: var(--p-brand-light); }
+.odev-week-day-dot {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 9px; color: transparent;
+}
+.odev-week-day.has-done .odev-week-day-dot {
+  background: linear-gradient(135deg, #6dd49e, #2a8a5a);
+  border-color: transparent;
+  color: white;
+}
+.odev-week-day.has-overdue .odev-week-day-dot {
+  background: rgba(255,122,74,0.20);
+  border-color: rgba(255,122,74,0.55);
+}
+.odev-week-day-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 800;
+  color: rgba(255,255,255,0.65);
+  font-feature-settings: "tnum";
+}
+
+/* Insights satırları */
+.odev-insights {
+  display: flex; flex-direction: column;
+  gap: 8px;
+}
+.odev-insight {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.odev-insight.is-good { border-color: rgba(109,212,158,0.32); background: rgba(109,212,158,0.06); }
+.odev-insight.is-warn { border-color: rgba(255,154,74,0.32); background: rgba(255,154,74,0.06); }
+.odev-insight-icon { font-size: 22px; line-height: 1; flex-shrink: 0; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4)); }
+.odev-insight-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.odev-insight-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+.odev-insight-value {
+  font-size: 13px; font-weight: 700;
+  color: rgba(255,255,255,0.85);
+}
+.odev-insight-value strong { color: white; font-weight: 800; }
+
+/* CTA state extension — Ödev için ek renkler */
+.prog-drawer-cta.is-overdue {
+  background: linear-gradient(135deg, #ff7a4a, #c44a1a);
+  border-color: transparent;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 18px 36px -12px rgba(255,122,74,0.65), inset 0 2px 0 rgba(255,255,255,0.25);
+}
+.prog-drawer-cta.is-overdue:hover {
+  transform: translateY(-2px);
+}
+.prog-drawer-cta.is-completed {
+  cursor: not-allowed;
+  background: rgba(109,212,158,0.12);
+  border-color: rgba(109,212,158,0.28);
+  color: rgba(190,255,225,0.92);
+  box-shadow: none;
+}
+.prog-drawer-cta.is-completed:disabled {
+  opacity: 1;
 }
 
 /* ── TOOLBAR ── */
@@ -4178,121 +5575,14 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   line-height: 1.2;
   margin: 0;
 }
-
-/* Eğitim haftası navigasyonu (ödevler sayfası ile aynı dil) */
-.prog-edu-nav {
-  display: flex; align-items: center; gap: 8px;
-  flex: 1; min-width: 0;
-  position: relative;
-}
-.prog-edu-nav-btn {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.85);
-  cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 0; flex-shrink: 0;
-  transition: background 0.18s, color 0.18s, border-color 0.18s;
-}
-.prog-edu-nav-btn:hover { background: rgba(74,214,255,0.18); color: white; border-color: rgba(74,214,255,0.45); }
-.prog-edu-nav-btn svg { width: 14px; height: 14px; }
-.prog-edu-nav-label {
-  display: flex; flex-direction: column;
-  gap: 2px; min-width: 0;
-}
-.prog-edu-nav-eyebrow {
+.prog-date-label {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 10.5px; font-weight: 800;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--p-aqua);
+  font-size: 12.5px; font-weight: 700;
+  color: rgba(255,255,255,0.62);
+  letter-spacing: 0.04em;
 }
-.prog-edu-nav-range-row {
-  display: flex; align-items: center; gap: 8px;
-}
-.prog-edu-nav-range {
-  font-size: 18px; font-weight: 800;
-  color: white; letter-spacing: -0.02em;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-.prog-edu-nav-cal-btn {
-  width: 30px; height: 30px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.14);
-  color: rgba(255,255,255,0.80);
-  cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 0; flex-shrink: 0;
-  transition: background 0.18s, border-color 0.18s, color 0.18s;
-}
-.prog-edu-nav-cal-btn:hover,
-.prog-edu-nav-cal-btn.is-open {
-  background: rgba(74,214,255,0.16);
-  border-color: rgba(74,214,255,0.42);
-  color: var(--p-aqua);
-}
-.prog-edu-nav-cal-btn svg { width: 15px; height: 15px; }
-.prog-edu-picker {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 36px;
-  z-index: 40;
-  width: min(320px, calc(100vw - 48px));
-  background: rgba(16,14,42,0.98);
-  border: 1px solid rgba(168,164,240,0.28);
-  border-radius: 14px;
-  box-shadow: 0 24px 48px -16px rgba(0,0,0,0.65);
-  overflow: hidden;
-}
-.prog-edu-picker[hidden] { display: none !important; }
-.prog-edu-picker-head {
-  padding: 12px 14px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px; font-weight: 800;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: rgba(255,255,255,0.50);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-.prog-edu-picker-list {
-  display: flex; flex-direction: column;
-  gap: 4px; padding: 8px;
-  max-height: 280px; overflow-y: auto;
-}
-.prog-edu-picker-item {
-  display: flex; flex-direction: column; align-items: flex-start;
-  gap: 2px; width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: white;
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-}
-.prog-edu-picker-item:hover {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.10);
-}
-.prog-edu-picker-item.is-active {
-  background: rgba(74,214,255,0.12);
-  border-color: rgba(74,214,255,0.35);
-}
-.prog-edu-picker-item strong {
-  font-size: 13px; font-weight: 800;
-  letter-spacing: -0.01em;
-}
-.prog-edu-picker-item span {
-  font-size: 11.5px;
-  color: rgba(255,255,255,0.55);
-}
-.prog-edu-picker-item.is-active span { color: rgba(255,255,255,0.72); }
 
-/* Önceki/sonraki nav (legacy — kaldırıldı) */
+/* Önceki/sonraki/bugün nav */
 .prog-nav {
   display: flex; align-items: center; gap: 6px;
 }
@@ -4350,7 +5640,192 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   box-shadow: 0 4px 14px -4px rgba(229,4,123,0.55), inset 0 1px 0 rgba(255,255,255,0.20);
 }
 
-/* Haftalık takvim + ders kartları → assets/prog-lesson-cards.css */
+/* ── HAFTALIK GÖRÜNÜM ── */
+.prog-week {
+  flex: 1; min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(168,164,240,0.30) transparent;
+}
+.prog-week::-webkit-scrollbar { width: 6px; }
+.prog-week::-webkit-scrollbar-thumb { background: rgba(168,164,240,0.30); border-radius: 3px; }
+.prog-week::-webkit-scrollbar-track { background: transparent; }
+
+.prog-week-grid {
+  display: grid;
+  grid-template-columns: 70px repeat(7, minmax(0, 1fr));
+  grid-auto-rows: 58px;
+  gap: 2px 4px;
+  position: relative;
+}
+.prog-week-corner {
+  position: sticky; top: 0; left: 0;
+  z-index: 5; /* en üst — hem yatay hem dikey sabit */
+  background: rgba(14, 12, 40, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 8px;
+}
+.prog-week-day {
+  position: sticky; top: 0;
+  z-index: 3;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 8px 4px;
+  background: rgba(14, 12, 40, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  text-align: center;
+}
+.prog-week-day.is-today {
+  background: linear-gradient(135deg, rgba(229,4,123,0.22), rgba(229,4,123,0.08));
+  border-color: rgba(229,4,123,0.50);
+}
+.day-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 800;
+  letter-spacing: 0.10em; text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+.prog-week-day.is-today .day-name { color: var(--p-brand-light); }
+.day-num {
+  font-size: 18px; font-weight: 800;
+  color: white;
+  letter-spacing: -0.02em;
+  margin-top: 2px;
+  line-height: 1;
+}
+/* Saat etiketi — sol sütunda STICKY, scroll'da sabit kalır */
+.prog-week-time {
+  position: sticky;
+  left: 0;
+  z-index: 4; /* etkinliklerin (z=1), slot/divider'ların üstünde — hücreler asla saat üzerine taşmaz */
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px; font-weight: 800;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.04em;
+  background: rgba(10, 8, 30, 0.96);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: inset -1px 0 0 rgba(168,164,240,0.22);
+}
+/* Slot — tüm hücreler aynı bg, hover'da hafif aydınlanma */
+.prog-week-slot {
+  background: rgba(255,255,255,0.022);
+  border-top: 1px dashed rgba(168,164,240,0.10);
+  border-radius: 4px;
+  transition: background 0.18s;
+  position: relative;
+}
+.prog-week-slot:hover { background: rgba(255,255,255,0.045); }
+
+/* Event chip — grid-positioned (day column + time row span) */
+.prog-event {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--ev-bg, rgba(168,164,240,0.20));
+  cursor: pointer;
+  display: flex; align-items: center;
+  gap: 9px;
+  overflow: hidden;
+  margin: 1px;
+  transition:
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 1;
+  will-change: transform;
+}
+.prog-event:hover {
+  transform: translateY(-2px) scale(1.015);
+  background: var(--ev-bg-hover, rgba(168,164,240,0.32));
+  z-index: 3;
+}
+.prog-event-icon {
+  flex-shrink: 0;
+  font-size: 22px; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.45));
+}
+.prog-event-body {
+  display: flex; flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+.prog-event-subject {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; font-weight: 800;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ev-color, #a8a4f0);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.prog-event-topic {
+  font-size: 12px; font-weight: 800;
+  color: white;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Sığmayan kartlarda anında çıkan custom tooltip — body-level (JS ile konumlanır,
+   .prog-event overflow:hidden ve .prog-week scroll clip'ini aşmak için) */
+.prog-tooltip {
+  position: fixed;
+  z-index: 5000;
+  padding: 7px 11px;
+  border-radius: 8px;
+  background: rgba(10, 8, 30, 0.97);
+  color: white;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px; font-weight: 700;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  box-shadow:
+    0 12px 28px -8px rgba(0, 0, 0, 0.70),
+    0 0 0 1px rgba(168, 164, 240, 0.25);
+  pointer-events: none;
+  /* Anında çıksın — transition yok */
+}
+.prog-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid rgba(10, 8, 30, 0.97);
+}
+.prog-event-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.04em;
+  margin-top: auto;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.prog-event-time::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--ev-color, currentColor);
+  opacity: 0.6;
+}
+
+/* Subject ve type renkleri */
+.prog-event[data-subject="mat"] { --ev-color: #ff6dc6; --ev-bg: rgba(255,109,198,0.16); --ev-bg-hover: rgba(255,109,198,0.28); }
+.prog-event[data-subject="fen"] { --ev-color: #6dd49e; --ev-bg: rgba(109,212,158,0.16); --ev-bg-hover: rgba(109,212,158,0.28); }
+.prog-event[data-subject="trk"] { --ev-color: #4ad6ff; --ev-bg: rgba(74,214,255,0.16); --ev-bg-hover: rgba(74,214,255,0.28); }
+.prog-event[data-subject="ing"] { --ev-color: #ff9a4a; --ev-bg: rgba(255,154,74,0.16); --ev-bg-hover: rgba(255,154,74,0.28); }
+.prog-event[data-subject="sos"] { --ev-color: #a8a4f0; --ev-bg: rgba(168,164,240,0.16); --ev-bg-hover: rgba(168,164,240,0.28); }
+.prog-event[data-subject="din"] { --ev-color: #5e9be8; --ev-bg: rgba(94,155,232,0.16); --ev-bg-hover: rgba(94,155,232,0.28); }
+.prog-event[data-type="exam"] { --ev-color: #ff7a4a; --ev-bg: rgba(255,122,74,0.22); --ev-bg-hover: rgba(255,122,74,0.36); }
 
 /* "Şu an" çizgisi — bugünün ders kolonu üzerinde yatay marker */
 .prog-week-now {
@@ -4607,24 +6082,28 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   line-height: 1.2;
 }
 
-/* Ders bilgi satırı (tarih / saat) — sade satır, ikon hizasından sonra (başlıkla aynı hiza) */
+/* Meta şerit — tarih / süre / hafta */
 .prog-drawer-meta-row {
-  display: flex; flex-wrap: wrap; gap: 16px;
-  padding-left: 70px; /* 56px hero icon + 14px gap = title metniyle aynı hiza */
-  margin-top: -10px; /* başlık altına yakın yapıştır (parent flex 18px gap'i nötralize) */
-  margin-bottom: 10px; /* ders içeriği bölümünden biraz daha rahat ayrıl */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(168, 164, 240, 0.06);
+  border: 1px solid rgba(168, 164, 240, 0.14);
 }
 .prog-drawer-chip {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 0;
-  background: transparent;
-  border: none;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(168,164,240,0.22);
   font-family: 'JetBrains Mono', monospace;
   font-size: 11.5px; font-weight: 700;
-  color: rgba(255,255,255,0.72);
+  color: rgba(255,255,255,0.85);
   letter-spacing: 0.03em;
 }
-.prog-drawer-chip svg { width: 13px; height: 13px; opacity: 0.70; }
+.prog-drawer-chip svg { width: 13px; height: 13px; opacity: 0.85; }
 .prog-drawer-chip.is-live {
   background: rgba(229,4,123,0.16);
   border-color: rgba(229,4,123,0.42);
@@ -4642,62 +6121,68 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   color: #ffb380;
 }
 
-/* Bölüm başlığı */
+/* Bölüm kartı */
 .prog-drawer-section {
-  display: flex; flex-direction: column;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(168, 164, 240, 0.18);
 }
 .prog-drawer-label {
+  display: block;
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(168, 164, 240, 0.22);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; font-weight: 800;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--p-aqua);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
 }
 .prog-drawer-text {
   margin: 0;
-  font-size: 14.5px; line-height: 1.6;
-  color: rgba(255,255,255,0.85);
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.88);
 }
-/* Kazanım — başlık üstte, metin altta (Ders İçeriği section ile aynı dil) */
-.prog-drawer-kazanim {
-  display: flex; flex-direction: column; gap: 6px;
-  padding: 4px 0 0;
+.prog-drawer-format-hint {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-dark-1, #5c567a);
+  background: rgba(168, 164, 240, 0.08);
+  border-left: 3px solid rgba(168, 164, 240, 0.45);
 }
-.prog-drawer-kazanim-tag {
-  flex-shrink: 0;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; font-weight: 800;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: #ffd84a; /* altın — kazanım/öğrenme çıktısı vurgusu */
+.prog-drawer-format-hint.is-kid {
+  border-left-color: rgba(124, 58, 237, 0.55);
+  background: rgba(124, 58, 237, 0.08);
+  color: #c4b5fd;
 }
-.prog-drawer-kazanim-text {
-  flex: 1;
-  font-size: 14px; line-height: 1.5;
-  color: rgba(255,255,255,0.92);
-  font-weight: 500;
+.prog-drawer-format-hint.is-rud {
+  border-left-color: rgba(16, 185, 129, 0.42);
+  background: rgba(16, 185, 129, 0.08);
+  color: #6ee7b7;
 }
-.prog-drawer-kazanim[hidden] { display: none; }
-/* Bölüm ayracı — eğitmen ile ödüller arası */
+.prog-drawer-format-hint[hidden] { display: none !important; }
+/* Bölüm ayracı — artık kartlar arası boşluk yeterli */
 .prog-drawer-sep {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(168,164,240,0.28), transparent);
-  margin: 2px 0;
-  flex-shrink: 0;
+  display: none;
 }
 
-/* Öğretmen kartı — bg yok, sade satır */
+/* Öğretmen kartı — bölüm kartının içinde, ekstra kutu yok */
 .prog-drawer-teacher {
-  display: flex; align-items: center; gap: 14px;
-  padding: 4px 0;
-}
-/* Ders içeriği box — description + kazanım'ı tek bg içinde toplar */
-.prog-drawer-icerik-box {
-  display: flex; flex-direction: column;
+  display: flex;
+  align-items: center;
   gap: 14px;
-  padding: 14px 16px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(168,164,240,0.18);
-  border-radius: 14px;
+  padding: 0;
+  border: none;
+  background: none;
 }
 .prog-drawer-teacher-avatar {
   width: 52px; height: 52px;
@@ -4708,10 +6193,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 }
 .prog-drawer-teacher-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
 .prog-drawer-teacher-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px; font-weight: 800;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: rgba(255,255,255,0.50);
+  display: none;
 }
 .prog-drawer-teacher-name {
   font-size: 15px; font-weight: 800;
@@ -4722,27 +6204,31 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   font-size: 12.5px; font-weight: 600;
   color: rgba(255,255,255,0.65);
 }
-/* ====== Ödüller paneli — d3 ile aynı dil ====== */
+/* Ödüller — diğer bölümlerle aynı kart dili */
 .prog-drawer-game {
-  padding: 2px 2px 0;
-  background: none;
-  border: none;
-  display: flex; flex-direction: column;
-  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(168, 164, 240, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 .prog-drawer-game-label {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11.5px; font-weight: 800;
-  letter-spacing: 0.10em; text-transform: uppercase;
-  color: rgba(255,216,74,0.85);
+  display: block;
   margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(168, 164, 240, 0.22);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
   line-height: 1.2;
 }
 .prog-drawer-game-label::before {
-  content: '✦';
-  font-size: 13px;
-  color: rgba(255,216,74,0.85);
+  display: none;
 }
 .prog-drawer-game-rewards {
   display: flex; flex-direction: row; gap: 6px;
@@ -4751,16 +6237,28 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 .prog-drawer-game-reward {
   flex: 1 1 0;
   min-width: 0;
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 9px;
-  border-radius: 9px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(168, 164, 240, 0.14);
 }
 .prog-drawer-game-reward-icon { font-size: 20px; line-height: 1; flex-shrink: 0; }
 .prog-drawer-game-reward-text {
-  display: flex; align-items: baseline; gap: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
   min-width: 0;
+}
+.prog-drawer-game-reward-kicker {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.48);
 }
 .prog-drawer-game-reward-text strong {
   font-size: 13px; font-weight: 800; color: white;
@@ -5026,9 +6524,57 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 /* Drawer alt buton — pasif countdown veya aktif "Derse Katıl" */
 .prog-drawer-footer {
   flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
   padding: 16px 24px 22px;
   border-top: 1px solid rgba(168,164,240,0.18);
   background: rgba(10,8,30,0.50);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.prog-drawer-retry-note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 200, 120, 0.28);
+  background: rgba(255, 180, 80, 0.10);
+  color: rgba(255, 236, 210, 0.92);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.prog-drawer-late-xp-note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 122, 74, 0.32);
+  background: rgba(255, 122, 74, 0.12);
+  color: rgba(255, 220, 200, 0.95);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.prog-drawer-late-xp-note strong { color: #ffd0b8; font-weight: 800; }
+.prog-drawer-chip.is-status-done {
+  color: #9be5bb;
+}
+.prog-drawer-chip.is-status-active {
+  color: #ffd84a;
+}
+.prog-drawer-chip.is-status-overdue {
+  color: #ffb380;
+}
+.prog-drawer-cta.is-retry {
+  background: linear-gradient(135deg, #a8a4f0 0%, #6964c4 100%);
+  border-color: transparent;
+  box-shadow: 0 12px 28px rgba(105,100,196,0.35);
+}
+.prog-drawer-cta.is-continue {
+  background: linear-gradient(135deg, #4ad6ff 0%, #2a8fc4 100%);
+  border-color: transparent;
+  box-shadow: 0 18px 36px -12px rgba(74,214,255,0.40);
 }
 .prog-drawer-cta {
   width: 100%;
@@ -5081,20 +6627,17 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 
 /* Mobil responsive */
 @media (max-width: 1024px) {
-  .prog-wrap {
+  .prog-page {
     grid-column: auto !important;
     grid-row: auto !important;
     min-height: 0;
-    padding: 0;
-    overflow: visible;
-  }
-  .prog-page {
-    min-height: 0;
   }
   .prog-toolbar { gap: 12px; }
-  .prog-legend { width: 100%; margin-left: 0; }
   .prog-title { font-size: 19px; }
+  .prog-week-grid { grid-template-columns: 50px repeat(7, minmax(60px, 1fr)); }
   .prog-week { overflow-x: auto; }
+  .prog-event-topic { font-size: 11px; }
+  .prog-event-time { font-size: 9.5px; }
   .prog-month-day { padding: 6px; }
   .month-event { font-size: 9px; padding: 2px 5px; }
 
@@ -5200,11 +6743,11 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span class="nav-item-label">Merkez</span>
     </a>
-    <a class="nav-item is-active" href="program.html" title="Program" aria-current="page">
+    <a class="nav-item" href="program.html" title="Program">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       <span class="nav-item-label">Program</span>
     </a>
-    <a class="nav-item" href="ogrenci-odevler.html" title="Ödevler">
+    <a class="nav-item is-active" href="ogrenci-odevler.html" title="Ödevler" aria-current="page">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span class="nav-item-label">Ödevler</span>
     </a>
@@ -5267,185 +6810,276 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   </div>
   </div>
 
-  <!-- ====== PROGRAM SAYFASI ====== -->
-  <div class="prog-wrap" id="progWrap">
-    <header class="prog-section-head" aria-labelledby="progSectionTitle">
-      <h2 class="prog-section-title" id="progSectionTitle">Alfa Klanı Ders Programı</h2>
-      <span class="prog-section-line" aria-hidden="true"></span>
-    </header>
+  <!-- ====== ÖDEVLER SAYFASI · v2 ====== -->
+  <section class="ov-page" id="odevPage">
 
-    <section class="prog-page" id="progPage">
-    <!-- Üst toolbar: tarih + nav + view toggle -->
-    <div class="prog-toolbar">
-      <div class="prog-edu-nav">
-        <button type="button" class="prog-edu-nav-btn" id="progPrev" aria-label="Önceki hafta">
+    <!-- TOOLBAR: hafta nav (sol) + ders filtre pill'leri (sağ) -->
+    <div class="ov-toolbar">
+      <div class="ov-week">
+        <button type="button" class="ov-week-btn" id="odevPrevWeek" aria-label="Önceki hafta">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
-        <div class="prog-edu-nav-label">
-          <span class="prog-edu-nav-eyebrow" id="progWeekEyebrow">11. Eğitim Haftası</span>
-          <div class="prog-edu-nav-range-row">
-            <strong class="prog-edu-nav-range" id="progDateLabel">— —</strong>
-            <button type="button" class="prog-edu-nav-cal-btn" id="progWeekCalBtn" aria-label="Hafta seç" aria-expanded="false" aria-controls="progWeekPicker">
+        <div class="ov-week-label">
+          <span class="ov-week-eyebrow" id="odevWeekEyebrow">11. Eğitim Haftası</span>
+          <div class="ov-week-range-row">
+            <strong class="ov-week-range" id="odevDateLabel">— —</strong>
+            <button type="button" class="ov-week-cal-btn" id="odevWeekCalBtn" aria-label="Hafta seç" aria-expanded="false" aria-controls="odevWeekPicker">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </button>
           </div>
         </div>
-        <button type="button" class="prog-edu-nav-btn" id="progNext" aria-label="Sonraki hafta">
+        <button type="button" class="ov-week-btn" id="odevNextWeek" aria-label="Sonraki hafta">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-        <div class="prog-edu-picker" id="progWeekPicker" hidden role="dialog" aria-label="Eğitim haftası seç">
-          <div class="prog-edu-picker-head">Eğitim Haftası Seç</div>
-          <div class="prog-edu-picker-list" id="progWeekPickerList"></div>
+        <div class="ov-week-picker" id="odevWeekPicker" hidden role="dialog" aria-label="Eğitim haftası seç">
+          <div class="ov-week-picker-head">Eğitim Haftası Seç</div>
+          <div class="ov-week-picker-list" id="odevWeekPickerList"></div>
         </div>
       </div>
-      <div class="prog-legend" aria-hidden="true">
-        <span><i class="is-attended"></i> Katıldı</span>
-        <span><i class="is-absent"></i> Katılmadı</span>
-        <span><i class="is-upcoming"></i> Gelecek Ders</span>
+
+      <div class="ov-filters">
+        <div class="ov-status-filter" id="ovStatusFilter">
+          <button type="button" class="ov-status-filter-btn" id="ovStatusFilterBtn" aria-haspopup="true" aria-expanded="false">
+            <span id="ovStatusFilterLabel">Tüm Ödevler</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="ov-status-filter-menu" id="ovStatusFilterMenu" role="menu">
+            <button type="button" class="ov-status-filter-item is-active" data-hw-status="all" role="menuitem">Tüm Ödevler</button>
+            <button type="button" class="ov-status-filter-item" data-hw-status="active" role="menuitem">Aktif Ödev</button>
+            <button type="button" class="ov-status-filter-item" data-hw-status="overdue" role="menuitem">Geciken</button>
+            <button type="button" class="ov-status-filter-item" data-hw-status="done" role="menuitem">Tamamlanan</button>
+          </div>
+        </div>
+
+        <div class="ov-subj-chips" role="tablist" aria-label="Ders filtresi">
+          <button type="button" class="ov-subj-chip is-active" data-subj="all">Tümü</button>
+          <button type="button" class="ov-subj-chip" data-subj="mat" style="--c:#ff6dc6"><span class="ov-subj-chip-dot"></span>Matematik</button>
+          <button type="button" class="ov-subj-chip" data-subj="fen" style="--c:#6dd49e"><span class="ov-subj-chip-dot"></span>Fen</button>
+          <button type="button" class="ov-subj-chip" data-subj="trk" style="--c:#4ad6ff"><span class="ov-subj-chip-dot"></span>Türkçe</button>
+          <button type="button" class="ov-subj-chip" data-subj="ing" style="--c:#ff9a4a"><span class="ov-subj-chip-dot"></span>İngilizce</button>
+          <button type="button" class="ov-subj-chip" data-subj="sos" style="--c:#a8a4f0"><span class="ov-subj-chip-dot"></span>Sosyal</button>
+          <button type="button" class="ov-subj-chip" data-subj="din" style="--c:#5e9be8"><span class="ov-subj-chip-dot"></span>Din</button>
+        </div>
       </div>
     </div>
 
-    <!-- HAFTALIK GÖRÜNÜM -->
-    <div class="prog-week" id="progWeek">
-      <div class="prog-week-grid prog-week-grid--7" id="progWeekGrid">
-        <!-- JS ile dolduruluyor -->
+    <div class="ov-overdue-banner" id="ovOverdueBanner" hidden>
+      <div>
+        <strong>Gecikmiş Ödevler</strong>
+        <p>Teslim süresi geçmiş tüm ödevlerin burada listelenir. Başarı puanına etki eden resmi teslim süreleri geçmiş olabilir.</p>
       </div>
+      <a href="ogrenci-odevler.html" class="ov-overdue-back">← Tüm ödevlere dön</a>
     </div>
 
-    <!-- AYLIK GÖRÜNÜM -->
-    <div class="prog-month" id="progMonth" hidden>
-      <div class="prog-month-weekdays">
-        <div>Pzt</div><div>Sal</div><div>Çar</div><div>Per</div><div>Cum</div><div>Cmt</div><div>Paz</div>
+    <!-- HERO + STATS ROW -->
+    <div class="ov-hero-row" id="ovHeroRow">
+
+      <!-- HERO: Geciken ödevler carousel / sıradaki ödev -->
+      <div class="ov-hero-carousel" id="ovHeroCarousel">
+        <div class="ov-hero-stage">
+          <button type="button" class="ov-hero-nav is-prev" id="ovHeroPrev" aria-label="Önceki gecikmiş ödev">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="ov-hero-viewport">
+            <div class="ov-hero-track" id="ovHeroTrack"></div>
+          </div>
+          <button type="button" class="ov-hero-nav is-next" id="ovHeroNext" aria-label="Sonraki gecikmiş ödev">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+        <div class="ov-hero-carousel-meta" id="ovHeroCarouselMeta">
+          <div class="ov-hero-dots" id="ovHeroDots" role="tablist" aria-label="Gecikmiş ödevler"></div>
+          <span class="ov-hero-carousel-count" id="ovHeroCarouselCount"></span>
+        </div>
       </div>
-      <div class="prog-month-grid" id="progMonthGrid">
-        <!-- JS ile dolduruluyor -->
-      </div>
+
+      <!-- STATS: 4 dikey mini kart sidebar -->
+      <aside class="ov-stats">
+        <div class="ov-stat ov-stat--active">
+          <span class="ov-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </span>
+          <div class="ov-stat-body">
+            <strong class="ov-stat-val" id="odevStatActive">0</strong>
+            <span class="ov-stat-label">Aktif Ödev</span>
+          </div>
+        </div>
+        <div class="ov-stat ov-stat--done">
+          <span class="ov-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <div class="ov-stat-body">
+            <strong class="ov-stat-val" id="odevStatDoneWeek">0</strong>
+            <span class="ov-stat-label">Tamamlanan</span>
+          </div>
+        </div>
+        <div class="ov-stat ov-stat--xp">
+          <span class="ov-stat-icon">
+            <svg viewBox="0 0 256 256" fill="currentColor"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17Z"/></svg>
+          </span>
+          <div class="ov-stat-body">
+            <strong class="ov-stat-val" id="odevStatXp">0</strong>
+            <span class="ov-stat-label">Bu hafta XP</span>
+          </div>
+        </div>
+        <div class="ov-stat ov-stat--ontime">
+          <span class="ov-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </span>
+          <div class="ov-stat-body">
+            <strong class="ov-stat-val" id="odevStatOnTime">0%</strong>
+            <span class="ov-stat-label">Süresinde teslim</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- SMART SECTIONS -->
+    <div class="ov-sections" id="ovSections">
+      <!-- JS ile dolduruluyor: bugün, bu hafta, geciken, tamamlanan -->
+    </div>
+
+    <!-- Boş state -->
+    <div class="ov-empty" id="odevListEmpty" hidden>
+      <span class="ov-empty-icon">📝</span>
+      <span class="ov-empty-text">Seçili hafta için ödev yok</span>
+      <span class="ov-empty-sub">Takvim ikonundan başka bir eğitim haftası seçebilirsin</span>
     </div>
   </section>
-  </div>
 
 
 </main>
 
-<!-- ====== DERS DRAWER ====== -->
-<div class="d3-drawer" id="progDrawer" data-subject="mat" aria-hidden="true">
-  <div class="d3-drawer-overlay" data-prog-drawer-close></div>
-  <aside class="d3-drawer-panel" role="dialog" aria-label="Ders detayı">
-    <button type="button" class="d3-drawer-close" data-prog-drawer-close aria-label="Kapat">
+<!-- ====== DERS DRAWER — body altı, main dışı (HUD topbar dahil her şeyin üstüne çıksın) ====== -->
+<div class="prog-drawer" id="progDrawer" role="dialog" aria-label="Ders detayı" aria-hidden="true">
+  <div class="prog-drawer-overlay" data-prog-drawer-close></div>
+  <aside class="prog-drawer-panel">
+    <button type="button" class="prog-drawer-close" data-prog-drawer-close aria-label="Kapat">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
 
-    <div class="d3-drawer-head">
-      <span class="d3-drawer-icon" id="progDrawerIcon" aria-hidden="true">📐</span>
-      <div class="d3-drawer-meta">
-        <div class="d3-drawer-eyebrow-row">
-          <span class="d3-drawer-eyebrow" id="progDrawerSubject">MATEMATİK</span>
-          <span class="d3-drawer-lesson-type" id="progDrawerLessonType" hidden>KİD</span>
-        </div>
-        <h2 class="d3-drawer-title" id="progDrawerTopic">Konu Adı</h2>
-        <p class="d3-drawer-format-hint" id="progDrawerLessonTypeDesc" hidden>—</p>
-        <span class="d3-drawer-att-chip is-upcoming" id="progDrawerAttChip" hidden>Gelecek Ders</span>
-        <div class="d3-drawer-due">
-          <span class="d3-drawer-due-label">Tarih & Saat:</span>
-          <span class="d3-drawer-due-value">
-            <strong id="progDrawerDateText">—</strong>
-            <span class="d3-drawer-due-sub" id="progDrawerTimeText">—</span>
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <div class="d3-drawer-section">
-      <span class="d3-drawer-label">Ders İçeriği</span>
-      <div class="d3-drawer-quote">
-        <p class="d3-drawer-quote-text" id="progDrawerDesc">—</p>
-        <div class="d3-drawer-kazanim" id="progDrawerKazanimRow" hidden>
-          <span class="d3-drawer-kazanim-tag">Kazanım</span>
-          <span class="d3-drawer-kazanim-text" id="progDrawerKazanim">—</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="d3-drawer-section">
-      <span class="d3-drawer-label">Eğitmen</span>
-      <div class="d3-drawer-quote">
-        <div class="d3-drawer-quote-header">
-          <img class="d3-drawer-quote-avatar" id="progDrawerTeacherAvatar" alt="" />
-          <div class="d3-drawer-quote-meta">
-            <span class="d3-drawer-quote-name" id="progDrawerTeacherName">—</span>
-            <span class="d3-drawer-quote-role" id="progDrawerTeacherRole">—</span>
+    <!-- Body — scrollable -->
+    <div class="prog-drawer-body">
+      <!-- Başlık satırı: ikon + subject + topic -->
+      <div class="prog-drawer-titlebar">
+        <span class="prog-drawer-hero-icon" id="progDrawerIcon" aria-hidden="true">📐</span>
+        <div class="prog-drawer-hero-text">
+          <div class="prog-drawer-eyebrow-row">
+            <span class="prog-drawer-eyebrow" id="progDrawerSubject">MATEMATİK</span>
+            <span class="prog-drawer-hw-type" id="progDrawerHwType" hidden>KİD</span>
           </div>
-          <div class="d3-drawer-quote-actions">
-            <a href="#" class="d3-drawer-quote-action" title="Öğretmenin profiline git" aria-label="Profil">
+          <h3 class="prog-drawer-title" id="progDrawerTopic">Konu Adı</h3>
+          <p class="prog-drawer-format-hint" id="progDrawerHwTypeDesc" hidden>—</p>
+        </div>
+      </div>
+
+      <!-- Bilgi şeritleri -->
+      <div class="prog-drawer-meta-row">
+        <span class="prog-drawer-chip" id="progDrawerDate">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>—</span>
+        </span>
+        <span class="prog-drawer-chip" id="progDrawerTime">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>
+          <span>—</span>
+        </span>
+        <span class="prog-drawer-chip is-edu-week" id="progDrawerEduWeek" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="progDrawerEduWeekText">—</span>
+        </span>
+        <span class="prog-drawer-chip" id="progDrawerStatus" hidden>
+          <span id="progDrawerStatusText">—</span>
+        </span>
+      </div>
+
+      <!-- Ders içeriği -->
+      <div class="prog-drawer-section">
+        <span class="prog-drawer-label">Ödev Açıklaması</span>
+        <p class="prog-drawer-text" id="progDrawerDesc">—</p>
+      </div>
+
+      <!-- Öğretmen — profil + mesaj action ikonları -->
+      <div class="prog-drawer-section">
+        <span class="prog-drawer-label">Eğitmen</span>
+        <div class="prog-drawer-teacher">
+          <img class="prog-drawer-teacher-avatar" id="progDrawerTeacherAvatar" alt="" />
+          <div class="prog-drawer-teacher-info">
+            <span class="prog-drawer-teacher-label">Eğitmen</span>
+            <span class="prog-drawer-teacher-name" id="progDrawerTeacherName">—</span>
+            <span class="prog-drawer-teacher-role" id="progDrawerTeacherRole">—</span>
+          </div>
+          <div class="prog-drawer-teacher-actions">
+            <a href="#" class="prog-drawer-teacher-action" title="Öğretmenin profiline git" aria-label="Profil">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </a>
-            <button type="button" class="d3-drawer-quote-action" id="progMsgOpen" title="Öğretmene mesaj gönder" aria-label="Mesaj">
+            <button type="button" class="prog-drawer-teacher-action" id="progMsgOpen" title="Öğretmene mesaj gönder" aria-label="Mesaj">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             </button>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="d3-drawer-game">
-      <h4 class="d3-drawer-game-label">Ödüller</h4>
-      <div class="d3-drawer-game-rewards">
-        <div class="d3-drawer-game-reward">
-          <span class="d3-drawer-game-reward-icon">⚡</span>
-          <span class="d3-drawer-game-reward-text"><strong id="progDrawerXp">+ 30 XP</strong></span>
-        </div>
-        <div class="d3-drawer-game-reward">
-          <span class="d3-drawer-game-reward-icon" id="progDrawerBadgeIcon">🔢</span>
-          <span class="d3-drawer-game-reward-text"><strong id="progDrawerBadge">Sayı Avcısı</strong></span>
+      <!-- Ödüller -->
+      <div class="prog-drawer-game">
+        <h4 class="prog-drawer-game-label">Ödüller</h4>
+        <div class="prog-drawer-game-rewards">
+          <div class="prog-drawer-game-reward">
+            <span class="prog-drawer-game-reward-icon">⚡</span>
+            <span class="prog-drawer-game-reward-text">
+              <span class="prog-drawer-game-reward-kicker">En fazla</span>
+              <strong id="progDrawerMaxXp">75 XP</strong>
+            </span>
+          </div>
+          <div class="prog-drawer-game-reward">
+            <span class="prog-drawer-game-reward-icon" id="progDrawerBadgeIcon">🔢</span>
+            <span class="prog-drawer-game-reward-text">
+              <strong id="progDrawerBadge">Sayı Avcısı</strong>
+            </span>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="d3-drawer-footer">
-      <div class="d3-drawer-replay-block" id="progDrawerReplayBlock" hidden>
-        <div class="d3-drawer-missed-alert" role="alert">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          <p>Kaçırdığın canlı dersin tekrarını izlemelisin</p>
-        </div>
-        <button type="button" class="d3-drawer-replay-btn" id="progDrawerReplay">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-          Ders Tekrarını İzle
-        </button>
-      </div>
-      <button type="button" class="d3-drawer-cta is-waiting" id="progDrawerCta" disabled>
-        <span class="cta-label" id="progDrawerCtaLabel">Derse kalan süre</span>
-        <span class="cta-time" id="progDrawerCtaTime">00:00:00</span>
+    <!-- Alt CTA — ödeve başla / tekrar çöz -->
+    <div class="prog-drawer-footer">
+      <p class="prog-drawer-late-xp-note" id="progDrawerLateXpNote" hidden></p>
+      <p class="prog-drawer-retry-note" id="progDrawerRetryNote" hidden>
+        Tekrar çözülen ödevlerin başarı puanına etki etmez.
+      </p>
+      <button type="button" class="prog-drawer-cta" id="progDrawerCta" disabled>
+        <span class="cta-label" id="progDrawerCtaLabel">Ödeve Başla</span>
+        <span class="cta-time" id="progDrawerCtaTime" hidden></span>
       </button>
     </div>
   </aside>
 </div>
 
 <!-- ====== ÖĞRETMENE MESAJ MODAL ====== -->
-<div class="d3-msg-modal" id="progMsgModal" aria-hidden="true">
-  <div class="d3-msg-modal-overlay" data-prog-msg-close></div>
-  <div class="d3-msg-modal-panel" role="dialog" aria-label="Öğretmene mesaj gönder">
-    <button type="button" class="d3-msg-modal-close" data-prog-msg-close aria-label="Kapat">
+<div class="prog-msg-modal" id="progMsgModal" aria-hidden="true">
+  <div class="prog-msg-modal-overlay" data-prog-msg-close></div>
+  <div class="prog-msg-modal-panel" role="dialog" aria-label="Öğretmene mesaj gönder">
+    <button type="button" class="prog-msg-modal-close" data-prog-msg-close aria-label="Kapat">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
-    <div class="d3-msg-modal-head">
-      <img class="d3-msg-modal-avatar" id="progMsgAvatar" alt="" />
-      <div class="d3-msg-modal-meta">
-        <span class="d3-msg-modal-name" id="progMsgName">Öğretmen</span>
-        <span class="d3-msg-modal-role" id="progMsgRole">—</span>
+    <div class="prog-msg-modal-head">
+      <img class="prog-msg-modal-avatar" id="progMsgAvatar" alt="" />
+      <div class="prog-msg-modal-meta">
+        <span class="prog-msg-modal-name" id="progMsgName">Öğretmen</span>
+        <span class="prog-msg-modal-role" id="progMsgRole">—</span>
       </div>
     </div>
-    <textarea class="d3-msg-modal-textarea" id="progMsgText" placeholder="Mesajını yaz..." rows="5"></textarea>
-    <div class="d3-msg-modal-files">
-      <label class="d3-msg-modal-file-label" for="progMsgFile">
+    <textarea class="prog-msg-modal-textarea" id="progMsgText" placeholder="Mesajını yaz..." rows="5"></textarea>
+    <div class="prog-msg-modal-files">
+      <label class="prog-msg-modal-file-label" for="progMsgFile">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
         Dosya Ekle
       </label>
-      <input type="file" class="d3-msg-modal-file-input" id="progMsgFile" multiple />
-      <div class="d3-msg-modal-file-list" id="progMsgFileList"></div>
+      <input type="file" class="prog-msg-modal-file-input" id="progMsgFile" multiple />
+      <div class="prog-msg-modal-file-list" id="progMsgFileList"></div>
     </div>
-    <div class="d3-msg-modal-actions">
-      <button type="button" class="d3-msg-modal-cancel" data-prog-msg-close>Vazgeç</button>
-      <button type="button" class="d3-msg-modal-send" id="progMsgSend">
+    <div class="prog-msg-modal-actions">
+      <button type="button" class="prog-msg-modal-cancel" data-prog-msg-close>Vazgeç</button>
+      <button type="button" class="prog-msg-modal-send" id="progMsgSend">
         Gönder
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       </button>
@@ -5978,17 +7612,6 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
           </span>
         </div>
       </div>
-      <!-- Alt: level barı (full width) -->
-      <div class="d3-drawer-game-level">
-        <div class="d3-drawer-game-level-head">
-          <span><strong>Lv 9</strong><span class="d3-drawer-game-level-arrow">→</span><strong>Lv 10</strong></span>
-          <span><strong data-fill="gainHint">100 XP</strong> daha</span>
-        </div>
-        <div class="d3-drawer-game-level-track">
-          <div class="d3-drawer-game-level-current" style="width: 82.5%;"></div>
-          <div class="d3-drawer-game-level-gain" data-fill="gainBar" style="width: 7.5%;"></div>
-        </div>
-      </div>
     </div>
 
     <button type="button" class="d3-drawer-cta">Ödevi Yapmaya Başla</button>
@@ -6032,8 +7655,6 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 (function () {
   var drawer = document.getElementById('taskDrawer');
   if (!drawer) return;
-  var currentBaseXp = 825;
-  var nextLevelXp = 1000;
 
   function fill(key, value) {
     var el = drawer.querySelector('[data-fill="'+key+'"]');
@@ -6063,13 +7684,6 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       fill('xp', '+ ' + xp + ' XP');
       fill('badge', task.dataset.badge || 'Yeni Rozet');
       fill('badgeIcon', task.dataset.badgeIcon || '🏆');
-      var newTotal = currentBaseXp + xp;
-      var remaining = Math.max(0, nextLevelXp - newTotal);
-      fill('gainHint', remaining + ' XP');
-      var gainPct = Math.min(100 - 82.5, (xp / nextLevelXp) * 100);
-      var gainBar = drawer.querySelector('[data-fill="gainBar"]');
-      if (gainBar) gainBar.style.width = gainPct + '%';
-      fill('currentXp', currentBaseXp);
     }
     drawer.classList.add('is-open');
   }
@@ -6187,144 +7801,106 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 })();
 </script>
 
-<!-- ============ PROGRAM CALENDAR ============ -->
+<!-- ============ ÖDEVLER SAYFASI ============ -->
 <script>
 (function () {
   'use strict';
-  var pageEl = document.getElementById('progPage');
+  var pageEl = document.getElementById('odevPage');
   if (!pageEl) return;
 
-  var sectionTitle = document.getElementById('progSectionTitle');
-  var clanEl = document.querySelector('.player-clan');
-  if (sectionTitle && clanEl) {
-    var clanName = clanEl.textContent.replace(/\s+/g, ' ').trim();
-    if (clanName) sectionTitle.textContent = clanName + ' Ders Programı';
-  }
+  var pageParams = new URLSearchParams(location.search);
+  var pageView = pageParams.get('view') === 'geciken' ? 'overdue' : 'week';
+  var overdueBanner = document.getElementById('ovOverdueBanner');
 
-  var DAY_NAMES = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
-  var MONTH_NAMES = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-  var HOUR_START = 9;
-  var HOUR_END = 22;
-  var TODAY = new Date(2026, 4, 26); // "Bugün" = 26 Mayıs 2026 (demo)
-
-  var SUBJECT_NAMES = {
-    mat: 'Matematik', fen: 'Fen Bilimleri', trk: 'Türkçe',
-    ing: 'İngilizce', sos: 'Sosyal Bilgiler', din: 'Din Kültürü'
-  };
-  // 3D emoji ikonset — dashboard-3 ile aynı dil
-  var SUBJECT_ICONS = {
-    mat: '📐', fen: '🧬', trk: '📖',
-    ing: '🔤', sos: '🌍', din: '🕌'
-  };
-  // Konu bazlı hero görseller (Unsplash, küçük crop, lesson kapağı)
-  var TOPIC_IMAGES = {
-    mat: 'https://images.unsplash.com/photo-1635372722656-389f87a941b7?w=720&h=420&fit=crop&q=80',
-    fen: 'https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=720&h=420&fit=crop&q=80',
-    trk: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=720&h=420&fit=crop&q=80',
-    ing: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=720&h=420&fit=crop&q=80',
-    sos: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=720&h=420&fit=crop&q=80',
-    din: 'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?w=720&h=420&fit=crop&q=80'
-  };
-
-  // Subject bazlı rozet ödülleri — konu temalı
+  // ====== Subject helpers ======
+  var SUBJECT_NAMES = { mat:'Matematik', fen:'Fen Bilimleri', trk:'Türkçe', ing:'İngilizce', sos:'Sosyal Bilgiler', din:'Din Kültürü' };
+  var SUBJECT_ICONS = { mat:'📐', fen:'🧬', trk:'📖', ing:'🔤', sos:'🌍', din:'🕌' };
+  var SUBJECT_COLORS = { mat:'#ff6dc6', fen:'#6dd49e', trk:'#4ad6ff', ing:'#ff9a4a', sos:'#a8a4f0', din:'#5e9be8' };
   var BADGES = {
-    mat: { name: 'Sayı Avcısı',      icon: '🔢' },
-    fen: { name: 'Doğa Gözlemcisi',  icon: '🌿' },
-    trk: { name: 'Cümle Ustası',     icon: '✍️' },
-    ing: { name: 'Dil Kâşifi',       icon: '🗺️' },
-    sos: { name: 'Tarih Dedektifi',  icon: '🔍' },
-    din: { name: 'Bilge Öğrenci',    icon: '📿' }
+    mat:{name:'Sayı Avcısı',icon:'🔢'}, fen:{name:'Doğa Gözlemcisi',icon:'🌿'},
+    trk:{name:'Cümle Ustası',icon:'✍️'}, ing:{name:'Dil Kâşifi',icon:'🗺️'},
+    sos:{name:'Tarih Dedektifi',icon:'🔍'}, din:{name:'Bilge Öğrenci',icon:'📿'}
   };
-  // Demo öğrenci seviye durumu (ödev drawer demo)
-  var currentBaseXp = 825;
-
-  // Öğretmen kataloğu — short isim → full + role + avatar
   var TEACHERS = {
-    'Mehmet Y.': { full: 'Mehmet Yılmaz', role: 'Matematik Öğretmeni', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=faces&q=80' },
-    'Ayşe D.':   { full: 'Ayşe Demir',    role: 'Fen Bilimleri Öğretmeni', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop&crop=faces&q=80' },
-    'Zeynep K.': { full: 'Zeynep Kaya',   role: 'Türkçe Öğretmeni', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=faces&q=80' },
-    'Sarah J.':  { full: 'Sarah Johnson', role: 'İngilizce Öğretmeni', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80' },
-    'Ali T.':    { full: 'Ali Tunç',      role: 'Sosyal Bilgiler Öğretmeni', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&crop=faces&q=80' },
-    'Ömer A.':   { full: 'Ömer Aksoy',    role: 'Din Kültürü Öğretmeni', avatar: 'https://images.unsplash.com/photo-1542178243-bc20204b769f?w=120&h=120&fit=crop&crop=faces&q=80' }
+    'Mehmet Y.': { full:'Mehmet Yılmaz', role:'Matematik Öğretmeni',     avatar:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=faces&q=80' },
+    'Ayşe D.':   { full:'Ayşe Demir',    role:'Fen Bilimleri Öğretmeni', avatar:'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop&crop=faces&q=80' },
+    'Zeynep K.': { full:'Zeynep Kaya',   role:'Türkçe Öğretmeni',        avatar:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=faces&q=80' },
+    'Sarah J.':  { full:'Sarah Johnson', role:'İngilizce Öğretmeni',     avatar:'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80' },
+    'Ali T.':    { full:'Ali Tunç',      role:'Sosyal Bilgiler Öğretmeni', avatar:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&crop=faces&q=80' },
+    'Ömer A.':   { full:'Ömer Aksoy',    role:'Din Kültürü Öğretmeni',   avatar:'https://images.unsplash.com/photo-1542178243-bc20204b769f?w=120&h=120&fit=crop&crop=faces&q=80' }
   };
 
-  // --- Events (ISO date string YYYY-MM-DD) ---
-  var EVENTS = [
-    // Pazartesi 26 Mayıs — 12. Eğitim Haftası
-    { date: '2026-05-26', start: '09:00', dur: 60, subject: 'mat', topic: 'Olasılığa Giriş ve Örnek Uzay', type: 'live', lessonFormat: 'rud', teacher: 'Mehmet Y.', joined: true, joinStatus: 'attended',
-      kazanim: 'Olası durumları belirler ve basit olaylarda olasılık değerini hesaplar.',
-      desc: 'Olasılık konusuna giriş: deney, çıktı, örnek uzay kavramları. Bir madeni para ve zar üzerinden basit olasılık hesabı yapacağız. Derste 3 mini quiz ile pekiştirme var, defterini ve hesap makineni hazır bulundur.' },
-    { date: '2026-05-26', start: '11:00', dur: 60, subject: 'fen', topic: 'Madde Döngüleri ve Ekosistem', type: 'live', teacher: 'Ayşe D.', missed: true, joinStatus: 'absent',
-      kazanim: 'Madde döngülerini (su, karbon, azot) ve canlılar için önemini örneklerle açıklar.',
-      desc: 'Su, karbon ve azot döngülerinin canlılar için önemini ele alacağız. Her döngü için kavram haritası birlikte çıkaracak, doğadan örneklerle ilişkilendireceğiz. Ders sonunda küçük bir grup etkinliği var.' },
-    { date: '2026-05-26', start: '14:00', dur: 60, subject: 'trk', topic: 'Paragrafta Ana Fikir ve Yardımcı Fikir', type: 'live', teacher: 'Zeynep K.', joined: true, joinStatus: 'attended',
-      kazanim: 'Bir paragrafın ana fikrini ve yardımcı fikirlerini ayırt eder.',
-      desc: 'Paragrafta ana fikir, yardımcı fikir ve konu farklarını işliyoruz. LGS tarzı 8 örnek paragraf üzerinden hızlı analiz teknikleri öğreneceksiniz. Soru çözüm aşamasında aktif katılım bekliyorum 🌟' },
-    // Salı 27 Mayıs
-    { date: '2026-05-27', start: '10:00', dur: 90, subject: 'mat', topic: 'Köklü Sayılarda Dört İşlem', type: 'live', lessonFormat: 'kid', teacher: 'Mehmet Y.', joined: true, joinStatus: 'attended',
-      kazanim: 'Köklü ifadelerle toplama, çıkarma, çarpma ve bölme işlemlerini yapar.',
-      desc: 'Köklü ifadelerde dört işlem (toplama, çıkarma, çarpma, bölme) tekrarı. Karekök içinde çarpan ayırma, kök dışına çıkarma teknikleri. 90 dakikalık ders, 25 dk konu + 50 dk soru çözüm + 15 dk değerlendirme.' },
-    { date: '2026-05-27', start: '13:00', dur: 60, subject: 'ing', topic: 'Friendship Reading & Vocab', type: 'live', teacher: 'Sarah J.', missed: true, joinStatus: 'absent',
-      kazanim: 'Arkadaşlık temalı okuma metinlerini anlar ve yeni kelimeleri bağlam içinde kullanır.',
-      desc: 'Friendship unit reading passages. We will read 3 short dialogues and answer comprehension questions together. New vocabulary will be reviewed at the end — bring your notebook and a pencil!' },
-    { date: '2026-05-27', start: '15:00', dur: 60, subject: 'sos', topic: 'Atatürk İlkeleri ve İnkılapları', type: 'live', teacher: 'Ali T.', joined: true, joinStatus: 'attended',
-      kazanim: 'Atatürk ilkelerinin tarihsel arkaplanını açıklar ve günümüze yansımalarını yorumlar.',
-      desc: 'Atatürk ilkelerinin (Cumhuriyetçilik, Milliyetçilik, Halkçılık vd.) tarihsel arkaplanı ve günümüze yansımaları. Her ilke için somut örnekler üzerinden tartışma yapacağız.' },
-    // Çarşamba 28 Mayıs
-    { date: '2026-05-28', start: '09:00', dur: 60, subject: 'fen', topic: 'Basit Makineler ve Kaldıraç', type: 'live', teacher: 'Ayşe D.', missed: true, joinStatus: 'absent',
-      kazanim: 'Basit makinelerin (kaldıraç, makara, eğik düzlem) iş ve kuvvet üzerindeki etkisini açıklar.',
-      desc: 'Kaldıraç, makara, eğik düzlem, çıkrık. Kuvvet ve iş hesapları, mekanik avantaj kavramı. Sınıfta basit makara deneyimleri ile öğreneceğiz — kalem ve ip getirmeyi unutma.' },
-    { date: '2026-05-28', start: '11:00', dur: 60, subject: 'mat', topic: 'Cebirsel İfadeler ve Özdeşlikler', type: 'live', lessonFormat: 'rud', teacher: 'Mehmet Y.', joined: true, joinStatus: 'attended',
-      kazanim: 'Cebirsel ifadeleri özdeşlikleri kullanarak çarpanlarına ayırır.',
-      desc: 'Cebirsel ifadelerde toplama-çıkarma ve çarpanlara ayırma. Bilinen kimlikler (a²-b², (a+b)²) üzerinde örnek soru çözümleri. 15 sorudan oluşan mini test ile kapatıyoruz.' },
-    { date: '2026-05-28', start: '14:00', dur: 60, subject: 'din', topic: 'Hac ve Kurban İbadetleri', type: 'live', teacher: 'Ömer A.', joinStatus: 'upcoming',
-      kazanim: 'Hac ve kurban ibadetlerinin temel kavramlarını ve manevi boyutunu açıklar.',
-      desc: 'Hac ibadetinin temel şartları ve aşamaları. Kurban ibadetinin sosyal ve manevi boyutu. Konuyu güncel örneklerle zenginleştirip soru-cevap formatında ilerleyeceğiz.' },
-    // Perşembe 29 Mayıs
-    { date: '2026-05-29', start: '10:00', dur: 60, subject: 'trk', topic: 'Cümle Türleri ve Yapı Çözümlemesi', type: 'live', teacher: 'Zeynep K.', joined: true, joinStatus: 'attended',
-      kazanim: 'Cümleleri yapı bakımından sınıflandırır ve özelliklerini ayırt eder.',
-      desc: 'Cümle türleri (basit, birleşik, sıralı, bağlı) ve yapı bakımından sınıflandırma. Anlam ve yapı farklarını tablolarla göstereceğim, ardından örnekler üzerinde çalışacağız.' },
-    { date: '2026-05-29', start: '12:00', dur: 90, subject: 'mat', topic: 'Birinci Dereceden Eşitsizlikler', type: 'live', lessonFormat: 'kid', teacher: 'Mehmet Y.', missed: true, joinStatus: 'absent',
-      kazanim: 'Bir bilinmeyenli eşitsizliklerin çözüm kümesini bulur ve sayı doğrusunda gösterir.',
-      desc: 'Bir bilinmeyenli eşitsizlikler. Çözüm kümesi gösterimi, sayı doğrusu üzerinde temsil. 90 dk: 30 dk konu anlatımı + 45 dk soru çözüm + 15 dk genel değerlendirme.' },
-    { date: '2026-05-29', start: '16:00', dur: 60, subject: 'ing', topic: 'Daily Routines & Frequency', type: 'live', teacher: 'Sarah J.', joinStatus: 'upcoming',
-      kazanim: 'Present Simple zamanı ve sıklık zarflarıyla günlük rutinleri anlatır.',
-      desc: 'Present Simple tense + daily activities. Practice talking about your daily routines with classmates. Vocabulary focus: time expressions, frequency adverbs.' },
-    // Cuma 30 Mayıs
-    { date: '2026-05-30', start: '09:00', dur: 60, subject: 'fen', topic: 'DNA, Gen ve Kalıtım', type: 'live', teacher: 'Ayşe D.', joined: true, joinStatus: 'attended',
-      kazanim: 'DNA, gen ve kromozom kavramlarını açıklar; basit kalıtım problemlerini çözer.',
-      desc: 'DNA yapısı, gen kavramı, kalıtım temelleri. Mendel deneyleri üzerinden basit kalıtım hesapları. Mikroskobik dünyayı keşfedeceğimiz keyifli bir ders!' },
-    { date: '2026-05-30', start: '11:00', dur: 60, subject: 'mat', topic: 'Üçgen ve Çember Geometri Tekrarı', type: 'live', lessonFormat: 'rud', teacher: 'Mehmet Y.', missed: true, joinStatus: 'absent',
-      kazanim: 'Üçgen ve çember konularındaki temel formülleri (alan, çevre, açı) uygular.',
-      desc: 'Üçgen, dörtgen ve çember konularının genel tekrarı. Açı hesapları, alan ve çevre formülleri. LGS tarzı karma sorularla pekiştirme yapıyoruz.' },
-    { date: '2026-05-30', start: '14:00', dur: 60, subject: 'sos', topic: 'Türkiye\'nin İklim ve Bitki Örtüsü', type: 'live', teacher: 'Ali T.', joinStatus: 'upcoming',
-      kazanim: 'Türkiye\'nin iklim tiplerini ve bitki örtüsü özelliklerini bölgesel olarak açıklar.',
-      desc: 'Türkiye\'nin iklim, bitki örtüsü ve nüfus özellikleri. Bölgesel farklılıklar ve ekonomik etkileri. Harita üzerinden interaktif anlatım.' },
-    // Cumartesi 31 Mayıs — Deneme
-    { date: '2026-05-31', start: '20:00', dur: 120, subject: 'mat', topic: 'Mayıs Genel Değerlendirme Denemesi', type: 'exam', teacher: 'Mehmet Y.',
-      kazanim: 'Mayıs ayı boyunca işlenen tüm konularda öğrenme düzeyini değerlendirir.',
-      desc: 'Mayıs ayı genel değerlendirme denemesi. 90 soru / 120 dakika. Tüm dersleri kapsayan karma bir test. Sonuçların hemen ardından genel değerlendirme ve eksik analiz raporun teslim edilecek.' },
-    // Önceki/sonraki hafta events (ay görünümü için)
-    { date: '2026-05-19', start: '10:00', dur: 60, subject: 'mat', topic: 'Olasılığa Hazırlık', type: 'live', lessonFormat: 'kid', teacher: 'Mehmet Y.' },
-    { date: '2026-05-20', start: '13:00', dur: 60, subject: 'fen', topic: 'Maddenin Tanecikli Yapısı', type: 'live', teacher: 'Ayşe D.' },
-    { date: '2026-05-21', start: '11:00', dur: 60, subject: 'trk', topic: 'Sözcükte Anlam Bilgisi', type: 'live', teacher: 'Zeynep K.' },
-    { date: '2026-05-22', start: '14:00', dur: 60, subject: 'ing', topic: 'Reading Skills Practice', type: 'live', teacher: 'Sarah J.', missed: true },
-    { date: '2026-06-02', start: '09:00', dur: 60, subject: 'mat', topic: 'Veri Analizi ve Grafikler', type: 'live', lessonFormat: 'rud', teacher: 'Mehmet Y.' },
-    { date: '2026-06-03', start: '11:00', dur: 60, subject: 'fen', topic: 'Periyodik Sistem Girişi', type: 'live', teacher: 'Ayşe D.' },
-    { date: '2026-06-04', start: '14:00', dur: 60, subject: 'trk', topic: 'Türkçe Yazılı Sınavı', type: 'exam', teacher: 'Zeynep K.' }
+  var TODAY = new Date(2026, 4, 23); // 23 Mayıs 2026 (demo)
+  var DAY_NAMES = ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
+  var MONTH_NAMES = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+
+  // ====== ÖDEV VERİ SETİ ======
+  // due: 'YYYY-MM-DD HH:MM'  status: active | done | overdue
+  var HOMEWORKS = [
+    // AKTİF
+    { id: 1, subject:'mat', hwId:'mat-koklu', eduWeek:11, topic:'Köklü Sayılarda Dört İşlem · 15 Soru', teacher:'Mehmet Y.', due:'2026-05-23 23:59', status:'active', xp:75,
+      desc:'Köklü sayılarda toplama, çıkarma, çarpma ve bölme işlemleri. PDF içinde 15 örnek soru var. Önce konu tekrarını yapıp soruları sırayla çözmeni öneririm. Takıldığın yerleri not al, ders saatinde birlikte bakarız.' },
+    { id: 2, subject:'fen', hwId:'fen-dongu', eduWeek:8, topic:'Madde Döngüleri · Etkinlik', teacher:'Ayşe D.', due:'2026-05-24 18:00', status:'active', xp:60, started:true,
+      desc:'Karbon, su ve azot döngüleri için kavram haritası hazırlayacaksın. Etkinlik dosyasını indirip her döngüyü çevremizdeki örneklerle ilişkilendirmeni bekliyorum 🌱' },
+    { id: 3, subject:'ing', hwId:'ing-friendship', eduWeek:9, topic:'Friendship Reading · 12 Questions', teacher:'Sarah J.', due:'2026-05-26 17:00', status:'active', xp:45,
+      desc:'In our Friendship unit reading passages, complete the 12-question comprehension test attached. Try without dictionary first. We will review difficult words together in class 🌟' },
+    // GECİKMİŞ
+    { id: 4, subject:'mat', topic:'Cebirsel İfadeler · 20 Soru', teacher:'Mehmet Y.', due:'2026-05-21 23:59', status:'overdue', xp:80,
+      desc:'Cebirsel ifadelerin sadeleştirilmesi ve özdeşlikler üzerinden 20 soru. Hala teslim edebilirsin ama puan düşüşü olur — bir an önce tamamla.' },
+    { id: 5, subject:'sos', topic:'Atatürk İlkeleri Çalışma Kağıdı', teacher:'Ali T.', due:'2026-05-22 23:59', status:'overdue', xp:50,
+      desc:'Atatürk\'ün altı ilkesi için kısa açıklama ve günümüzden örnekler yaz. Tablonun her satırını eksiksiz doldur.' },
+    { id: 18, subject:'trk', topic:'Yazım Kuralları · 14 Soru', teacher:'Zeynep K.', due:'2026-05-20 18:00', status:'overdue', xp:55,
+      desc:'Büyük harf, birleşik kelime ve kısaltmalarda yazım kuralları üzerine 14 soru. Süresi geçti; yine de tamamlayabilirsin.' },
+    { id: 19, subject:'fen', topic:'Enerji Dönüşümleri · Deney Raporu', teacher:'Ayşe D.', due:'2026-05-19 23:59', status:'overdue', xp:65,
+      desc:'Potansiyel ve kinetik enerji dönüşümünü gözlemleyen mini deney raporu. Gözlem tablosunu eksiksiz doldur.' },
+    { id: 20, subject:'ing', topic:'Present Perfect · 10 Questions', teacher:'Sarah J.', due:'2026-05-18 17:00', status:'overdue', xp:40,
+      desc:'Present perfect tense kullanımı üzerine 10 soruluk alıştırma. Örnek cümleleri dikkatle incele.' },
+    { id: 21, subject:'din', topic:'Ahlaki Değerler Sunumu', teacher:'Ömer A.', due:'2026-05-17 23:59', status:'overdue', xp:45,
+      desc:'Dürüstlük, yardımseverlik ve sorumluluk değerlerini günlük hayattan örneklerle anlatan kısa sunum hazırla.' },
+    { id: 22, subject:'mat', topic:'Üslü İfadeler · 12 Soru', teacher:'Mehmet Y.', due:'2026-05-16 23:59', status:'overdue', xp:70,
+      desc:'Üslü ifadelerde çarpma, bölme ve sadeleştirme kuralları. 12 sorunun tamamını çözüp teslim et.' },
+    // TAMAMLANAN
+    { id: 6,  subject:'trk', hwId:'trk-paragraf', eduWeek:10, topic:'Paragraf Anlamı · 8 Soru',     teacher:'Zeynep K.', due:'2026-05-22 18:00', status:'done', xp:50, score:95, doneAt:'2026-05-22 14:30',
+      desc:'Paragrafın ana fikri, yardımcı fikir ve anlam bütünlüğü üzerine 8 soruluk ödev. Metinleri dikkatle okuyup şıkları işaretle.' },
+    { id: 7,  subject:'din', topic:'Hac ve Kurban · Kavramlar',    teacher:'Ömer A.',   due:'2026-05-22 23:59', status:'done', xp:40, score:88, doneAt:'2026-05-22 19:10',
+      desc:'Hac ve kurban ibadetlerinin temel kavramlarını özetleyen çalışma.' },
+    { id: 8,  subject:'fen', hwId:'fen-dongu', topic:'Basit Makineler Tekrarı',      teacher:'Ayşe D.',   due:'2026-05-21 18:00', status:'done', xp:55, score:92, doneAt:'2026-05-21 16:00',
+      desc:'Basit makineler konusunu pekiştirmek için hazırlanan tekrar ödevi. Kaldıraç, makara ve eğik düzlem örneklerini çalış.' },
+    { id: 9,  subject:'mat', hwId:'mat-koklu', topic:'Olasılığa Giriş · 10 Soru',    teacher:'Mehmet Y.', due:'2026-05-20 23:59', status:'done', xp:65, score:78, doneAt:'2026-05-20 21:40',
+      desc:'Temel olasılık kavramları ve örnek sorular. Sonuçları tekrar çözerek konuyu pekiştirebilirsin.' },
+    { id: 10, subject:'ing', hwId:'ing-friendship', topic:'Daily Routines Worksheet',     teacher:'Sarah J.',  due:'2026-05-20 17:00', status:'done', xp:45, score:100, doneAt:'2026-05-19 22:00',
+      desc:'Daily routines unit worksheet — reading and comprehension questions about everyday habits.' },
+    { id: 11, subject:'trk', hwId:'trk-paragraf', topic:'Cümle Türleri',                teacher:'Zeynep K.', due:'2026-05-19 18:00', status:'done', xp:50, score:90, doneAt:'2026-05-19 15:30',
+      desc:'Cümle türlerini ayırt etme ve örnek cümle kurma üzerine kısa çalışma.' },
+    { id: 12, subject:'fen', hwId:'fen-dongu', topic:'DNA ve Kalıtım Mini Quiz',     teacher:'Ayşe D.',   due:'2026-05-18 23:59', status:'done', xp:60, score:96, doneAt:'2026-05-18 20:00',
+      desc:'DNA yapısı ve kalıtımın temel kavramları üzerine mini quiz.' },
+    { id: 13, subject:'sos', topic:'Coğrafya · Türkiye İklimi',    teacher:'Ali T.',    due:'2026-05-17 18:00', status:'done', xp:50, score:82, doneAt:'2026-05-17 14:00',
+      desc:'Türkiye\'nin iklim tipleri ve bölgelere göre dağılımı üzerine çalışma.' },
+    { id: 14, subject:'mat', hwId:'mat-koklu', topic:'Geometri Tekrar Soruları',     teacher:'Mehmet Y.', due:'2026-05-16 23:59', status:'done', xp:70, score:85, doneAt:'2026-05-16 22:10',
+      desc:'Geometri konularını pekiştiren tekrar soruları.' },
+    { id: 15, subject:'din', topic:'Hz. Muhammed (s.a.v.) Dönemi', teacher:'Ömer A.',   due:'2026-05-15 23:59', status:'done', xp:40, score:91, doneAt:'2026-05-15 19:30',
+      desc:'Hz. Muhammed (s.a.v.) dönemindeki önemli olayları kronolojik sırayla çalış.' },
+    { id: 16, subject:'ing', hwId:'ing-friendship', topic:'Vocabulary Builder Quiz',      teacher:'Sarah J.',  due:'2026-05-14 17:00', status:'done', xp:35, score:95, doneAt:'2026-05-13 21:00',
+      desc:'Friendship ünitesindeki kelimelerle ilgili kelime bilgisi quizi.' },
+    { id: 17, subject:'trk', hwId:'trk-paragraf', topic:'Sözcükte Anlam',               teacher:'Zeynep K.', due:'2026-05-13 18:00', status:'done', xp:45, score:87, doneAt:'2026-05-13 17:00',
+      desc:'Sözcükte anlam türleri ve bağlamdan anlam çıkarma soruları.' }
   ];
 
-  EVENTS.forEach(function (e, i) {
-    if (e.type !== 'live') return;
-    if (e.lessonFormat !== 'kid' && e.lessonFormat !== 'rud') {
-      e.lessonFormat = i % 2 === 0 ? 'kid' : 'rud';
+  HOMEWORKS.forEach(function (h, i) {
+    if (h.homeworkType !== 'kid' && h.homeworkType !== 'rud') {
+      h.homeworkType = i % 2 === 0 ? 'kid' : 'rud';
     }
   });
 
-  // Mevcut görüntülenen tarih (haftanın Pazartesi'si veya ayın 1'i)
-  var currentDate = new Date(TODAY);
-  var currentView = 'week';
-
+  // ====== STATE ======
+  var currentTab = 'active';
+  var currentSubject = 'all';
+  var currentStatus = 'all';
+  function statusMatch(h) {
+    if (currentStatus === 'all') return true;
+    return h.status === currentStatus;
+  }
+  function addDays(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
   var EDU_TERM_START = new Date(2026, 2, 10); // 10 Mart 2026 — 1. eğitim haftası (Pzt)
   var MAX_EDU_WEEK = 16;
 
@@ -6340,11 +7916,132 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     }
     return MAX_EDU_WEEK;
   }
-  function formatEduWeek(week) {
-    var n = parseInt(week, 10);
-    if (!n || n < 1) return '';
-    return n + '. Eğitim Haftası';
+  function getHomeworkEduWeek(h) {
+    if (h.eduWeek) return h.eduWeek;
+    return findEduWeekForDate(parseISO(h.due));
   }
+  var selectedEduWeek = findEduWeekForDate(TODAY);
+
+  function lsGet(key) {
+    try { return localStorage.getItem('bilenyum.' + key); } catch (e) { return null; }
+  }
+
+  function resolveHwId(h) {
+    if (!h) return null;
+    if (h.hwId) return h.hwId;
+    return null;
+  }
+
+  function canRetryHomework(h) {
+    return !!(h && h.status === 'done' && resolveHwId(h));
+  }
+
+  var HW_OVERDUE_XP_RATE = 0.5;
+
+  function getHwBaseXp(h) {
+    return h && (h.maxXp || h.xp) ? (h.maxXp || h.xp) : 0;
+  }
+
+  function getHwOverdueXp(h) {
+    return Math.max(1, Math.round(getHwBaseXp(h) * HW_OVERDUE_XP_RATE));
+  }
+
+  function hasHwSession(hwId) {
+    if (!hwId) return false;
+    return !!lsGet('homeworkSession.' + hwId);
+  }
+
+  function isHwInProgress(h) {
+    if (!h || h.status === 'done') return false;
+    if (h.started) return true;
+    return hasHwSession(resolveHwId(h));
+  }
+
+  function getHwDrawerStatusLabel(h) {
+    if (!h) return '';
+    if (h.status === 'done') return 'Tamamlandı';
+    if (h.status === 'overdue') return 'Gecikmiş';
+    return isHwInProgress(h) ? 'Devam Eden' : 'Bekliyor';
+  }
+
+  function getHwLateXpNoteText(h) {
+    if (!h || h.status !== 'overdue') return '';
+    var full = getHwBaseXp(h);
+    var late = getHwOverdueXp(h);
+    return 'Bu ödevin teslim süresi geçti; yine de tamamlayabilirsin. Gecikmiş teslimde en fazla '
+      + '<strong>' + late + ' XP</strong> kazanabilirsin (zamanında teslimde <strong>' + full + ' XP</strong>).';
+  }
+
+  // ====== Helpers ======
+  function demoNow() {
+    var n = new Date();
+    return new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate(), n.getHours(), n.getMinutes(), n.getSeconds());
+  }
+  function parseISO(s) {
+    var p = s.split(' ');
+    var d = p[0].split('-'); var t = p[1].split(':');
+    return new Date(+d[0], +d[1]-1, +d[2], +t[0], +t[1], 0);
+  }
+  function pad2(n){ n=Math.floor(n); return (n<10?'0':'')+n; }
+  function fmtCountdown(ms) {
+    if (ms < 0) ms = 0;
+    var s=Math.floor(ms/1000), d=Math.floor(s/86400), h=Math.floor((s%86400)/3600), mi=Math.floor((s%3600)/60), se=s%60;
+    if (d>0) return d+' GÜN '+pad2(h)+':'+pad2(mi)+':'+pad2(se);
+    return pad2(h)+':'+pad2(mi)+':'+pad2(se);
+  }
+  function fmtDueShort(d) {
+    var diff = d - demoNow();
+    if (diff < 0) return 'Süresi geçti';
+    var hr = Math.floor(diff / 3600000);
+    if (hr < 1) return Math.max(1, Math.floor(diff / 60000)) + ' dk kaldı';
+    if (hr < 24) return hr + ' sa kaldı';
+    return Math.floor(hr / 24) + ' gün kaldı';
+  }
+  function fmtDueLong(s) {
+    var d = parseISO(s);
+    return d.getDate()+' '+MONTH_NAMES[d.getMonth()]+' '+d.getFullYear()+' · '+pad2(d.getHours())+':'+pad2(d.getMinutes());
+  }
+  function dueState(s) {
+    var diff = parseISO(s) - demoNow();
+    if (diff < 0) return 'overdue';
+    if (diff < 24*3600000) return 'urgent';
+    return 'normal';
+  }
+  function isoStrNow() {
+    var n = demoNow();
+    return n.getFullYear()+'-'+pad2(n.getMonth()+1)+'-'+pad2(n.getDate())+' '+pad2(n.getHours())+':'+pad2(n.getMinutes());
+  }
+
+  function formatDoneAt(iso) {
+    if (!iso) return null;
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return String(iso).replace('T', ' ').slice(0, 16);
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  }
+
+  function syncHomeworkFromStorage() {
+    HOMEWORKS.forEach(function (hw) {
+      if (!hw.hwId) return;
+      var raw = lsGet('homeworkDone.' + hw.hwId);
+      if (!raw) return;
+      try {
+        var data = JSON.parse(raw);
+        hw.status = 'done';
+        if (data.pct != null) hw.score = data.pct;
+        if (data.earnedXp != null) hw.xp = data.earnedXp;
+        hw.doneAt = formatDoneAt(data.completedAt) || hw.doneAt || isoStrNow();
+      } catch (e) {}
+    });
+  }
+
+  syncHomeworkFromStorage();
+
+  // Seçili eğitim haftasındaki ödevler (teslim tarihine göre)
+  function inSelectedEduWeek(h) {
+    var d = parseISO(h.due);
+    return d >= eduWeekStart(selectedEduWeek) && d < eduWeekEndExclusive(selectedEduWeek);
+  }
+
   function formatWeekRange(weekNum) {
     var start = eduWeekStart(weekNum);
     var end = addDays(start, 6);
@@ -6354,346 +8051,479 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     }
     return fmt(start) + ' — ' + fmt(end) + ' ' + end.getFullYear();
   }
-  var selectedEduWeek = 12; // Demo: 12. eğitim haftası — katıldı / katılmadı / gelecek ders karışımı
-
-  function syncCurrentDateFromEduWeek() {
-    currentDate = eduWeekStart(selectedEduWeek);
-  }
-  syncCurrentDateFromEduWeek();
 
   function updateWeekLabel() {
-    var eyebrow = document.getElementById('progWeekEyebrow');
-    var label = document.getElementById('progDateLabel');
+    var eyebrow = document.getElementById('odevWeekEyebrow');
+    var label = document.getElementById('odevDateLabel');
     if (eyebrow) eyebrow.textContent = formatEduWeek(selectedEduWeek);
     if (label) label.textContent = formatWeekRange(selectedEduWeek);
   }
 
-  // --- Helpers ---
-  function isoDate(d) {
-    var m = (d.getMonth() + 1).toString().padStart(2, '0');
-    var day = d.getDate().toString().padStart(2, '0');
-    return d.getFullYear() + '-' + m + '-' + day;
-  }
-  function sameDay(a, b) {
-    return a.getFullYear() === b.getFullYear() &&
-           a.getMonth() === b.getMonth() &&
-           a.getDate() === b.getDate();
-  }
-  function startOfWeek(d) {
-    // Pazartesi başlangıç
-    var x = new Date(d);
-    var day = x.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-    var diff = (day === 0 ? -6 : 1 - day); // shift to Monday
-    x.setDate(x.getDate() + diff);
-    x.setHours(0, 0, 0, 0);
-    return x;
-  }
-  function addDays(d, n) {
-    var x = new Date(d); x.setDate(x.getDate() + n); return x;
-  }
-  function formatDay(d) {
-    return d.getDate() + ' ' + MONTH_NAMES[d.getMonth()];
-  }
-  function timeToRow(time) {
-    var h = parseInt(time.split(':')[0], 10);
-    var m = parseInt(time.split(':')[1], 10);
-    // 09:00 → row 2 (header is row 1), each 30min = 1 row would be too many
-    // Using 1 hour rows: row = h - HOUR_START + 2
-    return (h - HOUR_START) + 2;
-  }
-  function durToSpan(durMin) {
-    return Math.max(1, Math.ceil(durMin / 60));
+  // ====== Render: Ödev liste — Hero + Smart Sections ======
+  var sectionsEl = document.getElementById('ovSections');
+  var emptyEl = document.getElementById('odevListEmpty');
+  var heroCarouselEl = document.getElementById('ovHeroCarousel');
+  var heroTrackEl = document.getElementById('ovHeroTrack');
+  var heroPrevEl = document.getElementById('ovHeroPrev');
+  var heroNextEl = document.getElementById('ovHeroNext');
+  var heroDotsEl = document.getElementById('ovHeroDots');
+  var heroCarouselCountEl = document.getElementById('ovHeroCarouselCount');
+  var SUBJECT_ORDER = ['mat','fen','trk','ing','sos','din'];
+
+  // SVG'ler (string olarak kullanılacak)
+  var SVG_CLOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>';
+  var SVG_BOLT = '<svg viewBox="0 0 256 256" fill="currentColor"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17Z"/></svg>';
+  var SVG_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  var SVG_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+
+  function isSameDay(a, b) {
+    return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
   }
 
-  // --- Render: WEEK view ---
-  var weekGrid = document.getElementById('progWeekGrid');
-
-  function resolveLessonFormat(e) {
-    if (!e || e.type !== 'live') return null;
-    if (e.lessonFormat === 'kid' || e.lessonFormat === 'rud') return e.lessonFormat;
-    return 'rud';
+  function formatEduWeek(week) {
+    var n = parseInt(week, 10);
+    if (!n || n < 1) return '';
+    return n + '. Eğitim Haftası';
   }
 
-  function lessonFormatShortLabel(fmt) {
-    if (fmt === 'kid') return 'KİD';
-    if (fmt === 'rud') return 'RUD';
-    return '';
+  function hwTypeLabel(h) {
+    if (h && h.homeworkType === 'rud') return 'RUD';
+    return 'KİD';
   }
 
-  function lessonFormatDesc(fmt) {
-    if (fmt === 'kid') {
-      return 'Kavram İnşa Dersi (KİD) — öğrenciler kavramı sınıf içi tartışma ve etkinliklerle birlikte inşa eder.';
+  function hwTypeDesc(h) {
+    if (!h || h.homeworkType === 'rud') {
+      return 'Rehberli Uygulama Dersi (RUD) ödevi — rehberli soru çözümü ve uygulama çalışması.';
     }
-    if (fmt === 'rud') {
-      return 'Rehberli Uygulama Dersi (RUD) — öğretmen rehberliğinde adım adım soru çözümü ve uygulama yapılır.';
+    return 'Kavram İnşa Dersi (KİD) ödevi — kavramı pekiştiren inşa odaklı çalışma.';
+  }
+
+  function hwTypeBadgeHtml(h, cls) {
+    var type = (h && h.homeworkType === 'rud') ? 'rud' : 'kid';
+    cls = cls || 'ov-card-type';
+    return '<span class="' + cls + ' is-' + type + '">' + hwTypeLabel(h) + '</span>';
+  }
+
+  function renderCard(h) {
+    var subjectName = SUBJECT_NAMES[h.subject] || h.subject;
+    var teacher = (TEACHERS[h.teacher] && TEACHERS[h.teacher].full) || h.teacher;
+    var isDone = h.status === 'done';
+    var due = parseISO(h.due);
+    var dueChipCls = '';
+    var dueText = '';
+    if (isDone) {
+      dueChipCls = ' is-done';
+      dueText = SVG_CHECK + ' Teslim edildi';
+    } else if (h.status === 'overdue') {
+      dueChipCls = ' is-overdue';
+      dueText = SVG_CLOCK + ' Süresi geçti';
+    } else {
+      var st = dueState(h.due);
+      dueChipCls = st === 'urgent' ? ' is-urgent' : '';
+      dueText = SVG_CLOCK + ' ' + fmtDueShort(due);
     }
-    return '';
+
+    var foot;
+    if (isDone) {
+      foot = '<div class="ov-card-foot">'
+        + '<span class="ov-card-score">' + SVG_CHECK + (h.score || '—') + '/100</span>'
+        + '<span class="ov-card-xp">' + SVG_BOLT + '+ ' + h.xp + ' XP</span>'
+        + (h.status === 'done' ? '<span class="ov-card-retry">Tekrar çöz</span>' : '')
+      + '</div>';
+    } else {
+      foot = '<div class="ov-card-foot">'
+        + '<span class="ov-card-xp">' + SVG_BOLT + '+ ' + h.xp + ' XP</span>'
+        + '<span class="ov-card-go">Aç ' + SVG_ARROW + '</span>'
+      + '</div>';
+    }
+
+    var weekBadge = '<span class="ov-card-week">' + formatEduWeek(getHomeworkEduWeek(h)) + '</span>';
+
+    return '<button type="button" class="ov-card' + (isDone?' is-done':'') + '" data-subject="' + h.subject + '" data-hw-type="' + (h.homeworkType || 'kid') + '" data-id="' + h.id + '">'
+      + '<div class="ov-card-head">'
+        + '<span class="ov-card-icon">' + (SUBJECT_ICONS[h.subject]||'📚') + '</span>'
+        + '<div class="ov-card-info">'
+          + '<span class="ov-card-subject-row">'
+            + '<span class="ov-card-subject">' + subjectName + '</span>'
+            + hwTypeBadgeHtml(h)
+          + '</span>'
+          + '<span class="ov-card-teacher">' + teacher + '</span>'
+        + '</div>'
+        + weekBadge
+        + '<span class="ov-card-due-chip' + dueChipCls + '">' + dueText + '</span>'
+      + '</div>'
+      + '<h3 class="ov-card-title">' + h.topic + '</h3>'
+      + foot
+    + '</button>';
   }
 
-  function lessonFormatBadgeHtml(fmt) {
-    if (!fmt) return '';
-    return '<span class="prog-lesson-type is-' + fmt + '">' + lessonFormatShortLabel(fmt) + '</span>';
+  // ====== HERO render ======
+  var heroCountdownTick = null;
+  var heroActiveHw = null;
+  var heroCarouselHwIds = [];
+  var heroCarouselItems = [];
+  var heroCarouselIndex = 0;
+
+  function getOverdueHeroPool() {
+    return HOMEWORKS.filter(function(h) {
+      if (h.status !== 'overdue') return false;
+      if (pageView !== 'overdue' && !inSelectedEduWeek(h)) return false;
+      if (currentSubject !== 'all' && h.subject !== currentSubject) return false;
+      return true;
+    }).sort(function(a, b) { return parseISO(b.due) - parseISO(a.due); });
   }
 
-  function monthEventLabel(e) {
-    if (e.type === 'holiday') return 'Tatil';
-    if (e.type === 'exam') return '🏆 ' + e.topic;
-    var base = SUBJECT_NAMES[e.subject] || e.topic;
-    var fmt = resolveLessonFormat(e);
-    if (fmt) return lessonFormatShortLabel(fmt) + ' · ' + base;
-    return base;
+  function pickActiveHeroHomework() {
+    var pool = HOMEWORKS.filter(function(h) {
+      if (!inSelectedEduWeek(h)) return false;
+      if (currentSubject !== 'all' && h.subject !== currentSubject) return false;
+      return h.status === 'active';
+    });
+    if (!pool.length) return null;
+    pool.sort(function(a, b) { return parseISO(a.due) - parseISO(b.due); });
+    return pool[0];
   }
 
-  function renderWeek() {
-    var start = eduWeekStart(selectedEduWeek);
-    var end = addDays(start, 6);
-    updateWeekLabel();
+  function heroEyebrowText(h) {
+    if (h.status === 'overdue') return 'Geciken Ödev · Hemen tamamla';
+    var due = parseISO(h.due);
+    if (isSameDay(due, demoNow())) return 'Sıradaki Ödev · Bugün son gün';
+    return 'Sıradaki Ödev · ' + fmtDueShort(due);
+  }
+
+  function buildHeroSlideHtml(h) {
+    var subjectName = SUBJECT_NAMES[h.subject] || h.subject;
+    var t = TEACHERS[h.teacher] || { full: h.teacher, avatar: '' };
+    var isOverdue = h.status === 'overdue';
+    var eyebrowText = heroEyebrowText(h);
+    return ''
+      + '<article class="ov-hero' + (isOverdue ? ' is-overdue' : '') + '" data-subject="' + h.subject + '" data-hw-id="' + h.id + '">'
+      + '<div class="ov-hero-glow" aria-hidden="true"></div>'
+      + '<div class="ov-hero-pattern" aria-hidden="true"></div>'
+      + '<div class="ov-hero-body">'
+        + '<header class="ov-hero-head">'
+          + '<span class="ov-hero-eyebrow"><span class="ov-hero-pulse"></span>' + eyebrowText + '</span>'
+          + '<span class="ov-hero-subject">'
+            + '<span class="ov-hero-subject-icon">' + (SUBJECT_ICONS[h.subject] || '📚') + '</span>'
+            + '<span>' + subjectName + '</span>'
+          + '</span>'
+        + '</header>'
+        + '<h2 class="ov-hero-title">' + h.topic + '</h2>'
+        + '<p class="ov-hero-desc">' + (h.desc || 'Detay yakında eklenecek.') + '</p>'
+        + '<div class="ov-hero-meta">'
+          + '<div class="ov-hero-teacher">'
+            + '<span class="ov-hero-teacher-ava"><img src="' + (t.avatar || '') + '" alt="' + t.full + '" /></span>'
+            + '<span class="ov-hero-teacher-text">'
+              + '<span class="ov-hero-teacher-label">Öğretmen</span>'
+              + '<strong>' + t.full + '</strong>'
+            + '</span>'
+          + '</div>'
+          + '<div class="ov-hero-countdown">'
+            + '<span class="ov-hero-countdown-label">Teslim için kalan</span>'
+            + '<strong class="ov-hero-countdown-val">—</strong>'
+          + '</div>'
+        + '</div>'
+        + '<footer class="ov-hero-foot">'
+          + '<span class="ov-hero-xp">'
+            + SVG_BOLT
+            + '<span>+<strong>' + h.xp + '</strong> XP ödülü</span>'
+          + '</span>'
+          + '<button type="button" class="ov-hero-cta">'
+            + '<span>Ödevi Yap</span>'
+            + SVG_ARROW
+          + '</button>'
+        + '</footer>'
+      + '</div>'
+      + '</article>';
+  }
+
+  function buildHeroEmptyHtml() {
+    var isOverdueView = pageView === 'overdue';
+    return ''
+      + '<article class="ov-hero is-empty" data-subject="trk">'
+      + '<div class="ov-hero-body">'
+        + '<header class="ov-hero-head">'
+          + '<span class="ov-hero-eyebrow"><span class="ov-hero-pulse"></span>'
+            + (isOverdueView ? 'Gecikmiş ödev yok' : 'Şu an aktif ödev yok')
+          + '</span>'
+        + '</header>'
+        + '<h2 class="ov-hero-title">'
+          + (isOverdueView ? 'Tüm ödevlerini zamanında teslim etmişsin 🎉' : 'Tüm ödevlerini tamamladın 🎉')
+        + '</h2>'
+        + '<p class="ov-hero-desc">'
+          + (isOverdueView
+            ? 'Gecikmiş ödev bulunmuyor. Aktif ödevlerin için haftalık listeye dönebilirsin.'
+            : 'Bu hafta için aktif ödev kalmadı. Takvimden başka bir eğitim haftası seçebilirsin.')
+        + '</p>'
+      + '</div>'
+      + '</article>';
+  }
+
+  function syncHeroCountdowns(items) {
+    items.forEach(function(h) {
+      var slide = heroTrackEl.querySelector('[data-hw-id="' + h.id + '"]');
+      if (!slide) return;
+      var el = slide.querySelector('.ov-hero-countdown-val');
+      if (!el) return;
+      var ms = parseISO(h.due) - demoNow();
+      el.textContent = ms <= 0 ? 'Süresi geçti' : fmtCountdown(ms);
+    });
+  }
+
+  function setHeroCarouselIndex(index) {
+    if (!heroCarouselItems.length) return;
+    heroCarouselIndex = Math.max(0, Math.min(heroCarouselItems.length - 1, index));
+    heroTrackEl.style.transform = 'translateX(-' + (heroCarouselIndex * 100) + '%)';
+    heroActiveHw = heroCarouselItems[heroCarouselIndex] || null;
+    if (heroDotsEl) {
+      Array.prototype.forEach.call(heroDotsEl.querySelectorAll('.ov-hero-dot'), function(dot, i) {
+        dot.classList.toggle('is-active', i === heroCarouselIndex);
+        dot.setAttribute('aria-selected', i === heroCarouselIndex ? 'true' : 'false');
+      });
+    }
+    if (heroCarouselCountEl && heroCarouselItems.length > 1) {
+      heroCarouselCountEl.textContent = (heroCarouselIndex + 1) + ' / ' + heroCarouselItems.length;
+    }
+    if (heroPrevEl) heroPrevEl.disabled = heroCarouselIndex <= 0;
+    if (heroNextEl) heroNextEl.disabled = heroCarouselIndex >= heroCarouselItems.length - 1;
+  }
+
+  function initHeroCarouselNav() {
+    if (!heroCarouselEl || heroCarouselEl.dataset.bound === '1') return;
+    heroCarouselEl.dataset.bound = '1';
+    if (heroPrevEl) {
+      heroPrevEl.addEventListener('click', function(e) {
+        e.stopPropagation();
+        setHeroCarouselIndex(heroCarouselIndex - 1);
+      });
+    }
+    if (heroNextEl) {
+      heroNextEl.addEventListener('click', function(e) {
+        e.stopPropagation();
+        setHeroCarouselIndex(heroCarouselIndex + 1);
+      });
+    }
+    if (heroDotsEl) {
+      heroDotsEl.addEventListener('click', function(e) {
+        var dot = e.target.closest('.ov-hero-dot');
+        if (!dot) return;
+        e.stopPropagation();
+        setHeroCarouselIndex(parseInt(dot.getAttribute('data-index'), 10) || 0);
+      });
+    }
+    heroCarouselEl.addEventListener('click', function(ev) {
+      if (ev.target.closest('.ov-hero-nav') || ev.target.closest('.ov-hero-dot')) return;
+      var slide = ev.target.closest('.ov-hero[data-hw-id]');
+      if (!slide || slide.classList.contains('is-empty')) return;
+      var id = parseInt(slide.getAttribute('data-hw-id'), 10);
+      if (ev.target.closest('.ov-hero-cta')) {
+        ev.stopPropagation();
+        openDrawer(id);
+        return;
+      }
+      openDrawer(id);
+    });
+  }
+
+  function renderHeroSlides(items) {
+    heroCarouselItems = items.slice();
+    heroCarouselHwIds = items.map(function(h) { return h.id; });
+    heroTrackEl.style.transform = 'translateX(0)';
+    heroCarouselIndex = 0;
+
+    if (!items.length) {
+      heroCarouselItems = [];
+      heroCarouselHwIds = [];
+      heroActiveHw = null;
+      heroTrackEl.innerHTML = buildHeroEmptyHtml();
+      if (heroCarouselEl) heroCarouselEl.classList.add('is-single');
+      if (heroDotsEl) heroDotsEl.innerHTML = '';
+      if (heroCarouselCountEl) heroCarouselCountEl.textContent = '';
+      return;
+    }
+
+    heroTrackEl.innerHTML = items.map(buildHeroSlideHtml).join('');
+    if (heroCarouselEl) heroCarouselEl.classList.toggle('is-single', items.length <= 1);
+
+    if (heroDotsEl) {
+      heroDotsEl.innerHTML = items.length > 1
+        ? items.map(function(h, i) {
+            return '<button type="button" class="ov-hero-dot' + (i === 0 ? ' is-active' : '') + '" data-index="' + i + '" role="tab" aria-label="Gecikmiş ödev ' + (i + 1) + '" aria-selected="' + (i === 0 ? 'true' : 'false') + '"></button>';
+          }).join('')
+        : '';
+    }
+
+    setHeroCarouselIndex(0);
+    syncHeroCountdowns(items);
+    if (heroCountdownTick) clearInterval(heroCountdownTick);
+    heroCountdownTick = setInterval(function() { syncHeroCountdowns(items); }, 1000);
+  }
+
+  function renderHero() {
+    if (heroCountdownTick) { clearInterval(heroCountdownTick); heroCountdownTick = null; }
+    initHeroCarouselNav();
+
+    var overduePool = getOverdueHeroPool();
+    if (overduePool.length) {
+      renderHeroSlides(overduePool);
+      return;
+    }
+
+    var active = pickActiveHeroHomework();
+    if (active) {
+      heroCarouselHwIds = [active.id];
+      renderHeroSlides([active]);
+      return;
+    }
+
+    heroCarouselHwIds = [];
+    renderHeroSlides([]);
+  }
+
+  function heroExcludeIds() {
+    if (heroCarouselHwIds.length) return heroCarouselHwIds.slice();
+    return heroActiveHw ? [heroActiveHw.id] : [];
+  }
+
+  // ====== SMART SECTIONS render ======
+  function renderSections() {
+    if (pageView === 'overdue') {
+      var overdueItems = HOMEWORKS.filter(function(h){
+        if (h.status !== 'overdue') return false;
+        if (currentSubject !== 'all' && h.subject !== currentSubject) return false;
+        return true;
+      });
+      overdueItems.sort(function(a,b){ return parseISO(b.due) - parseISO(a.due); });
+      var excludeIds = heroExcludeIds();
+      overdueItems = overdueItems.filter(function(h){ return excludeIds.indexOf(h.id) === -1; });
+
+      if (!overdueItems.length && !heroCarouselItems.length) {
+        sectionsEl.innerHTML = '';
+        emptyEl.hidden = false;
+        emptyEl.querySelector('.ov-empty-text').textContent = 'Gecikmiş ödevin yok';
+        emptyEl.querySelector('.ov-empty-sub').textContent = 'Harika! Tüm ödevlerini zamanında teslim etmişsin.';
+        return;
+      }
+      emptyEl.hidden = true;
+      emptyEl.querySelector('.ov-empty-text').textContent = 'Seçili hafta için ödev yok';
+      emptyEl.querySelector('.ov-empty-sub').textContent = 'Takvim ikonundan başka bir eğitim haftası seçebilirsin';
+
+      var overdueHtml = '';
+      if (overdueItems.length) {
+        overdueHtml = '<section class="ov-section ov-section--overdue">'
+          + '<header class="ov-section-head">'
+            + '<span class="ov-section-dot"></span>'
+            + '<h3 class="ov-section-title">Gecikmiş Ödevler</h3>'
+            + '<span class="ov-section-line"></span>'
+          + '</header>'
+          + '<div class="ov-grid">' + overdueItems.map(renderCard).join('') + '</div>'
+        + '</section>';
+      }
+      sectionsEl.innerHTML = overdueHtml;
+      return;
+    }
+
+    // Hafta filtresi + subject filtresi + durum filtresi
+    var pool = HOMEWORKS.filter(function(h){
+      if (!inSelectedEduWeek(h)) return false;
+      if (currentSubject !== 'all' && h.subject !== currentSubject) return false;
+      if (!statusMatch(h)) return false;
+      return true;
+    });
+
+    if (!pool.length) {
+      sectionsEl.innerHTML = '';
+      emptyEl.hidden = false;
+      return;
+    }
+    emptyEl.hidden = true;
+
+    // Hero carousel'deki ödevleri smart-section'lardan çıkar (duplicate gösterme)
+    var excludeIds = heroExcludeIds();
+    var rest = pool.filter(function(h){ return excludeIds.indexOf(h.id) === -1; });
+
+    var now = demoNow();
+    var bucket = { today: [], week: [], overdue: [], done: [] };
+    rest.forEach(function(h){
+      if (h.status === 'done') { bucket.done.push(h); return; }
+      if (h.status === 'overdue') { bucket.overdue.push(h); return; }
+      var due = parseISO(h.due);
+      if (isSameDay(due, now)) bucket.today.push(h);
+      else bucket.week.push(h);
+    });
+
+    // Her bucket'ta tarih sıralaması
+    bucket.today.sort(function(a,b){ return parseISO(a.due) - parseISO(b.due); });
+    bucket.week.sort(function(a,b){ return parseISO(a.due) - parseISO(b.due); });
+    bucket.overdue.sort(function(a,b){ return parseISO(b.due) - parseISO(a.due); });
+    bucket.done.sort(function(a,b){ return parseISO(b.doneAt || b.due) - parseISO(a.doneAt || a.due); });
 
     var html = '';
-    // Header row — explicit grid-row: 1
-    html += '<div class="prog-week-corner" style="grid-column: 1; grid-row: 1;"></div>';
-    for (var d = 0; d < 7; d++) {
-      var dayDate = addDays(start, d);
-      var isToday = sameDay(dayDate, TODAY);
-      html += '<div class="prog-week-day' + (isToday ? ' is-today' : '') + '" '
-            + 'style="grid-column: ' + (d + 2) + '; grid-row: 1;">'
-            + '<span class="day-name">' + DAY_NAMES[d] + '</span>'
-            + '<span class="day-num">' + dayDate.getDate() + '</span>'
-            + '</div>';
+    function sectionBlock(key, title, items, compact) {
+      if (!items.length) return '';
+      var gridCls = compact ? 'ov-grid ov-grid--compact' : 'ov-grid';
+      return '<section class="ov-section ov-section--' + key + '">'
+        + '<header class="ov-section-head">'
+          + '<span class="ov-section-dot"></span>'
+          + '<h3 class="ov-section-title">' + title + '</h3>'
+          + '<span class="ov-section-line"></span>'
+        + '</header>'
+        + '<div class="' + gridCls + '">' + items.map(renderCard).join('') + '</div>'
+      + '</section>';
     }
-    // Time rows — explicit grid-column/row ile yerleşim (auto-placement bug fix:
-    // event'ler explicit-placed olduğunda auto-placed slot'lar yer kaydırıyordu)
-    for (var h = HOUR_START; h <= HOUR_END; h++) {
-      var hStr = (h < 10 ? '0' : '') + h + ':00';
-      var rowNum = (h - HOUR_START) + 2; // +1 header, +1 1-indexed
-      html += '<div class="prog-week-time" style="grid-column: 1; grid-row: ' + rowNum + ';">' + hStr + '</div>';
-      for (var d2 = 0; d2 < 7; d2++) {
-        html += '<div class="prog-week-slot" style="grid-column: ' + (d2 + 2) + '; grid-row: ' + rowNum + ';"></div>';
+
+    html += sectionBlock('today', 'Bugün', bucket.today, false);
+    html += sectionBlock('active', 'Aktif Ödevler', bucket.week, false);
+    html += sectionBlock('overdue', 'Geciken', bucket.overdue, false);
+    html += sectionBlock('done', 'Tamamlananlar', bucket.done, true);
+
+    sectionsEl.innerHTML = html;
+  }
+
+  // ====== Render: Stats (sadece 4 kart) ======
+  function updateCounts() {
+    if (pageView === 'overdue') {
+      var allOverdue = HOMEWORKS.filter(function(h){ return h.status === 'overdue'; });
+      if (currentSubject !== 'all') {
+        allOverdue = allOverdue.filter(function(h){ return h.subject === currentSubject; });
       }
+      document.getElementById('odevStatActive').textContent = allOverdue.length;
+      document.getElementById('odevStatDoneWeek').textContent = '—';
+      document.getElementById('odevStatXp').textContent = '—';
+      document.getElementById('odevStatOnTime').textContent = '—';
+      return;
     }
-    // Events (grid-positioned over slots)
-    for (var i = 0; i < EVENTS.length; i++) {
-      var e = EVENTS[i];
-      var eDate = new Date(e.date + 'T00:00:00');
-      // Check if event is in current week
-      for (var dd = 0; dd < 7; dd++) {
-        var curD = addDays(start, dd);
-        if (sameDay(eDate, curD)) {
-          var col = dd + 2; // +1 for time column, +1 for 1-indexed
-          var row = timeToRow(e.start);
-          var span = durToSpan(e.dur);
-          var endTime = computeEndTime(e.start, e.dur);
-          var subjectName = SUBJECT_NAMES[e.subject] || (e.type === 'exam' ? 'Sınav' : '');
-          var icon = SUBJECT_ICONS[e.subject] || (e.type === 'exam' ? '🏆' : '📅');
-          var joinSt = resolveJoinStatus(e);
-          var attAttr = joinSt ? ' data-attendance="' + joinSt + '"' : '';
-          var lessonFmt = resolveLessonFormat(e);
-          var fmtAttr = lessonFmt ? ' data-lesson-format="' + lessonFmt + '"' : '';
-          var fmtBadge = lessonFormatBadgeHtml(lessonFmt);
-          var attBadge = joinStatusBadgeHtml(joinSt);
-          var a11yLabel = subjectName + ' — ' + e.topic + (lessonFmt ? ' — ' + lessonFormatShortLabel(lessonFmt) : '') + (joinSt ? ' — ' + joinStatusLabel(joinSt) : '');
-          html += '<div class="prog-event" '
-                + 'style="grid-column: ' + col + '; grid-row: ' + row + ' / span ' + span + ';" '
-                + 'data-subject="' + (e.subject || '') + '" '
-                + 'data-type="' + (e.type || '') + '" '
-                + fmtAttr
-                + 'data-event-id="' + i + '" '
-                + attAttr
-                + ' aria-label="' + a11yLabel.replace(/"/g, '&quot;') + '"'
-                + ' data-topic="' + e.topic.replace(/"/g, '&quot;') + '">'
-                + '<span class="prog-event-icon" aria-hidden="true">' + icon + '</span>'
-                + '<span class="prog-event-body">'
-                + '<span class="prog-event-head">'
-                + '<span class="prog-event-subject">' + subjectName + '</span>'
-                + attBadge
-                + fmtBadge
-                + '</span>'
-                + '<span class="prog-event-topic">' + e.topic + '</span>'
-                + '</span>'
-                + '</div>';
-          break;
-        }
-      }
+    var weekItems = HOMEWORKS.filter(inSelectedEduWeek);
+    if (currentSubject !== 'all') {
+      weekItems = weekItems.filter(function(h){ return h.subject === currentSubject; });
     }
-    weekGrid.innerHTML = html;
-    updateNowLine();
-    updateTruncationTitles();
+    var counts = { active:0, done:0, overdue:0 };
+    weekItems.forEach(function(h){ counts[h.status]++; });
+    document.getElementById('odevStatActive').textContent = counts.active + counts.overdue;
+    document.getElementById('odevStatDoneWeek').textContent = counts.done;
+
+    var weekXp = weekItems
+      .filter(function(h){ return h.status === 'done'; })
+      .reduce(function(s,h){ return s + (h.xp||0); }, 0);
+    document.getElementById('odevStatXp').textContent = weekXp;
+
+    var doneInWeek = weekItems.filter(function(h){ return h.status === 'done'; });
+    var onTime = doneInWeek.filter(function(h){ return h.doneAt && parseISO(h.doneAt) <= parseISO(h.due); });
+    var rate = doneInWeek.length ? Math.round(onTime.length / doneInWeek.length * 100) : 0;
+    document.getElementById('odevStatOnTime').textContent = rate + '%';
   }
 
-  // Konu adı kartı aşıyorsa data-truncated="true" → body-level tooltip anında çıkar
-  function updateTruncationTitles() {
-    var cards = weekGrid.querySelectorAll('.prog-event');
-    for (var i = 0; i < cards.length; i++) {
-      var topicEl = cards[i].querySelector('.prog-event-topic');
-      if (!topicEl) continue;
-      // 1px tolerans — sub-pixel rounding'i tolere et
-      if (topicEl.scrollWidth > topicEl.clientWidth + 1) {
-        cards[i].setAttribute('data-truncated', 'true');
-        // a11y için aria-label (browser tooltip değil, ama screen reader okur)
-        cards[i].setAttribute('aria-label', cards[i].getAttribute('data-topic') || topicEl.textContent);
-      } else {
-        cards[i].removeAttribute('data-truncated');
-        cards[i].removeAttribute('aria-label');
-      }
-    }
-  }
-
-  // ---- Body-level tooltip (anında, clipping yok) ----
-  var tooltipEl = null;
-  function getTooltipEl() {
-    if (!tooltipEl) {
-      tooltipEl = document.createElement('div');
-      tooltipEl.className = 'prog-tooltip';
-      tooltipEl.style.display = 'none';
-      document.body.appendChild(tooltipEl);
-    }
-    return tooltipEl;
-  }
-  function showTooltip(card) {
-    var topic = card.getAttribute('data-topic');
-    if (!topic) return;
-    var el = getTooltipEl();
-    el.textContent = topic;
-    el.style.display = 'block';
-    // Önce görünür yap ki ölçüm doğru olsun
-    var rect = card.getBoundingClientRect();
-    var tipRect = el.getBoundingClientRect();
-    // Kartın üstüne, 10px boşlukla yerleştir
-    var top = rect.top - tipRect.height - 10;
-    var left = rect.left + rect.width / 2 - tipRect.width / 2;
-    // Viewport içinde tut
-    var margin = 6;
-    if (left < margin) left = margin;
-    if (left + tipRect.width > window.innerWidth - margin) {
-      left = window.innerWidth - tipRect.width - margin;
-    }
-    // Üstte yer yoksa (sticky day-header altında kalıyorsa) altına çevir
-    if (top < 110) {
-      top = rect.bottom + 10;
-    }
-    el.style.left = left + 'px';
-    el.style.top = top + 'px';
-  }
-  function hideTooltip() {
-    if (tooltipEl) tooltipEl.style.display = 'none';
-  }
-  // Event delegation — mouseover/out (bubble yapar)
-  weekGrid.addEventListener('mouseover', function (ev) {
-    var card = ev.target.closest('.prog-event[data-truncated="true"]');
-    if (card) showTooltip(card);
-  });
-  weekGrid.addEventListener('mouseout', function (ev) {
-    var card = ev.target.closest('.prog-event');
-    if (!card) return;
-    // mouseout başka bir child'a girince de tetiklenir — sadece kart dışına çıkışta gizle
-    if (!ev.relatedTarget || !card.contains(ev.relatedTarget)) hideTooltip();
-  });
-  // Scroll'da kart hareket eder, tooltip bayatlamasın
-  document.getElementById('progWeek').addEventListener('scroll', hideTooltip);
-  window.addEventListener('scroll', hideTooltip, true);
-
-  // --- Now line — günün hangi saatindeysek yatay marker ---
-  function updateNowLine() {
-    if (currentView !== 'week') return;
-    var existing = weekGrid.querySelector('.prog-week-now');
-    if (existing) existing.remove();
-
-    var now = new Date();
-    var h = now.getHours();
-    var m = now.getMinutes();
-    // Sadece görünür saat aralığında göster
-    if (h < HOUR_START || h > HOUR_END) return;
-
-    // Bugün (TODAY) cari haftada mı? Hangi sütunda?
-    var start = eduWeekStart(selectedEduWeek);
-    var todayDayIdx = -1;
-    for (var d = 0; d < 7; d++) {
-      if (sameDay(addDays(start, d), TODAY)) { todayDayIdx = d; break; }
-    }
-    if (todayDayIdx < 0) return;
-
-    // Dikey konum: header(58px) + gap(2px) = 60px, sonra her saat 60px (58+2),
-    // dakika offset row içinde (58px row yüksekliğine göre).
-    var topPx = 60 + (h - HOUR_START) * 60 + (m / 60) * 58;
-
-    var hh = (h < 10 ? '0' : '') + h;
-    var mm = (m < 10 ? '0' : '') + m;
-    var line = document.createElement('div');
-    line.className = 'prog-week-now';
-    line.style.top = topPx + 'px';
-    line.innerHTML = '<span class="prog-week-now-time">' + hh + ':' + mm + '</span>'
-                   + '<span class="prog-week-now-dot"></span>';
-    weekGrid.appendChild(line);
-
-    // Dot'u bugünün kolonunun merkezine yerleştir
-    var todayHeader = weekGrid.querySelector('.prog-week-day.is-today');
-    if (todayHeader) {
-      var hRect = todayHeader.getBoundingClientRect();
-      var lineRect = line.getBoundingClientRect();
-      var dot = line.querySelector('.prog-week-now-dot');
-      if (dot) {
-        dot.style.left = (hRect.left + hRect.width / 2 - lineRect.left) + 'px';
-      }
-    }
-  }
-
-  function computeEndTime(start, durMin) {
-    var h = parseInt(start.split(':')[0], 10);
-    var m = parseInt(start.split(':')[1], 10);
-    var total = h * 60 + m + durMin;
-    var eh = Math.floor(total / 60);
-    var em = total % 60;
-    return (eh < 10 ? '0' : '') + eh + ':' + (em < 10 ? '0' : '') + em;
-  }
-
-  // --- Render: MONTH view ---
-  var monthGrid = document.getElementById('progMonthGrid');
-  function renderMonth() {
-    var year = currentDate.getFullYear();
-    var month = currentDate.getMonth();
-    var eyebrow = document.getElementById('progWeekEyebrow');
-    if (eyebrow) eyebrow.textContent = MONTH_NAMES[month] + ' ' + year;
-    document.getElementById('progDateLabel').textContent = 'Aylık görünüm';
-
-    var firstDay = new Date(year, month, 1);
-    var firstWeekStart = startOfWeek(firstDay); // her zaman Pazartesi
-    // 42 gün (6 hafta × 7 gün)
-    var html = '';
-    for (var i = 0; i < 42; i++) {
-      var d = addDays(firstWeekStart, i);
-      var dIso = isoDate(d);
-      var inMonth = (d.getMonth() === month);
-      var isToday = sameDay(d, TODAY);
-      var dayEvents = EVENTS.filter(function (e) { return e.date === dIso; });
-      var evHtml = '';
-      var maxShow = 3;
-      for (var j = 0; j < Math.min(dayEvents.length, maxShow); j++) {
-        var e = dayEvents[j];
-        var label = monthEventLabel(e);
-        evHtml += '<span class="month-event" data-subject="' + (e.subject || '') + '" data-type="' + (e.type || '') + '"' + (resolveLessonFormat(e) ? ' data-lesson-format="' + resolveLessonFormat(e) + '"' : '') + ' title="' + e.topic + ' — ' + e.start + '">' + label + '</span>';
-      }
-      if (dayEvents.length > maxShow) {
-        evHtml += '<span class="month-event-more">+' + (dayEvents.length - maxShow) + ' daha</span>';
-      }
-      html += '<div class="prog-month-day' + (inMonth ? '' : ' is-other-month') + (isToday ? ' is-today' : '') + '">'
-            + '<span class="month-day-num">' + d.getDate() + '</span>'
-            + '<div class="month-day-events">' + evHtml + '</div>'
-            + '</div>';
-    }
-    monthGrid.innerHTML = html;
-  }
-
-  // --- Eğitim haftası seçici ---
-  var weekPickerEl = document.getElementById('progWeekPicker');
-  var weekPickerListEl = document.getElementById('progWeekPickerList');
-  var weekCalBtn = document.getElementById('progWeekCalBtn');
+  // ====== Eğitim haftası navigasyonu + seçici ======
+  var weekPickerEl = document.getElementById('odevWeekPicker');
+  var weekPickerListEl = document.getElementById('odevWeekPickerList');
+  var weekCalBtn = document.getElementById('odevWeekCalBtn');
 
   function renderWeekPicker() {
     if (!weekPickerListEl) return;
     var html = '';
     for (var w = 1; w <= MAX_EDU_WEEK; w++) {
       var activeCls = w === selectedEduWeek ? ' is-active' : '';
-      html += '<button type="button" class="prog-edu-picker-item' + activeCls + '" data-week="' + w + '">'
+      html += '<button type="button" class="ov-week-picker-item' + activeCls + '" data-week="' + w + '">'
         + '<strong>' + formatEduWeek(w) + '</strong>'
         + '<span>' + formatWeekRange(w) + '</span>'
         + '</button>';
@@ -6730,18 +8560,59 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     var w = parseInt(weekNum, 10);
     if (!w || w < 1 || w > MAX_EDU_WEEK) return;
     selectedEduWeek = w;
-    syncCurrentDateFromEduWeek();
     closeWeekPicker();
-    renderWeek();
+    refreshAll();
   }
 
   function shiftEduWeek(delta) {
     var next = selectedEduWeek + delta;
     if (next < 1 || next > MAX_EDU_WEEK) return;
     selectedEduWeek = next;
-    syncCurrentDateFromEduWeek();
-    renderWeek();
+    refreshAll();
   }
+
+  var weekNavEl = document.querySelector('.ov-week');
+  var statLabelActive = document.querySelector('.ov-stat--active .ov-stat-label');
+  var statLabelDone = document.querySelector('.ov-stat--done .ov-stat-label');
+  var statLabelXp = document.querySelector('.ov-stat--xp .ov-stat-label');
+  var statLabelOnTime = document.querySelector('.ov-stat--ontime .ov-stat-label');
+
+  function applyPageView() {
+    if (pageView === 'overdue') {
+      if (overdueBanner) overdueBanner.hidden = false;
+      if (weekNavEl) weekNavEl.hidden = true;
+      document.title = 'Gecikmiş Ödevler · Bilenyum';
+      if (statLabelActive) statLabelActive.textContent = 'Gecikmiş';
+      if (statLabelDone) statLabelDone.textContent = 'Haftalık tamamlanan';
+      if (statLabelXp) statLabelXp.textContent = 'Haftalık XP';
+      if (statLabelOnTime) statLabelOnTime.textContent = 'Zamanında teslim';
+    } else {
+      if (overdueBanner) overdueBanner.hidden = true;
+      if (weekNavEl) weekNavEl.hidden = false;
+      document.title = 'Ödevlerim · Bilenyum';
+      if (statLabelActive) statLabelActive.textContent = 'Aktif Ödev';
+      if (statLabelDone) statLabelDone.textContent = 'Tamamlanan';
+      if (statLabelXp) statLabelXp.textContent = 'Bu hafta XP';
+      if (statLabelOnTime) statLabelOnTime.textContent = 'Süresinde teslim';
+    }
+  }
+
+  function refreshAll() {
+    applyPageView();
+    updateWeekLabel();
+    renderWeekPicker();
+    renderHero();
+    renderSections();
+    updateCounts();
+    if (pageView === 'overdue' && sectionsEl) {
+      requestAnimationFrame(function () {
+        sectionsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }
+
+  document.getElementById('odevPrevWeek').addEventListener('click', function(){ shiftEduWeek(-1); });
+  document.getElementById('odevNextWeek').addEventListener('click', function(){ shiftEduWeek(1); });
 
   if (weekCalBtn) {
     weekCalBtn.addEventListener('click', function(e){
@@ -6758,395 +8629,334 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   }
   document.addEventListener('click', function(e){
     if (!weekPickerEl || weekPickerEl.hidden) return;
-    if (e.target.closest('.prog-edu-nav')) return;
+    if (e.target.closest('.ov-week')) return;
     closeWeekPicker();
   });
   document.addEventListener('keydown', function(e){
     if (e.key === 'Escape') closeWeekPicker();
   });
 
-  document.getElementById('progPrev').addEventListener('click', function () {
-    shiftEduWeek(-1);
-  });
-  document.getElementById('progNext').addEventListener('click', function () {
-    shiftEduWeek(1);
-  });
-
-  updateWeekLabel();
-  renderWeekPicker();
-  renderWeek();
-
-  setInterval(updateNowLine, 60 * 1000);
-  window.addEventListener('resize', function () {
-    updateNowLine();
-    updateTruncationTitles();
+  // ====== Ders chip filtresi ======
+  document.querySelectorAll('.ov-subj-chip').forEach(function(c){
+    c.addEventListener('click', function(){
+      document.querySelectorAll('.ov-subj-chip').forEach(function(x){ x.classList.remove('is-active'); });
+      c.classList.add('is-active');
+      currentSubject = c.dataset.subj;
+      refreshAll();
+    });
   });
 
-  // ============ DERS DRAWER ============
+  // ====== Durum filtresi (Tüm / Aktif / Geciken / Tamamlanan) ======
+  (function(){
+    var sf = document.getElementById('ovStatusFilter');
+    var sfBtn = document.getElementById('ovStatusFilterBtn');
+    var sfMenu = document.getElementById('ovStatusFilterMenu');
+    var sfLabel = document.getElementById('ovStatusFilterLabel');
+    if (!sf || !sfBtn || !sfMenu) return;
+    sfBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      sf.classList.toggle('is-open');
+      sfBtn.setAttribute('aria-expanded', sf.classList.contains('is-open') ? 'true' : 'false');
+    });
+    sfMenu.querySelectorAll('[data-hw-status]').forEach(function(item){
+      item.addEventListener('click', function(e){
+        e.stopPropagation();
+        sfMenu.querySelectorAll('.ov-status-filter-item').forEach(function(x){ x.classList.remove('is-active'); });
+        item.classList.add('is-active');
+        if (sfLabel) sfLabel.textContent = item.textContent;
+        currentStatus = item.getAttribute('data-hw-status');
+        sf.classList.remove('is-open');
+        sfBtn.setAttribute('aria-expanded', 'false');
+        refreshAll();
+      });
+    });
+    document.addEventListener('click', function(e){
+      if (!sf.contains(e.target)) {
+        sf.classList.remove('is-open');
+        sfBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  })();
+
+  // ====== Hero CTA → drawer aç (carousel delegation initHeroCarouselNav içinde) ======
+
+  // ====== DRAWER (ödev için adapte) ======
   var drawerEl = document.getElementById('progDrawer');
   var drawerIcon = document.getElementById('progDrawerIcon');
   var drawerSubject = document.getElementById('progDrawerSubject');
   var drawerTopic = document.getElementById('progDrawerTopic');
-  var drawerDate = document.getElementById('progDrawerDateText');
-  var drawerTime = document.getElementById('progDrawerTimeText');
+  var drawerDate = document.getElementById('progDrawerDate').querySelector('span');
+  var drawerTime = document.getElementById('progDrawerTime').querySelector('span');
   var drawerDesc = document.getElementById('progDrawerDesc');
-  var drawerKazanim = document.getElementById('progDrawerKazanim');
-  var drawerKazanimRow = document.getElementById('progDrawerKazanimRow');
   var drawerTeacherAvatar = document.getElementById('progDrawerTeacherAvatar');
   var drawerTeacherName = document.getElementById('progDrawerTeacherName');
   var drawerTeacherRole = document.getElementById('progDrawerTeacherRole');
-  var drawerXp = document.getElementById('progDrawerXp');
+  var drawerXp = document.getElementById('progDrawerMaxXp');
   var drawerBadge = document.getElementById('progDrawerBadge');
   var drawerBadgeIcon = document.getElementById('progDrawerBadgeIcon');
   var drawerCta = document.getElementById('progDrawerCta');
   var drawerCtaLabel = document.getElementById('progDrawerCtaLabel');
   var drawerCtaTime = document.getElementById('progDrawerCtaTime');
-  var drawerReplayBlock = document.getElementById('progDrawerReplayBlock');
-  var drawerReplayBtn = document.getElementById('progDrawerReplay');
-  var drawerAttChip = document.getElementById('progDrawerAttChip');
-  var drawerLessonType = document.getElementById('progDrawerLessonType');
-  var drawerLessonTypeDesc = document.getElementById('progDrawerLessonTypeDesc');
+  var drawerRetryNote = document.getElementById('progDrawerRetryNote');
+  var drawerLateXpNote = document.getElementById('progDrawerLateXpNote');
+  var drawerStatus = document.getElementById('progDrawerStatus');
+  var drawerStatusText = document.getElementById('progDrawerStatusText');
+  var drawerEduWeek = document.getElementById('progDrawerEduWeek');
+  var drawerEduWeekText = document.getElementById('progDrawerEduWeekText');
+  var drawerHwType = document.getElementById('progDrawerHwType');
+  var drawerHwTypeDesc = document.getElementById('progDrawerHwTypeDesc');
+  var drawerPanel = drawerEl.querySelector('.prog-drawer-panel');
 
-  // Ders tipine göre XP ödülü
-  function computeXp(e) {
-    if (e.type === 'exam') return 120;
-    if (e.dur >= 90) return 45;
-    return 30;
-  }
-  // Subject'e göre rozet (sınavda özel)
-  function pickBadge(e) {
-    if (e.type === 'exam') return { name: 'Sınav Şampiyonu', icon: '🏆' };
-    return BADGES[e.subject] || { name: 'Yeni Rozet', icon: '⭐' };
+  var currentHw = null;
+
+  function setRetryNote(visible) {
+    if (drawerRetryNote) drawerRetryNote.hidden = !visible;
   }
 
-  var ctaTick = null;
-  var currentEvent = null;
-
-  // Demo'da TODAY hardcoded — gerçek saatten dakika/saat alıp TODAY tarihine uyguluyoruz
-  function demoNow() {
-    var n = new Date();
-    return new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate(),
-                    n.getHours(), n.getMinutes(), n.getSeconds());
-  }
-  function eventDateTime(e) {
-    var p = e.date.split('-');
-    var h = parseInt(e.start.split(':')[0], 10);
-    var m = parseInt(e.start.split(':')[1], 10);
-    return new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10), h, m, 0);
-  }
-  function joinStatusLabel(s) {
-    if (s === 'attended') return 'Katıldı';
-    if (s === 'absent') return 'Katılmadı';
-    return 'Gelecek Ders';
-  }
-  function joinStatusBadgeHtml(st) {
-    if (!st) return '';
-    return '<span class="prog-event-att is-' + st + '">' + joinStatusLabel(st) + '</span>';
-  }
-  function resolveJoinStatus(e) {
-    if (e.type !== 'live') return null;
-    if (e.joinStatus) return e.joinStatus;
-    var start = eventDateTime(e);
-    var end = new Date(start.getTime() + e.dur * 60000);
-    var now = demoNow();
-    if (now < start) return 'upcoming';
-    if (now >= end) return e.missed ? 'absent' : 'attended';
-    if (e.missed) return 'absent';
-    return 'upcoming';
-  }
-  function pad2(n) { n = Math.floor(n); return (n < 10 ? '0' : '') + n; }
-  function formatCountdown(ms) {
-    if (ms < 0) ms = 0;
-    var totalSec = Math.floor(ms / 1000);
-    var days = Math.floor(totalSec / 86400);
-    var hours = Math.floor((totalSec % 86400) / 3600);
-    var mins = Math.floor((totalSec % 3600) / 60);
-    var secs = totalSec % 60;
-    if (days > 0) {
-      return days + ' GÜN ' + pad2(hours) + ':' + pad2(mins) + ':' + pad2(secs);
-    }
-    return pad2(hours) + ':' + pad2(mins) + ':' + pad2(secs);
-  }
-
-  function updateLessonFormatUI(e) {
-    var fmt = resolveLessonFormat(e);
-    var show = !!fmt;
-
-    if (drawerLessonType) {
-      drawerLessonType.hidden = !show;
-      if (show) {
-        drawerLessonType.textContent = lessonFormatShortLabel(fmt);
-        drawerLessonType.className = 'd3-drawer-lesson-type is-' + fmt;
-      }
-    }
-    if (drawerLessonTypeDesc) {
-      drawerLessonTypeDesc.hidden = !show;
-      if (show) {
-        drawerLessonTypeDesc.textContent = lessonFormatDesc(fmt);
-        drawerLessonTypeDesc.className = 'd3-drawer-format-hint is-' + fmt;
-      }
-    }
-    if (drawerEl && show) {
-      drawerEl.setAttribute('data-lesson-format', fmt);
-    } else if (drawerEl) {
-      drawerEl.removeAttribute('data-lesson-format');
+  function setLateXpNote(h) {
+    if (!drawerLateXpNote) return;
+    var html = getHwLateXpNoteText(h);
+    if (html) {
+      drawerLateXpNote.innerHTML = html;
+      drawerLateXpNote.hidden = false;
+    } else {
+      drawerLateXpNote.hidden = true;
+      drawerLateXpNote.textContent = '';
     }
   }
 
-  function updateAttChip(e) {
-    if (!drawerAttChip) return;
-    var joinSt = resolveJoinStatus(e);
-    if (!joinSt) {
-      drawerAttChip.hidden = true;
+  function setDrawerStatus(h) {
+    if (!drawerStatus || !drawerStatusText) return;
+    var label = getHwDrawerStatusLabel(h);
+    if (!label) {
+      drawerStatus.hidden = true;
       return;
     }
-    drawerAttChip.hidden = false;
-    drawerAttChip.textContent = joinStatusLabel(joinSt);
-    drawerAttChip.className = 'd3-drawer-att-chip is-' + joinSt;
+    drawerStatusText.textContent = label;
+    drawerStatus.hidden = false;
+    drawerStatus.className = 'prog-drawer-chip';
+    if (h.status === 'done') drawerStatus.classList.add('is-status-done');
+    else if (h.status === 'overdue') drawerStatus.classList.add('is-status-overdue');
+    else drawerStatus.classList.add('is-status-active');
   }
 
-  function updateReplayBlock(e) {
-    if (!drawerReplayBlock) return;
-    var joinSt = resolveJoinStatus(e);
-    var showReplay = joinSt === 'absent';
-    drawerReplayBlock.hidden = !showReplay;
+  function clearHwSession(hwId) {
+    if (!hwId) return;
+    try { localStorage.removeItem('bilenyum.homeworkSession.' + hwId); } catch (e) {}
   }
 
   function updateCta() {
-    if (!currentEvent) return;
-    var e = currentEvent;
-    var start = eventDateTime(e);
-    var end = new Date(start.getTime() + e.dur * 60000);
-    var now = demoNow();
-    var diff = start - now;
-    var joinSt = resolveJoinStatus(e);
+    if (!currentHw || !drawerCta || !drawerCtaLabel) return;
+    var h = currentHw;
+    var hwId = resolveHwId(h);
+    var inProgress = isHwInProgress(h);
+    if (drawerCtaTime) drawerCtaTime.hidden = true;
+    drawerCta.className = 'prog-drawer-cta';
+    drawerCta.disabled = false;
+    setRetryNote(false);
+    setLateXpNote(h);
 
-    updateReplayBlock(e);
-
-    // Past: ders bitti
-    if (now >= end) {
-      drawerCta.classList.remove('is-active');
-      drawerCta.classList.add('is-past', 'is-waiting');
-      drawerCta.disabled = true;
-      if (joinSt === 'absent') {
-        drawerCtaLabel.textContent = 'Canlı Ders Süresi Geçti';
-        drawerCtaTime.textContent = '';
-      } else {
-        drawerCtaLabel.textContent = 'Ders sona erdi';
-        drawerCtaTime.textContent = pad2(end.getHours()) + ':' + pad2(end.getMinutes());
+    if (h.status === 'done') {
+      setRetryNote(true);
+      if (hwId) {
+        drawerCta.classList.add('is-active', 'is-retry');
+        drawerCtaLabel.textContent = 'Tekrar Çöz';
+        return;
       }
+      drawerCta.classList.add('is-completed');
+      drawerCta.disabled = true;
+      drawerCtaLabel.textContent = 'Ödev Tamamlandı';
       return;
     }
-    if (diff <= 0 && now < end) {
-      drawerCta.classList.add('is-active');
-      drawerCta.classList.remove('is-past', 'is-waiting');
-      drawerCta.disabled = false;
-      drawerCtaLabel.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Derse Katıl';
-      var remainingMin = Math.ceil((end - now) / 60000);
-      drawerCtaTime.textContent = 'CANLI · ' + remainingMin + ' dk';
+
+    if (inProgress) {
+      drawerCta.classList.add(h.status === 'overdue' ? 'is-overdue' : 'is-continue');
+      drawerCtaLabel.textContent = 'Ödeve Devam Et';
       return;
     }
-    drawerCta.classList.remove('is-active', 'is-past');
-    drawerCta.classList.add('is-waiting');
-    drawerCta.disabled = true;
-    // 1 saatten az kaldıysa "Ders başlamak üzere"
-    if (diff <= 60 * 60 * 1000) {
-      drawerCtaLabel.textContent = 'Ders başlamak üzere';
-    } else {
-      drawerCtaLabel.textContent = 'Derse kalan süre';
-    }
-    drawerCtaTime.textContent = formatCountdown(diff);
+
+    drawerCta.classList.add(h.status === 'overdue' ? 'is-overdue' : 'is-active');
+    drawerCtaLabel.textContent = 'Ödevi Yapmaya Başla';
   }
 
-  function openDrawer(eventId) {
-    var e = EVENTS[eventId];
-    if (!e) return;
-    currentEvent = e;
+  function openDrawer(id) {
+    if (!drawerEl) return;
+    var h = null;
+    for (var i = 0; i < HOMEWORKS.length; i++) if (HOMEWORKS[i].id === id) { h = HOMEWORKS[i]; break; }
+    if (!h) return;
+    currentHw = h;
+    drawerPanel.style.setProperty('--ev-color', SUBJECT_COLORS[h.subject] || '#a8a4f0');
+    drawerIcon.textContent = SUBJECT_ICONS[h.subject] || '📚';
+    drawerSubject.textContent = (SUBJECT_NAMES[h.subject] || 'Ders').toUpperCase();
+    drawerTopic.textContent = h.topic;
 
-    var subjectName = SUBJECT_NAMES[e.subject] || (e.type === 'exam' ? 'Sınav' : 'Etkinlik');
-    var icon = SUBJECT_ICONS[e.subject] || (e.type === 'exam' ? '🏆' : '📅');
-
-    drawerIcon.textContent = icon;
-    drawerSubject.textContent = subjectName.toUpperCase();
-    drawerTopic.textContent = e.topic;
-
-    drawerEl.setAttribute('data-subject', e.type === 'exam' ? 'exam' : (e.subject || 'mat'));
-    updateAttChip(e);
-    updateLessonFormatUI(e);
-
-    var dt = eventDateTime(e);
-    var dateStr = DAY_NAMES[(dt.getDay() + 6) % 7] + ', ' + dt.getDate() + ' ' + MONTH_NAMES[dt.getMonth()];
-    drawerDate.textContent = dateStr;
-    var endTime = computeEndTime(e.start, e.dur);
-    drawerTime.textContent = e.start + ' – ' + endTime;
-
-    // Kazanım + Açıklama
-    if (e.kazanim) {
-      drawerKazanim.textContent = e.kazanim;
-      drawerKazanimRow.hidden = false;
-    } else {
-      drawerKazanimRow.hidden = true;
+    var hwType = h.homeworkType === 'rud' ? 'rud' : 'kid';
+    if (drawerHwType) {
+      drawerHwType.hidden = false;
+      drawerHwType.textContent = hwTypeLabel(h);
+      drawerHwType.className = 'prog-drawer-hw-type is-' + hwType;
     }
-    drawerDesc.textContent = e.desc || 'Bu ders için detay açıklaması yakında eklenecek. Eğitmenin ders öncesi notlarını ve ders materyallerini bu alandan takip edebileceksin.';
+    if (drawerHwTypeDesc) {
+      drawerHwTypeDesc.hidden = false;
+      drawerHwTypeDesc.textContent = hwTypeDesc(h);
+      drawerHwTypeDesc.className = 'prog-drawer-format-hint is-' + hwType;
+    }
+    if (drawerEl) drawerEl.setAttribute('data-hw-type', hwType);
 
-    // Eğitmen
-    var t = TEACHERS[e.teacher] || { full: e.teacher || '—', role: subjectName + ' Öğretmeni', avatar: '' };
+    drawerDate.textContent = 'Teslim: ' + fmtDueLong(h.due);
+    if (h.status === 'done') {
+      drawerTime.textContent = 'Teslim edildi · ' + (h.doneAt ? fmtDueLong(h.doneAt) : '');
+    } else if (h.status === 'overdue') {
+      drawerTime.textContent = 'Süresi geçti';
+    } else {
+      drawerTime.textContent = fmtDueShort(parseISO(h.due));
+    }
+
+    drawerDesc.textContent = h.desc || 'Bu ödev için detaylı açıklama yakında eklenecek.';
+
+    var weekLabel = formatEduWeek(h.eduWeek);
+    if (drawerEduWeek && drawerEduWeekText) {
+      if (weekLabel) {
+        drawerEduWeekText.textContent = weekLabel;
+        drawerEduWeek.hidden = false;
+      } else {
+        drawerEduWeek.hidden = true;
+      }
+    }
+
+    var t = TEACHERS[h.teacher] || { full:h.teacher, role:(SUBJECT_NAMES[h.subject]||'Ders')+' Öğretmeni', avatar:'' };
     drawerTeacherAvatar.src = t.avatar;
     drawerTeacherAvatar.alt = t.full;
     drawerTeacherName.textContent = t.full;
     drawerTeacherRole.textContent = t.role;
 
-    // Ödüller — XP + rozet + level barı
-    var xp = computeXp(e);
-    var badge = pickBadge(e);
-    drawerXp.textContent = '+ ' + xp + ' XP';
+    var badge = BADGES[h.subject] || { name:'Yeni Rozet', icon:'⭐' };
+    if (drawerXp) {
+      if (h.status === 'overdue') {
+        drawerXp.textContent = getHwOverdueXp(h) + ' XP';
+      } else if (h.status === 'done') {
+        drawerXp.textContent = getHwBaseXp(h) + ' XP';
+      } else {
+        drawerXp.textContent = getHwBaseXp(h) + ' XP';
+      }
+    }
     drawerBadgeIcon.textContent = badge.icon;
     drawerBadge.textContent = badge.name;
 
-    updateReplayBlock(e);
+    setDrawerStatus(h);
     updateCta();
-    if (ctaTick) clearInterval(ctaTick);
-    ctaTick = setInterval(updateCta, 1000);
 
     drawerEl.classList.add('is-open');
     drawerEl.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
+    if (drawerCta) {
+      requestAnimationFrame(function () {
+        drawerCta.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      });
+    }
   }
-
   function closeDrawer() {
     drawerEl.classList.remove('is-open');
     drawerEl.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-    if (ctaTick) { clearInterval(ctaTick); ctaTick = null; }
-    currentEvent = null;
+    currentHw = null;
   }
 
-  // Event delegation — ders kartlarına tıklama
-  weekGrid.addEventListener('click', function (ev) {
-    var card = ev.target.closest('.prog-event');
+  sectionsEl.addEventListener('click', function(ev){
+    var card = ev.target.closest('.ov-card');
     if (!card) return;
-    var id = parseInt(card.getAttribute('data-event-id'), 10);
+    var id = parseInt(card.getAttribute('data-id'), 10);
     if (!isNaN(id)) openDrawer(id);
   });
-
-  // Close handlers
-  document.querySelectorAll('[data-prog-drawer-close]').forEach(function (el) {
+  document.querySelectorAll('[data-prog-drawer-close]').forEach(function(el){
     el.addEventListener('click', closeDrawer);
   });
-  document.addEventListener('keydown', function (ev) {
+  document.addEventListener('keydown', function(ev){
     if (ev.key === 'Escape' && drawerEl.classList.contains('is-open')) closeDrawer();
   });
 
+  // Ödevi yap — soru seti varsa çözüm sayfasına yönlendir
   if (drawerCta) {
-    drawerCta.addEventListener('click', function () {
-      if (!currentEvent || drawerCta.disabled || !drawerCta.classList.contains('is-active')) return;
-      var t = TEACHERS[currentEvent.teacher];
-      if (window.BilenyumLiveClass) {
-        window.BilenyumLiveClass.go({
-          subject: currentEvent.subject,
-          topic: currentEvent.topic,
-          teacher: t ? t.full : currentEvent.teacher,
-          teacherAvatar: t ? t.avatar : ''
-        });
+    drawerCta.addEventListener('click', function(){
+      if (!currentHw || drawerCta.disabled) return;
+      var hwId = resolveHwId(currentHw);
+      if (hwId) {
+        var url = 'odev-coz.html?hw=' + encodeURIComponent(hwId);
+        if (currentHw.status === 'done') {
+          url += '&retry=1';
+          clearHwSession(hwId);
+        }
+        location.href = url;
+        return;
       }
-    });
-  }
-  if (drawerReplayBtn) {
-    drawerReplayBtn.addEventListener('click', function () {
-      window.location.href = 'tekrarlar.html';
+      if (currentHw.status === 'done') return;
+      currentHw.status = 'done';
+      currentHw.doneAt = isoStrNow();
+      currentHw.score = Math.floor(80 + Math.random() * 20);
+      refreshAll();
+      updateCta();
     });
   }
 
-  // ============ ÖĞRETMENE MESAJ MODAL ============
-  var msgModal    = document.getElementById('progMsgModal');
-  var msgOpenBtn  = document.getElementById('progMsgOpen');
-  var msgAvatar   = document.getElementById('progMsgAvatar');
-  var msgName     = document.getElementById('progMsgName');
-  var msgRole     = document.getElementById('progMsgRole');
-  var msgText     = document.getElementById('progMsgText');
-  var msgFile     = document.getElementById('progMsgFile');
+  // ====== MESAJ MODAL ======
+  var msgModal = document.getElementById('progMsgModal');
+  var msgOpenBtn = document.getElementById('progMsgOpen');
+  var msgAvatar = document.getElementById('progMsgAvatar');
+  var msgName = document.getElementById('progMsgName');
+  var msgRole = document.getElementById('progMsgRole');
+  var msgText = document.getElementById('progMsgText');
+  var msgFile = document.getElementById('progMsgFile');
   var msgFileList = document.getElementById('progMsgFileList');
-  var msgSend     = document.getElementById('progMsgSend');
+  var msgSend = document.getElementById('progMsgSend');
   var attachedFiles = [];
-
   function openMsg() {
-    // Drawer'daki güncel öğretmen bilgisini modal'a kopyala
     msgName.textContent = drawerTeacherName.textContent || 'Öğretmen';
     msgRole.textContent = drawerTeacherRole.textContent || '';
     if (drawerTeacherAvatar.src) msgAvatar.src = drawerTeacherAvatar.src;
-    msgText.value = '';
-    attachedFiles = [];
-    renderFileList();
+    msgText.value = ''; attachedFiles = []; renderFileList();
     msgModal.classList.add('is-open');
     msgModal.setAttribute('aria-hidden', 'false');
-    setTimeout(function () { msgText.focus(); }, 220);
+    setTimeout(function(){ msgText.focus(); }, 220);
   }
   function closeMsg() {
     msgModal.classList.remove('is-open');
     msgModal.setAttribute('aria-hidden', 'true');
   }
-  function formatSize(bytes) {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
-    return (bytes / 1024 / 1024).toFixed(1) + ' MB';
-  }
-  function fileIcon(name) {
-    var ext = (name.split('.').pop() || '').toLowerCase();
-    if (['pdf'].indexOf(ext) > -1) return '📄';
-    if (['png','jpg','jpeg','gif','webp','svg'].indexOf(ext) > -1) return '🖼️';
-    if (['doc','docx'].indexOf(ext) > -1) return '📝';
-    if (['xls','xlsx','csv'].indexOf(ext) > -1) return '📊';
-    if (['mp4','mov','avi','mkv'].indexOf(ext) > -1) return '🎬';
-    return '📎';
-  }
+  function formatSize(b){ if(b<1024)return b+' B'; if(b<1048576)return (b/1024).toFixed(0)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
+  function fileIcon(n){ var e=(n.split('.').pop()||'').toLowerCase();
+    if(e==='pdf')return '📄'; if(['png','jpg','jpeg','gif','webp','svg'].indexOf(e)>-1)return '🖼️';
+    if(['doc','docx'].indexOf(e)>-1)return '📝'; if(['xls','xlsx','csv'].indexOf(e)>-1)return '📊';
+    if(['mp4','mov','avi','mkv'].indexOf(e)>-1)return '🎬'; return '📎'; }
   function renderFileList() {
-    msgFileList.innerHTML = attachedFiles.map(function (f, i) {
-      return '<div class="d3-msg-modal-file-chip">'
-        + '<span class="d3-msg-modal-file-chip-icon">' + fileIcon(f.name) + '</span>'
-        + '<span class="d3-msg-modal-file-chip-name">' + f.name + '</span>'
-        + '<span class="d3-msg-modal-file-chip-size">' + formatSize(f.size) + '</span>'
-        + '<button type="button" class="d3-msg-modal-file-chip-remove" data-rm="' + i + '" aria-label="Dosyayı kaldır">'
+    msgFileList.innerHTML = attachedFiles.map(function(f,i){
+      return '<div class="prog-msg-modal-file-chip">'
+        + '<span class="prog-msg-modal-file-chip-icon">'+fileIcon(f.name)+'</span>'
+        + '<span class="prog-msg-modal-file-chip-name">'+f.name+'</span>'
+        + '<span class="prog-msg-modal-file-chip-size">'+formatSize(f.size)+'</span>'
+        + '<button type="button" class="prog-msg-modal-file-chip-remove" data-rm="'+i+'" aria-label="Kaldır">'
         + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
-        + '</button>'
-        + '</div>';
+        + '</button></div>';
     }).join('');
   }
-
-  msgOpenBtn.addEventListener('click', function (ev) {
-    ev.preventDefault();
-    ev.stopPropagation();
-    openMsg();
+  msgOpenBtn.addEventListener('click', function(ev){ ev.preventDefault(); ev.stopPropagation(); openMsg(); });
+  msgModal.querySelectorAll('[data-prog-msg-close]').forEach(function(el){ el.addEventListener('click', closeMsg); });
+  document.addEventListener('keydown', function(ev){ if (ev.key === 'Escape' && msgModal.classList.contains('is-open')) closeMsg(); });
+  msgFile.addEventListener('change', function(){ Array.prototype.forEach.call(msgFile.files, function(f){ attachedFiles.push(f); }); msgFile.value=''; renderFileList(); });
+  msgFileList.addEventListener('click', function(ev){
+    var rm = ev.target.closest('[data-rm]'); if (!rm) return;
+    var idx = parseInt(rm.getAttribute('data-rm'),10);
+    if (!isNaN(idx)) { attachedFiles.splice(idx,1); renderFileList(); }
   });
-  msgModal.querySelectorAll('[data-prog-msg-close]').forEach(function (el) {
-    el.addEventListener('click', closeMsg);
-  });
-  document.addEventListener('keydown', function (ev) {
-    if (ev.key === 'Escape' && msgModal.classList.contains('is-open')) closeMsg();
-  });
-  msgFile.addEventListener('change', function () {
-    Array.prototype.forEach.call(msgFile.files, function (f) { attachedFiles.push(f); });
-    msgFile.value = '';
-    renderFileList();
-  });
-  msgFileList.addEventListener('click', function (ev) {
-    var rmBtn = ev.target.closest('[data-rm]');
-    if (!rmBtn) return;
-    var idx = parseInt(rmBtn.getAttribute('data-rm'), 10);
-    if (!isNaN(idx)) { attachedFiles.splice(idx, 1); renderFileList(); }
-  });
-  msgSend.addEventListener('click', function () {
-    // Demo — gerçek bir backend yok, mesajı temizleyip kapatıyoruz
+  msgSend.addEventListener('click', function(){
     if (!msgText.value.trim() && !attachedFiles.length) return;
-    msgText.value = '';
-    attachedFiles = [];
-    renderFileList();
-    closeMsg();
+    msgText.value=''; attachedFiles=[]; renderFileList(); closeMsg();
   });
+
+  // ====== INIT ======
+  refreshAll();
+
 })();
 </script>
 
 <!-- Paylaşılan inbox + chat sistemi -->
-<script src="assets/live-class-nav.js"></script>
 <script src="assets/assessment.js"></script>
 <script src="assets/inbox.js"></script>
 <script src="assets/auth-tab-session.js"></script>

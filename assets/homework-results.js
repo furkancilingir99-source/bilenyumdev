@@ -192,7 +192,7 @@
         '<div class="asm-res-empty">' +
           '<p>Ödev sonucu bulunamadı.</p>' +
           '<div class="asm-res-actions">' +
-            '<a href="odevler.html" class="asm-btn asm-btn-primary">Ödevlerime Dön</a>' +
+            '<a href="ogrenci-odevler.html" class="asm-btn asm-btn-primary">Ödevlerime Dön</a>' +
           '</div>' +
         '</div>';
       return;
@@ -274,7 +274,7 @@
 
       '<div class="asm-hw-res-actions">' +
         '<a href="ogrenci-dashboard.html" class="asm-btn asm-btn-primary">Kontrol Merkezine Dön ' + SVG_ARROW + '</a>' +
-        '<a href="odevler.html" class="asm-btn asm-btn-ghost">Tüm Ödevlerim</a>' +
+        '<a href="ogrenci-odevler.html" class="asm-btn asm-btn-ghost">Tüm Ödevlerim</a>' +
         (showContinue
           ? '<a href="' + continueHref + '" class="asm-btn asm-btn-ghost">Ödeve Devam Et</a>'
           : '') +

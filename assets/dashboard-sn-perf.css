@@ -786,7 +786,7 @@ button.perf-hw-stat:hover::after { color: var(--brand-purple) !important; }
 .perf-mini-card-trend.is-up   { background: rgba(46, 168, 106, 0.12) !important; color: #248f58 !important; }
 .perf-mini-card-trend.is-down { background: rgba(230, 8, 123, 0.1) !important; color: var(--brand-magenta) !important; }
 
-/* Ödev detay drawer — açık tema (odevler.html prog-drawer ile uyumlu) */
+/* Ödev detay drawer — açık tema (ogrenci-odevler.html prog-drawer ile uyumlu) */
 .perf-hw-detail-back {
   background: var(--bg-subtle) !important;
   border-color: var(--brand-purple-14) !important;
