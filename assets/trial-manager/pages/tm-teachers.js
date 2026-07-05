@@ -98,6 +98,7 @@
             '<p class="tm-source-notice">' + SL.dataSourceBadge(teacher.source || 'admin_panel') + '</p>' +
             '<div class="tm-detail-actions" style="margin-bottom:12px">' +
               (QuickMsg ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-wa-teacher>WhatsApp</button> ' : '') +
+              (teacher.dashboardEnabled ? '<a class="tm-btn tm-btn--sm tm-btn--ghost" href="ogretmen-dashboard.html?tmTeacher=' + encodeURIComponent(teacher.id) + '" target="_blank" rel="noopener">Dashboard önizle</a> ' : '') +
               '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-op-notes data-tm-require="edit-teacher-operational">Operasyon notu</button>' +
             '</div>' +
             '<div class="tm-detail-grid">' +

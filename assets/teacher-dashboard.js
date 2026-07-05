@@ -259,6 +259,8 @@
   }
 
   function lessonTypeShortLabel(lesson) {
+    if (lesson.trialRole === 'pdr') return 'PDR Sunumu';
+    if (lesson.trialRole === 'branch') return 'Deneme Dersi';
     if (lesson.type === 'kid') return 'KİD';
     if (lesson.type === 'rud') return 'RUD';
     return lessonCardStyle(lesson).label;
@@ -277,7 +279,12 @@
       return 'Birebir ders — tek öğrenci ile bire bir canlı ders oturumu.';
     }
     if (lesson.type === 'free_trial') {
-      return 'Ücretsiz deneme dersi (' + trialModeLabel(lesson) + ') — öğrenci ve veliye tanıtım amaçlı deneme oturumu.';
+      var roleNote = lesson.trialRole === 'pdr'
+        ? 'İlk 20 dakika veli sunumu sizin sorumluluğunuzdadır.'
+        : (lesson.trialRole === 'branch'
+          ? 'Son 30 dakika öğrenci deneme dersi sizin sorumluluğunuzdadır; öncesinde PDR veli sunumu yapılır.'
+          : '');
+      return 'Ücretsiz deneme dersi (' + trialModeLabel(lesson) + ') — online grup oturumu. ' + roleNote;
     }
     if (lesson.type === 'kid') {
       return 'Kavram İnşa Dersi (KİD) — öğrenciler kavramı sınıf içi tartışma ve etkinliklerle birlikte inşa eder.';
@@ -310,6 +317,8 @@
 
   // Ücretsiz deneme dersi "Birebir Ders" ya da "Klan Dersi" modunu taşır (KİD/RUD içermez)
   function trialModeLabel(lesson) {
+    if (lesson.trialRole === 'pdr') return 'PDR Veli Sunumu';
+    if (lesson.trialRole === 'branch') return 'Branş Deneme Dersi';
     return lesson.trialMode === 'clan' ? 'Klan Dersi' : 'Birebir Ders';
   }
 

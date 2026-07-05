@@ -1258,11 +1258,13 @@ body.tm-admin-body .tm-dg-toolbar-row--filters .tm-dg-control[type="date"] {
 }
 
 @media (max-width: 900px) {
-  .tm-sessions-table-wrap {
+  .tm-sessions-table-wrap,
+  .tm-mobile-table-wrap {
     display: none !important;
   }
 
-  .tm-sessions-cards {
+  .tm-sessions-cards,
+  .tm-mobile-cards {
     display: flex;
     flex-direction: column;
   }

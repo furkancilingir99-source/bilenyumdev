@@ -12,6 +12,7 @@
   if (!Store) return;
 
   var tbody = document.getElementById('tmMeetingsBody');
+  var cardsEl = document.getElementById('tmMeetingsCards');
   var searchInput = document.getElementById('tmMeetingsSearch');
   var statusFilter = document.getElementById('tmMeetingsStatus');
   var countEl = document.getElementById('tmMeetingsCount');
@@ -52,34 +53,53 @@
     return items;
   }
 
-  function render() {
-    if (!tbody) return;
-    var loading = document.getElementById('tmMeetingsLoading');
-    var wrap = document.getElementById('tmMeetingsTableWrap');
-    try {
-    var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
-    var p = U.paginate(filtered(), page, pageSize);
-    if (countEl) countEl.textContent = p.total + ' link';
-    tbody.innerHTML = p.items.map(function (r) {
-      var s = r.session;
-      var lt = r.detail.lessonType;
-      var teacher = r.detail.teacher;
-      return '<tr data-id="' + s.id + '" style="cursor:pointer"><td>' + U.formatDateKey(s.date) + '</td><td>' + s.startTime + '</td>' +
-        '<td>' + (lt ? lt.name : '—') + '</td>' +
-        '<td>' + (teacher ? U.escapeHtml(U.fullName(teacher.firstName, teacher.lastName)) : '—') + '</td>' +
-        '<td><code style="font-size:11px">' + U.escapeHtml(r.meeting.meetingId) + '</code></td>' +
-        '<td><code style="font-size:11px">' + U.escapeHtml(r.meeting.passcode) + '</code></td>' +
-        '<td>' + SL.meetingBadge(r.meeting.status) + '</td>' +
-        '<td>' + r.sent + '</td><td>' + r.notSent + '</td>' +
-        '<td>' + SL.sessionBadge(s.status) + '</td>' +
-        '<td style="white-space:nowrap">' +
-          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-copy-url="' + U.escapeHtml(r.meeting.meetingUrl) + '">Kopyala</button> ' +
-          (r.notSent > 0 ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-bulk-session="' + s.id + '" data-tm-require="edit">Toplu link</button> ' : '') +
-          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-session="' + s.id + '">Detay</button>' +
-        '</td></tr>';
-    }).join('');
-    U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
-    tbody.querySelectorAll('[data-bulk-session]').forEach(function (btn) {
+  function teacherNames(d) {
+    var pdr = d.pdrTeacher ? U.fullName(d.pdrTeacher.firstName, d.pdrTeacher.lastName) : '—';
+    var branch = d.branchTeacher ? U.fullName(d.branchTeacher.firstName, d.branchTeacher.lastName) : '—';
+    return { pdr: pdr, branch: branch, combined: pdr + ' / ' + branch };
+  }
+
+  function rowHtml(r) {
+    var s = r.session;
+    var lt = r.detail.lessonType;
+    var names = teacherNames(r.detail);
+    return '<tr data-id="' + s.id + '" style="cursor:pointer"><td>' + U.formatDateKey(s.date) + '</td><td>' + s.startTime + '</td>' +
+      '<td>' + (lt ? lt.name : '—') + '</td>' +
+      '<td>' + U.escapeHtml(names.pdr) + '</td>' +
+      '<td>' + U.escapeHtml(names.branch) + '</td>' +
+      '<td><code style="font-size:11px">' + U.escapeHtml(r.meeting.meetingId) + '</code></td>' +
+      '<td><code style="font-size:11px">' + U.escapeHtml(r.meeting.passcode) + '</code></td>' +
+      '<td>' + SL.meetingBadge(r.meeting.status) + '</td>' +
+      '<td>' + r.sent + '</td><td>' + r.notSent + '</td>' +
+      '<td>' + SL.sessionBadge(s.status) + '</td>' +
+      '<td style="white-space:nowrap">' +
+        '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-copy-url="' + U.escapeHtml(r.meeting.meetingUrl) + '">Kopyala</button> ' +
+        (r.notSent > 0 ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-bulk-session="' + s.id + '" data-tm-require="edit">Toplu link</button> ' : '') +
+        '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-session="' + s.id + '">Detay</button>' +
+      '</td></tr>';
+  }
+
+  function cardHtml(r) {
+    var s = r.session;
+    var lt = r.detail.lessonType;
+    var names = teacherNames(r.detail);
+    return '<article class="tm-list-card" data-id="' + s.id + '">' +
+      '<div class="tm-list-card-head"><div><strong>' + U.formatDateKey(s.date) + ' · ' + s.startTime + '</strong></div>' +
+      SL.meetingBadge(r.meeting.status) + '</div>' +
+      '<div class="tm-list-card-body">' +
+        '<div><span class="tm-list-card-label">Ders</span> ' + U.escapeHtml(lt ? lt.name : '—') + '</div>' +
+        '<div><span class="tm-list-card-label">PDR</span> ' + U.escapeHtml(names.pdr) + '</div>' +
+        '<div><span class="tm-list-card-label">Branş</span> ' + U.escapeHtml(names.branch) + '</div>' +
+        '<div><span class="tm-list-card-label">Gönderim</span> ' + r.sent + ' gönderildi · ' + r.notSent + ' bekliyor</div>' +
+      '</div>' +
+      '<div class="tm-list-card-foot">' +
+        '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-session="' + s.id + '">Detay</button>' +
+      '</div></article>';
+  }
+
+  function bindRowActions(root) {
+    if (!root) return;
+    root.querySelectorAll('[data-bulk-session]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
         if (Perms && !Perms.guard('edit')) return;
@@ -93,28 +113,46 @@
         }
       });
     });
-    tbody.querySelectorAll('[data-session]').forEach(function (btn) {
+    root.querySelectorAll('[data-session]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
         if (window.TMSessionDetail) window.TMSessionDetail.open(btn.getAttribute('data-session'), 2);
       });
     });
-    tbody.querySelectorAll('tr[data-id]').forEach(function (tr) {
-      tr.addEventListener('click', function (e) {
-        if (e.target.closest('button')) return;
-        if (window.TMSessionDetail) window.TMSessionDetail.open(tr.getAttribute('data-id'), 2);
+    root.querySelectorAll('tr[data-id], .tm-list-card[data-id]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        if (e.target.closest('button, a')) return;
+        if (window.TMSessionDetail) window.TMSessionDetail.open(el.getAttribute('data-id'), 2);
       });
     });
-    tbody.querySelectorAll('[data-copy-url]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
+    root.querySelectorAll('[data-copy-url]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
         var url = btn.getAttribute('data-copy-url');
         if (navigator.clipboard) navigator.clipboard.writeText(url);
         if (window.TMToast) window.TMToast.show('Link kopyalandı.', 'success');
       });
     });
-    if (loading) loading.hidden = true;
-    if (wrap) wrap.hidden = false;
-    if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(tbody);
+  }
+
+  function render() {
+    if (!tbody) return;
+    var loading = document.getElementById('tmMeetingsLoading');
+    var wrap = document.getElementById('tmMeetingsTableWrap');
+    try {
+      var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
+      var p = U.paginate(filtered(), page, pageSize);
+      if (countEl) countEl.textContent = p.total + ' link';
+      tbody.innerHTML = p.items.map(rowHtml).join('');
+      if (cardsEl) cardsEl.innerHTML = p.items.map(cardHtml).join('');
+      U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
+      bindRowActions(tbody);
+      bindRowActions(cardsEl);
+      if (loading) loading.hidden = true;
+      if (wrap) wrap.hidden = false;
+      if (cardsEl) cardsEl.hidden = false;
+      if (paginationEl) paginationEl.hidden = p.pages <= 1;
+      if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(tbody);
     } catch (err) {
       if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
       console.error(err);
@@ -132,8 +170,11 @@
       { key: 'session', label: 'Tarih', value: function (r) { return U.formatDateKey(r.session.date); } },
       { key: 'session', label: 'Saat', value: function (r) { return r.session.startTime; } },
       { key: 'detail', label: 'Ders', value: function (r) { return r.detail.lessonType ? r.detail.lessonType.name : ''; } },
-      { key: 'detail', label: 'Öğretmen', value: function (r) {
-        return r.detail.teacher ? U.fullName(r.detail.teacher.firstName, r.detail.teacher.lastName) : '';
+      { key: 'detail', label: 'PDR öğretmeni', value: function (r) {
+        return r.detail.pdrTeacher ? U.fullName(r.detail.pdrTeacher.firstName, r.detail.pdrTeacher.lastName) : '';
+      }},
+      { key: 'detail', label: 'Branş öğretmeni', value: function (r) {
+        return r.detail.branchTeacher ? U.fullName(r.detail.branchTeacher.firstName, r.detail.branchTeacher.lastName) : '';
       }},
       { key: 'sent', label: 'Gönderilen' },
       { key: 'notSent', label: 'Gönderilmeyen' },
