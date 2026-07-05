@@ -144,6 +144,90 @@
       slotLabel: 'Pazartesi, 7 Tem · 13:00',
       status: 'pending',
       createdAt: '2026-07-05T09:30:00+03:00'
+    },
+    {
+      id: 'r11',
+      studentFirstName: 'Zeynep',
+      studentLastName: 'Arslan',
+      grade: '6. Sınıf',
+      subject: 'Matematik',
+      parentFirstName: 'Murat',
+      parentLastName: 'Arslan',
+      phone: '0532 901 22 18',
+      email: 'murat.arslan@gmail.com',
+      slotLabel: 'Salı, 8 Tem · 16:00',
+      status: 'pending',
+      createdAt: '2026-07-04T22:10:00+03:00'
+    },
+    {
+      id: 'r12',
+      studentFirstName: 'Berk',
+      studentLastName: 'Yıldız',
+      grade: '7. Sınıf',
+      subject: 'Fen Bilimleri',
+      parentFirstName: 'Pınar',
+      parentLastName: 'Yıldız',
+      phone: '0554 112 33 77',
+      email: 'pinar.yildiz@mail.com',
+      slotLabel: 'Çarşamba, 9 Tem · 11:30',
+      status: 'confirmed',
+      createdAt: '2026-07-04T08:40:00+03:00'
+    },
+    {
+      id: 'r13',
+      studentFirstName: 'Ece',
+      studentLastName: 'Güneş',
+      grade: '5. Sınıf',
+      subject: 'İngilizce',
+      parentFirstName: 'Serkan',
+      parentLastName: 'Güneş',
+      phone: '0507 445 66 90',
+      email: 'serkan.gunes@outlook.com',
+      slotLabel: 'Perşembe, 10 Tem · 14:30',
+      status: 'completed',
+      createdAt: '2026-07-03T17:25:00+03:00'
+    },
+    {
+      id: 'r14',
+      studentFirstName: 'Alp',
+      studentLastName: 'Kurt',
+      grade: '8. Sınıf',
+      subject: 'Matematik',
+      parentFirstName: 'Nihan',
+      parentLastName: 'Kurt',
+      phone: '0536 778 01 44',
+      email: 'nihan.kurt@mail.com',
+      slotLabel: 'Cuma, 11 Tem · 19:00',
+      status: 'pending',
+      createdAt: '2026-07-02T13:15:00+03:00'
+    },
+    {
+      id: 'r15',
+      studentFirstName: 'Damla',
+      studentLastName: 'Erdoğan',
+      grade: '6. Sınıf',
+      subject: 'Türkçe',
+      parentFirstName: 'Oğuz',
+      parentLastName: 'Erdoğan',
+      phone: '0541 330 55 22',
+      email: 'oguz.erdogan@gmail.com',
+      slotLabel: 'Cumartesi, 12 Tem · 17:30',
+      status: 'confirmed',
+      createdAt: '2026-07-01T10:50:00+03:00'
+    },
+    {
+      id: 'r16',
+      studentFirstName: 'Kaan',
+      studentLastName: 'Tekin',
+      grade: '7. Sınıf',
+      subject: 'Sosyal Bilgiler',
+      parentFirstName: 'Esra',
+      parentLastName: 'Tekin',
+      phone: '0538 990 14 63',
+      email: 'esra.tekin@icloud.com',
+      slotLabel: 'Pazar, 13 Tem · 10:00',
+      status: 'cancelled',
+      createdAt: '2026-06-30T20:05:00+03:00'
     }
   ];
 
@@ -156,6 +240,26 @@
 
   function getReservations() {
     return RESERVATIONS.slice();
+  }
+
+  function getReservationById(id) {
+    for (var i = 0; i < RESERVATIONS.length; i++) {
+      if (RESERVATIONS[i].id === id) return RESERVATIONS[i];
+    }
+    return null;
+  }
+
+  function getFilterOptions() {
+    var grades = {};
+    var subjects = {};
+    RESERVATIONS.forEach(function (r) {
+      grades[r.grade] = true;
+      subjects[r.subject] = true;
+    });
+    return {
+      grades: Object.keys(grades).sort(),
+      subjects: Object.keys(subjects).sort()
+    };
   }
 
   function getStats() {
@@ -175,6 +279,8 @@
 
   global.TrialLessonManagerMock = {
     getReservations: getReservations,
+    getReservationById: getReservationById,
+    getFilterOptions: getFilterOptions,
     getStats: getStats,
     STATUS_LABELS: STATUS_LABELS
   };

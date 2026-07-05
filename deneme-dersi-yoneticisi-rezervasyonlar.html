@@ -47,7 +47,7 @@
     </div>
 
     <section class="tm-panel">
-      <div class="tm-toolbar">
+      <div class="tm-toolbar tm-toolbar-filters">
         <input type="search" class="tm-search" id="tmResSearch" placeholder="Öğrenci, veli, telefon veya e-posta ara…" aria-label="Rezervasyon ara">
         <select class="tm-filter-select" id="tmResStatusFilter" aria-label="Durum filtresi">
           <option value="all">Tüm durumlar</option>
@@ -55,6 +55,28 @@
           <option value="confirmed">Onaylandı</option>
           <option value="completed">Tamamlandı</option>
           <option value="cancelled">İptal</option>
+        </select>
+        <select class="tm-filter-select" id="tmResGradeFilter" aria-label="Sınıf filtresi">
+          <option value="all">Tüm sınıflar</option>
+        </select>
+        <select class="tm-filter-select" id="tmResSubjectFilter" aria-label="Ders filtresi">
+          <option value="all">Tüm dersler</option>
+        </select>
+      </div>
+
+      <div class="tm-toolbar tm-toolbar-meta">
+        <select class="tm-filter-select" id="tmResSort" aria-label="Sıralama">
+          <option value="createdAt-desc">Kayıt tarihi (en yeni)</option>
+          <option value="createdAt-asc">Kayıt tarihi (en eski)</option>
+          <option value="student-asc">Öğrenci adı (A→Z)</option>
+          <option value="student-desc">Öğrenci adı (Z→A)</option>
+          <option value="subject-asc">Ders (A→Z)</option>
+        </select>
+        <select class="tm-filter-select" id="tmResPageSize" aria-label="Sayfa başına kayıt">
+          <option value="5">5 / sayfa</option>
+          <option value="8" selected>8 / sayfa</option>
+          <option value="10">10 / sayfa</option>
+          <option value="20">20 / sayfa</option>
         </select>
         <span class="tm-panel-link" id="tmResCount" aria-live="polite">—</span>
       </div>
@@ -72,16 +94,33 @@
               <th>Veli</th>
               <th>Telefon</th>
               <th>E-posta</th>
-              <th>Tarih / Saat</th>
+              <th>Kayıt Tarihi</th>
+              <th>Ders Tarihi / Saat</th>
               <th>Durum</th>
             </tr>
           </thead>
           <tbody id="tmResTableBody"></tbody>
         </table>
       </div>
+
+      <div id="tmResPagination" class="tm-pagination" hidden></div>
     </section>
   </div>
 </main>
+
+<div class="tm-drawer" id="tmResDrawer" aria-hidden="true" role="dialog" aria-labelledby="tmResDrawerTitle" aria-modal="true">
+  <div class="tm-drawer-overlay" id="tmResDrawerOverlay"></div>
+  <aside class="tm-drawer-panel">
+    <button type="button" class="tm-drawer-close" data-tm-drawer-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <header class="tm-drawer-head">
+      <span class="tm-drawer-eyebrow">REZERVASYON DETAYI</span>
+      <h2 class="tm-drawer-title" id="tmResDrawerTitle">—</h2>
+    </header>
+    <div class="tm-drawer-body" id="tmResDrawerBody"></div>
+  </aside>
+</div>
 
 <script src="assets/trial-lesson-manager-mock.js"></script>
 <script src="assets/trial-lesson-manager-reservations.js"></script>
