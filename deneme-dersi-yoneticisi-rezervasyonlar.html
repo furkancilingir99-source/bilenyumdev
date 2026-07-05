@@ -37,7 +37,7 @@
     <div class="thw-context-panel">
       <div class="thw-page-head">
         <h1 class="thw-page-title">Rezervasyonlar</h1>
-        <p class="thw-page-subtitle">Deneme dersi talep eden velilerin, öğrencilerin ve iletişim bilgilerinin listesi.</p>
+        <p class="thw-page-subtitle">100+ başvuru — filtreleyin, sıralayın, detaya gidin.</p>
       </div>
     </div>
 
@@ -46,79 +46,56 @@
       Rezervasyonlar yükleniyor...
     </div>
 
-    <section class="tm-panel">
-      <div class="tm-filter-grid tm-filter-grid--res">
-        <div class="tm-filter-row tm-filter-row--res">
-          <label class="tm-filter-field tm-filter-field--search">
-            <span class="tm-filter-field-label">Ara</span>
-            <input type="search" class="tm-search" id="tmResSearch" placeholder="ID, öğrenci, veli, telefon…" aria-label="Rezervasyon ara">
-          </label>
-          <label class="tm-filter-field">
-            <span class="tm-filter-field-label">Durum</span>
-            <select class="tm-filter-select" id="tmResStatusFilter" aria-label="Durum filtresi">
-              <option value="all">Tüm durumlar</option>
-              <option value="pending">Onay bekliyor</option>
-              <option value="confirmed">Onaylandı</option>
-              <option value="completed">Tamamlandı</option>
-              <option value="cancelled">İptal</option>
-            </select>
-          </label>
-          <label class="tm-filter-field">
-            <span class="tm-filter-field-label">Sınıf</span>
-            <select class="tm-filter-select" id="tmResGradeFilter" aria-label="Sınıf filtresi">
-              <option value="all">Tüm sınıflar</option>
-            </select>
-          </label>
-          <label class="tm-filter-field">
-            <span class="tm-filter-field-label">Ders</span>
-            <select class="tm-filter-select" id="tmResSubjectFilter" aria-label="Ders filtresi">
-              <option value="all">Tüm dersler</option>
-            </select>
-          </label>
-          <div class="tm-filter-field tm-filter-field--dates">
-            <span class="tm-filter-field-label">Kayıt tarihi</span>
-            <div class="tm-date-range tm-date-range--compact" aria-label="Kayıt tarihi aralığı">
-              <div class="tm-date-field-wrap">
-                <button type="button" class="tm-date-btn" id="tmResDateStartBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="tmResDateStartPop" aria-label="Başlangıç tarihi">
-                  <span class="tm-date-btn-text is-placeholder">Başlangıç</span>
-                </button>
-                <div class="tm-date-popover" id="tmResDateStartPop" hidden role="dialog" aria-label="Başlangıç tarihi"></div>
-              </div>
-              <span class="tm-date-sep" aria-hidden="true">—</span>
-              <div class="tm-date-field-wrap">
-                <button type="button" class="tm-date-btn" id="tmResDateEndBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="tmResDateEndPop" aria-label="Bitiş tarihi">
-                  <span class="tm-date-btn-text is-placeholder">Bitiş</span>
-                </button>
-                <div class="tm-date-popover" id="tmResDateEndPop" hidden role="dialog" aria-label="Bitiş tarihi"></div>
-              </div>
-              <button type="button" class="tm-date-clear" id="tmResDateClear" hidden>Temizle</button>
+    <section class="tm-panel tm-panel--datagrid">
+      <header class="tm-dg-toolbar" aria-label="Liste araç çubuğu">
+        <div class="tm-dg-toolbar-row">
+          <input type="search" class="tm-dg-control tm-dg-search" id="tmResSearch" placeholder="Ara: ID, öğrenci, veli, telefon…" aria-label="Rezervasyon ara">
+          <select class="tm-dg-control tm-dg-select" id="tmResStatusFilter" aria-label="Durum filtresi" title="Durum">
+            <option value="all">Tüm durumlar</option>
+            <option value="pending">Onay bekliyor</option>
+            <option value="confirmed">Onaylandı</option>
+            <option value="completed">Tamamlandı</option>
+            <option value="cancelled">İptal</option>
+          </select>
+          <select class="tm-dg-control tm-dg-select" id="tmResGradeFilter" aria-label="Sınıf filtresi" title="Sınıf">
+            <option value="all">Tüm sınıflar</option>
+          </select>
+          <select class="tm-dg-control tm-dg-select" id="tmResSubjectFilter" aria-label="Ders filtresi" title="Ders">
+            <option value="all">Tüm dersler</option>
+          </select>
+          <div class="tm-dg-dates" aria-label="Kayıt tarihi aralığı">
+            <div class="tm-date-field-wrap">
+              <button type="button" class="tm-dg-control tm-dg-date" id="tmResDateStartBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="tmResDateStartPop" aria-label="Kayıt başlangıç tarihi">
+                <span class="tm-date-btn-text is-placeholder">Başlangıç</span>
+              </button>
+              <div class="tm-date-popover" id="tmResDateStartPop" hidden role="dialog" aria-label="Başlangıç tarihi"></div>
             </div>
+            <span class="tm-dg-date-sep" aria-hidden="true">–</span>
+            <div class="tm-date-field-wrap">
+              <button type="button" class="tm-dg-control tm-dg-date" id="tmResDateEndBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="tmResDateEndPop" aria-label="Kayıt bitiş tarihi">
+                <span class="tm-date-btn-text is-placeholder">Bitiş</span>
+              </button>
+              <div class="tm-date-popover" id="tmResDateEndPop" hidden role="dialog" aria-label="Bitiş tarihi"></div>
+            </div>
+            <button type="button" class="tm-dg-link" id="tmResDateClear" hidden>Temizle</button>
           </div>
+          <span class="tm-dg-spacer" aria-hidden="true"></span>
+          <select class="tm-dg-control tm-dg-select tm-dg-select--sort" id="tmResSort" aria-label="Sıralama" title="Sıralama">
+            <option value="createdAt-desc">Kayıt ↓</option>
+            <option value="createdAt-asc">Kayıt ↑</option>
+            <option value="student-asc">Öğrenci A→Z</option>
+            <option value="student-desc">Öğrenci Z→A</option>
+            <option value="subject-asc">Ders A→Z</option>
+          </select>
+          <select class="tm-dg-control tm-dg-select tm-dg-select--narrow" id="tmResPageSize" aria-label="Sayfa başına kayıt" title="Sayfa boyutu">
+            <option value="5">5</option>
+            <option value="8" selected>8</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+          </select>
+          <span class="tm-dg-count" id="tmResCount" aria-live="polite">—</span>
         </div>
-
-        <div class="tm-filter-row tm-filter-row--meta">
-          <label class="tm-filter-field tm-filter-field--inline">
-            <span class="tm-filter-field-label">Sıralama</span>
-            <select class="tm-filter-select" id="tmResSort" aria-label="Sıralama">
-              <option value="createdAt-desc">Kayıt tarihi (en yeni)</option>
-              <option value="createdAt-asc">Kayıt tarihi (en eski)</option>
-              <option value="student-asc">Öğrenci adı (A→Z)</option>
-              <option value="student-desc">Öğrenci adı (Z→A)</option>
-              <option value="subject-asc">Ders (A→Z)</option>
-            </select>
-          </label>
-          <label class="tm-filter-field tm-filter-field--inline">
-            <span class="tm-filter-field-label">Sayfa</span>
-            <select class="tm-filter-select" id="tmResPageSize" aria-label="Sayfa başına kayıt">
-              <option value="5">5 / sayfa</option>
-              <option value="8" selected>8 / sayfa</option>
-              <option value="10">10 / sayfa</option>
-              <option value="20">20 / sayfa</option>
-            </select>
-          </label>
-          <span class="tm-filter-meta-count" id="tmResCount" aria-live="polite">—</span>
-        </div>
-      </div>
+      </header>
 
       <p id="tmResEmpty" class="td-state" hidden>Eşleşen rezervasyon bulunamadı.</p>
 

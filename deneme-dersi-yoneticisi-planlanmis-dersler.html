@@ -37,7 +37,7 @@
     <div class="thw-context-panel">
       <div class="thw-page-head">
         <h1 class="thw-page-title">Planlanmış Dersler</h1>
-        <p class="thw-page-subtitle">Oluşturulan deneme derslerinin branş, öğretmen, öğrenci ve ders saati detayları.</p>
+        <p class="thw-page-subtitle">Planlı dersler — filtreleyin, düzenleyin, detaya gidin.</p>
       </div>
     </div>
 
@@ -46,79 +46,53 @@
       Planlanmış dersler yükleniyor...
     </div>
 
-    <section class="tm-panel">
-      <div class="tm-filter-grid">
-        <div class="tm-filter-row tm-filter-row--main">
-          <label class="tm-filter-field tm-filter-field--search">
-            <span class="tm-filter-field-label">Ara</span>
-            <input type="search" class="tm-search" id="tmPlannedSearch" placeholder="ID, branş, öğretmen, öğrenci…" aria-label="Planlanmış ders ara">
-          </label>
-          <label class="tm-filter-field">
-            <span class="tm-filter-field-label">Sınıf</span>
-            <select class="tm-filter-select" id="tmPlannedGradeFilter" aria-label="Sınıf filtresi">
-              <option value="all">Tüm sınıflar</option>
-            </select>
-          </label>
-          <label class="tm-filter-field">
-            <span class="tm-filter-field-label">Branş</span>
-            <select class="tm-filter-select" id="tmPlannedSubjectFilter" aria-label="Branş filtresi">
-              <option value="all">Tüm branşlar</option>
-            </select>
-          </label>
-          <label class="tm-filter-field">
-            <span class="tm-filter-field-label">Öğretmen</span>
-            <select class="tm-filter-select" id="tmPlannedTeacherFilter" aria-label="Öğretmen filtresi">
-              <option value="all">Tüm öğretmenler</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="tm-filter-row tm-filter-row--dates">
-          <span class="tm-filter-row-title">Ders tarihi aralığı</span>
-          <div class="tm-date-range" aria-label="Ders tarihi aralığı">
+    <section class="tm-panel tm-panel--datagrid">
+      <header class="tm-dg-toolbar" aria-label="Liste araç çubuğu">
+        <div class="tm-dg-toolbar-row">
+          <input type="search" class="tm-dg-control tm-dg-search" id="tmPlannedSearch" placeholder="Ara: ID, branş, öğretmen, öğrenci…" aria-label="Planlanmış ders ara">
+          <select class="tm-dg-control tm-dg-select" id="tmPlannedGradeFilter" aria-label="Sınıf filtresi" title="Sınıf">
+            <option value="all">Tüm sınıflar</option>
+          </select>
+          <select class="tm-dg-control tm-dg-select" id="tmPlannedSubjectFilter" aria-label="Branş filtresi" title="Branş">
+            <option value="all">Tüm branşlar</option>
+          </select>
+          <select class="tm-dg-control tm-dg-select" id="tmPlannedTeacherFilter" aria-label="Öğretmen filtresi" title="Öğretmen">
+            <option value="all">Tüm öğretmenler</option>
+          </select>
+          <div class="tm-dg-dates" aria-label="Ders tarihi aralığı">
             <div class="tm-date-field-wrap">
-              <span class="tm-date-label">Başlangıç</span>
-              <button type="button" class="tm-date-btn" id="tmPlannedDateStartBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="tmPlannedDateStartPop">
-                <span class="tm-date-btn-text is-placeholder">Tarih seç</span>
+              <button type="button" class="tm-dg-control tm-dg-date" id="tmPlannedDateStartBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="tmPlannedDateStartPop" aria-label="Ders başlangıç tarihi">
+                <span class="tm-date-btn-text is-placeholder">Başlangıç</span>
               </button>
               <div class="tm-date-popover" id="tmPlannedDateStartPop" hidden role="dialog" aria-label="Başlangıç tarihi"></div>
             </div>
-            <span class="tm-date-sep" aria-hidden="true">—</span>
+            <span class="tm-dg-date-sep" aria-hidden="true">–</span>
             <div class="tm-date-field-wrap">
-              <span class="tm-date-label">Bitiş</span>
-              <button type="button" class="tm-date-btn" id="tmPlannedDateEndBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="tmPlannedDateEndPop">
-                <span class="tm-date-btn-text is-placeholder">Tarih seç</span>
+              <button type="button" class="tm-dg-control tm-dg-date" id="tmPlannedDateEndBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="tmPlannedDateEndPop" aria-label="Ders bitiş tarihi">
+                <span class="tm-date-btn-text is-placeholder">Bitiş</span>
               </button>
               <div class="tm-date-popover" id="tmPlannedDateEndPop" hidden role="dialog" aria-label="Bitiş tarihi"></div>
             </div>
-            <button type="button" class="tm-date-clear" id="tmPlannedDateClear" hidden>Temizle</button>
+            <button type="button" class="tm-dg-link" id="tmPlannedDateClear" hidden>Temizle</button>
           </div>
+          <span class="tm-dg-spacer" aria-hidden="true"></span>
+          <select class="tm-dg-control tm-dg-select tm-dg-select--sort" id="tmPlannedSort" aria-label="Sıralama" title="Sıralama">
+            <option value="slot-desc">Tarih ↓</option>
+            <option value="slot-asc">Tarih ↑</option>
+            <option value="updated-desc">Güncelleme ↓</option>
+            <option value="subject-asc">Branş A→Z</option>
+            <option value="teacher-asc">Öğretmen A→Z</option>
+          </select>
+          <select class="tm-dg-control tm-dg-select tm-dg-select--narrow" id="tmPlannedPageSize" aria-label="Sayfa başına kayıt" title="Sayfa boyutu">
+            <option value="5">5</option>
+            <option value="8" selected>8</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+          </select>
+          <a class="tm-dg-action" href="deneme-dersi-yoneticisi-ders-planla.html">+ Planla</a>
+          <span class="tm-dg-count" id="tmPlannedCount" aria-live="polite">—</span>
         </div>
-      </div>
-
-      <div class="tm-toolbar tm-toolbar-meta">
-        <label class="tm-filter-field tm-filter-field--inline">
-          <span class="tm-filter-field-label">Sıralama</span>
-          <select class="tm-filter-select" id="tmPlannedSort" aria-label="Sıralama">
-            <option value="slot-desc">Ders tarihi (en yakın)</option>
-            <option value="slot-asc">Ders tarihi (en uzak)</option>
-            <option value="updated-desc">Son güncelleme (en yeni)</option>
-            <option value="subject-asc">Branş (A→Z)</option>
-            <option value="teacher-asc">Öğretmen (A→Z)</option>
-          </select>
-        </label>
-        <label class="tm-filter-field tm-filter-field--inline">
-          <span class="tm-filter-field-label">Sayfa</span>
-          <select class="tm-filter-select" id="tmPlannedPageSize" aria-label="Sayfa başına kayıt">
-            <option value="5">5 / sayfa</option>
-            <option value="8" selected>8 / sayfa</option>
-            <option value="10">10 / sayfa</option>
-            <option value="20">20 / sayfa</option>
-          </select>
-        </label>
-        <a class="tm-panel-link" href="deneme-dersi-yoneticisi-ders-planla.html">+ Yeni ders planla</a>
-        <span class="tm-panel-link" id="tmPlannedCount" aria-live="polite">—</span>
-      </div>
+      </header>
 
       <p id="tmPlannedEmpty" class="td-state" hidden>Eşleşen planlanmış ders bulunamadı.</p>
 
