@@ -22,7 +22,21 @@
     };
   }
 
-  function welcomeDashboardBtn(className) {
+  function getStudentClanLabel() {
+    var name = lsGet('assignedClan');
+    if (!name || /atanmad/i.test(name)) return 'Klan atanmadı';
+    var emoji = lsGet('assignedClanEmoji') || '';
+    return (emoji ? emoji + ' ' : '') + name;
+  }
+
+  function formatStudentSubtitle(student) {
+    return escapeHtml(student.name) + ' · ' + escapeHtml(student.gradeLabel) + ' · ' + escapeHtml(getStudentClanLabel());
+  }
+
+  function updateResultsTopbar(label) {
+    var el = document.getElementById('asmResultsTopMeta');
+    if (el) el.textContent = label || '';
+  }
     return '<a href="ogrenci-dashboard.html?assessment=done" class="asm-btn asm-btn-primary' + (className ? ' ' + className : '') + '">Dashboard\'a Hoşgeldin ' + ICON_ARROW + '</a>';
   }
 
@@ -58,7 +72,8 @@
         '<div class="asm-res-hero-glow"></div>' +
         '<span class="asm-res-hero-emoji">🎉</span>' +
         '<h1 class="asm-res-hero-title">Tebrikler, ' + escapeHtml(data.student.name) + '!</h1>' +
-        '<p class="asm-res-hero-sub">Seviye belirleme ve dikkat testi sonuçların birlikte değerlendirildi.</p>' +
+        '<p class="asm-res-hero-sub">' + formatStudentSubtitle(data.student) + '</p>' +
+        '<p class="asm-res-note">Seviye belirleme ve dikkat testi sonuçların birlikte değerlendirildi.</p>' +
         '<div class="asm-res-score-ring">' +
           '<div class="asm-res-score-val">' + c.combined500 + '</div>' +
           '<div class="asm-res-score-lbl">Toplam Bilenyum Puanı <span>/ 500</span></div>' +
@@ -77,7 +92,7 @@
       '<section class="asm-res-hero asm-res-hero--partial">' +
         '<span class="asm-res-hero-emoji">📊</span>' +
         '<h1 class="asm-res-hero-title">Seviye Belirleme Sonucun</h1>' +
-        '<p class="asm-res-hero-sub">' + escapeHtml(student.name) + ' · ' + escapeHtml(student.gradeLabel) + '</p>' +
+        '<p class="asm-res-hero-sub">' + formatStudentSubtitle(student) + '</p>' +
         '<div class="asm-res-score-ring">' +
           '<div class="asm-res-score-val">' + data.placementScore + '</div>' +
           '<div class="asm-res-score-lbl">Deneme Puanı <span>/ 500</span></div>' +
@@ -227,7 +242,7 @@
       '<section class="asm-res-hero asm-res-hero--partial">' +
         '<span class="asm-res-hero-emoji">📊</span>' +
         '<h1 class="asm-res-hero-title">' + escapeHtml(examName || 'Deneme Sınavı') + '</h1>' +
-        '<p class="asm-res-hero-sub">' + escapeHtml(student.name) + ' · ' + escapeHtml(student.gradeLabel) + '</p>' +
+        '<p class="asm-res-hero-sub">' + formatStudentSubtitle(student) + '</p>' +
         '<div class="asm-res-score-ring">' +
           '<div class="asm-res-score-val">' + data.placementScore + '</div>' +
           '<div class="asm-res-score-lbl">Deneme Puanı <span>/ 500</span></div>' +
@@ -265,7 +280,7 @@
       '<section class="asm-res-hero asm-res-hero--partial">' +
         '<span class="asm-res-hero-emoji">🎯</span>' +
         '<h1 class="asm-res-hero-title">Dikkat Testi Sonucun</h1>' +
-        '<p class="asm-res-hero-sub">' + escapeHtml(student.name) + ' · ' + escapeHtml(student.gradeLabel) + '</p>' +
+        '<p class="asm-res-hero-sub">' + formatStudentSubtitle(student) + '</p>' +
         '<div class="asm-res-score-ring">' +
           '<div class="asm-res-score-val">' + attention.attentionScore + '</div>' +
           '<div class="asm-res-score-lbl">Dikkat Puanı <span>/ 100</span></div>' +
@@ -287,7 +302,7 @@
         '<div class="asm-res-student-ava" aria-hidden="true">' + (student.name.charAt(0) || 'Ö') + '</div>' +
         '<div class="asm-res-student-info">' +
           '<strong>' + escapeHtml(student.name) + '</strong>' +
-          '<span>' + escapeHtml(student.gradeLabel) + '</span>' +
+          '<span>' + escapeHtml(student.gradeLabel) + ' · ' + escapeHtml(getStudentClanLabel()) + '</span>' +
         '</div>' +
       '</div>'
     );
@@ -430,6 +445,7 @@
     view = view || 'combined';
 
     if (view === 'combined' && combined) {
+      updateResultsTopbar('Birleşik Sonuç');
       var combinedPlacement = (placementRaw && resolvePlacement(placementRaw)) || combined.placement;
       root.innerHTML =
         renderCombinedHero(combined) +
@@ -449,6 +465,7 @@
         var denemeQuestions = getDenemeQuestions();
         var denemePlacement = resolveDenemePlacement(denemeRaw) || denemeRaw.placement;
         var examName = getDenemeExamName(denemeRaw);
+        updateResultsTopbar(examName);
         root.innerHTML =
           renderDenemeHero(denemePlacement, student, examName) +
           renderSubjectTable(denemePlacement, 'Ders Bazlı Sonuçlar', false) +
@@ -459,6 +476,7 @@
     }
 
     if (view === 'placement' && placementRaw && placementRaw.placement) {
+      updateResultsTopbar('Seviye Belirleme Sınavı');
       var placement = resolvePlacement(placementRaw) || placementRaw.placement;
       var autoVideos = new URLSearchParams(location.search).get('videos') === '1';
       root.innerHTML =
@@ -473,6 +491,7 @@
     if (view === 'attention') {
       var attention = resolveAttention(attentionRaw);
       if (attention) {
+        updateResultsTopbar('Dikkat Testi');
         root.innerHTML =
           renderAttentionHero(attention, student) +
           renderAttentionCard(attention) +
@@ -481,6 +500,7 @@
       }
     }
 
+    updateResultsTopbar('');
     root.innerHTML =
       '<section class="asm-res-empty">' +
         '<span class="asm-res-hero-emoji">📋</span>' +
