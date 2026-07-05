@@ -17,6 +17,7 @@
   var paginationEl = document.getElementById('tmRequestsPagination');
   var pageSizeSelect = document.getElementById('tmRequestsPageSize');
   var exportBtn = document.getElementById('tmRequestsExport');
+  var simulateBtn = document.getElementById('tmRequestsSimulate');
   var page = 1;
 
   function filtered() {
@@ -91,6 +92,18 @@
         { key: 'studentLastName', label: 'Öğrenci Soyad' },
         { key: 'status', label: 'Durum' }
       ]);
+    });
+  }
+  if (simulateBtn && Store.createSimulatedRequest) {
+    simulateBtn.addEventListener('click', function () {
+      var res = Store.createSimulatedRequest();
+      if (!res.ok) {
+        if (U.notifyError) U.notifyError(res.error || 'Talep oluşturulamadı.');
+        return;
+      }
+      page = 1;
+      if (window.TMToast) window.TMToast.show('Yeni talep eklendi.', 'success');
+      render();
     });
   }
   render();

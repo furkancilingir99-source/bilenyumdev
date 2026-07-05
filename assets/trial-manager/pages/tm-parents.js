@@ -9,6 +9,7 @@
   var SL = window.TMStatusLabels;
   var Drawer = window.TMDetailDrawer;
   var Export = window.TMExportUtils;
+  var QuickMsg = window.TMQuickMessage;
   if (!Store) return;
 
   var tbody = document.getElementById('tmParentsBody');
@@ -19,6 +20,29 @@
   var exportBtn = document.getElementById('tmParentsExport');
   var page = 1;
 
+  function openParentWhatsApp(pa) {
+    if (!QuickMsg || !pa) return;
+    var res = Store.getReservationsForParent(pa.id).find(function (r) {
+      return r.status === 'confirmed' || r.status === 'pending';
+    });
+    var student = res ? Store.getStudentById(res.studentId) : (pa.studentIds.length ? Store.getStudentById(pa.studentIds[0]) : null);
+    var session = res ? Store.getSessionById(res.sessionId) : null;
+    var meeting = session ? Store.getMeetingBySessionId(session.id) : null;
+    var lt = session ? Store.getLessonTypeById(session.lessonTypeId) : null;
+    QuickMsg.openForParent({
+      parentName: U.fullName(pa.firstName, pa.lastName),
+      studentName: student ? U.fullName(student.firstName, student.lastName) : 'Öğrenci',
+      lessonType: lt ? lt.name : 'Deneme dersi',
+      date: session ? U.formatDateKey(session.date) : '—',
+      time: session ? session.startTime : '—',
+      meetingUrl: meeting ? meeting.meetingUrl : '',
+      meetingId: meeting ? meeting.meetingId : '',
+      passcode: meeting ? meeting.passcode : '',
+      phone: pa.phone,
+      email: pa.email
+    });
+  }
+
   function openDetail(pa) {
     if (!Drawer) return;
     var students = pa.studentIds.map(function (id) { return Store.getStudentById(id); }).filter(Boolean);
@@ -26,7 +50,10 @@
     Drawer.open({
       title: U.fullName(pa.firstName, pa.lastName),
       subtitle: pa.phone,
-      body: '<div class="tm-detail-grid">' +
+      body: '<div class="tm-detail-actions" style="margin-bottom:12px">' +
+        '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-wa-parent>WhatsApp</button>' +
+        '</div>' +
+        '<div class="tm-detail-grid">' +
         '<div><div class="tm-detail-cell-label">E-posta</div><div class="tm-detail-cell-value">' + U.escapeHtml(pa.email) + '</div></div>' +
         '<div><div class="tm-detail-cell-label">Öğrenciler</div><div class="tm-detail-cell-value">' + students.map(function (s) { return U.escapeHtml(U.fullName(s.firstName, s.lastName)); }).join(', ') + '</div></div></div>' +
         '<h4 style="margin:16px 0 8px;font-size:13px">Rezervasyonlar</h4>' +
@@ -35,6 +62,8 @@
           return '<tr><td>' + (s ? U.formatDateKey(s.date) : r.id) + '</td><td>' + r.status + '</td></tr>';
         }).join('') + '</tbody></table>' : '<p class="tm-empty">Rezervasyon yok.</p>')
     });
+    var waBtn = document.querySelector('#tmDetailDrawer [data-wa-parent]');
+    if (waBtn) waBtn.addEventListener('click', function () { openParentWhatsApp(pa); });
   }
 
   function filtered() {

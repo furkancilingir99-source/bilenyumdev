@@ -44,12 +44,30 @@
         <a class="tm-btn tm-btn--ghost" href="deneme-dersi-yoneticisi-raporlar.html">Raporları aç</a>
         <a class="tm-btn tm-btn--ghost" href="deneme-dersi-yoneticisi-planlanmis-dersler.html">Ders listesi</a>
       </div>
+      <h2 class="tm-panel-title" style="margin:24px 0 12px">Mock veri (geliştirme)</h2>
+      <p style="font-size:13px;color:#64748b;margin:0 0 12px">Gerçek API bağlanana kadar tüm işlemler yerel mock depoda çalışır. Değişiklikler tarayıcı oturumunda saklanır.</p>
+      <p id="tmMockPersist" style="font-size:12px;color:#94a3b8;margin:0 0 16px">—</p>
+      <div id="tmMockStats" style="margin-bottom:16px"></div>
+      <div class="tm-detail-actions">
+        <button type="button" class="tm-btn tm-btn--primary" id="tmSimulateRequest">Web formu talebi simüle et</button>
+        <button type="button" class="tm-btn tm-btn--ghost" id="tmResetMock">Mock veriyi sıfırla</button>
+        <a class="tm-btn tm-btn--ghost" href="deneme-dersi-yoneticisi-rezervasyonlar.html">Talepleri gör</a>
+      </div>
       <h2 class="tm-panel-title" style="margin:24px 0 12px">Dışa aktarım</h2>
       <p style="font-size:13px;color:#64748b;margin:0">Tüm listelerde CSV butonu bulunur. Kapsamlı özet ve çok sayfalı rapor için <strong>Raporlar</strong> ekranındaki Excel paketini kullanın.</p>
     </section>
   </main>
 </div>
+<script src="assets/trial-manager/lib/types.js"></script>
+<script src="assets/trial-manager/lib/status-labels.js"></script>
+<script src="assets/trial-manager/lib/audit-utils.js"></script>
+<script src="assets/trial-manager/lib/mock-data.js"></script>
+<script src="assets/trial-manager/lib/scheduling-rules.js"></script>
+<script src="assets/trial-manager/components/tm-utils.js"></script>
+<script src="assets/trial-manager/components/tm-confirm-dialog.js"></script>
+<script src="assets/trial-manager/components/tm-toast.js"></script>
 <script src="assets/trial-manager/components/tm-app-shell.js"></script>
 <script src="assets/trial-manager/components/tm-page-boot.js"></script>
+<script src="assets/trial-manager/pages/tm-settings.js"></script>
 </body>
 </html>

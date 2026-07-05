@@ -48,6 +48,13 @@
     return href ? '<a class="' + cls + '" href="' + href + '">' + inner + '</a>' : '<div class="' + cls + '">' + inner + '</div>';
   }
 
+  function reservationDetailHref(r) {
+    if (r && r.requestId) {
+      return 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(r.requestId);
+    }
+    return 'deneme-dersi-yoneticisi-rezervasyonlar.html';
+  }
+
   function renderTodayLessons(sessions) {
     var wrap = document.getElementById('tmTodayLessons');
     if (!wrap) return;
@@ -90,10 +97,17 @@
     var items = [];
     m.pendingApproval.slice(0, 5).forEach(function (r) {
       var st = Store.getStudentById(r.studentId);
-      items.push({ text: 'Veli onayı: ' + (st ? U.fullName(st.firstName, st.lastName) : r.id), href: 'deneme-dersi-yoneticisi-rezervasyonlar.html' });
+      items.push({
+        text: 'Veli onayı: ' + (st ? U.fullName(st.firstName, st.lastName) : r.id),
+        href: reservationDetailHref(r)
+      });
     });
     m.linkNotSent.slice(0, 3).forEach(function (r) {
-      items.push({ text: 'Link gönderilmedi: ' + r.id, href: 'deneme-dersi-yoneticisi-online-linkler.html' });
+      var st = Store.getStudentById(r.studentId);
+      items.push({
+        text: 'Link gönderilmedi: ' + (st ? U.fullName(st.firstName, st.lastName) : r.id),
+        href: reservationDetailHref(r)
+      });
     });
     m.teacherNotInformed.slice(0, 3).forEach(function (s) {
       items.push({ text: 'Öğretmen bilgilendir: ' + s.title, href: '#', sessionId: s.id });

@@ -8,6 +8,54 @@
   var Rules = global.TMSchedulingRules;
 
   var CURRENT_USER_ID = 'user-manager-1';
+  var STORAGE_KEY = 'bilenyum_tmstore_v1';
+
+  function touch() {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) { /* depolama dolu veya kapalı */ }
+  }
+
+  function loadPersistedState() {
+    try {
+      var raw = sessionStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      var parsed = JSON.parse(raw);
+      Object.keys(state).forEach(function (k) {
+        if (Object.prototype.hasOwnProperty.call(parsed, k)) state[k] = parsed[k];
+      });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function resetMockData() {
+    try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+    initState();
+    touch();
+    return { ok: true };
+  }
+
+  function getMockStats() {
+    var orphan = state.requests.filter(function (r) {
+      if (r.status === 'rejected' || r.status === 'cancelled') return false;
+      return !state.reservations.some(function (res) { return res.requestId === r.id; });
+    });
+    return {
+      students: state.students.length,
+      parents: state.parents.length,
+      sessions: state.sessions.length,
+      meetings: state.meetings.length,
+      requests: state.requests.length,
+      reservations: state.reservations.length,
+      communicationLogs: state.communicationLogs.length,
+      orphanRequests: orphan.length,
+      persisted: (function () {
+        try { return !!sessionStorage.getItem(STORAGE_KEY); } catch (e) { return false; }
+      })()
+    };
+  }
 
   function isoAt(daysOffset, hour, minute) {
     var d = new Date();
@@ -217,6 +265,7 @@
       var parent = state.parents.find(function (p) { return p.id === parentId; });
       var session = activeSessions[i % activeSessions.length];
       var statuses = ['new', 'reviewing', 'assigned', 'rejected', 'cancelled'];
+      var status = i < 10 ? 'new' : statuses[i % statuses.length];
       requests.push({
         id: 'request-' + String(i + 1).padStart(4, '0'),
         studentFirstName: st.firstName,
@@ -230,13 +279,45 @@
         parentPhone: parent ? parent.phone : '',
         parentEmail: parent ? parent.email : '',
         selectedSessionId: session ? session.id : undefined,
-        status: statuses[i % statuses.length],
+        status: status,
         source: 'website_form',
         createdAt: isoAt(-7 + (i % 5), 8 + (i % 10), 0),
         updatedAt: isoAt(-1, 12, 0)
       });
     }
     return requests;
+  }
+
+  function buildOrphanRequests(sessions) {
+    var activeSessions = sessions.filter(function (s) { return s.status !== 'cancelled' && s.status !== 'completed'; });
+    var demos = [
+      { studentFirstName: 'Ece', studentLastName: 'Vural', studentAge: 11, studentGrade: '5. Sınıf', studentLevel: 'Orta', requestedLessonTypeId: 'lt-mat', parentFirstName: 'Serkan', parentLastName: 'Vural', parentPhone: '0532 441 2218', parentEmail: 'serkan.vural@mail.com' },
+      { studentFirstName: 'Baran', studentLastName: 'Güneş', studentAge: 12, studentGrade: '6. Sınıf', studentLevel: 'Başlangıç', requestedLessonTypeId: 'lt-fen', parentFirstName: 'Merve', parentLastName: 'Güneş', parentPhone: '0533 552 9031', parentEmail: 'merve.gunes@mail.com' },
+      { studentFirstName: 'Lina', studentLastName: 'Koç', studentAge: 10, studentGrade: '4. Sınıf', studentLevel: 'Başlangıç', requestedLessonTypeId: 'lt-mat', parentFirstName: 'Hakan', parentLastName: 'Koç', parentPhone: '0542 118 7744', parentEmail: 'hakan.koc@mail.com' },
+      { studentFirstName: 'Arda', studentLastName: 'Tekin', studentAge: 13, studentGrade: '7. Sınıf', studentLevel: 'İleri', requestedLessonTypeId: 'lt-fen', parentFirstName: 'Seda', parentLastName: 'Tekin', parentPhone: '0555 902 3311', parentEmail: 'seda.tekin@mail.com' },
+      { studentFirstName: 'Nil', studentLastName: 'Akar', studentAge: 11, studentGrade: '5. Sınıf', studentLevel: 'Orta', requestedLessonTypeId: 'lt-mat', parentFirstName: 'Volkan', parentLastName: 'Akar', parentPhone: '0506 771 2409', parentEmail: 'volkan.akar@mail.com' }
+    ];
+    return demos.map(function (d, i) {
+      var session = activeSessions[i % activeSessions.length];
+      return {
+        id: 'request-orphan-' + String(i + 1).padStart(2, '0'),
+        studentFirstName: d.studentFirstName,
+        studentLastName: d.studentLastName,
+        studentAge: d.studentAge,
+        studentGrade: d.studentGrade,
+        studentLevel: d.studentLevel,
+        requestedLessonTypeId: d.requestedLessonTypeId,
+        parentFirstName: d.parentFirstName,
+        parentLastName: d.parentLastName,
+        parentPhone: d.parentPhone,
+        parentEmail: d.parentEmail,
+        selectedSessionId: session ? session.id : undefined,
+        status: 'new',
+        source: 'website_form',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+    });
   }
 
   function buildReservations(students, sessions, requests) {
@@ -258,7 +339,7 @@
         var st = matchingStudents[(si * 7 + j) % matchingStudents.length];
         var parentId = st.parentIds[0];
         var req = requests.find(function (rq) {
-          return rq.studentFirstName === st.firstName && rq.studentLastName === st.lastName;
+          return rq.studentFirstName === st.firstName && rq.studentLastName === st.lastName && rq.status !== 'new';
         });
         var status = resStatuses[(si + j) % resStatuses.length];
         if (session.status === 'completed') status = j % 4 === 0 ? 'no_show' : 'attended';
@@ -373,13 +454,14 @@
     var sm = buildSessionsAndMeetings(state.teachers);
     state.sessions = sm.sessions;
     state.meetings = sm.meetings;
-    state.requests = buildRequests(state.students, state.sessions);
+    state.requests = buildRequests(state.students, state.sessions).concat(buildOrphanRequests(state.sessions));
     state.reservations = buildReservations(state.students, state.sessions, state.requests);
     state.communicationLogs = buildCommunicationLogs(state.reservations);
     state.auditLogs = buildAuditLogs(state.sessions, state.reservations);
   }
 
-  initState();
+  if (!loadPersistedState()) initState();
+  else touch();
 
   function find(arr, id) {
     return arr.find(function (x) { return x.id === id; }) || null;
@@ -439,6 +521,7 @@
         description: 'Online deneme dersi planlandı.'
       });
     }
+    touch();
     return { ok: true, session: session, meeting: meeting };
   }
 
@@ -470,6 +553,7 @@
         newValue: 'cancelled'
       });
     }
+    touch();
     return { ok: true, session: session };
   }
 
@@ -498,6 +582,7 @@
         newValue: newTeacherId
       });
     }
+    touch();
     return { ok: true, session: session };
   }
 
@@ -529,6 +614,7 @@
         newValue: { date: newDate, startTime: newStartTime }
       });
     }
+    touch();
     return { ok: true, session: session };
   }
 
@@ -550,6 +636,7 @@
         newValue: meeting.passcode
       });
     }
+    touch();
     return { ok: true, meeting: meeting };
   }
 
@@ -571,6 +658,7 @@
         description: 'Link gönderildi olarak işaretlendi.'
       });
     }
+    touch();
     return { ok: true, reservation: r };
   }
 
@@ -581,6 +669,7 @@
     session.teacherInformedAt = new Date().toISOString();
     session.teacherInformedByUserId = state.currentUserId;
     session.updatedAt = new Date().toISOString();
+    touch();
     return { ok: true, session: session };
   }
 
@@ -606,6 +695,7 @@
       var r = find(state.reservations, entry.reservationId);
       if (r) r.communicationLogIds.push(id);
     }
+    touch();
     return log;
   }
 
@@ -642,6 +732,7 @@
         description: 'Katılım sonuçları girildi.'
       });
     }
+    touch();
     return { ok: true };
   }
 
@@ -668,6 +759,7 @@
         description: 'Veli onayı işaretlendi.'
       });
     }
+    touch();
     return { ok: true, request: req, reservation: res };
   }
 
@@ -676,6 +768,7 @@
     if (!r) return { ok: false, error: 'Rezervasyon bulunamadı.' };
     r.parentApprovalStatus = status;
     r.updatedAt = new Date().toISOString();
+    touch();
     return { ok: true, reservation: r };
   }
 
@@ -786,6 +879,7 @@
         description: 'Talepten rezervasyon oluşturuldu.'
       });
     }
+    touch();
     return { ok: true, reservation: reservation, created: true };
   }
 
@@ -802,6 +896,7 @@
         description: 'Ders notu güncellendi.'
       });
     }
+    touch();
     return { ok: true, session: session };
   }
 
@@ -833,6 +928,7 @@
         reason: reason
       });
     }
+    touch();
     return { ok: true, request: req };
   }
 
@@ -859,6 +955,7 @@
         description: 'Talep derse atandı: ' + sessionId
       });
     }
+    touch();
     return { ok: true, request: req, session: session };
   }
 
@@ -894,6 +991,7 @@
         description: 'Öğrenci kayda dönüştürüldü.'
       });
     }
+    touch();
     return { ok: true, student: st };
   }
 
@@ -905,7 +1003,50 @@
       var res = markLinkSent(r.id);
       if (res.ok) count += 1;
     });
+    touch();
     return { ok: true, count: count };
+  }
+
+  function createSimulatedRequest(draft) {
+    draft = draft || {};
+    var seq = state.requests.length + 1;
+    var id = 'request-' + String(seq).padStart(4, '0');
+    var pools = [
+      { studentFirstName: 'Melis', studentLastName: 'Ergin', studentAge: 10, studentGrade: '4. Sınıf', studentLevel: 'Başlangıç', requestedLessonTypeId: 'lt-mat', parentFirstName: 'Umut', parentLastName: 'Ergin', parentPhone: '0531 220 8891', parentEmail: 'umut.ergin@mail.com' },
+      { studentFirstName: 'Kaan', studentLastName: 'Polat', studentAge: 12, studentGrade: '6. Sınıf', studentLevel: 'Orta', requestedLessonTypeId: 'lt-fen', parentFirstName: 'İrem', parentLastName: 'Polat', parentPhone: '0538 441 0021', parentEmail: 'irem.polat@mail.com' }
+    ];
+    var sample = pools[seq % pools.length];
+    var sessions = getAvailableSessionsForLessonType(sample.requestedLessonTypeId);
+    var session = sessions[0] || state.sessions.find(function (s) { return s.status !== 'cancelled'; });
+    var req = {
+      id: id,
+      studentFirstName: draft.studentFirstName || sample.studentFirstName,
+      studentLastName: draft.studentLastName || sample.studentLastName,
+      studentAge: draft.studentAge || sample.studentAge,
+      studentGrade: draft.studentGrade || sample.studentGrade,
+      studentLevel: draft.studentLevel || sample.studentLevel,
+      requestedLessonTypeId: draft.requestedLessonTypeId || sample.requestedLessonTypeId,
+      parentFirstName: draft.parentFirstName || sample.parentFirstName,
+      parentLastName: draft.parentLastName || sample.parentLastName,
+      parentPhone: draft.parentPhone || sample.parentPhone,
+      parentEmail: draft.parentEmail || sample.parentEmail,
+      selectedSessionId: draft.selectedSessionId || (session ? session.id : undefined),
+      status: 'new',
+      source: 'website_form',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    state.requests.unshift(req);
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'trial_lesson_request',
+        entityId: id,
+        action: 'created',
+        description: 'Web formundan yeni talep simüle edildi.'
+      });
+    }
+    touch();
+    return { ok: true, request: req };
   }
 
   function updateUserPermissions(userId, perms) {
@@ -923,6 +1064,7 @@
         newValue: perms
       });
     }
+    touch();
     return { ok: true, user: user };
   }
 
@@ -1042,6 +1184,9 @@
     addCommunicationLog: addCommunicationLog,
     markAttendance: markAttendance,
     updateUserPermissions: updateUserPermissions,
+    resetMockData: resetMockData,
+    getMockStats: getMockStats,
+    createSimulatedRequest: createSimulatedRequest,
     _state: state
   };
 })(typeof window !== 'undefined' ? window : this);
