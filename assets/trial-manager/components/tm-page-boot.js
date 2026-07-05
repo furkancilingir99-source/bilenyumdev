@@ -43,7 +43,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     setTimeout(function () {
-      if (!window.TMStore && document.querySelector('[data-tm-page]')) {
+      if (!window.TMStore && !window.TMApi && document.querySelector('[data-tm-page]')) {
         showBootError('Veri deposu (TMStore) yüklenemedi. Sayfayı yenileyin veya önbelleği temizleyin.');
         return;
       }

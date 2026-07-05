@@ -72,6 +72,7 @@
     return auditInRange().map(function (l) {
       return {
         date: l.createdAt,
+        rawEntityType: l.entityType,
         entityType: SL.auditEntityLabel(l.entityType),
         entityId: l.entityId,
         action: SL.auditActionLabel(l.action),
@@ -79,6 +80,30 @@
         reason: l.reason || '',
         user: userLabel(l.createdByUserId)
       };
+    });
+  }
+
+  function openAuditEntity(rawType, entityId) {
+    if (!entityId) return;
+    if (rawType === 'trial_lesson_request' && window.TMRequestDrawer) {
+      window.TMRequestDrawer.open(entityId);
+    } else if (rawType === 'trial_lesson_session' && window.TMSessionDetail) {
+      window.TMSessionDetail.open(entityId);
+    } else if (rawType === 'student') {
+      window.location.href = 'deneme-dersi-yoneticisi-ogrenciler.html';
+    } else if (rawType === 'parent') {
+      window.location.href = 'deneme-dersi-yoneticisi-veliler.html';
+    } else if (rawType === 'teacher') {
+      window.location.href = 'deneme-dersi-yoneticisi-ogretmenler.html';
+    }
+  }
+
+  function bindAuditTableActions() {
+    if (!tableEl || activeTab !== 'audit') return;
+    tableEl.querySelectorAll('[data-audit-entity]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        openAuditEntity(btn.getAttribute('data-entity-type'), btn.getAttribute('data-entity-id'));
+      });
     });
   }
 
@@ -269,12 +294,23 @@
       );
     } else if (activeTab === 'audit') {
       var audits = auditRows();
-      tableEl.innerHTML = tableHtml(
-        ['Tarih', 'Varlık', 'Kayıt ID', 'İşlem', 'Açıklama', 'Neden', 'Kullanıcı'],
-        audits.map(function (l) {
-          return [U.formatDateTime(l.date), l.entityType, l.entityId, l.action, l.description, l.reason || '—', l.user];
-        })
-      );
+      if (!audits.length) {
+        tableEl.innerHTML = '<p class="tm-empty">Seçilen aralıkta veri yok.</p>';
+      } else {
+        var head = ['Tarih', 'Varlık', 'Kayıt ID', 'İşlem', 'Açıklama', 'Neden', 'Kullanıcı'].map(function (h) {
+          return '<th>' + U.escapeHtml(h) + '</th>';
+        }).join('');
+        var body = audits.map(function (l) {
+          var idCell = '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-audit-entity data-entity-type="' +
+            U.escapeHtml(l.rawEntityType) + '" data-entity-id="' + U.escapeHtml(l.entityId) + '">' + U.escapeHtml(l.entityId) + '</button>';
+          return '<tr><td>' + U.formatDateTime(l.date) + '</td><td>' + U.escapeHtml(l.entityType) + '</td><td>' + idCell +
+            '</td><td>' + U.escapeHtml(l.action) + '</td><td>' + U.escapeHtml(l.description) + '</td><td>' +
+            U.escapeHtml(l.reason || '—') + '</td><td>' + U.escapeHtml(l.user) + '</td></tr>';
+        }).join('');
+        tableEl.innerHTML = '<div class="tm-res-table-wrap"><table class="tm-res-table"><thead><tr>' + head +
+          '</tr></thead><tbody>' + body + '</tbody></table></div>';
+        bindAuditTableActions();
+      }
     } else {
       tableEl.hidden = true;
       tableEl.innerHTML = '';

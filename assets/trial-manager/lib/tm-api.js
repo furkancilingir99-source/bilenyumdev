@@ -62,11 +62,16 @@
     };
   }
 
+  function data() {
+    return store();
+  }
+
   global.TMApi = {
     getMode: getMode,
     setMode: setMode,
     isMock: function () { return getMode() === 'mock'; },
     endpoints: ENDPOINTS,
+    data: data,
     getOperationMetrics: callStore('getOperationMetrics'),
     getMockStats: callStore('getMockStats'),
     getAuditLogs: callStore('getAuditLogs'),
@@ -76,10 +81,14 @@
     getStudents: callStore('getStudents'),
     getParents: callStore('getParents'),
     getTeachers: callStore('getTeachers'),
+    getUsers: callStore('getUsers'),
     getCurrentUser: callStore('getCurrentUser'),
     getDataConsistencySnapshot: callStore('getDataConsistencySnapshot'),
     createSimulatedRequest: callStore('createSimulatedRequest'),
     resetMockData: callStore('resetMockData'),
-    switchCurrentUser: callStore('switchCurrentUser')
+    switchCurrentUser: callStore('switchCurrentUser'),
+    updateUserPermissions: callStore('updateUserPermissions')
   };
+
+  global.TMData = global.TMApi;
 })(typeof window !== 'undefined' ? window : this);

@@ -5,9 +5,15 @@
   'use strict';
 
   var Store = window.TMStore;
+  var Api = window.TMApi;
   var U = window.TMUtils;
   var SL = window.TMStatusLabels;
-  if (!Store) return;
+  if (!Store && !Api) return;
+
+  function metrics() {
+    if (Api && Api.getOperationMetrics) return Api.getOperationMetrics();
+    return Store.getOperationMetrics();
+  }
 
   var loading = document.getElementById('tmDashLoading');
   var root = document.getElementById('tmDashRoot');
@@ -23,7 +29,7 @@
 
   function render() {
     try {
-    var m = Store.getOperationMetrics();
+    var m = metrics();
     var statsEl = document.getElementById('tmDashStats');
     if (statsEl) {
       statsEl.innerHTML =

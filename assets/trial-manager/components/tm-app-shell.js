@@ -92,8 +92,10 @@
   }
 
   function refreshHudProfile() {
-    if (!global.TMStore || !global.TMStore.getCurrentUser) return;
-    var u = global.TMStore.getCurrentUser();
+    var getUser = global.TMApi && global.TMApi.getCurrentUser ? global.TMApi.getCurrentUser.bind(global.TMApi) :
+      (global.TMStore && global.TMStore.getCurrentUser ? global.TMStore.getCurrentUser.bind(global.TMStore) : null);
+    if (!getUser) return;
+    var u = getUser();
     if (!u) return;
     var nameEl = document.querySelector('.player-name');
     var clanEl = document.querySelector('.player-clan');
@@ -110,9 +112,11 @@
   }
 
   function refreshSidebarBadges() {
-    if (!global.TMStore || !global.TMStore.getOperationMetrics) return;
+    var getMetrics = global.TMApi && global.TMApi.getOperationMetrics ? global.TMApi.getOperationMetrics.bind(global.TMApi) :
+      (global.TMStore && global.TMStore.getOperationMetrics ? global.TMStore.getOperationMetrics.bind(global.TMStore) : null);
+    if (!getMetrics) return;
     refreshHudProfile();
-    var m = global.TMStore.getOperationMetrics();
+    var m = getMetrics();
     NAV_ITEMS.forEach(function (item) {
       if (!item.badgeMetric) return;
       var el = document.querySelector('[data-nav-badge="' + item.badgeMetric + '"]');

@@ -26,10 +26,14 @@
 
     <div class="tm-page-head"><h1 class="tm-page-title">Kullanıcılar ve Yetkiler</h1><p class="tm-page-sub">Yönetici görüntüleme, düzenleme, iptal ve dışa aktarma izinleri.</p></div>
     <section class="tm-panel tm-panel--datagrid">
+      <header class="tm-dg-toolbar"><div class="tm-dg-toolbar-row">
+        <span class="tm-dg-spacer"></span>
+        <button type="button" class="tm-dg-action" id="tmUsersExport" data-tm-export style="border:none;cursor:pointer">CSV</button>
+      </div></header>
       <div id="tmUsersLoading" class="td-state">Yükleniyor…</div>
       <div id="tmUsersTableWrap" class="tm-res-table-wrap" hidden>
         <table class="tm-res-table"><thead><tr>
-          <th>Ad</th><th>E-posta</th><th>Rol</th><th>Görüntüle</th><th>Oluştur</th><th>Düzenle</th><th>İptal</th><th>Dışa aktar</th><th>Durum</th>
+          <th>Ad</th><th>E-posta</th><th>Rol</th><th>Görüntüle</th><th>Oluştur</th><th>Düzenle</th><th>İptal</th><th>Dışa aktar</th><th>Durum</th><th></th>
         </tr></thead><tbody id="tmUsersBody"></tbody></table>
       </div>
     </section>
@@ -38,9 +42,12 @@
 <script src="assets/trial-manager/lib/status-labels.js"></script>
 <script src="assets/trial-manager/lib/audit-utils.js"></script>
 <script src="assets/trial-manager/lib/mock-data.js"></script>
+<script src="assets/trial-manager/lib/tm-api.js"></script>
+<script src="assets/trial-manager/lib/export-utils.js"></script>
 <script src="assets/trial-manager/components/tm-utils.js"></script>
 <script src="assets/trial-manager/components/tm-toast.js"></script>
 <script src="assets/trial-manager/components/tm-permissions.js"></script>
+<script src="assets/trial-manager/components/tm-detail-drawer.js"></script>
 <script src="assets/trial-manager/components/tm-app-shell.js"></script>
 <script src="assets/trial-manager/components/tm-page-boot.js"></script>
 <script src="assets/trial-manager/pages/tm-users.js"></script>

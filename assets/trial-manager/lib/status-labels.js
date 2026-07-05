@@ -90,6 +90,12 @@
     link_sent: 'Link gönderildi'
   };
 
+  var USER_ROLE = {
+    trial_lesson_manager: 'Deneme Dersi Yöneticisi',
+    super_admin: 'Süper Admin',
+    viewer: 'Gözlemci'
+  };
+
   var AUDIT_ACTION = {
     created: 'Oluşturuldu',
     updated: 'Güncellendi',
@@ -143,10 +149,12 @@
     TEACHER_INFO: TEACHER_INFO,
     COMM_CHANNEL: COMM_CHANNEL,
     COMM_RESULT: COMM_RESULT,
+    USER_ROLE: USER_ROLE,
     AUDIT_ACTION: AUDIT_ACTION,
     AUDIT_ENTITY: AUDIT_ENTITY,
     auditActionLabel: function (a) { return label(AUDIT_ACTION, a); },
     auditEntityLabel: function (e) { return label(AUDIT_ENTITY, e); },
+    userRoleLabel: function (r) { return label(USER_ROLE, r); },
     sessionBadge: function (s) { return badgeHtml(SESSION_STATUS, s); },
     reservationBadge: function (s) { return badgeHtml(RESERVATION_STATUS, s); },
     parentApprovalBadge: function (s) { return badgeHtml(PARENT_APPROVAL, s); },
