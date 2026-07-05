@@ -21,7 +21,7 @@
     { key: 'dashboard', href: 'ogretmen-dashboard.html', title: 'Merkez', label: 'Merkez', icon: ICON_HOME },
     { key: 'klanlar', href: 'ogretmen-klanlar.html', title: 'Öğrenci & Klan Detay', label: 'Öğrenci & Klan Detay', icon: ICON_GROUPS, labelWrap: true },
     { key: 'odev', href: 'ogretmen-odev-kontrol.html', title: 'Ödev Kontrol', label: 'Ödev Kontrol', icon: ICON_HW },
-    { key: 'deneme', href: 'ogretmen-deneme-sinavlari.html', title: 'Deneme Sınavları', label: 'Deneme Sınavları', icon: ICON_EXAM },
+    { key: 'deneme', href: 'ogretmen-deneme-sinavlari.html', title: 'Deneme Sınavları', label: 'Deneme<br>Sınavları', icon: ICON_EXAM, labelWrap: true },
     { key: 'performans', href: 'ogretmen-performans.html', title: 'Performansım', label: 'Performansım', icon: ICON_PERF }
   ];
 
