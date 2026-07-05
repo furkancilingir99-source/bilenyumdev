@@ -518,6 +518,31 @@
     bindPlacementVideosButton(Scoring.loadPlacementResults());
   }
 
+  function showDenemeFinishModal(root, placement) {
+    if (!root || !placement) return;
+
+    var overlay = root.querySelector('#asmFinishOverlay');
+    var inner = root.querySelector('#asmFinishModalInner');
+    if (!overlay || !inner) return;
+
+    root.classList.add('is-exam-finished');
+    inner.innerHTML =
+      '<span class="asm-finish-modal-icon" aria-hidden="true">📊</span>' +
+      '<h2 class="asm-finish-modal-title" id="asmFinishTitle">Deneme Sınavın Tamamlandı!</h2>' +
+      '<p class="asm-finish-modal-sub">Deneme sınavı sonucun hesaplandı. İstediğin zaman deneme sınavları sayfasından tekrar katılabilirsin.</p>' +
+      '<div class="asm-finish-score">' +
+        '<span class="asm-finish-score-val">' + placement.placementScore + '</span>' +
+        '<span class="asm-finish-score-lbl">Deneme Puanı / 500</span>' +
+      '</div>' +
+      renderCompactSubjectTable(placement) +
+      '<div class="asm-finish-actions">' +
+        '<a href="deneme-sinavlari.html" class="asm-btn asm-btn-primary">Deneme Sınavlarına Dön</a>' +
+      '</div>';
+
+    overlay.hidden = false;
+    overlay.setAttribute('aria-hidden', 'false');
+  }
+
   function renderInlineFinish(container, type, data, Assessment) {
     if (!container) return;
 
@@ -570,7 +595,8 @@
   global.BilenyumResults = {
     mount: mountResults,
     renderInlineFinish: renderInlineFinish,
-    showPlacementFinishModal: showPlacementFinishModal
+    showPlacementFinishModal: showPlacementFinishModal,
+    showDenemeFinishModal: showDenemeFinishModal
   };
 
   if (document.getElementById('asmResultsRoot')) {

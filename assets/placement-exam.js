@@ -162,36 +162,31 @@
   function lsSet(k, v) { try { localStorage.setItem(P + k, v); } catch (e) {} }
   function lsRemove(k) { try { localStorage.removeItem(P + k); } catch (e) {} }
 
-  function loadState() {
-    var answers = [];
-    var subjectIdx = {};
-    var passedBlank = {};
-    try { answers = JSON.parse(lsGet('placementAnswers') || '[]'); } catch (e) {}
-    try { subjectIdx = JSON.parse(lsGet('placementSubjectIdx') || '{}'); } catch (e) {}
-    try { passedBlank = JSON.parse(lsGet('placementPassedBlank') || '{}'); } catch (e) {}
-    var sayisalDone = lsGet('placementSayisalDone') === '1';
-    var sozelStarted = lsGet('placementSozelStarted') === '1';
-    var phase = 'sayisal';
-    if (sayisalDone && sozelStarted) phase = 'sozel';
-    else if (sayisalDone) phase = 'break';
-    return {
-      phase: phase,
-      answers: answers,
-      subjectIdx: subjectIdx,
-      passedBlank: passedBlank,
-      activeSubject: lsGet('placementActiveSubject') || null,
-      sayisalEndAt: lsGet('placementSayisalEndAt'),
-      breakEndAt: lsGet('placementBreakEndAt')
-    };
-  }
-
-  function saveState(state) {
-    lsSet('placementAnswers', JSON.stringify(state.answers));
-    lsSet('placementSubjectIdx', JSON.stringify(state.subjectIdx));
-    lsSet('placementPassedBlank', JSON.stringify(state.passedBlank || {}));
-    if (state.activeSubject) lsSet('placementActiveSubject', state.activeSubject);
-    if (state.sayisalEndAt) lsSet('placementSayisalEndAt', state.sayisalEndAt);
-  }
+  var PLACEMENT_EXAM_CFG = {
+    keys: {
+      answers: 'placementAnswers',
+      subjectIdx: 'placementSubjectIdx',
+      passedBlank: 'placementPassedBlank',
+      sayisalDone: 'placementSayisalDone',
+      sozelStarted: 'placementSozelStarted',
+      sozelStartedAt: 'placementSozelStartedAt',
+      activeSubject: 'placementActiveSubject',
+      sayisalEndAt: 'placementSayisalEndAt',
+      breakEndAt: 'placementBreakEndAt',
+      complete: 'placementComplete',
+      results: 'placementResults'
+    },
+    getQuestions: function () { return global.BilenyumPlacementQuestions || []; },
+    titles: {
+      break: 'Seviye Belirleme Sınavı',
+      sayisal: 'Sayısal Bölüm Seviye Belirleme Sınavı',
+      sozel: 'Sözel Bölüm Seviye Belirleme Sınavı'
+    },
+    finishConfirmText: 'Seviye belirleme sınavını tamamlamak istediğine emin misin? Onayladığında cevapların kaydedilecek ve sonucun gösterilecek.',
+    markAssessmentComplete: true,
+    showCompletedOnInit: true,
+    finishModalType: 'placement'
+  };
 
   function buildQuestionMaps(questions) {
     var bySubject = {};
@@ -210,10 +205,44 @@
     return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
   }
 
-  function init(root) {
+  function init(root, examCfg) {
     if (!root) return;
+    examCfg = examCfg || PLACEMENT_EXAM_CFG;
+    var K = examCfg.keys;
 
-    var questions = global.BilenyumPlacementQuestions || [];
+    function loadState() {
+      var answers = [];
+      var subjectIdx = {};
+      var passedBlank = {};
+      try { answers = JSON.parse(lsGet(K.answers) || '[]'); } catch (e) {}
+      try { subjectIdx = JSON.parse(lsGet(K.subjectIdx) || '{}'); } catch (e) {}
+      try { passedBlank = JSON.parse(lsGet(K.passedBlank) || '{}'); } catch (e) {}
+      var sayisalDone = lsGet(K.sayisalDone) === '1';
+      var sozelStarted = lsGet(K.sozelStarted) === '1';
+      var phase = 'sayisal';
+      if (sayisalDone && sozelStarted) phase = 'sozel';
+      else if (sayisalDone) phase = 'break';
+      return {
+        phase: phase,
+        answers: answers,
+        subjectIdx: subjectIdx,
+        passedBlank: passedBlank,
+        activeSubject: lsGet(K.activeSubject) || null,
+        sayisalEndAt: lsGet(K.sayisalEndAt),
+        breakEndAt: lsGet(K.breakEndAt)
+      };
+    }
+
+    function saveState(state) {
+      lsSet(K.answers, JSON.stringify(state.answers));
+      lsSet(K.subjectIdx, JSON.stringify(state.subjectIdx));
+      lsSet(K.passedBlank, JSON.stringify(state.passedBlank || {}));
+      if (state.activeSubject) lsSet(K.activeSubject, state.activeSubject);
+      if (state.sayisalEndAt) lsSet(K.sayisalEndAt, state.sayisalEndAt);
+      if (state.breakEndAt) lsSet(K.breakEndAt, state.breakEndAt);
+    }
+
+    var questions = examCfg.getQuestions ? examCfg.getQuestions() : [];
     var bySubject = buildQuestionMaps(questions);
     var state = loadState();
     var phase = state.phase;
@@ -347,7 +376,7 @@
 
     function updatePhaseUI() {
       if (phase === 'break') {
-        if (examTitleEl) examTitleEl.textContent = 'Deneme Sınavı';
+        if (examTitleEl) examTitleEl.textContent = examCfg.titles.break;
         if (finishSayisalBtn) finishSayisalBtn.hidden = true;
         if (finishSozelBtn) finishSozelBtn.hidden = true;
         if (examFooter) examFooter.hidden = true;
@@ -363,8 +392,8 @@
 
       if (examTitleEl) {
         examTitleEl.textContent = phase === 'sayisal'
-          ? 'Deneme Sınavı · Sayısal Bölüm'
-          : 'Deneme Sınavı · Sözel Bölüm';
+          ? examCfg.titles.sayisal
+          : examCfg.titles.sozel;
       }
 
       if (stepSayisal && stepSozel) {
@@ -604,7 +633,7 @@
     }
 
     function sozelSecondsElapsed() {
-      var raw = lsGet('placementSozelStartedAt');
+      var raw = lsGet(K.sozelStartedAt);
       if (!raw) return 0;
       return Math.max(0, Math.floor((Date.now() - new Date(raw).getTime()) / 1000));
     }
@@ -654,16 +683,38 @@
       }
     }
 
-    function tryShowCompletedPlacementModal() {
-      if (lsGet('placementComplete') !== '1') return false;
+    function showCompletedModal() {
+      if (lsGet(K.complete) !== '1') return false;
       var Scoring = global.BilenyumScoring;
-      var placementRaw = Scoring ? Scoring.loadPlacementResults() : null;
-      if (!placementRaw || !placementRaw.placement) {
-        location.href = 'sinav-sonuclari.html?view=placement';
+      var Results = global.BilenyumResults;
+      var resultsRaw = lsGet(K.results);
+      var parsed = null;
+      if (resultsRaw) {
+        try { parsed = JSON.parse(resultsRaw); } catch (e) {}
+      }
+      var placementData = parsed && parsed.placement ? parsed.placement : null;
+      if (!placementData && examCfg.finishModalType === 'deneme') {
+        return false;
+      }
+      if (!placementData) {
+        if (examCfg.finishModalType === 'deneme') {
+          location.href = 'deneme-sinavlari.html';
+        } else {
+          location.href = 'sinav-sonuclari.html?view=placement';
+        }
         return true;
       }
-      showPlacementFinishModal(placementRaw.placement);
+      if (examCfg.finishModalType === 'deneme' && Results && Results.showDenemeFinishModal) {
+        Results.showDenemeFinishModal(root, placementData);
+      } else {
+        showPlacementFinishModal(placementData);
+      }
       return true;
+    }
+
+    function tryShowCompletedPlacementModal() {
+      if (!examCfg.showCompletedOnInit) return false;
+      return showCompletedModal();
     }
 
     function render(opts) {
@@ -789,10 +840,10 @@
     function showTransition(reason) {
       locked = true;
       clearInterval(timerId);
-      lsSet('placementSayisalDone', '1');
+      lsSet(K.sayisalDone, '1');
       if (!state.breakEndAt) {
         state.breakEndAt = new Date(Date.now() + BREAK_SEC * 1000).toISOString();
-        lsSet('placementBreakEndAt', state.breakEndAt);
+        lsSet(K.breakEndAt, state.breakEndAt);
       }
       phase = 'break';
       updatePhaseUI();
@@ -827,11 +878,11 @@
     function goToSozel() {
       if (breakSecondsLeft() > 0 && !isBreakSkipRequested()) return;
       clearInterval(breakTimerId);
-      lsSet('placementSayisalDone', '1');
-      lsSet('placementSozelStarted', '1');
-      lsSet('placementSozelStartedAt', new Date().toISOString());
-      lsRemove('placementBreakEndAt');
-      lsRemove('placementSayisalEndAt');
+      lsSet(K.sayisalDone, '1');
+      lsSet(K.sozelStarted, '1');
+      lsSet(K.sozelStartedAt, new Date().toISOString());
+      lsRemove(K.breakEndAt);
+      lsRemove(K.sayisalEndAt);
       state.breakEndAt = null;
       state.sayisalEndAt = null;
       phase = 'sozel';
@@ -853,19 +904,28 @@
       var placementData = Scoring ? Scoring.scorePlacement(questions, answers) : null;
 
       if (Scoring && placementData) {
-        lsSet('placementResults', JSON.stringify({
+        lsSet(K.results, JSON.stringify({
           placement: placementData, answers: answers, completedAt: new Date().toISOString()
         }));
       }
-      lsSet('placementComplete', '1');
-      lsRemove('placementSayisalEndAt');
-      lsRemove('placementBreakEndAt');
-      lsRemove('placementSozelStarted');
-      lsRemove('placementSozelStartedAt');
-      if (global.BilenyumAssessment) global.BilenyumAssessment.markPlacementComplete();
+      lsSet(K.complete, '1');
+      lsRemove(K.sayisalEndAt);
+      lsRemove(K.breakEndAt);
+      lsRemove(K.sozelStarted);
+      lsRemove(K.sozelStartedAt);
+      if (examCfg.markAssessmentComplete && global.BilenyumAssessment) {
+        global.BilenyumAssessment.markPlacementComplete();
+      }
 
       if (placementData) {
-        showPlacementFinishModal(placementData);
+        if (examCfg.finishModalType === 'deneme') {
+          var Results = global.BilenyumResults;
+          if (Results && Results.showDenemeFinishModal) {
+            Results.showDenemeFinishModal(root, placementData);
+          }
+        } else {
+          showPlacementFinishModal(placementData);
+        }
       }
     }
 
@@ -946,7 +1006,7 @@
         showConfirm({
           title: 'Sınavı bitir?',
           hint: sozelFinishWarning(),
-          text: 'Deneme sınavını tamamlamak istediğine emin misin? Onayladığında cevapların kaydedilecek ve sonucun gösterilecek.',
+          text: examCfg.finishConfirmText,
           okLabel: 'Evet, bitir',
           cancelLabel: 'Vazgeç',
           onOk: function () { finishSozel(); },
@@ -970,7 +1030,7 @@
 
     if (phase === 'sayisal' && state.sayisalEndAt) {
       var sayisalLeft = Math.floor((new Date(state.sayisalEndAt).getTime() - Date.now()) / 1000);
-      if (sayisalLeft <= 0 && lsGet('placementSayisalDone') !== '1') {
+      if (sayisalLeft <= 0 && lsGet(K.sayisalDone) !== '1') {
         showTransition('timeup');
       }
     }
@@ -990,6 +1050,7 @@
     BREAK_SEC: BREAK_SEC,
     PHASES: PHASES,
     SUBJECT_LABELS: SUBJECT_LABELS,
+    PLACEMENT_EXAM_CFG: PLACEMENT_EXAM_CFG,
     init: init
   };
 })(typeof window !== 'undefined' ? window : this);

@@ -2,11 +2,162 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8" />
-<meta http-equiv="refresh" content="0;url=seviye-belirleme.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Deneme Sınavı · Bilenyum</title>
-<script>location.replace('seviye-belirleme.html');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/assessment.css">
+<link rel="stylesheet" href="assets/assessment-light.css">
 </head>
 <body>
-<p><a href="seviye-belirleme.html">Seviye belirleme sınavına git</a></p>
+
+<div class="asm-exam-page asm-placement-page asm-deneme-page asm-homework-page" id="asmDenemeExam">
+  <header class="asm-exam-topbar asm-homework-topbar asm-placement-topbar">
+    <div class="asm-homework-topbar-left"></div>
+    <div class="asm-homework-topbar-center">
+      <h1 class="asm-exam-topbar-title asm-hw-title asm-placement-exam-title" id="asmPlacementExamTitle">Deneme Sınavı</h1>
+      <p class="asm-hw-topic asm-placement-topic">Deneme Sınavı · Sayısal ve Sözel</p>
+    </div>
+    <div class="asm-homework-topbar-badges">
+      <span class="asm-hw-type-badge is-deneme" aria-hidden="true">DENEME</span>
+    </div>
+  </header>
+
+  <div class="asm-placement-controls" aria-label="Sınav bölümü ve ders seçimi">
+    <div class="asm-placement-controls-col asm-phase-bar" aria-label="Sınav bölümleri">
+      <p class="asm-placement-section-label">Bölüm</p>
+      <div class="asm-phase-steps">
+        <div class="asm-phase-step is-active" id="asmStepSayisal" data-phase="sayisal">
+          <span class="asm-phase-step-num">1</span>
+          <span class="asm-phase-step-label">Sayısal</span>
+          <span class="asm-phase-step-sub">Mat 20 · Fen 20</span>
+        </div>
+        <div class="asm-phase-step-connector"></div>
+        <div class="asm-phase-step is-locked" id="asmStepSozel" data-phase="sozel">
+          <span class="asm-phase-step-num">2</span>
+          <span class="asm-phase-step-label">Sözel</span>
+          <span class="asm-phase-step-sub">Tr 20 · Sos 10 · Din 10 · İng 10</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="asm-placement-controls-col asm-subject-tabs-wrap" id="asmSubjectTabsWrap">
+      <p class="asm-placement-section-label">Ders</p>
+      <nav class="asm-subject-tabs" id="asmSubjectTabs" role="tablist" aria-label="Ders sekmeleri"></nav>
+    </div>
+  </div>
+
+  <div class="asm-hw-layout asm-placement-layout">
+    <aside class="asm-hw-board-toolbar asm-hw-board-toolbar--rail asm-hw-board-toolbar--docked" id="hwBoardToolbar" aria-label="Tahta araçları"></aside>
+    <div class="asm-hw-workspace">
+      <section class="asm-hw-board-wrap" aria-label="Sınav tahtası">
+        <div class="asm-hw-board-viewport" id="hwBoardViewport">
+          <div class="asm-hw-board-layer" id="hwBoardLayer">
+            <div class="asm-hw-sheet-cluster" id="hwSheetCluster">
+              <div class="asm-hw-sheet" id="hwQuestionSheet">
+                <header class="asm-hw-sheet-head" id="hwSheetHead">
+                  <div class="asm-hw-sheet-head-inner" id="hwSheetHeadInner"></div>
+                </header>
+                <div class="asm-hw-draw-region" id="hwDrawRegion">
+                  <div class="asm-hw-sheet-body" id="hwSheetBody"></div>
+                  <div class="asm-hw-options-row asm-hw-sheet-interactive">
+                    <div class="asm-options asm-hw-sheet-options" id="hwSheetOptions"></div>
+                  </div>
+                  <div class="asm-hw-solve-zone" id="hwSolveZone" aria-label="Çözüm alanı">
+                    <span class="asm-hw-solve-label">Çözüm alanı</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <canvas id="hwDrawCanvas" aria-label="Çizim katmanı"></canvas>
+          </div>
+        </div>
+      </section>
+    </div>
+    <aside class="asm-hw-qnav-rail asm-placement-qnav" aria-label="Soru navigasyonu">
+      <div class="asm-hw-qnav-current" aria-live="polite" aria-atomic="true">
+        <span class="asm-hw-qnav-label">Soru</span>
+        <div class="asm-hw-qnav-current-row">
+          <strong class="asm-hw-qnav-current-num" id="asmPlacementQCurrent">1</strong>
+          <span class="asm-hw-qnav-current-total" id="asmPlacementQTotal">/ 1</span>
+        </div>
+      </div>
+      <div class="asm-hw-qnav-divider" aria-hidden="true"></div>
+      <div class="asm-hw-qnav-progress">
+        <span class="asm-hw-qnav-label">Tamamlanan</span>
+        <div class="asm-exam-progress asm-hw-meta-progress asm-hw-nav-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="asm-exam-progress-fill"></div>
+        </div>
+      </div>
+      <div class="asm-hw-qnav-divider" aria-hidden="true"></div>
+      <div class="asm-hw-qnav-palette">
+        <span class="asm-hw-qnav-label">Sorular</span>
+        <div class="asm-q-palette asm-hw-qnav-track" id="asmQPalette"></div>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="asm-exam-footer asm-exam-footer--actions asm-hw-footer-nav" id="asmExamFooter">
+    <button type="button" class="asm-hw-nav-btn asm-hw-footer-nav-btn" data-asm-prev aria-label="Önceki soru" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Önceki Soru</span>
+    </button>
+    <button type="button" class="asm-btn asm-btn-primary asm-btn-finish-exam asm-btn-finish-phase" id="asmFinishSayisal" hidden>Sayısal Sınavı Bitir</button>
+    <button type="button" class="asm-btn asm-btn-primary asm-btn-finish-exam" id="asmFinishSozel" hidden>Sınavı Bitir</button>
+    <button type="button" class="asm-hw-nav-btn asm-hw-footer-nav-btn is-next" data-asm-next aria-label="Sonraki soru">
+      <span>Sonraki Soru</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </footer>
+
+  <div class="asm-confirm" id="asmConfirm" hidden role="alertdialog" aria-modal="true" aria-labelledby="asmConfirmTitle">
+    <div class="asm-confirm-backdrop" data-asm-confirm-cancel></div>
+    <div class="asm-confirm-card">
+      <h3 class="asm-confirm-title" id="asmConfirmTitle">Emin misin?</h3>
+      <p class="asm-confirm-hint" id="asmConfirmHint" hidden></p>
+      <p class="asm-confirm-text" id="asmConfirmText"></p>
+      <div class="asm-confirm-actions">
+        <button type="button" class="asm-btn asm-btn-ghost" data-asm-confirm-cancel id="asmConfirmCancel">Vazgeç</button>
+        <button type="button" class="asm-btn asm-btn-primary" data-asm-confirm-ok id="asmConfirmOk">Evet, tamamla</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="asm-phase-transition" id="asmPhaseTransition" hidden role="dialog" aria-modal="true" aria-labelledby="asmTransitionTitle">
+    <div class="asm-phase-transition-card">
+      <span class="asm-phase-transition-icon">☕</span>
+      <h2 id="asmTransitionTitle">Sayısal bölüm tamamlandı</h2>
+      <p id="asmTransitionText">7 dakikalık molandan sonra sözel bölüme geçeceksin.</p>
+      <div class="asm-break-timer-wrap">
+        <span class="asm-break-timer-label">Mola süresi</span>
+        <div class="asm-break-timer" id="asmBreakTimer" aria-live="polite">07:00</div>
+      </div>
+      <p class="asm-transition-hint" id="asmTransitionHint">7 dakikalık molan var. Dinlenmek istersen süreyi bekle; molayı atlamak istersen aşağıdaki kutucuğu işaretleyerek sözel sınava geçebilirsin.</p>
+      <label class="asm-break-skip" for="asmBreakSkip">
+        <input type="checkbox" id="asmBreakSkip" class="asm-break-skip-input" />
+        <span class="asm-break-skip-box" aria-hidden="true"></span>
+        <span class="asm-break-skip-text">Mola süresini kullanmak istemiyorum</span>
+      </label>
+      <button type="button" class="asm-btn asm-btn-primary is-waiting" id="asmTransitionBtn" disabled>Sözel Sınava Başla</button>
+    </div>
+  </div>
+  <div class="asm-finish-overlay" id="asmFinishOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="asmFinishTitle">
+    <div class="asm-finish-modal">
+      <div class="asm-finish-modal-inner" id="asmFinishModalInner"></div>
+    </div>
+  </div>
+</div>
+<script src="assets/deneme-questions.js"></script>
+<script src="assets/assessment-scoring.js"></script>
+<script src="assets/exam-header.js"></script>
+<script src="assets/exam-student-bar.js"></script>
+<script src="assets/assessment-results.js"></script>
+<script src="assets/homework-whiteboard.js"></script>
+<script src="assets/homework-video-player.js"></script>
+<script src="assets/placement-exam.js"></script>
+<script src="assets/deneme-exam.js"></script>
+<script src="assets/auth-tab-session.js"></script>
+<script src="assets/assessment.js"></script>
 </body>
 </html>

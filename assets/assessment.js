@@ -756,6 +756,15 @@
   }
 
   /* ---------- Exam page helpers ---------- */
+  function initDenemeExam() {
+    var root = document.getElementById('asmDenemeExam');
+    if (!root) return;
+    if (global.BilenyumExamHeader) global.BilenyumExamHeader.mount(root);
+    if (global.BilenyumDenemeExam) {
+      global.BilenyumDenemeExam.init(root);
+    }
+  }
+
   function initPlacementExam() {
     var root = document.getElementById('asmPlacementExam');
     if (!root) return;
@@ -954,6 +963,8 @@
         } else {
           initPlacementExam();
         }
+      } else if (page === 'deneme-sinavi.html') {
+        initDenemeExam();
       } else if (page === 'dikkat-testi.html') {
         var attentionRoot = document.getElementById('asmAttentionExam');
         if (global.BilenyumCrossBreak && attentionRoot) {

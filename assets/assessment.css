@@ -1680,6 +1680,11 @@ body.asm-has-banner .stage {
   border: 1.5px solid rgba(229, 4, 123, 0.35);
   color: var(--brand-magenta, #e6087b);
 }
+.asm-hw-type-badge.is-deneme {
+  background: rgba(62, 58, 142, 0.12);
+  border: 1.5px solid rgba(62, 58, 142, 0.35);
+  color: var(--brand-navy, #1a1538);
+}
 .asm-placement-page .asm-placement-controls {
   padding: 10px 20px;
   background: #fff;
