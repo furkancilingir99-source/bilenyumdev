@@ -1110,6 +1110,19 @@
     return { ok: true, count: count };
   }
 
+  function markAllApprovedLinksSent() {
+    var count = 0;
+    state.reservations.forEach(function (r) {
+      if (r.status === 'cancelled') return;
+      if (r.parentApprovalStatus === 'approved' && !r.linkSent) {
+        var res = markLinkSent(r.id);
+        if (res.ok) count += 1;
+      }
+    });
+    touch();
+    return { ok: true, count: count };
+  }
+
   function updateStudent(studentId, patch) {
     var st = find(state.students, studentId);
     if (!st) return { ok: false, error: 'Öğrenci bulunamadı.' };
@@ -1593,6 +1606,7 @@
     removeStudentFromSession: removeStudentFromSession,
     getDataConsistencySnapshot: getDataConsistencySnapshot,
     markBulkLinksSentForSession: markBulkLinksSentForSession,
+    markAllApprovedLinksSent: markAllApprovedLinksSent,
     getMeetingBySessionId: function (sessionId) {
       var s = find(state.sessions, sessionId);
       return s ? find(state.meetings, s.onlineMeetingId) : null;

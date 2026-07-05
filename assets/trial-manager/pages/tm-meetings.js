@@ -18,6 +18,7 @@
   var paginationEl = document.getElementById('tmMeetingsPagination');
   var pageSizeSelect = document.getElementById('tmMeetingsPageSize');
   var exportBtn = document.getElementById('tmMeetingsExport');
+  var bulkLinksBtn = document.getElementById('tmMeetingsBulkLinks');
   var page = 1;
 
   function initFromUrl() {
@@ -73,10 +74,25 @@
         '<td>' + SL.sessionBadge(s.status) + '</td>' +
         '<td style="white-space:nowrap">' +
           '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-copy-url="' + U.escapeHtml(r.meeting.meetingUrl) + '">Kopyala</button> ' +
+          (r.notSent > 0 ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-bulk-session="' + s.id + '" data-tm-require="edit">Toplu link</button> ' : '') +
           '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-session="' + s.id + '">Detay</button>' +
         '</td></tr>';
     }).join('');
     U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
+    tbody.querySelectorAll('[data-bulk-session]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (Perms && !Perms.guard('edit')) return;
+        var sid = btn.getAttribute('data-bulk-session');
+        var result = Store.markBulkLinksSentForSession(sid);
+        if (!result.ok) U.notifyError(result.error || 'İşlem başarısız.');
+        else {
+          U.notifySuccess(result.count + ' veliye link gönderildi işaretlendi.');
+          if (window.TMOnSessionChange) window.TMOnSessionChange();
+          render();
+        }
+      });
+    });
     tbody.querySelectorAll('[data-session]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();

@@ -131,7 +131,9 @@
     exportMockSnapshot: callStore('exportMockSnapshot'),
     importMockSnapshot: callStore('importMockSnapshot'),
     switchCurrentUser: callStore('switchCurrentUser'),
-    updateUserPermissions: callStore('updateUserPermissions')
+    updateUserPermissions: callStore('updateUserPermissions'),
+    markAllApprovedLinksSent: callStore('markAllApprovedLinksSent'),
+    markBulkLinksSentForSession: callStore('markBulkLinksSentForSession')
   };
 
   global.TMData = global.TMApi;
