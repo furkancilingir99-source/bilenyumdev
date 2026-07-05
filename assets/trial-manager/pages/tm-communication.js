@@ -16,6 +16,7 @@
   var tbody = document.getElementById('tmCommBody');
   var tabsEl = document.getElementById('tmCommTabs');
   var exportBtn = document.getElementById('tmCommExport');
+  var bulkLinksBtn = document.getElementById('tmCommBulkLinks');
   var activeTab = 'all';
   var page = 1;
   var paginationEl = document.getElementById('tmCommPagination');
@@ -71,16 +72,18 @@
     return rows;
   }
 
-  function filterTab(rows) {
+  function filterTab(rows, tabId) {
+    tabId = tabId || activeTab;
     var today = Store.todayKey();
-    if (activeTab === 'unreachable') return rows.filter(function (x) { return x.reservation && x.reservation.parentApprovalStatus === 'unreachable'; });
-    if (activeTab === 'pending') return rows.filter(function (x) { return x.reservation && (x.reservation.parentApprovalStatus === 'not_called' || x.reservation.status === 'pending'); });
-    if (activeTab === 'call_again') return rows.filter(function (x) { return x.reservation && x.reservation.parentApprovalStatus === 'call_again'; });
-    if (activeTab === 'link') return rows.filter(function (x) { return x.reservation && x.reservation.parentApprovalStatus === 'approved' && !x.reservation.linkSent; });
-    if (activeTab === 'teacher') return rows.filter(function (x) { return x.role === 'Öğretmen'; });
-    if (activeTab === 'today') return rows.filter(function (x) {
+    if (tabId === 'unreachable') return rows.filter(function (x) { return x.reservation && x.reservation.parentApprovalStatus === 'unreachable'; });
+    if (tabId === 'pending') return rows.filter(function (x) { return x.reservation && (x.reservation.parentApprovalStatus === 'not_called' || x.reservation.status === 'pending'); });
+    if (tabId === 'call_again') return rows.filter(function (x) { return x.reservation && x.reservation.parentApprovalStatus === 'call_again'; });
+    if (tabId === 'link') return rows.filter(function (x) { return x.reservation && x.reservation.parentApprovalStatus === 'approved' && !x.reservation.linkSent; });
+    if (tabId === 'teacher') return rows.filter(function (x) { return x.role === 'Öğretmen'; });
+    if (tabId === 'today') return rows.filter(function (x) {
       return x.reservation && x.session && x.session.date === today;
     });
+    if (tabId !== 'all') return rows;
     return Store.getCommunicationLogs().map(function (l) {
       var pa = l.parentId ? Store.getParentById(l.parentId) : null;
       var t = l.teacherId ? Store.getTeacherById(l.teacherId) : null;

@@ -36,8 +36,8 @@
         metric(m.actionableCount, 'Toplam aksiyon bekleyen', '#tmDashActions', 'warn') +
         metric(m.todaySessionCount, 'Bugünkü ders', 'deneme-dersi-yoneticisi-planlanmis-dersler.html?today=1') +
         metric(m.todayStudentCount, 'Bugünkü öğrenci', 'deneme-dersi-yoneticisi-planlanmis-dersler.html') +
-        metric(m.pendingApprovalCount, 'Onay bekleyen', 'deneme-dersi-yoneticisi-iletisim.html', 'warn') +
-        metric(m.linkNotSentCount, 'Link gönderilmemiş', 'deneme-dersi-yoneticisi-online-linkler.html?status=not_sent', 'warn') +
+        metric(m.pendingApprovalCount, 'Onay bekleyen', 'deneme-dersi-yoneticisi-iletisim.html?tab=pending', 'warn') +
+        metric(m.linkNotSentCount, 'Link gönderilmemiş', 'deneme-dersi-yoneticisi-iletisim.html?tab=link', 'warn') +
         metric(m.orphanRequestCount, 'Rezervasyonsuz talep', 'deneme-dersi-yoneticisi-rezervasyonlar.html?filter=orphan', 'warn') +
         metric(m.newRequestCount, 'Yeni web talebi', 'deneme-dersi-yoneticisi-rezervasyonlar.html?status=new', 'warn') +
         metric(m.teacherNotInformedCount, 'Öğretmen bilgilendirilmemiş', 'deneme-dersi-yoneticisi-iletisim.html', 'warn') +
