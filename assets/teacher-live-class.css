@@ -626,6 +626,9 @@ html, body {
   transition: border-color 0.15s, background 0.15s, transform 0.15s;
 }
 .tlc-sc-btn:hover { border-color: var(--tlc-neon); background: rgba(255,45,170,0.08); transform: translateY(-1px); }
+.tlc-sc-btn.is-active { border-color: var(--tlc-neon); background: rgba(255,45,170,0.14); color: #fff; }
+.tlc-sc-btn.is-active .tlc-sc-ico { color: #ff9ed8; }
+.tlc-chip.is-hand-off { background: rgba(251, 146, 60, 0.18); border-color: rgba(251, 146, 60, 0.35); color: #fdba74; }
 .tlc-sc-ico { display: inline-flex; flex-shrink: 0; color: var(--tlc-neon); }
 .tlc-sc-ico svg { width: 18px; height: 18px; }
 .tlc-panel-section[hidden] { display: none !important; }

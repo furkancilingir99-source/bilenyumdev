@@ -271,6 +271,7 @@
     }
     if (state.isScreenSharing) chips.push('<span class="tlc-chip">Ekran paylaşımı</span>');
     if (state.isFocusModeActive) chips.push('<span class="tlc-chip is-focus">Odak modu</span>');
+    if (state.isHandRaiseEnabled === false) chips.push('<span class="tlc-chip is-hand-off">El kaldırma kapalı</span>');
     if (state.isCaptionsEnabled) chips.push('<span class="tlc-chip">Altyazı</span>');
     el.chips.innerHTML = chips.join('');
   }
@@ -1255,6 +1256,10 @@
         state.activeSpeakerId = pick.id;
       }
       if (val === 'hand') {
+        if (state.isHandRaiseEnabled === false) {
+          toast('El kaldırma izni kapalı.', true);
+          return;
+        }
         pick.isHandRaised = true;
         pick.handRaisedAt = Date.now();
         stats.handCount++;

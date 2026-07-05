@@ -62,6 +62,7 @@
       isScreenSharing: false,
       isCaptionsEnabled: false,
       isChatEnabled: true,
+      isHandRaiseEnabled: true,
       wbPermission: 'teacher_only',
       isWhiteboardLocked: false,
       activeSpeakerId: null,

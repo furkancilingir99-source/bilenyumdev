@@ -75,6 +75,34 @@
     });
   }
 
+  function setClassHandRaise(enabled) {
+    deps.state.isHandRaiseEnabled = !!enabled;
+    if (deps.permMgr) {
+      Object.keys(deps.permMgr.getAllStates()).forEach(function (sid) {
+        deps.permMgr.setPermission(sid, 'canRaiseHand', enabled, enabled ? 'El kaldırma izni açıldı' : 'El kaldırma izni kapatıldı');
+      });
+    }
+    if (!enabled) {
+      deps.participants.forEach(function (p) {
+        if (p.role === 'student') {
+          p.isHandRaised = false;
+          p.handRaisedAt = null;
+        }
+      });
+    }
+    deps.toast(enabled
+      ? 'El kaldırma izni açıldı — öğrenciler el kaldırabilir.'
+      : 'El kaldırma izni kapatıldı — tüm eller indirildi.');
+  }
+
+  function updateShortcutButtons() {
+    var enabled = deps.state.isHandRaiseEnabled !== false;
+    var onBtn = document.querySelector('[data-shortcut="hand-raise-on"]');
+    var offBtn = document.querySelector('[data-shortcut="hand-raise-off"]');
+    if (onBtn) onBtn.classList.toggle('is-active', enabled);
+    if (offBtn) offBtn.classList.toggle('is-active', !enabled);
+  }
+
   function runDockAction(action) {
     switch (action) {
       case 'mute-all': deps.muteAll(); break;
@@ -94,6 +122,12 @@
           deps.participants.forEach(function (p) { p.isHandRaised = false; p.handRaisedAt = null; });
           deps.renderAll();
         });
+        break;
+      case 'hand-raise-on':
+        setClassHandRaise(true);
+        break;
+      case 'hand-raise-off':
+        setClassHandRaise(false);
         break;
       case 'focus':
         deps.toggleFocus(!deps.state.isFocusModeActive);
@@ -224,6 +258,7 @@
     if (!global.TeacherCrisisUI) renderRaisedQueue();
     renderSuggestions();
     renderPermissionCommandCenter();
+    updateShortcutButtons();
   }
 
   function renderRaisedQueueOnly() {
