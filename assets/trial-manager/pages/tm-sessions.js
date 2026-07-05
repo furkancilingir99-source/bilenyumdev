@@ -21,6 +21,7 @@
 
   var page = 1;
   var needsAttendanceFilter = false;
+  var todayFilter = false;
 
   function initFromUrl() {
     var st = U.qs('status');
@@ -28,6 +29,7 @@
       statusFilter.value = st;
     }
     if (U.qs('needsAttendance') === '1') needsAttendanceFilter = true;
+    if (U.qs('today') === '1') todayFilter = true;
   }
 
   function rowData(s) {
@@ -72,6 +74,10 @@
         if (!needs) return false;
         return Store.getReservationsForSession(s.id).some(function (res) { return res.status === 'confirmed'; });
       });
+    }
+    if (todayFilter) {
+      var todayKey = Store.todayKey();
+      items = items.filter(function (r) { return r.session.date === todayKey && r.session.status !== 'cancelled'; });
     }
     return U.sortBy(items, function (r) { return r.session.date + r.session.startTime; }, 'asc');
   }

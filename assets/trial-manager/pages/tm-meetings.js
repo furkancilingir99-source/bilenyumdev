@@ -127,4 +127,8 @@
   window.TMOnSessionChange = render;
   initFromUrl();
   render();
+  var openSessionId = U.qs('id');
+  if (openSessionId && window.TMSessionDetail) window.TMSessionDetail.open(openSessionId);
+  var openMeetingSessionId = U.qs('session');
+  if (openMeetingSessionId && window.TMSessionDetail) window.TMSessionDetail.open(openMeetingSessionId, 2);
 })();

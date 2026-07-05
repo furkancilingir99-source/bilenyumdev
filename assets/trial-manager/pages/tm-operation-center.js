@@ -34,7 +34,7 @@
     if (statsEl) {
       statsEl.innerHTML =
         metric(m.actionableCount, 'Toplam aksiyon bekleyen', '#tmDashActions', 'warn') +
-        metric(m.todaySessionCount, 'Bugünkü ders', 'deneme-dersi-yoneticisi-planlanmis-dersler.html') +
+        metric(m.todaySessionCount, 'Bugünkü ders', 'deneme-dersi-yoneticisi-planlanmis-dersler.html?today=1') +
         metric(m.todayStudentCount, 'Bugünkü öğrenci', 'deneme-dersi-yoneticisi-planlanmis-dersler.html') +
         metric(m.pendingApprovalCount, 'Onay bekleyen', 'deneme-dersi-yoneticisi-iletisim.html', 'warn') +
         metric(m.linkNotSentCount, 'Link gönderilmemiş', 'deneme-dersi-yoneticisi-online-linkler.html?status=not_sent', 'warn') +

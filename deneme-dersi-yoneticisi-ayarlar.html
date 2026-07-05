@@ -47,7 +47,11 @@
       </div>
       <h2 class="tm-panel-title" style="margin:24px 0 12px">Veri kaynağı</h2>
       <p style="font-size:13px;color:#64748b;margin:0 0 8px">İşlemler <code>TMApi</code> adapter üzerinden mock depoya gider. REST API bağlandığında aynı arayüz kullanılacak.</p>
-      <p style="font-size:13px;margin:0 0 16px">Aktif mod: <strong id="tmApiModeLabel">—</strong></p>
+      <p style="font-size:13px;margin:0 0 8px">Aktif mod: <strong id="tmApiModeLabel">—</strong></p>
+      <p id="tmApiHealthStatus" style="font-size:12px;color:#64748b;margin:0 0 12px">—</p>
+      <div class="tm-detail-actions" style="margin-bottom:16px">
+        <button type="button" class="tm-btn tm-btn--ghost" id="tmApiHealthCheck">API bağlantısını test et</button>
+      </div>
       <h2 class="tm-panel-title" style="margin:24px 0 12px">Mock kullanıcı (geliştirme)</h2>
       <p style="font-size:13px;color:#64748b;margin:0 0 12px">Yetki testi için oturum kullanıcısını değiştirin. Gözlemci rolünde düzenleme butonları kilitlenir.</p>
       <div class="tm-detail-actions" style="margin-bottom:20px;align-items:center;flex-wrap:wrap;gap:8px">
