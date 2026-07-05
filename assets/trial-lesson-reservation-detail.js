@@ -4,7 +4,8 @@
   var Mock = window.TrialLessonManagerMock;
   var Planner = window.TrialLessonPlannerMock;
   var Modal = window.TrialManagerModal;
-  if (!Mock || !Planner || !Modal) return;
+  var Tabs = window.TrialManagerTabs;
+  if (!Mock || !Planner || !Modal || !Tabs) return;
 
   var root = document.getElementById('tmResDetailRoot');
   var toastEl = document.getElementById('tmDetailToast');
@@ -51,27 +52,32 @@
     return r && r.status !== 'completed' && r.status !== 'cancelled';
   }
 
-  function slotWasUpdated(r) {
-    return !!(r.slotUpdatedAt && r.requestedSlotLabel && r.slotLabel !== r.requestedSlotLabel);
+  function canEditStatus(r) {
+    return r && r.status !== 'cancelled';
   }
 
-  function detailUrl(id) {
-    return 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(id);
+  function slotWasUpdated(r) {
+    return !!(r.slotUpdatedAt && r.requestedSlotLabel && r.slotLabel !== r.requestedSlotLabel);
   }
 
   function plannedDetailUrl(id) {
     return 'deneme-dersi-yoneticisi-planlanmis-ders-detay.html?id=' + encodeURIComponent(id);
   }
 
+  function slotConfirmLabel(r) {
+    if (r.slotConfirmedByParent) return { text: 'Veli onaylı', tone: 'ok' };
+    return { text: 'Onay bekleniyor', tone: 'warn' };
+  }
+
   function renderPlannedLessonsTable(lessons) {
     if (!lessons.length) {
-      return '<p class="tm-planned-no-students">Bu öğrenci henüz planlanmış bir derse atanmamış.</p>';
+      return '<p class="tm-dash-empty">Planlı derse atanmamış. Ders Planla sayfasından ekleyebilirsiniz.</p>';
     }
     return (
-      '<div class="tm-res-table-wrap">' +
-        '<table class="tm-detail-table">' +
+      '<div class="tm-dash-table-wrap">' +
+        '<table class="tm-dash-table">' +
           '<thead><tr>' +
-            '<th>Ders ID</th><th>Branş</th><th>Sınıf</th><th>Öğretmen</th><th>Ders Saati</th><th></th>' +
+            '<th>Ders ID</th><th>Branş</th><th>Sınıf</th><th>Öğretmen</th><th>Tarih / Saat</th><th></th>' +
           '</tr></thead>' +
           '<tbody>' +
             lessons.map(function (l) {
@@ -82,7 +88,7 @@
                   '<td>' + escapeHtml(l.grade) + '</td>' +
                   '<td>' + escapeHtml(l.teacherName) + '</td>' +
                   '<td>' + escapeHtml(l.slotLabel) + '</td>' +
-                  '<td><a class="tm-action-link" href="' + plannedDetailUrl(l.id) + '">Derse git</a></td>' +
+                  '<td><a class="tm-dash-row-link" href="' + plannedDetailUrl(l.id) + '">Detay</a></td>' +
                 '</tr>'
               );
             }).join('') +
@@ -92,69 +98,152 @@
     );
   }
 
+  function renderStatusOptions(r) {
+    var statuses = ['pending', 'confirmed', 'completed', 'cancelled'];
+    return statuses.map(function (s) {
+      return '<option value="' + s + '"' + (r.status === s ? ' selected' : '') + '>' + escapeHtml(Mock.STATUS_LABELS[s] || s) + '</option>';
+    }).join('');
+  }
+
   function renderPage(r) {
     if (!root) return;
     var lessons = Planner.findLessonsForReservation(r.id);
     var updated = slotWasUpdated(r);
+    var slotConfirm = slotConfirmLabel(r);
+    var parentNeedsAttention = !r.slotConfirmedByParent && r.status !== 'cancelled';
+
+    var alerts = '';
+    if (parentNeedsAttention) {
+      alerts += '<div class="tm-admin-alert">Veli slot onayı alınmadı — İletişim sekmesinden veli ile görüşün veya Ders &amp; slot sekmesinden güncelleyin.</div>';
+    }
+    if (!lessons.length && r.status === 'confirmed') {
+      alerts += '<div class="tm-admin-alert">Onaylı başvuru planlı derse atanmamış — Ders Planla ile sınıfa ekleyin.</div>';
+    }
+
+    var tabDefs = [
+      { id: 'ozet', label: 'Özet' },
+      { id: 'iletisim', label: 'İletişim' },
+      { id: 'slot', label: 'Ders & slot', badge: parentNeedsAttention ? '!' : '', badgeTone: parentNeedsAttention ? 'warn' : '' },
+      { id: 'planli', label: 'Planlı dersler', badge: String(lessons.length), badgeTone: lessons.length ? '' : 'warn' },
+      { id: 'kayit', label: 'Kayıt' }
+    ];
+
+    var overviewPanel = Tabs.kvGrid([
+      { label: 'Öğrenci', value: escapeHtml(studentName(r)) },
+      { label: 'Sınıf', value: escapeHtml(r.grade) },
+      { label: 'Deneme dersi', value: escapeHtml(r.subject) },
+      { label: 'Veli', value: escapeHtml(parentName(r)) },
+      { label: 'Kayıt tarihi', value: escapeHtml(formatCreatedAt(r.createdAt)) },
+      { label: 'Durum', value: '<span class="tm-status ' + statusClass(r.status) + '">' + escapeHtml(Mock.STATUS_LABELS[r.status] || r.status) + '</span>' },
+      { label: 'Tercih slotu', value: '<strong>' + escapeHtml(r.slotLabel) + '</strong>', full: true }
+    ]);
+
+    var contactPanel =
+      Tabs.kvGrid([
+        { label: 'Veli adı', value: escapeHtml(parentName(r)) },
+        { label: 'Telefon', value: '<a href="tel:' + escapeHtml(r.phone.replace(/\s/g, '')) + '">' + escapeHtml(r.phone) + '</a>' },
+        { label: 'E-posta', value: '<a href="mailto:' + escapeHtml(r.email) + '">' + escapeHtml(r.email) + '</a>' },
+        { label: 'Öğrenci', value: escapeHtml(studentName(r)) }
+      ]) +
+      '<div class="tm-admin-inline-actions">' +
+        '<a class="tm-planner-btn is-primary" href="tel:' + escapeHtml(r.phone.replace(/\s/g, '')) + '">Ara</a>' +
+        '<a class="tm-planner-btn is-ghost" href="mailto:' + escapeHtml(r.email) + '">E-posta gönder</a>' +
+      '</div>';
+
+    var slotPanel =
+      '<p class="tm-admin-panel-desc">Veli ile mutabık kalınan ders saatini buradan güncelleyin. Kayıttan önce veli onayını işaretleyin.</p>' +
+      Tabs.kvGrid([
+        { label: 'Güncel slot', value: '<strong>' + escapeHtml(r.slotLabel) + '</strong>' },
+        { label: 'Veli onayı', value: '<span class="tm-applicant-slot ' + (r.slotConfirmedByParent ? 'is-ok' : 'is-warn') + '">' + escapeHtml(slotConfirm.text) + '</span>' },
+        updated ? { label: 'İlk talep', value: escapeHtml(r.requestedSlotLabel) } : null,
+        r.slotUpdatedAt ? { label: 'Slot güncelleme', value: escapeHtml(formatCreatedAt(r.slotUpdatedAt)) } : null
+      ].filter(Boolean)) +
+      (canEditSlot(r)
+        ? '<div class="tm-admin-inline-actions"><button type="button" class="tm-planner-btn is-primary" id="tmOpenSlotModal">Ders tarihini düzenle</button></div>'
+        : '<p class="tm-admin-panel-desc">Tamamlanmış veya iptal edilmiş kayıtlarda slot düzenlenemez.</p>');
+
+    var recordPanel =
+      Tabs.kvGrid([
+        { label: 'Rezervasyon ID', value: '<span class="tm-record-id">' + escapeHtml(r.id) + '</span>', full: true },
+        { label: 'Oluşturulma', value: escapeHtml(formatCreatedAt(r.createdAt)) },
+        { label: 'Durum', value: escapeHtml(Mock.STATUS_LABELS[r.status] || r.status) }
+      ]) +
+      (canEditStatus(r)
+        ? '<div class="tm-admin-form-row">' +
+            '<label class="tm-filter-field">' +
+              '<span class="tm-filter-field-label">Durumu güncelle</span>' +
+              '<select class="tm-filter-select" id="tmResStatusEdit">' + renderStatusOptions(r) + '</select>' +
+            '</label>' +
+            '<button type="button" class="tm-planner-btn is-primary" id="tmResStatusSave">Durumu kaydet</button>' +
+          '</div>'
+        : '');
+
+    var plannedPanel =
+      '<p class="tm-admin-panel-desc">Bu başvurunun atandığı planlanmış deneme dersleri.</p>' +
+      renderPlannedLessonsTable(lessons) +
+      '<div class="tm-admin-inline-actions">' +
+        '<a class="tm-planner-btn is-ghost" href="deneme-dersi-yoneticisi-ders-planla.html">Yeni ders planla</a>' +
+      '</div>';
 
     root.innerHTML =
-      '<nav class="tm-breadcrumb">' +
-        '<a href="deneme-dersi-yoneticisi-rezervasyonlar.html">Rezervasyonlar</a>' +
-        '<span aria-hidden="true">/</span>' +
-        '<span>' + escapeHtml(r.id) + '</span>' +
-      '</nav>' +
-      '<header class="tm-detail-hero">' +
-        '<div class="tm-detail-hero-main">' +
-          '<h1 class="tm-detail-hero-title">' + escapeHtml(studentName(r)) + '</h1>' +
-          '<p class="tm-detail-hero-sub">' +
-            escapeHtml(r.subject) + ' · ' + escapeHtml(r.grade) + ' · Veli: ' + escapeHtml(parentName(r)) +
-          '</p>' +
-          '<span class="tm-record-id tm-record-id--lg">' + escapeHtml(r.id) + '</span>' +
+      '<div class="tm-admin" data-admin-root>' +
+        '<nav class="tm-breadcrumb">' +
+          '<a href="deneme-dersi-yoneticisi-dashboard.html">Merkez</a>' +
+          '<span aria-hidden="true">/</span>' +
+          '<a href="deneme-dersi-yoneticisi-rezervasyonlar.html">Rezervasyonlar</a>' +
+          '<span aria-hidden="true">/</span>' +
+          '<span>' + escapeHtml(r.id) + '</span>' +
+        '</nav>' +
+        '<header class="tm-admin-header">' +
+          '<div class="tm-admin-header-main">' +
+            '<h1 class="tm-admin-header-title">' + escapeHtml(studentName(r)) + '</h1>' +
+            '<p class="tm-admin-header-meta">' + escapeHtml(r.subject) + ' · ' + escapeHtml(r.grade) + ' · Veli: ' + escapeHtml(parentName(r)) + '</p>' +
+            '<span class="tm-record-id tm-admin-header-id">' + escapeHtml(r.id) + '</span>' +
+          '</div>' +
+          '<div class="tm-admin-header-actions">' +
+            '<span class="tm-status ' + statusClass(r.status) + '">' + escapeHtml(Mock.STATUS_LABELS[r.status] || r.status) + '</span>' +
+            (canEditSlot(r) ? '<button type="button" class="tm-planner-btn is-primary" id="tmOpenSlotModalHead">Slot düzenle</button>' : '') +
+            '<a class="tm-planner-btn is-ghost" href="deneme-dersi-yoneticisi-rezervasyonlar.html">Listeye dön</a>' +
+          '</div>' +
+        '</header>' +
+        Tabs.summaryCells([
+          { label: 'Durum', value: Mock.STATUS_LABELS[r.status] || r.status, tone: r.status === 'pending' ? 'warn' : r.status === 'confirmed' ? 'ok' : 'muted' },
+          { label: 'Ders slotu', value: r.slotLabel, tone: '' },
+          { label: 'Veli onayı', value: slotConfirm.text, tone: slotConfirm.tone },
+          { label: 'Planlı ders', value: lessons.length ? lessons.length + ' ders' : 'Atanmadı', tone: lessons.length ? 'ok' : 'warn' }
+        ]) +
+        alerts +
+        '<div class="tm-admin-body">' +
+          Tabs.renderTabNav(tabDefs) +
+          '<div class="tm-admin-panels">' +
+            Tabs.panelWrap('ozet', overviewPanel) +
+            Tabs.panelWrap('iletisim', contactPanel) +
+            Tabs.panelWrap('slot', slotPanel) +
+            Tabs.panelWrap('planli', plannedPanel) +
+            Tabs.panelWrap('kayit', recordPanel) +
+          '</div>' +
         '</div>' +
-        '<div class="tm-detail-hero-actions">' +
-          '<span class="tm-status ' + statusClass(r.status) + '">' + escapeHtml(Mock.STATUS_LABELS[r.status] || r.status) + '</span>' +
-          (canEditSlot(r) ? '<button type="button" class="tm-planner-btn is-primary" id="tmOpenSlotModal">Ders tarihini düzenle</button>' : '') +
-          '<a class="tm-planner-btn is-ghost" href="deneme-dersi-yoneticisi-rezervasyonlar.html">Listeye dön</a>' +
-        '</div>' +
-      '</header>' +
-      '<div class="tm-detail-grid">' +
-        '<div class="tm-detail-card is-student">' +
-          '<div class="tm-detail-card-head"><span class="tm-detail-card-icon" aria-hidden="true">🎓</span><h4 class="tm-detail-card-title">Öğrenci</h4></div>' +
-          '<dl class="tm-detail-dl">' +
-            '<div><dt>Ad Soyad</dt><dd>' + escapeHtml(studentName(r)) + '</dd></div>' +
-            '<div><dt>Sınıf</dt><dd>' + escapeHtml(r.grade) + '</dd></div>' +
-            '<div><dt>Deneme dersi</dt><dd>' + escapeHtml(r.subject) + '</dd></div>' +
-          '</dl>' +
-        '</div>' +
-        '<div class="tm-detail-card is-parent">' +
-          '<div class="tm-detail-card-head"><span class="tm-detail-card-icon" aria-hidden="true">👤</span><h4 class="tm-detail-card-title">Veli</h4></div>' +
-          '<dl class="tm-detail-dl">' +
-            '<div><dt>Ad Soyad</dt><dd>' + escapeHtml(parentName(r)) + '</dd></div>' +
-            '<div><dt>Telefon</dt><dd><a href="tel:' + escapeHtml(r.phone.replace(/\s/g, '')) + '">' + escapeHtml(r.phone) + '</a></dd></div>' +
-            '<div><dt>E-posta</dt><dd><a href="mailto:' + escapeHtml(r.email) + '">' + escapeHtml(r.email) + '</a></dd></div>' +
-          '</dl>' +
-        '</div>' +
-        '<div class="tm-detail-card is-reservation">' +
-          '<div class="tm-detail-card-head"><span class="tm-detail-card-icon" aria-hidden="true">📅</span><h4 class="tm-detail-card-title">Rezervasyon</h4></div>' +
-          '<dl class="tm-detail-dl">' +
-            '<div><dt>Kayıt tarihi</dt><dd>' + escapeHtml(formatCreatedAt(r.createdAt)) + '</dd></div>' +
-            '<div><dt>Ders tarihi / saat</dt><dd><strong>' + escapeHtml(r.slotLabel) + '</strong>' +
-              (updated ? '<br><small class="tm-slot-updated-at">İlk talep: ' + escapeHtml(r.requestedSlotLabel) + '</small>' : '') +
-              (r.slotUpdatedAt ? '<br><small class="tm-slot-updated-at">Son güncelleme: ' + escapeHtml(formatCreatedAt(r.slotUpdatedAt)) + '</small>' : '') +
-            '</dd></div>' +
-            '<div><dt>Durum</dt><dd><span class="tm-status ' + statusClass(r.status) + '">' + escapeHtml(Mock.STATUS_LABELS[r.status] || r.status) + '</span></dd></div>' +
-          '</dl>' +
-        '</div>' +
-      '</div>' +
-      '<section class="tm-detail-section">' +
-        '<div class="tm-detail-section-head">' +
-          '<h2 class="tm-detail-section-title">Planlanmış dersler (' + lessons.length + ')</h2>' +
-        '</div>' +
-        renderPlannedLessonsTable(lessons) +
-      '</section>';
+      '</div>';
 
-    var slotBtn = document.getElementById('tmOpenSlotModal');
-    if (slotBtn) slotBtn.addEventListener('click', openSlotModal);
+    Tabs.bind(root.querySelector('[data-admin-root]'));
+
+    ['tmOpenSlotModal', 'tmOpenSlotModalHead'].forEach(function (id) {
+      var btn = document.getElementById(id);
+      if (btn) btn.addEventListener('click', openSlotModal);
+    });
+
+    var statusSave = document.getElementById('tmResStatusSave');
+    if (statusSave) {
+      statusSave.addEventListener('click', function () {
+        var sel = document.getElementById('tmResStatusEdit');
+        if (!sel) return;
+        var next = sel.value;
+        if (next === 'cancelled' && !Modal.confirmDelete({ subject: 'Bu rezervasyon', detail: r.id + ' iptal edilecek.' })) return;
+        Mock.updateReservationSlot(reservationId, { status: next });
+        showToast('Durum güncellendi.');
+        renderPage(Mock.getReservationById(reservationId));
+      });
+    }
   }
 
   function renderSlotModalBody() {

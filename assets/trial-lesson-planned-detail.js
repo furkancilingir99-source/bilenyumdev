@@ -5,7 +5,8 @@
   var ResMock = window.TrialLessonManagerMock;
   var Modal = window.TrialManagerModal;
   var Picker = window.TrialLessonApplicantPicker;
-  if (!Planner || !ResMock || !Modal || !Picker) return;
+  var Tabs = window.TrialManagerTabs;
+  if (!Planner || !ResMock || !Modal || !Picker || !Tabs) return;
 
   var root = document.getElementById('tmPlannedDetailRoot');
   var toastEl = document.getElementById('tmDetailToast');
@@ -188,33 +189,65 @@
     }
   }
 
+  function countParentIssues(l) {
+    var applicants = Planner.getEligibleStudents(l.subject, l.grade, l.id, l.slotDateKey, l.slotTime, l.slotLabel);
+    return applicants.filter(function (a) {
+      return l.studentIds.indexOf(a.reservationId) !== -1 && a.needsParentContact;
+    }).length;
+  }
+
   function renderPage(l) {
     if (!root) return;
     var desc = Planner.describeLessonId(l.id);
-    var conflicts = renderConflictsBlock(l);
     var teacher = Planner.getTeacherById(l.teacherId);
+    var issues = Planner.checkConflicts(l);
+    var parentIssueCount = countParentIssues(l);
+    var hasConflicts = issues.length > 0;
 
-    root.innerHTML =
-      '<nav class="tm-breadcrumb">' +
-        '<a href="deneme-dersi-yoneticisi-planlanmis-dersler.html">Planlanmış Dersler</a>' +
-        '<span aria-hidden="true">/</span>' +
-        '<span>' + escapeHtml(l.id) + '</span>' +
-      '</nav>' +
-      '<header class="tm-detail-hero">' +
-        '<div class="tm-detail-hero-main">' +
-          '<h1 class="tm-detail-hero-title">' + escapeHtml(l.subject) + ' · ' + escapeHtml(l.grade) + '</h1>' +
-          '<p class="tm-detail-hero-sub">' + escapeHtml(l.teacherName) + ' · ' + escapeHtml(l.slotLabel) + '</p>' +
-          '<span class="tm-record-id tm-record-id--lg">' + escapeHtml(l.id) + '</span>' +
-          '<p class="tm-lesson-id-desc">' + escapeHtml(desc.subject) + ' · ' + escapeHtml(desc.grade) + ' · ' + escapeHtml(desc.year) + '-#' + escapeHtml(desc.seq) + '</p>' +
-        '</div>' +
-        '<div class="tm-detail-hero-actions">' +
-          (l.conflicts && l.conflicts.length ? '<span class="tm-status is-pending">Çakışma var</span>' : '<span class="tm-status is-confirmed">Planlandı</span>') +
-          '<button type="button" class="tm-planner-btn is-primary" id="tmOpenStudentsModal">Başvurulardan düzenle</button>' +
-          '<a class="tm-planner-btn is-ghost" href="deneme-dersi-yoneticisi-ders-planla.html?edit=' + encodeURIComponent(l.id) + '">Dersi düzenle</a>' +
-          '<a class="tm-planner-btn is-ghost" href="deneme-dersi-yoneticisi-planlanmis-dersler.html">Listeye dön</a>' +
-        '</div>' +
-      '</header>' +
-      conflicts +
+    var alerts = '';
+    if (hasConflicts) {
+      alerts += '<div class="tm-admin-alert is-error"><strong>Çakışma:</strong> ' +
+        issues.map(function (i) { return escapeHtml(i.message); }).join(' · ') + '</div>';
+    }
+
+    var tabDefs = [
+      { id: 'ozet', label: 'Özet' },
+      { id: 'ogrenciler', label: 'Öğrenciler', badge: String(l.students.length), badgeTone: l.students.length ? '' : 'warn' },
+      { id: 'koordinasyon', label: 'Koordinasyon', badge: parentIssueCount ? String(parentIssueCount) : '', badgeTone: parentIssueCount ? 'warn' : '' },
+      { id: 'kayit', label: 'Kayıt' }
+    ];
+
+    var overviewPanel =
+      Tabs.kvGrid([
+        { label: 'Branş', value: escapeHtml(l.subject) },
+        { label: 'Sınıf', value: escapeHtml(l.grade) },
+        { label: 'Ders tarihi', value: '<strong>' + escapeHtml(l.slotLabel) + '</strong>' },
+        { label: 'Öğretmen', value: escapeHtml(l.teacherName) },
+        { label: 'Öğrenci sayısı', value: String(l.students.length) },
+        { label: 'Durum', value: hasConflicts
+          ? '<span class="tm-status is-pending">Çakışma var</span>'
+          : '<span class="tm-status is-confirmed">Planlandı</span>' }
+      ]) +
+      '<div class="tm-admin-inline-actions">' +
+        '<a class="tm-planner-btn is-primary" href="deneme-dersi-yoneticisi-ders-planla.html?edit=' + encodeURIComponent(l.id) + '">Dersi düzenle</a>' +
+        '<button type="button" class="tm-planner-btn is-ghost" id="tmOpenStudentsModal">Öğrenci listesini düzenle</button>' +
+      '</div>' +
+      '<p class="tm-admin-section-label">Öğretmen iletişim</p>' +
+      Tabs.kvGrid([
+        teacher && teacher.phone ? { label: 'Telefon', value: '<a href="tel:' + escapeHtml(String(teacher.phone).replace(/\s/g, '')) + '">' + escapeHtml(teacher.phone) + '</a>' } : null,
+        teacher && teacher.email ? { label: 'E-posta', value: '<a href="mailto:' + escapeHtml(teacher.email) + '">' + escapeHtml(teacher.email) + '</a>' } : null,
+        { label: 'Branşlar', value: escapeHtml((l.teacherSubjects || []).join(', ')) }
+      ].filter(Boolean));
+
+    var studentsPanel =
+      '<div class="tm-admin-panel-head">' +
+        '<h3 class="tm-admin-panel-title">Derse kayıtlı öğrenciler</h3>' +
+        '<button type="button" class="tm-action-link is-primary" id="tmOpenStudentsModal2">Başvurulardan düzenle</button>' +
+      '</div>' +
+      renderStudentsTable(l.students, l);
+
+    var coordinationPanel =
+      '<p class="tm-admin-panel-desc">Veli onayı ve öğretmen bilgilendirmesi bu sekmeden yönetilir.</p>' +
       Picker.renderParentCoordinationAlert(
         Planner.getEligibleStudents(l.subject, l.grade, l.id, l.slotDateKey, l.slotTime, l.slotLabel),
         l.studentIds,
@@ -223,50 +256,62 @@
       Picker.renderTeacherCoordination(
         teacher || { name: l.teacherName, phone: l.teacherPhone, email: l.teacherEmail },
         { subject: l.subject, grade: l.grade, lessonSlotLabel: l.slotLabel, lessonId: l.id, studentNames: l.students.map(function (s) { return s.name; }) }
-      ) +
-      '<div class="tm-detail-grid">' +
-        '<div class="tm-detail-card is-lesson">' +
-          '<div class="tm-detail-card-head"><span class="tm-detail-card-icon" aria-hidden="true">📚</span><h4 class="tm-detail-card-title">Ders</h4></div>' +
-          '<dl class="tm-detail-dl">' +
-            '<div><dt>Branş</dt><dd>' + escapeHtml(l.subject) + '</dd></div>' +
-            '<div><dt>Sınıf</dt><dd>' + escapeHtml(l.grade) + '</dd></div>' +
-            '<div><dt>Ders tarihi / saat</dt><dd><strong>' + escapeHtml(l.slotLabel) + '</strong></dd></div>' +
-            '<div><dt>Öğrenci sayısı</dt><dd>' + l.students.length + '</dd></div>' +
-            '<div><dt>Son güncelleme</dt><dd>' + escapeHtml(formatUpdatedAt(l.updatedAt)) + '</dd></div>' +
-          '</dl>' +
+      );
+
+    var recordPanel =
+      Tabs.kvGrid([
+        { label: 'Ders ID', value: '<span class="tm-record-id">' + escapeHtml(l.id) + '</span>', full: true },
+        { label: 'Branş kodu', value: escapeHtml(desc.subject) + ' · ' + escapeHtml(desc.grade) },
+        { label: 'Yıl / sıra', value: escapeHtml(desc.year) + '-#' + escapeHtml(desc.seq) },
+        { label: 'Tarih anahtarı', value: escapeHtml(l.slotDateKey) + ' · ' + escapeHtml(l.slotTime) },
+        { label: 'Son güncelleme', value: escapeHtml(formatUpdatedAt(l.updatedAt)) },
+        { label: 'Atanan kayıt', value: l.studentIds.length + ' rezervasyon' }
+      ]) +
+      '<div class="tm-admin-inline-actions">' +
+        '<a class="tm-planner-btn is-ghost" href="deneme-dersi-yoneticisi-ders-planla.html?edit=' + encodeURIComponent(l.id) + '">Tam düzenleme formu</a>' +
+      '</div>';
+
+    root.innerHTML =
+      '<div class="tm-admin" data-admin-root>' +
+        '<nav class="tm-breadcrumb">' +
+          '<a href="deneme-dersi-yoneticisi-dashboard.html">Merkez</a>' +
+          '<span aria-hidden="true">/</span>' +
+          '<a href="deneme-dersi-yoneticisi-planlanmis-dersler.html">Planlanmış Dersler</a>' +
+          '<span aria-hidden="true">/</span>' +
+          '<span>' + escapeHtml(l.id) + '</span>' +
+        '</nav>' +
+        '<header class="tm-admin-header">' +
+          '<div class="tm-admin-header-main">' +
+            '<h1 class="tm-admin-header-title">' + escapeHtml(l.subject) + ' · ' + escapeHtml(l.grade) + '</h1>' +
+            '<p class="tm-admin-header-meta">' + escapeHtml(l.teacherName) + ' · ' + escapeHtml(l.slotLabel) + '</p>' +
+            '<span class="tm-record-id tm-admin-header-id">' + escapeHtml(l.id) + '</span>' +
+          '</div>' +
+          '<div class="tm-admin-header-actions">' +
+            (hasConflicts ? '<span class="tm-status is-pending">Çakışma</span>' : '<span class="tm-status is-confirmed">Planlandı</span>') +
+            '<button type="button" class="tm-planner-btn is-primary" id="tmOpenStudentsModalHead">Öğrencileri düzenle</button>' +
+            '<a class="tm-planner-btn is-ghost" href="deneme-dersi-yoneticisi-ders-planla.html?edit=' + encodeURIComponent(l.id) + '">Dersi düzenle</a>' +
+            '<a class="tm-planner-btn is-ghost" href="deneme-dersi-yoneticisi-planlanmis-dersler.html">Listeye dön</a>' +
+          '</div>' +
+        '</header>' +
+        Tabs.summaryCells([
+          { label: 'Durum', value: hasConflicts ? 'Çakışma var' : 'Planlandı', tone: hasConflicts ? 'danger' : 'ok' },
+          { label: 'Öğretmen', value: l.teacherName, tone: 'muted' },
+          { label: 'Ders saati', value: l.slotLabel, tone: '' },
+          { label: 'Öğrenci', value: l.students.length + ' kişi', tone: l.students.length ? 'ok' : 'warn' }
+        ]) +
+        alerts +
+        '<div class="tm-admin-body">' +
+          Tabs.renderTabNav(tabDefs) +
+          '<div class="tm-admin-panels">' +
+            Tabs.panelWrap('ozet', overviewPanel) +
+            Tabs.panelWrap('ogrenciler', studentsPanel) +
+            Tabs.panelWrap('koordinasyon', coordinationPanel) +
+            Tabs.panelWrap('kayit', recordPanel) +
+          '</div>' +
         '</div>' +
-        '<div class="tm-detail-card is-teacher">' +
-          '<div class="tm-detail-card-head"><span class="tm-detail-card-icon" aria-hidden="true">👨‍🏫</span><h4 class="tm-detail-card-title">Öğretmen</h4></div>' +
-          '<dl class="tm-detail-dl">' +
-            '<div><dt>Ad Soyad</dt><dd>' + escapeHtml(l.teacherName) + '</dd></div>' +
-            '<div><dt>Branşlar</dt><dd>' + escapeHtml((l.teacherSubjects || []).join(', ')) + '</dd></div>' +
-            (l.teacherPhone ? '<div><dt>Telefon</dt><dd><a href="tel:' + escapeHtml(String(l.teacherPhone).replace(/\s/g, '')) + '">' + escapeHtml(l.teacherPhone) + '</a></dd></div>' : '') +
-            (l.teacherEmail ? '<div><dt>E-posta</dt><dd><a href="mailto:' + escapeHtml(l.teacherEmail) + '">' + escapeHtml(l.teacherEmail) + '</a></dd></div>' : '') +
-          '</dl>' +
-          (teacher && (teacher.phone || teacher.email)
-            ? '<div class="tm-applicant-contacts tm-teacher-card-contacts">' +
-                (teacher.phone ? '<a class="tm-contact-chip" href="tel:' + String(teacher.phone).replace(/\s/g, '') + '">Ara</a>' : '') +
-                (teacher.email ? '<a class="tm-contact-chip" href="mailto:' + escapeHtml(teacher.email) + '">E-posta</a>' : '') +
-                (teacher.phone ? '<a class="tm-contact-chip is-wa" href="' + escapeHtml(Picker.whatsAppUrl(teacher.phone, Picker.buildTeacherLessonMessage(teacher, { subject: l.subject, grade: l.grade, lessonSlotLabel: l.slotLabel, lessonId: l.id, studentNames: l.students.map(function (s) { return s.name; }) }))) + '" target="_blank" rel="noopener">WhatsApp</a>' : '') +
-              '</div>'
-            : '') +
-        '</div>' +
-        '<div class="tm-detail-card is-reservation">' +
-          '<div class="tm-detail-card-head"><span class="tm-detail-card-icon" aria-hidden="true">🗓</span><h4 class="tm-detail-card-title">Planlama</h4></div>' +
-          '<dl class="tm-detail-dl">' +
-            '<div><dt>Ders ID</dt><dd><span class="tm-record-id">' + escapeHtml(l.id) + '</span></dd></div>' +
-            '<div><dt>Tarih anahtarı</dt><dd>' + escapeHtml(l.slotDateKey) + ' · ' + escapeHtml(l.slotTime) + '</dd></div>' +
-            '<div><dt>Atanan öğrenci</dt><dd>' + l.studentIds.length + ' kayıt</dd></div>' +
-          '</dl>' +
-        '</div>' +
-      '</div>' +
-      '<section class="tm-detail-section">' +
-        '<div class="tm-detail-section-head">' +
-          '<h2 class="tm-detail-section-title">Derse katılacak öğrenciler (' + l.students.length + ')</h2>' +
-          '<button type="button" class="tm-action-link is-primary" id="tmOpenStudentsModal2">Başvurulardan düzenle</button>' +
-        '</div>' +
-        renderStudentsTable(l.students, l) +
-      '</section>';
+      '</div>';
+
+    Tabs.bind(root.querySelector('[data-admin-root]'));
 
     root.querySelectorAll('[data-confirm-slot]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
@@ -307,7 +352,7 @@
       });
     });
 
-    ['tmOpenStudentsModal', 'tmOpenStudentsModal2'].forEach(function (id) {
+    ['tmOpenStudentsModal', 'tmOpenStudentsModal2', 'tmOpenStudentsModalHead'].forEach(function (id) {
       var btn = document.getElementById(id);
       if (btn) btn.addEventListener('click', openStudentsModal);
     });
