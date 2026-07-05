@@ -4,7 +4,7 @@
 (function (global) {
   'use strict';
 
-  var Store = global.TMStore;
+  var Store = (global.TMBridge && global.TMBridge.store()) || global.TMStore;
   var U = global.TMUtils;
   var SL = global.TMStatusLabels;
   var Drawer = global.TMDetailDrawer;

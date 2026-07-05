@@ -5,17 +5,13 @@
   'use strict';
 
   var Api = window.TMApi;
-  var Store = window.TMStore;
+  var Store = (window.TMBridge && window.TMBridge.store()) || window.TMStore;
   var U = window.TMUtils;
   var SL = window.TMStatusLabels;
   var Perms = window.TMPermissions;
   var Drawer = window.TMDetailDrawer;
   var Export = window.TMExportUtils;
   if (!Api && !Store) return;
-
-  function data() {
-    return Api && Api.data ? Api.data() : Store;
-  }
 
   function getUsers() {
     return Api && Api.getUsers ? Api.getUsers() : Store.getUsers();
@@ -149,6 +145,9 @@
           '<td>' + (u.isActive ? 'Aktif' : 'Pasif') + '</td>' +
           '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + u.id + '">Detay</button></td></tr>';
       }).join('');
+      tbody.querySelectorAll('.tm-switch').forEach(function (lab) {
+        lab.addEventListener('click', function (e) { e.stopPropagation(); });
+      });
       tbody.querySelectorAll('.tm-switch input').forEach(function (inp) {
         inp.addEventListener('change', function (e) {
           e.stopPropagation();

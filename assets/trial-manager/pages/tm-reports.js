@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var Store = window.TMStore;
+  var Store = (window.TMBridge && window.TMBridge.store()) || window.TMStore;
   var U = window.TMUtils;
   var SL = window.TMStatusLabels;
   var Export = window.TMExportUtils;
@@ -84,18 +84,7 @@
   }
 
   function openAuditEntity(rawType, entityId) {
-    if (!entityId) return;
-    if (rawType === 'trial_lesson_request' && window.TMRequestDrawer) {
-      window.TMRequestDrawer.open(entityId);
-    } else if (rawType === 'trial_lesson_session' && window.TMSessionDetail) {
-      window.TMSessionDetail.open(entityId);
-    } else if (rawType === 'student') {
-      window.location.href = 'deneme-dersi-yoneticisi-ogrenciler.html';
-    } else if (rawType === 'parent') {
-      window.location.href = 'deneme-dersi-yoneticisi-veliler.html';
-    } else if (rawType === 'teacher') {
-      window.location.href = 'deneme-dersi-yoneticisi-ogretmenler.html';
-    }
+    if (window.TMAuditActions) window.TMAuditActions.openEntity(rawType, entityId);
   }
 
   function bindAuditTableActions() {

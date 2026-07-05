@@ -66,12 +66,37 @@
     return store();
   }
 
+  function invoke(method) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    var fn = data()[method];
+    if (typeof fn !== 'function') {
+      throw new Error('TMStore.' + method + ' bulunamadı.');
+    }
+    return fn.apply(data(), args);
+  }
+
+  function fetchJson(path, options) {
+    options = options || {};
+    var headers = Object.assign({ Accept: 'application/json' }, options.headers || {});
+    return fetch(path, Object.assign({ credentials: 'same-origin', headers: headers }, options))
+      .then(function (res) {
+        if (!res.ok) {
+          return res.text().then(function (body) {
+            throw new Error(body || ('HTTP ' + res.status));
+          });
+        }
+        return res.json();
+      });
+  }
+
   global.TMApi = {
     getMode: getMode,
     setMode: setMode,
     isMock: function () { return getMode() === 'mock'; },
     endpoints: ENDPOINTS,
     data: data,
+    invoke: invoke,
+    fetchJson: fetchJson,
     getOperationMetrics: callStore('getOperationMetrics'),
     getMockStats: callStore('getMockStats'),
     getAuditLogs: callStore('getAuditLogs'),
@@ -91,4 +116,12 @@
   };
 
   global.TMData = global.TMApi;
+
+  global.TMBridge = {
+    store: data,
+    call: invoke,
+    available: function () {
+      return !!(global.TMApi || global.TMStore);
+    }
+  };
 })(typeof window !== 'undefined' ? window : this);

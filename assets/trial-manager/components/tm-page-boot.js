@@ -7,7 +7,7 @@
   var LOAD_IDS = [
     'tmDashRoot', 'tmSessionsTableWrap', 'tmRequestsTableWrap', 'tmStudentsTableWrap',
     'tmParentsTableWrap', 'tmTeachersTableWrap', 'tmMeetingsTableWrap', 'tmCommTableWrap',
-    'tmUsersTableWrap', 'tmReportGrid', 'tmRequestDetail', 'tmFullDetail'
+    'tmUsersTableWrap', 'tmReportGrid', 'tmRequestDetail', 'tmFullDetail', 'tmAuditTableWrap'
   ];
 
   function showBootError(msg) {
@@ -43,7 +43,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     setTimeout(function () {
-      if (!window.TMStore && !window.TMApi && document.querySelector('[data-tm-page]')) {
+      if (!window.TMStore && !(window.TMBridge && window.TMBridge.available && window.TMBridge.available()) && document.querySelector('[data-tm-page]')) {
         showBootError('Veri deposu (TMStore) yüklenemedi. Sayfayı yenileyin veya önbelleği temizleyin.');
         return;
       }

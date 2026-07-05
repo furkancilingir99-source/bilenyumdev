@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var Store = window.TMStore;
+  var Store = (window.TMBridge && window.TMBridge.store()) || window.TMStore;
   var U = window.TMUtils;
   var SL = window.TMStatusLabels;
   var Form = window.TMFormDialog;

@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var Store = window.TMStore;
+  var Store = (window.TMBridge && window.TMBridge.store()) || window.TMStore;
   var Rules = window.TMSchedulingRules;
   var U = window.TMUtils;
   var Confirm = window.TMConfirmDialog;
