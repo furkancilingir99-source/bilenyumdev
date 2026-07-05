@@ -111,14 +111,14 @@
     status = status || examStatus();
     var items = [
       {
-        label: 'Deneme Sınavının Video Çözümlerini İzle',
+        label: 'Seviye Belirleme Sınavının Video Çözümlerini İzle',
         desc: 'Ders ders tüm soruların video çözümlerine ulaşabilirsin.'
       },
       {
-        label: 'Sonucumu Göster',
+        label: 'Seviye Belirleme Sınavının Sonuçlarını Görüntüle',
         desc: status.allDone
           ? 'Birleşik puanını, klan yerleşimini ve ders bazlı sonuçlarını görüntülersin.'
-          : 'Deneme puanını ve her ders için doğru, yanlış ve net sonuçlarını görüntülersin.'
+          : 'Seviye belirleme puanını ve her ders için doğru, yanlış ve net sonuçlarını görüntülersin.'
       }
     ];
     if (status.allDone) {
@@ -177,18 +177,66 @@
   function renderPlacementFinishActions(status) {
     status = status || examStatus();
     var html = '';
-    html += '<button type="button" class="asm-btn asm-btn-ghost" id="asmPlacementVideosBtn">Deneme Sınavının Video Çözümlerini İzle</button>';
+    html += '<button type="button" class="asm-btn asm-btn-ghost" id="asmPlacementVideosBtn">Seviye Belirleme Sınavının Video Çözümlerini İzle</button>';
     if (status.allDone) {
-      html += '<a href="sinav-sonuclari.html?view=combined" class="asm-btn asm-btn-primary">Sonucumu Göster ' + ICON_ARROW + '</a>';
+      html += '<a href="sinav-sonuclari.html?view=combined" class="asm-btn asm-btn-primary">Seviye Belirleme Sınavının Sonuçlarını Görüntüle ' + ICON_ARROW + '</a>';
       html += welcomeDashboardBtn();
       return html;
     }
-    html += '<a href="sinav-sonuclari.html?view=placement" class="asm-btn asm-btn-primary">Sonucumu Göster ' + ICON_ARROW + '</a>';
+    html += '<a href="sinav-sonuclari.html?view=placement" class="asm-btn asm-btn-primary">Seviye Belirleme Sınavının Sonuçlarını Görüntüle ' + ICON_ARROW + '</a>';
     if (!status.attention) {
       html += '<a href="dikkat-testi.html" class="asm-btn asm-btn-primary asm-btn-attention">Dikkat Testine Geç ' + ICON_ARROW + '</a>';
       html += '<a href="ogrenci-dashboard.html" class="asm-btn asm-btn-ghost">Dikkat Testini Daha Sonra Çöz</a>';
     }
     return html;
+  }
+
+  function renderDenemeFinishActions() {
+    return (
+      '<button type="button" class="asm-btn asm-btn-ghost" id="asmDenemeVideosBtn">Deneme Sınavının Video Çözümlerini İzle</button>' +
+      '<a href="sinav-sonuclari.html?view=deneme" class="asm-btn asm-btn-primary">Deneme Sınavının Sonuçlarını Görüntüle ' + ICON_ARROW + '</a>' +
+      '<a href="deneme-sinavlari.html" class="asm-btn asm-btn-ghost">Deneme Sınavlarına Dön</a>'
+    );
+  }
+
+  function denemeFinishHints() {
+    return renderFinishHints([
+      {
+        label: 'Deneme Sınavının Video Çözümlerini İzle',
+        desc: 'Bu oturumdaki soruların ders ders video çözümlerine ulaşabilirsin.'
+      },
+      {
+        label: 'Deneme Sınavının Sonuçlarını Görüntüle',
+        desc: 'Deneme puanını ve ders bazlı doğru, yanlış ve net sonuçlarını detaylı görürsün.'
+      },
+      {
+        label: 'Deneme Sınavlarına Dön',
+        desc: 'Deneme sınavları sayfasına dönersin; istediğin zaman tekrar katılabilirsin.'
+      }
+    ]);
+  }
+
+  function renderDenemeHero(data, student) {
+    return (
+      '<section class="asm-res-hero asm-res-hero--partial">' +
+        '<span class="asm-res-hero-emoji">📊</span>' +
+        '<h1 class="asm-res-hero-title">Deneme Sınavı Sonucun</h1>' +
+        '<p class="asm-res-hero-sub">' + escapeHtml(student.name) + ' · ' + escapeHtml(student.gradeLabel) + '</p>' +
+        '<div class="asm-res-score-ring">' +
+          '<div class="asm-res-score-val">' + data.placementScore + '</div>' +
+          '<div class="asm-res-score-lbl">Deneme Puanı <span>/ 500</span></div>' +
+        '</div>' +
+      '</section>'
+    );
+  }
+
+  function renderDenemeActions() {
+    return (
+      '<div class="asm-res-actions">' +
+        '<button type="button" class="asm-btn asm-btn-primary" id="asmDenemeVideosBtn">Deneme Sınavının Video Çözümlerini İzle</button>' +
+        '<a href="deneme-sinavlari.html" class="asm-btn asm-btn-ghost">Deneme Sınavlarına Dön</a>' +
+      '</div>'
+    );
   }
 
   function renderAttentionFinishActions(status) {
@@ -329,6 +377,30 @@
     return html;
   }
 
+  function loadDenemeResults() {
+    var raw = lsGet('denemeExamResults');
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch (e) { return null; }
+  }
+
+  function getDenemeQuestions() {
+    if (global.BilenyumDenemeQuestions && global.BilenyumDenemeQuestions.getActiveBank) {
+      return global.BilenyumDenemeQuestions.getActiveBank();
+    }
+    var raw = lsGet('denemeExamBank');
+    if (!raw) return [];
+    try { return JSON.parse(raw); } catch (e) { return []; }
+  }
+
+  function resolveDenemePlacement(denemeRaw) {
+    if (!denemeRaw || !denemeRaw.placement) return null;
+    var questions = getDenemeQuestions();
+    if (questions.length && denemeRaw.answers && denemeRaw.answers.length) {
+      return Scoring.scorePlacement(questions, denemeRaw.answers);
+    }
+    return denemeRaw.placement;
+  }
+
   function resolvePlacement(placementRaw) {
     if (!placementRaw || !placementRaw.placement) return null;
     var questions = global.BilenyumPlacementQuestions;
@@ -360,6 +432,23 @@
         renderActions('combined');
       bindDetailToggle(root);
       return;
+    }
+
+    if (view === 'deneme') {
+      var denemeRaw = loadDenemeResults();
+      if (denemeRaw && denemeRaw.placement) {
+        var denemeQuestions = getDenemeQuestions();
+        var denemePlacement = resolveDenemePlacement(denemeRaw) || denemeRaw.placement;
+        var autoDenemeVideos = new URLSearchParams(location.search).get('videos') === '1';
+        root.innerHTML =
+          renderDenemeHero(denemePlacement, student) +
+          renderSubjectTable(denemePlacement, 'Ders Bazlı Sonuçlar') +
+          renderPlacementVideoHost() +
+          renderDenemeActions();
+        bindExamVideos(root, denemeRaw, denemeQuestions, autoDenemeVideos);
+        bindFinishVideosButton('asmDenemeVideosBtn', denemeQuestions, denemeRaw);
+        return;
+      }
     }
 
     if (view === 'placement' && placementRaw && placementRaw.placement) {
@@ -394,12 +483,11 @@
       '</section>';
   }
 
-  function bindPlacementVideos(root, placementRaw, autoOpen) {
+  function bindExamVideos(root, resultsRaw, questions, autoOpen) {
     var PV = global.BilenyumPlacementVideos;
-    var questions = global.BilenyumPlacementQuestions;
     if (!PV || !questions || !questions.length) return null;
 
-    var answers = placementRaw && placementRaw.answers ? placementRaw.answers : [];
+    var answers = resultsRaw && resultsRaw.answers ? resultsRaw.answers : [];
     var host = root.querySelector('#asmPlacementVideosHost');
     if (!host) return null;
 
@@ -408,16 +496,23 @@
     return api;
   }
 
-  function bindPlacementVideosButton(placementRaw) {
-    var btn = document.getElementById('asmPlacementVideosBtn');
+  function bindFinishVideosButton(btnId, questions, resultsRaw) {
+    var btn = document.getElementById(btnId);
     var PV = global.BilenyumPlacementVideos;
-    var questions = global.BilenyumPlacementQuestions;
     if (!btn || !PV || !questions || !questions.length) return;
 
     btn.addEventListener('click', function () {
-      var answers = placementRaw && placementRaw.answers ? placementRaw.answers : [];
+      var answers = resultsRaw && resultsRaw.answers ? resultsRaw.answers : [];
       PV.mountModal(questions, answers);
     });
+  }
+
+  function bindPlacementVideos(root, placementRaw, autoOpen) {
+    return bindExamVideos(root, placementRaw, global.BilenyumPlacementQuestions, autoOpen);
+  }
+
+  function bindPlacementVideosButton(placementRaw) {
+    bindFinishVideosButton('asmPlacementVideosBtn', global.BilenyumPlacementQuestions, placementRaw);
   }
 
   function renderPlacementVideoHost() {
@@ -436,7 +531,7 @@
     });
   }
 
-  function renderCompactSubjectTable(placement) {
+  function renderCompactSubjectTable(placement, showFormula) {
     return (
       '<div class="asm-finish-table-wrap">' +
         '<table class="asm-finish-table">' +
@@ -463,7 +558,7 @@
             '<td class="is-net"><strong>' + Scoring.fmtNet(placement.totalNet) + '</strong></td>' +
           '</tr></tfoot>' +
         '</table>' +
-        '<p class="asm-finish-formula">Net = Doğru − (Yanlış ÷ 3)</p>' +
+        (showFormula ? '<p class="asm-finish-formula">Net = Doğru − (Yanlış ÷ 3)</p>' : '') +
       '</div>'
     );
   }
@@ -482,7 +577,7 @@
     var scoreVal = placement.placementScore;
     var scoreLbl = 'Deneme Puanı / 500';
     var scoreBlock = '';
-    var tableBlock = renderCompactSubjectTable(placement);
+    var tableBlock = renderCompactSubjectTable(placement, false);
 
     if (status.allDone && combinedData && combinedData.combined && combinedData.clan) {
       scoreVal = combinedData.combined.combined500;
@@ -494,7 +589,7 @@
     inner.innerHTML =
       '<span class="asm-finish-modal-icon" aria-hidden="true">' + (status.allDone ? '🎉' : '📊') + '</span>' +
       '<h2 class="asm-finish-modal-title" id="asmFinishTitle">' +
-        (status.allDone ? 'Tebrikler, ' + escapeHtml(Scoring.getStudentProfile().name) + '!' : 'Deneme Sınavın Tamamlandı!') +
+        (status.allDone ? 'Tebrikler, ' + escapeHtml(Scoring.getStudentProfile().name) + '!' : 'Seviye Belirleme Sınavın Tamamlandı!') +
       '</h2>' +
       '<p class="asm-finish-modal-sub">' +
         (status.allDone
@@ -526,21 +621,25 @@
     if (!overlay || !inner) return;
 
     root.classList.add('is-exam-finished');
+    var denemeRaw = loadDenemeResults();
     inner.innerHTML =
       '<span class="asm-finish-modal-icon" aria-hidden="true">📊</span>' +
       '<h2 class="asm-finish-modal-title" id="asmFinishTitle">Deneme Sınavın Tamamlandı!</h2>' +
-      '<p class="asm-finish-modal-sub">Deneme sınavı sonucun hesaplandı. İstediğin zaman deneme sınavları sayfasından tekrar katılabilirsin.</p>' +
+      '<p class="asm-finish-modal-sub">Deneme sınavı sonucun hesaplandı. Detaylı sonucunu görüntüleyebilir veya video çözümlerini izleyebilirsin.</p>' +
       '<div class="asm-finish-score">' +
         '<span class="asm-finish-score-val">' + placement.placementScore + '</span>' +
         '<span class="asm-finish-score-lbl">Deneme Puanı / 500</span>' +
       '</div>' +
-      renderCompactSubjectTable(placement) +
+      renderCompactSubjectTable(placement, false) +
       '<div class="asm-finish-actions">' +
-        '<a href="deneme-sinavlari.html" class="asm-btn asm-btn-primary">Deneme Sınavlarına Dön</a>' +
-      '</div>';
+        renderDenemeFinishActions() +
+      '</div>' +
+      denemeFinishHints();
 
     overlay.hidden = false;
     overlay.setAttribute('aria-hidden', 'false');
+
+    bindFinishVideosButton('asmDenemeVideosBtn', getDenemeQuestions(), denemeRaw);
   }
 
   function renderInlineFinish(container, type, data, Assessment) {
