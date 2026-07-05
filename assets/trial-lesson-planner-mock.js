@@ -24,24 +24,134 @@
     {
       id: 'DERS-2026-0001',
       subject: 'Matematik',
-      grade: '7. Sınıf',
+      grade: '5. Sınıf',
       teacherId: 't1',
       slotLabel: 'Pazartesi, 7 Tem · 14:30',
       slotDateKey: '2026-07-07',
       slotTime: '14:30',
-      studentIds: ['REZ-2026-0001', 'REZ-2026-0009'],
+      studentIds: ['REZ-2026-0001', 'REZ-2026-0021', 'REZ-2026-0041'],
       updatedAt: '2026-07-05T10:00:00+03:00'
     },
     {
       id: 'DERS-2026-0002',
       subject: 'Fen Bilimleri',
-      grade: '8. Sınıf',
+      grade: '6. Sınıf',
       teacherId: 't5',
       slotLabel: 'Bugün · 16:00',
       slotDateKey: '2026-07-05',
       slotTime: '16:00',
-      studentIds: ['REZ-2026-0002'],
+      studentIds: ['REZ-2026-0007', 'REZ-2026-0027'],
       updatedAt: '2026-07-05T08:30:00+03:00'
+    },
+    {
+      id: 'DERS-2026-0003',
+      subject: 'Türkçe',
+      grade: '6. Sınıf',
+      teacherId: 't3',
+      slotLabel: 'Salı, 8 Tem · 11:30',
+      slotDateKey: '2026-07-08',
+      slotTime: '11:30',
+      studentIds: ['REZ-2026-0028', 'REZ-2026-0048'],
+      updatedAt: '2026-07-04T18:20:00+03:00'
+    },
+    {
+      id: 'DERS-2026-0004',
+      subject: 'Matematik',
+      grade: '5. Sınıf',
+      teacherId: 't2',
+      slotLabel: 'Pazartesi, 7 Tem · 10:00',
+      slotDateKey: '2026-07-07',
+      slotTime: '10:00',
+      studentIds: ['REZ-2026-0001', 'REZ-2026-0021', 'REZ-2026-0041'],
+      updatedAt: '2026-07-04T14:10:00+03:00'
+    },
+    {
+      id: 'DERS-2026-0005',
+      subject: 'İngilizce',
+      grade: '7. Sınıf',
+      teacherId: 't4',
+      slotLabel: 'Perşembe, 10 Tem · 17:30',
+      slotDateKey: '2026-07-10',
+      slotTime: '17:30',
+      studentIds: ['REZ-2026-0014', 'REZ-2026-0034'],
+      updatedAt: '2026-07-03T16:45:00+03:00'
+    },
+    {
+      id: 'DERS-2026-0006',
+      subject: 'Fen Bilimleri',
+      grade: '7. Sınıf',
+      teacherId: 't2',
+      slotLabel: 'Çarşamba, 9 Tem · 13:00',
+      slotDateKey: '2026-07-09',
+      slotTime: '13:00',
+      studentIds: ['REZ-2026-0012', 'REZ-2026-0032'],
+      updatedAt: '2026-07-03T11:30:00+03:00'
+    },
+    {
+      id: 'DERS-2026-0007',
+      subject: 'Sosyal Bilgiler',
+      grade: '8. Sınıf',
+      teacherId: 't4',
+      slotLabel: 'Cuma, 11 Tem · 10:00',
+      slotDateKey: '2026-07-11',
+      slotTime: '10:00',
+      studentIds: ['REZ-2026-0020', 'REZ-2026-0040'],
+      updatedAt: '2026-07-02T09:15:00+03:00'
+    },
+    {
+      id: 'DERS-2026-0008',
+      subject: 'Matematik',
+      grade: '8. Sınıf',
+      teacherId: 't1',
+      slotLabel: 'Salı, 8 Tem · 16:00',
+      slotDateKey: '2026-07-08',
+      slotTime: '16:00',
+      studentIds: ['REZ-2026-0016', 'REZ-2026-0036'],
+      updatedAt: '2026-07-01T20:00:00+03:00'
+    },
+    {
+      id: 'DERS-2026-0009',
+      subject: 'Türkçe',
+      grade: '8. Sınıf',
+      teacherId: 't3',
+      slotLabel: 'Pazartesi, 7 Tem · 19:00',
+      slotDateKey: '2026-07-07',
+      slotTime: '19:00',
+      studentIds: ['REZ-2026-0018', 'REZ-2026-0038'],
+      updatedAt: '2026-06-30T15:40:00+03:00'
+    },
+    {
+      id: 'DERS-2026-0010',
+      subject: 'İngilizce',
+      grade: '5. Sınıf',
+      teacherId: 't4',
+      slotLabel: 'Cumartesi, 12 Tem · 10:00',
+      slotDateKey: '2026-07-12',
+      slotTime: '10:00',
+      studentIds: ['REZ-2026-0004', 'REZ-2026-0024', 'REZ-2026-0044'],
+      updatedAt: '2026-06-29T12:20:00+03:00'
+    },
+    {
+      id: 'DERS-2026-0011',
+      subject: 'Matematik',
+      grade: '6. Sınıf',
+      teacherId: 't2',
+      slotLabel: 'Bugün · 13:00',
+      slotDateKey: '2026-07-05',
+      slotTime: '13:00',
+      studentIds: ['REZ-2026-0026', 'REZ-2026-0046'],
+      updatedAt: '2026-07-05T07:10:00+03:00'
+    },
+    {
+      id: 'DERS-2026-0012',
+      subject: 'Fen Bilimleri',
+      grade: '8. Sınıf',
+      teacherId: 't5',
+      slotLabel: 'Perşembe, 10 Tem · 14:30',
+      slotDateKey: '2026-07-10',
+      slotTime: '14:30',
+      studentIds: ['REZ-2026-0017', 'REZ-2026-0037'],
+      updatedAt: '2026-06-28T17:55:00+03:00'
     }
   ];
 

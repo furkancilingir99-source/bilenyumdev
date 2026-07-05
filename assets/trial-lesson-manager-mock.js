@@ -22,234 +22,135 @@
     return formatReservationId(year, max + 1);
   }
 
-  var RESERVATIONS = [
-    {
-      id: 'REZ-2026-0001',
-      studentFirstName: 'Mira',
-      studentLastName: 'Yılmaz',
-      grade: '7. Sınıf',
-      subject: 'Matematik',
-      parentFirstName: 'Ayşe',
-      parentLastName: 'Yılmaz',
-      phone: '0532 441 28 90',
-      email: 'ayse.yilmaz@mail.com',
-      slotLabel: 'Pazartesi, 7 Tem · 14:30',
-      status: 'pending',
-      createdAt: '2026-07-05T08:12:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0002',
-      studentFirstName: 'Can',
-      studentLastName: 'Kaya',
-      grade: '8. Sınıf',
-      subject: 'Fen Bilimleri',
-      parentFirstName: 'Mehmet',
-      parentLastName: 'Kaya',
-      phone: '0544 902 17 33',
-      email: 'mehmet.kaya@gmail.com',
-      slotLabel: 'Bugün · 16:00',
-      status: 'confirmed',
-      createdAt: '2026-07-05T07:45:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0003',
-      studentFirstName: 'Elif',
-      studentLastName: 'Demir',
-      grade: '6. Sınıf',
-      subject: 'Türkçe',
-      parentFirstName: 'Zeynep',
-      parentLastName: 'Demir',
-      phone: '0505 778 44 12',
-      email: 'zeynep.demir@outlook.com',
-      slotLabel: 'Salı, 8 Tem · 11:30',
-      requestedSlotLabel: 'Salı, 8 Tem · 11:30',
-      slotConfirmedByParent: false,
-      status: 'pending',
-      createdAt: '2026-07-04T19:30:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0004',
-      studentFirstName: 'Arda',
-      studentLastName: 'Öztürk',
-      grade: '5. Sınıf',
-      subject: 'Matematik',
-      parentFirstName: 'Fatma',
-      parentLastName: 'Öztürk',
-      phone: '0533 612 09 55',
-      email: 'fatma.ozturk@mail.com',
-      slotLabel: 'Çarşamba, 9 Tem · 19:00',
-      status: 'confirmed',
-      createdAt: '2026-07-04T16:20:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0005',
-      studentFirstName: 'Selin',
-      studentLastName: 'Aksoy',
-      grade: '7. Sınıf',
-      subject: 'İngilizce',
-      parentFirstName: 'Burak',
-      parentLastName: 'Aksoy',
-      phone: '0542 330 88 71',
-      email: 'burak.aksoy@icloud.com',
-      slotLabel: 'Perşembe, 10 Tem · 17:30',
-      status: 'pending',
-      createdAt: '2026-07-04T11:05:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0006',
-      studentFirstName: 'Emir',
-      studentLastName: 'Çelik',
-      grade: '8. Sınıf',
-      subject: 'Matematik',
-      parentFirstName: 'Deniz',
-      parentLastName: 'Çelik',
-      phone: '0555 901 44 28',
-      email: 'deniz.celik@yahoo.com',
-      slotLabel: 'Cuma, 4 Tem · 14:30',
-      status: 'completed',
-      createdAt: '2026-07-03T14:40:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0007',
-      studentFirstName: 'Lina',
-      studentLastName: 'Şahin',
-      grade: '6. Sınıf',
-      subject: 'Fen Bilimleri',
-      parentFirstName: 'Gül',
-      parentLastName: 'Şahin',
-      phone: '0537 220 15 66',
-      email: 'gul.sahin@mail.com',
-      slotLabel: 'Cumartesi, 12 Tem · 10:00',
-      status: 'confirmed',
-      createdAt: '2026-07-03T09:18:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0008',
-      studentFirstName: 'Kerem',
-      studentLastName: 'Aydın',
-      grade: '5. Sınıf',
-      subject: 'Sosyal Bilgiler',
-      parentFirstName: 'Hakan',
-      parentLastName: 'Aydın',
-      phone: '0546 881 02 39',
-      email: 'hakan.aydin@gmail.com',
-      slotLabel: 'Pazar, 6 Tem · 20:30',
-      status: 'cancelled',
-      createdAt: '2026-07-02T21:50:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0009',
-      studentFirstName: 'Defne',
-      studentLastName: 'Koç',
-      grade: '7. Sınıf',
-      subject: 'Matematik',
-      parentFirstName: 'Seda',
-      parentLastName: 'Koç',
-      phone: '0530 114 77 58',
-      email: 'seda.koc@mail.com',
-      slotLabel: 'Bugün · 11:30',
-      status: 'confirmed',
-      createdAt: '2026-07-05T06:55:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0010',
-      studentFirstName: 'Yiğit',
-      studentLastName: 'Polat',
-      grade: '8. Sınıf',
-      subject: 'Türkçe',
-      parentFirstName: 'Emre',
-      parentLastName: 'Polat',
-      phone: '0543 667 31 04',
-      email: 'emre.polat@mail.com',
-      slotLabel: 'Pazartesi, 7 Tem · 13:00',
-      status: 'pending',
-      createdAt: '2026-07-05T09:30:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0011',
-      studentFirstName: 'Zeynep',
-      studentLastName: 'Arslan',
-      grade: '6. Sınıf',
-      subject: 'Matematik',
-      parentFirstName: 'Murat',
-      parentLastName: 'Arslan',
-      phone: '0532 901 22 18',
-      email: 'murat.arslan@gmail.com',
-      slotLabel: 'Salı, 8 Tem · 16:00',
-      status: 'pending',
-      createdAt: '2026-07-04T22:10:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0012',
-      studentFirstName: 'Berk',
-      studentLastName: 'Yıldız',
-      grade: '7. Sınıf',
-      subject: 'Fen Bilimleri',
-      parentFirstName: 'Pınar',
-      parentLastName: 'Yıldız',
-      phone: '0554 112 33 77',
-      email: 'pinar.yildiz@mail.com',
-      slotLabel: 'Çarşamba, 9 Tem · 11:30',
-      status: 'confirmed',
-      createdAt: '2026-07-04T08:40:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0013',
-      studentFirstName: 'Ece',
-      studentLastName: 'Güneş',
-      grade: '5. Sınıf',
-      subject: 'İngilizce',
-      parentFirstName: 'Serkan',
-      parentLastName: 'Güneş',
-      phone: '0507 445 66 90',
-      email: 'serkan.gunes@outlook.com',
-      slotLabel: 'Perşembe, 10 Tem · 14:30',
-      status: 'completed',
-      createdAt: '2026-07-03T17:25:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0014',
-      studentFirstName: 'Alp',
-      studentLastName: 'Kurt',
-      grade: '8. Sınıf',
-      subject: 'Matematik',
-      parentFirstName: 'Nihan',
-      parentLastName: 'Kurt',
-      phone: '0536 778 01 44',
-      email: 'nihan.kurt@mail.com',
-      slotLabel: 'Cuma, 11 Tem · 19:00',
-      status: 'pending',
-      createdAt: '2026-07-02T13:15:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0015',
-      studentFirstName: 'Damla',
-      studentLastName: 'Erdoğan',
-      grade: '6. Sınıf',
-      subject: 'Türkçe',
-      parentFirstName: 'Oğuz',
-      parentLastName: 'Erdoğan',
-      phone: '0541 330 55 22',
-      email: 'oguz.erdogan@gmail.com',
-      slotLabel: 'Cumartesi, 12 Tem · 17:30',
-      status: 'confirmed',
-      createdAt: '2026-07-01T10:50:00+03:00'
-    },
-    {
-      id: 'REZ-2026-0016',
-      studentFirstName: 'Kaan',
-      studentLastName: 'Tekin',
-      grade: '7. Sınıf',
-      subject: 'Sosyal Bilgiler',
-      parentFirstName: 'Esra',
-      parentLastName: 'Tekin',
-      phone: '0538 990 14 63',
-      email: 'esra.tekin@icloud.com',
-      slotLabel: 'Pazar, 13 Tem · 10:00',
-      status: 'cancelled',
-      createdAt: '2026-06-30T20:05:00+03:00'
-    }
+  var DEMO_PEOPLE = [
+    { s: 'Mira', l: 'Yılmaz', p: 'Ayşe', pl: 'Yılmaz' },
+    { s: 'Can', l: 'Kaya', p: 'Mehmet', pl: 'Kaya' },
+    { s: 'Elif', l: 'Demir', p: 'Zeynep', pl: 'Demir' },
+    { s: 'Arda', l: 'Öztürk', p: 'Fatma', pl: 'Öztürk' },
+    { s: 'Selin', l: 'Aksoy', p: 'Burak', pl: 'Aksoy' },
+    { s: 'Emir', l: 'Çelik', p: 'Deniz', pl: 'Çelik' },
+    { s: 'Lina', l: 'Şahin', p: 'Gül', pl: 'Şahin' },
+    { s: 'Kerem', l: 'Aydın', p: 'Hakan', pl: 'Aydın' },
+    { s: 'Defne', l: 'Koç', p: 'Seda', pl: 'Koç' },
+    { s: 'Yiğit', l: 'Polat', p: 'Emre', pl: 'Polat' },
+    { s: 'Zeynep', l: 'Arslan', p: 'Murat', pl: 'Arslan' },
+    { s: 'Berk', l: 'Yıldız', p: 'Pınar', pl: 'Yıldız' },
+    { s: 'Ece', l: 'Güneş', p: 'Serkan', pl: 'Güneş' },
+    { s: 'Alp', l: 'Kurt', p: 'Nihan', pl: 'Kurt' },
+    { s: 'Damla', l: 'Erdoğan', p: 'Oğuz', pl: 'Erdoğan' },
+    { s: 'Kaan', l: 'Tekin', p: 'Esra', pl: 'Tekin' },
+    { s: 'Asya', l: 'Bulut', p: 'Volkan', pl: 'Bulut' },
+    { s: 'Deniz', l: 'Acar', p: 'Melis', pl: 'Acar' },
+    { s: 'Eren', l: 'Taş', p: 'Cem', pl: 'Taş' },
+    { s: 'Gizem', l: 'Uçar', p: 'Hande', pl: 'Uçar' },
+    { s: 'Baran', l: 'Işık', p: 'Tolga', pl: 'Işık' },
+    { s: 'Ceren', l: 'Vural', p: 'Dilek', pl: 'Vural' },
+    { s: 'Doruk', l: 'Sezer', p: 'Koray', pl: 'Sezer' },
+    { s: 'Fulya', l: 'Tan', p: 'Selin', pl: 'Tan' },
+    { s: 'Gökhan', l: 'Bayrak', p: 'Aslı', pl: 'Bayrak' },
+    { s: 'Hazal', l: 'Duman', p: 'Onur', pl: 'Duman' },
+    { s: 'Ilgın', l: 'Eren', p: 'Tuğba', pl: 'Eren' },
+    { s: 'Jale', l: 'Fırat', p: 'Barış', pl: 'Fırat' },
+    { s: 'Kuzey', l: 'Gencer', p: 'Mine', pl: 'Gencer' },
+    { s: 'Lara', l: 'Horoz', p: 'Umut', pl: 'Horoz' },
+    { s: 'Mete', l: 'Ilıcalı', p: 'Yasemin', pl: 'Ilıcalı' },
+    { s: 'Nil', l: 'Jandarma', p: 'Sinan', pl: 'Özkan' },
+    { s: 'Ozan', l: 'Kılıç', p: 'Betül', pl: 'Kılıç' },
+    { s: 'Pelin', l: 'Lale', p: 'Erhan', pl: 'Lale' },
+    { s: 'Rüya', l: 'Mert', p: 'Gamze', pl: 'Mert' },
+    { s: 'Sarp', l: 'Nalbant', p: 'Levent', pl: 'Nalbant' },
+    { s: 'Tuana', l: 'Oral', p: 'Şule', pl: 'Oral' },
+    { s: 'Umut', l: 'Pak', p: 'Ferhat', pl: 'Pak' },
+    { s: 'Vildan', l: 'Rüzgar', p: 'Cansu', pl: 'Rüzgar' },
+    { s: 'Yasin', l: 'Soylu', p: 'İpek', pl: 'Soylu' },
+    { s: 'Zara', l: 'Toprak', p: 'Alper', pl: 'Toprak' },
+    { s: 'Atlas', l: 'Uzun', p: 'Berna', pl: 'Uzun' },
+    { s: 'Belinay', l: 'Vardar', p: 'Kaan', pl: 'Vardar' },
+    { s: 'Cemre', l: 'Yavuz', p: 'Derya', pl: 'Yavuz' },
+    { s: 'Dilan', l: 'Zengin', p: 'Halil', pl: 'Zengin' },
+    { s: 'Efe', l: 'Akın', p: 'Lale', pl: 'Akın' },
+    { s: 'Fırat', l: 'Bozkurt', p: 'Merve', pl: 'Bozkurt' },
+    { s: 'Gülce', l: 'Ceylan', p: 'Okan', pl: 'Ceylan' }
   ];
+
+  var DEMO_SUBJECTS = ['Matematik', 'Fen Bilimleri', 'Türkçe', 'İngilizce', 'Sosyal Bilgiler'];
+  var DEMO_GRADES = ['5. Sınıf', '6. Sınıf', '7. Sınıf', '8. Sınıf'];
+  var DEMO_STATUSES = [
+    'pending', 'pending', 'pending', 'confirmed', 'confirmed', 'confirmed',
+    'pending', 'confirmed', 'completed', 'cancelled'
+  ];
+  var DEMO_SLOTS = [
+    'Bugün · 10:00', 'Bugün · 11:30', 'Bugün · 13:00', 'Bugün · 16:00',
+    'Pazartesi, 7 Tem · 10:00', 'Pazartesi, 7 Tem · 14:30', 'Pazartesi, 7 Tem · 19:00',
+    'Salı, 8 Tem · 11:30', 'Salı, 8 Tem · 16:00', 'Salı, 8 Tem · 17:30',
+    'Çarşamba, 9 Tem · 13:00', 'Çarşamba, 9 Tem · 19:00',
+    'Perşembe, 10 Tem · 14:30', 'Perşembe, 10 Tem · 17:30',
+    'Cuma, 11 Tem · 10:00', 'Cuma, 11 Tem · 19:00',
+    'Cumartesi, 12 Tem · 10:00', 'Cumartesi, 12 Tem · 17:30',
+    'Pazar, 6 Tem · 20:30', 'Pazar, 13 Tem · 10:00'
+  ];
+  var DEMO_DOMAINS = ['mail.com', 'gmail.com', 'outlook.com', 'icloud.com', 'yahoo.com'];
+
+  function slugify(s) {
+    return String(s)
+      .toLowerCase()
+      .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+      .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+      .replace(/[^a-z0-9]+/g, '.')
+      .replace(/^\.|\.$/g, '');
+  }
+
+  function buildDemoReservations() {
+    var list = [];
+    var total = 48;
+    for (var i = 0; i < total; i++) {
+      var person = DEMO_PEOPLE[i];
+      var seq = i + 1;
+      var combo = i % 20;
+      var gradeIdx = Math.floor(combo / 5);
+      var subjectIdx = combo % 5;
+      var phoneMid = String(100 + (i * 17) % 900);
+      var phoneEnd = String(10 + (i * 13) % 90).padStart(2, '0');
+      var day = String(Math.max(1, 30 - (i % 28))).padStart(2, '0');
+      var hour = String(8 + (i % 14)).padStart(2, '0');
+      var minute = (i % 2) ? '30' : '00';
+      var createdAt = '2026-06-' + day + 'T' + hour + ':' + minute + ':00+03:00';
+      if (i < 8) {
+        createdAt = '2026-07-0' + (1 + (i % 5)) + 'T' + hour + ':' + minute + ':00+03:00';
+      }
+
+      list.push({
+        id: formatReservationId(2026, seq),
+        studentFirstName: person.s,
+        studentLastName: person.l,
+        grade: DEMO_GRADES[gradeIdx],
+        subject: DEMO_SUBJECTS[subjectIdx],
+        parentFirstName: person.p,
+        parentLastName: person.pl,
+        phone: '05' + String(30 + (i % 50)).padStart(2, '0') + ' ' + phoneMid + ' ' + phoneEnd + ' ' + String(10 + (i % 89)).padStart(2, '0'),
+        email: slugify(person.p) + '.' + slugify(person.pl) + '@' + DEMO_DOMAINS[i % DEMO_DOMAINS.length],
+        slotLabel: DEMO_SLOTS[i % DEMO_SLOTS.length],
+        status: DEMO_STATUSES[i % DEMO_STATUSES.length],
+        createdAt: createdAt
+      });
+    }
+
+    /* Özel senaryolar — drawer / filtre demo */
+    list[2].requestedSlotLabel = 'Salı, 8 Tem · 11:30';
+    list[2].slotConfirmedByParent = false;
+    list[5].status = 'completed';
+    list[7].status = 'cancelled';
+    list[37].status = 'cancelled';
+    list[8].status = 'confirmed';
+    list[8].slotLabel = 'Bugün · 11:30';
+    list[0].status = 'pending';
+    list[1].status = 'confirmed';
+    list[1].slotLabel = 'Bugün · 16:00';
+
+    return list;
+  }
+
+  var RESERVATIONS = buildDemoReservations();
 
   var STATUS_LABELS = {
     pending: 'Onay Bekliyor',
