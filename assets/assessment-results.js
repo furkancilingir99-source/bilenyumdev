@@ -11,6 +11,7 @@
   var ICON_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
 
   function lsGet(k) { try { return localStorage.getItem(P + k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(P + k, v); } catch (e) {} }
 
   function examStatus() {
     var placement = lsGet('placementComplete') === '1';
@@ -426,22 +427,69 @@
   function resolvePlacement(placementRaw) {
     if (!placementRaw || !placementRaw.placement) return null;
     var questions = global.BilenyumPlacementQuestions;
-    if (questions && placementRaw.answers && placementRaw.answers.length) {
+    if (questions && questions.length && placementRaw.answers && placementRaw.answers.length) {
       return Scoring.scorePlacement(questions, placementRaw.answers);
     }
     return placementRaw.placement;
+  }
+
+  function loadPlacementAnswers() {
+    var raw = lsGet('placementAnswers');
+    if (!raw) return [];
+    try {
+      var parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function normalizePlacementRaw(raw) {
+    if (!raw) return null;
+    if (raw.placement) return raw;
+    if (raw.placementScore != null) {
+      return {
+        placement: raw,
+        answers: raw.answers || [],
+        completedAt: raw.completedAt || ''
+      };
+    }
+    return null;
+  }
+
+  function persistPlacementResults(raw) {
+    if (!raw || !raw.placement) return raw;
+    lsSet('placementResults', JSON.stringify(raw));
+    return raw;
+  }
+
+  function ensurePlacementRaw() {
+    var raw = normalizePlacementRaw(Scoring.loadPlacementResults());
+    if (raw && raw.placement) return raw;
+
+    var answers = loadPlacementAnswers();
+    var questions = global.BilenyumPlacementQuestions;
+    if (!answers.length || !questions || !questions.length) return raw;
+
+    var placement = Scoring.scorePlacement(questions, answers);
+    return persistPlacementResults({
+      placement: placement,
+      answers: answers,
+      completedAt: new Date().toISOString()
+    });
   }
 
   function mountResults(root, view) {
     if (!root) return;
 
     var combined = Scoring.loadCombinedResults();
-    var placementRaw = Scoring.loadPlacementResults();
+    var placementRaw = ensurePlacementRaw();
     var attentionRaw = Scoring.loadAttentionResults();
     var student = Scoring.getStudentProfile();
 
     view = view || 'combined';
 
+    try {
     if (view === 'combined' && combined) {
       updateResultsTopbar('Birleşik Sonuç');
       var combinedPlacement = (placementRaw && resolvePlacement(placementRaw)) || combined.placement;
@@ -482,7 +530,11 @@
         renderSubjectTable(placement, 'Ders Bazlı Sonuçlar') +
         renderPlacementVideoHost() +
         renderActions('placement');
-      bindPlacementVideos(root, placementRaw, autoVideos);
+      try {
+        bindPlacementVideos(root, placementRaw, autoVideos);
+      } catch (videoErr) {
+        console.warn('Video çözümleri yüklenemedi:', videoErr);
+      }
       return;
     }
 
@@ -499,13 +551,40 @@
     }
 
     updateResultsTopbar('');
+    var status = examStatus();
+    var emptyTitle = 'Henüz sonuç yok';
+    var emptySub = 'Seviye belirleme sınavını tamamladığında sonuçların burada görünecek.';
+    var emptyCta = '<a href="seviye-belirleme.html" class="asm-btn asm-btn-primary">Sınava Başla ' + ICON_ARROW + '</a>';
+    if (view === 'placement' && status.placement) {
+      emptyTitle = 'Sonuçlar kaydedilemedi';
+      emptySub = 'Sınav tamamlanmış görünüyor ancak sonuç verisi bulunamadı. Sınava tekrar girip bitirmeyi deneyin veya geliştirici kısayolundan eski öğrenci modunu kullanın.';
+      emptyCta = '<a href="seviye-belirleme.html" class="asm-btn asm-btn-primary">Seviye Sınavına Git ' + ICON_ARROW + '</a>';
+    }
     root.innerHTML =
       '<section class="asm-res-empty">' +
         '<span class="asm-res-hero-emoji">📋</span>' +
-        '<h1 class="asm-res-hero-title">Henüz sonuç yok</h1>' +
-        '<p class="asm-res-hero-sub">Seviye belirleme sınavını tamamladığında sonuçların burada görünecek.</p>' +
-        '<a href="seviye-belirleme.html" class="asm-btn asm-btn-primary">Sınava Başla ' + ICON_ARROW + '</a>' +
+        '<h1 class="asm-res-hero-title">' + emptyTitle + '</h1>' +
+        '<p class="asm-res-hero-sub">' + emptySub + '</p>' +
+        emptyCta +
       '</section>';
+    } catch (err) {
+      console.error('Sonuç sayfası yüklenemedi:', err);
+      updateResultsTopbar('');
+      root.innerHTML =
+        '<section class="asm-res-empty">' +
+          '<span class="asm-res-hero-emoji">⚠️</span>' +
+          '<h1 class="asm-res-hero-title">Sonuçlar yüklenemedi</h1>' +
+          '<p class="asm-res-hero-sub">Sayfa yenilenirken bir hata oluştu. Lütfen sayfayı yenileyin.</p>' +
+          '<button type="button" class="asm-btn asm-btn-primary" onclick="location.reload()">Yenile</button>' +
+        '</section>';
+    }
+  }
+
+  function bootResultsPage() {
+    var root = document.getElementById('asmResultsRoot');
+    if (!root) return;
+    var params = new URLSearchParams(location.search);
+    mountResults(root, params.get('view') || 'combined');
   }
 
   function bindExamVideos(root, resultsRaw, questions, autoOpen) {
@@ -723,7 +802,10 @@
   };
 
   if (document.getElementById('asmResultsRoot')) {
-    var params = new URLSearchParams(location.search);
-    mountResults(document.getElementById('asmResultsRoot'), params.get('view') || 'combined');
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootResultsPage);
+    } else {
+      bootResultsPage();
+    }
   }
 })(typeof window !== 'undefined' ? window : this);

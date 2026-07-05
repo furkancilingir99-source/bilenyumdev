@@ -974,6 +974,13 @@
         }
       } else if (page === 'sinav-sonuclari.html') {
         if (global.BilenyumExamHeader) global.BilenyumExamHeader.mount();
+        if (global.BilenyumResults && global.BilenyumResults.mount) {
+          var resultsRoot = document.getElementById('asmResultsRoot');
+          if (resultsRoot) {
+            var viewParams = new URLSearchParams(location.search);
+            global.BilenyumResults.mount(resultsRoot, viewParams.get('view') || 'combined');
+          }
+        }
       } else if (STUDENT_PAGES.indexOf(page) !== -1) {
         ensureInitialStudentProfile();
         bindModalEvents();

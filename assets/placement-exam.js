@@ -693,6 +693,17 @@
         try { parsed = JSON.parse(resultsRaw); } catch (e) {}
       }
       var placementData = parsed && parsed.placement ? parsed.placement : null;
+      if (!placementData && Scoring && questions.length) {
+        var storedAnswers = (parsed && parsed.answers) ? parsed.answers : answers;
+        if (storedAnswers && storedAnswers.length) {
+          placementData = Scoring.scorePlacement(questions, storedAnswers);
+          lsSet(K.results, JSON.stringify({
+            placement: placementData,
+            answers: storedAnswers,
+            completedAt: (parsed && parsed.completedAt) || new Date().toISOString()
+          }));
+        }
+      }
       if (!placementData && examCfg.finishModalType === 'deneme') {
         return false;
       }
@@ -902,18 +913,22 @@
       clearInterval(timerId);
       var Scoring = global.BilenyumScoring;
       var placementData = Scoring ? Scoring.scorePlacement(questions, answers) : null;
-
-      if (Scoring && placementData) {
-        var resultsPayload = {
-          placement: placementData,
-          answers: answers,
-          completedAt: new Date().toISOString()
-        };
-        if (examCfg.examName) {
-          resultsPayload.examName = examCfg.examName;
-        }
-        lsSet(K.results, JSON.stringify(resultsPayload));
+      var resultsPayload = {
+        placement: placementData || {
+          placementScore: 0,
+          totalCorrect: 0,
+          totalWrong: 0,
+          totalBlank: questions.length,
+          totalNet: 0,
+          bySubject: {}
+        },
+        answers: answers,
+        completedAt: new Date().toISOString()
+      };
+      if (examCfg.examName) {
+        resultsPayload.examName = examCfg.examName;
       }
+      lsSet(K.results, JSON.stringify(resultsPayload));
       lsSet(K.complete, '1');
       lsRemove(K.sayisalEndAt);
       lsRemove(K.breakEndAt);
