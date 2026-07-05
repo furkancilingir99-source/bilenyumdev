@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Planlanmış Ders Detayı · Deneme Dersi Yöneticisi · Bilenyum</title>
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-d3-mega.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
+<link rel="stylesheet" href="assets/dashboard-polish.css">
+<link rel="stylesheet" href="assets/teacher-dashboard.css">
+<link rel="stylesheet" href="assets/trial-lesson-manager.css">
+<script src="assets/auth-tab-session.js"></script>
+<script src="assets/dashboard-switcher.js" defer></script>
+<script src="assets/trial-lesson-manager-shell.js" defer></script>
+<script src="assets/shell.js" defer></script>
+</head>
+<body data-trial-manager-active="planlanmis-dersler">
+
+<div class="scene" aria-hidden="true">
+  <div class="scene-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
+<header class="hud" data-trial-manager-hud></header>
+
+<main class="stage thw-stage tm-stage">
+  <div class="stage-nav" data-trial-manager-nav></div>
+
+  <div class="tm-main-col" id="tmPlannedDetailRoot">
+    <p class="td-state">Ders yükleniyor…</p>
+  </div>
+</main>
+
+<div class="tm-modal" id="tmModal" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="tm-modal-overlay" data-tm-modal-close></div>
+  <div class="tm-modal-panel tm-modal-panel--wide">
+    <button type="button" class="tm-modal-close" data-tm-modal-close aria-label="Kapat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <header class="tm-modal-head">
+      <span class="tm-modal-eyebrow">DÜZENLE</span>
+      <h2 class="tm-modal-title" data-tm-modal-title>—</h2>
+      <p class="tm-modal-sub" data-tm-modal-sub hidden></p>
+    </header>
+    <div class="tm-modal-body" data-tm-modal-body></div>
+    <footer class="tm-modal-foot" data-tm-modal-foot></footer>
+  </div>
+</div>
+
+<div class="tm-planner-toast" id="tmDetailToast" role="status" aria-live="polite" hidden></div>
+
+<script src="assets/trial-lesson-manager-mock.js"></script>
+<script src="assets/trial-lesson-planner-mock.js"></script>
+<script src="assets/trial-lesson-manager-modal.js"></script>
+<script src="assets/trial-lesson-planned-detail.js"></script>
+</body>
+</html>

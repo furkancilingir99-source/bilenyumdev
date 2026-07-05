@@ -126,7 +126,7 @@
       <p id="tmResEmpty" class="td-state" hidden>Eşleşen rezervasyon bulunamadı.</p>
 
       <div id="tmResTableWrap" class="tm-res-table-wrap" hidden>
-        <table class="tm-res-table">
+        <table class="tm-res-table tm-res-table--rich">
           <thead>
             <tr>
               <th>Rezervasyon ID</th>
@@ -138,7 +138,9 @@
               <th>E-posta</th>
               <th>Kayıt Tarihi</th>
               <th>Ders Tarihi / Saat</th>
+              <th>Planlı ders</th>
               <th>Durum</th>
+              <th>İşlemler</th>
             </tr>
           </thead>
           <tbody id="tmResTableBody"></tbody>
@@ -150,21 +152,8 @@
   </div>
 </main>
 
-<div class="tm-drawer" id="tmResDrawer" aria-hidden="true" role="dialog" aria-labelledby="tmResDrawerTitle" aria-modal="true">
-  <div class="tm-drawer-overlay" id="tmResDrawerOverlay"></div>
-  <aside class="tm-drawer-panel">
-    <button type="button" class="tm-drawer-close" data-tm-drawer-close aria-label="Kapat">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <header class="tm-drawer-head">
-      <span class="tm-drawer-eyebrow">REZERVASYON DETAYI</span>
-      <h2 class="tm-drawer-title" id="tmResDrawerTitle">—</h2>
-    </header>
-    <div class="tm-drawer-body" id="tmResDrawerBody"></div>
-  </aside>
-</div>
-
 <script src="assets/trial-lesson-manager-mock.js"></script>
+<script src="assets/trial-lesson-planner-mock.js"></script>
 <script src="assets/trial-lesson-manager-reservations.js"></script>
 </body>
 </html>

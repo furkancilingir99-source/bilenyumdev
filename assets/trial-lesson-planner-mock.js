@@ -445,6 +445,21 @@
     };
   }
 
+  function findLessonsForReservation(reservationId) {
+    return PLANNED_LESSONS.filter(function (l) {
+      return l.studentIds.indexOf(reservationId) !== -1;
+    }).map(function (l) {
+      var teacher = getTeacherById(l.teacherId);
+      return {
+        id: l.id,
+        subject: l.subject,
+        grade: l.grade,
+        slotLabel: l.slotLabel,
+        teacherName: teacher ? teacher.name : '—'
+      };
+    });
+  }
+
   function getFilterOptions() {
     return {
       grades: GRADES.slice(),
@@ -472,6 +487,7 @@
     updatePlannedLessonStudents: updatePlannedLessonStudents,
     deletePlannedLesson: deletePlannedLesson,
     getEnrichedPlannedLesson: getEnrichedPlannedLesson,
+    findLessonsForReservation: findLessonsForReservation,
     getFilterOptions: getFilterOptions
   };
 })(typeof window !== 'undefined' ? window : this);
