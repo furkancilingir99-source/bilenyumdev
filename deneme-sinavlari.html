@@ -10071,7 +10071,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
           <img class="sn-upcoming-visual-img" src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=400&h=533&fit=crop&q=80" alt="" width="168" height="224" loading="lazy" decoding="async" />
         </div>
         <div class="sn-upcoming-left">
-          <h2 class="sn-upcoming-title" id="snUpcomingTitle">Bilenyum Genel Deneme · 12</h2>
+          <h2 class="sn-upcoming-title" id="snUpcomingTitle">Deneme Sınavı</h2>
           <p class="sn-upcoming-desc">LGS formatında 90 soruluk genel deneme. Matematik 20, Fen 20, Türkçe 20, Sosyal 10, Din 10, İngilizce 10 soru.</p>
           <div class="sn-upcoming-meta">
             <div class="sn-upcoming-meta-item">
@@ -10105,7 +10105,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
           <button type="button" class="sn-upcoming-join" id="snJoinBtn">
             <span class="sn-upcoming-join-default">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              <span>Sınava Katıl</span>
+              <span>Deneme sınavına katıl</span>
             </span>
             <span class="sn-upcoming-join-done">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -12234,7 +12234,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 
   // ====== YAKLAŞAN SINAV BUTONLARI ======
   var UPCOMING_EXAM = {
-    name: 'Bilenyum Genel Deneme · 12',
+    name: 'Deneme Sınavı',
     id: 'genel-deneme-12',
     at: new Date(2026, 5, 14, 10, 0, 0),
     durationMin: 135,
@@ -12497,30 +12497,14 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     }));
   }
 
-  function isPlacementComplete() {
-    return localStorage.getItem('bilenyum.placementComplete') === '1';
-  }
-
   function updateJoinButtonUI() {
     if (!joinBtn) return;
-    var placementDone = isPlacementComplete();
-    var live = isExamEntryOpen();
-    var joined = !!loadJoinState();
-    joinBtn.classList.toggle('is-joined', placementDone);
-    joinBtn.classList.toggle('is-enrolled', joined && !placementDone);
+    joinBtn.classList.remove('is-joined', 'is-enrolled');
     var label = joinBtn.querySelector('.sn-upcoming-join-default span:last-child');
     var doneLabel = joinBtn.querySelector('.sn-upcoming-join-done span:last-child');
-    if (placementDone) {
-      if (label) label.textContent = 'Sonuçları Gör';
-      if (doneLabel) doneLabel.textContent = 'Sonuçları Gör';
-      joinBtn.setAttribute('aria-label', 'Deneme sınavı sonuçlarını gör');
-    } else {
-      if (doneLabel) doneLabel.textContent = 'Tamamlandı';
-      if (label) {
-        label.textContent = live ? 'Sınava Başla' : (joined ? 'Denemeye Gir' : 'Sınava Katıl');
-      }
-      joinBtn.setAttribute('aria-label', live ? 'Sınava başla' : (joined ? 'Denemeye gir' : 'Sınava katıl'));
-    }
+    if (label) label.textContent = 'Deneme sınavına katıl';
+    if (doneLabel) doneLabel.textContent = 'Deneme sınavına katıl';
+    joinBtn.setAttribute('aria-label', 'Deneme sınavına katıl');
     joinBtn.setAttribute('aria-disabled', 'false');
   }
 
@@ -12528,13 +12512,9 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 
   if (joinBtn) {
     joinBtn.addEventListener('click', function(){
-      if (isPlacementComplete()) {
-        location.href = 'sinav-sonuclari.html?view=placement';
-        return;
-      }
       if (!loadJoinState()) {
         saveJoinState();
-        showToast('Kaydın alındı · Seviye belirleme sınavına yönlendiriliyorsun.');
+        showToast('Kaydın alındı · Deneme sınavına yönlendiriliyorsun.');
       }
       location.href = UPCOMING_EXAM.entryHref;
     });

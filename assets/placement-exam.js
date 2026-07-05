@@ -347,7 +347,7 @@
 
     function updatePhaseUI() {
       if (phase === 'break') {
-        if (examTitleEl) examTitleEl.textContent = 'Seviye Belirleme Sınavı';
+        if (examTitleEl) examTitleEl.textContent = 'Deneme Sınavı';
         if (finishSayisalBtn) finishSayisalBtn.hidden = true;
         if (finishSozelBtn) finishSozelBtn.hidden = true;
         if (examFooter) examFooter.hidden = true;
@@ -363,8 +363,8 @@
 
       if (examTitleEl) {
         examTitleEl.textContent = phase === 'sayisal'
-          ? 'Sayısal Bölüm Seviye Belirleme Sınavı'
-          : 'Sözel Bölüm Seviye Belirleme Sınavı';
+          ? 'Deneme Sınavı · Sayısal Bölüm'
+          : 'Deneme Sınavı · Sözel Bölüm';
       }
 
       if (stepSayisal && stepSozel) {
@@ -946,7 +946,7 @@
         showConfirm({
           title: 'Sınavı bitir?',
           hint: sozelFinishWarning(),
-          text: 'Seviye belirleme sınavını tamamlamak istediğine emin misin? Onayladığında cevapların kaydedilecek ve deneme sonucun gösterilecek.',
+          text: 'Deneme sınavını tamamlamak istediğine emin misin? Onayladığında cevapların kaydedilecek ve sonucun gösterilecek.',
           okLabel: 'Evet, bitir',
           cancelLabel: 'Vazgeç',
           onOk: function () { finishSozel(); },

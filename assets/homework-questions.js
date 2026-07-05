@@ -409,7 +409,7 @@
       gradeLevel: 8,
       unit: 'LGS Genel Deneme',
       unitSubtitle: '80 Soru · 5 Ders · 135 Dakika',
-      title: 'Bilenyum Genel Deneme · 12',
+      title: 'Deneme Sınavı',
       topic: 'LGS Formatı · 10 Soru (Demo)',
       questions: [
         {
