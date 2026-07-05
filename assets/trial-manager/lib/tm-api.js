@@ -7,6 +7,7 @@
   var MODE_KEY = 'bilenyum_tm_api_mode';
 
   var ENDPOINTS = {
+    health: '/api/trial-manager/health',
     metrics: '/api/trial-manager/metrics',
     sessions: '/api/trial-manager/sessions',
     requests: '/api/trial-manager/requests',
@@ -89,6 +90,21 @@
       });
   }
 
+  function checkHealth() {
+    if (getMode() === 'mock') {
+      return Promise.resolve({
+        ok: true,
+        mode: 'mock',
+        message: 'Mock mod aktif — veriler tarayıcı oturumunda.'
+      });
+    }
+    return fetchJson(ENDPOINTS.health).then(function (data) {
+      return { ok: true, mode: 'api', data: data };
+    }).catch(function (err) {
+      return { ok: false, mode: 'api', error: err.message || 'Bağlantı başarısız.' };
+    });
+  }
+
   global.TMApi = {
     getMode: getMode,
     setMode: setMode,
@@ -97,6 +113,7 @@
     data: data,
     invoke: invoke,
     fetchJson: fetchJson,
+    checkHealth: checkHealth,
     getOperationMetrics: callStore('getOperationMetrics'),
     getMockStats: callStore('getMockStats'),
     getAuditLogs: callStore('getAuditLogs'),

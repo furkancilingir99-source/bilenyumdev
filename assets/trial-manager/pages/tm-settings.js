@@ -17,6 +17,8 @@
   var userSelect = document.getElementById('tmMockUserSelect');
   var switchUserBtn = document.getElementById('tmSwitchUser');
   var apiModeEl = document.getElementById('tmApiModeLabel');
+  var apiHealthEl = document.getElementById('tmApiHealthStatus');
+  var apiHealthBtn = document.getElementById('tmApiHealthCheck');
   var exportAuditBtn = document.getElementById('tmExportAudit');
   var exportMockBtn = document.getElementById('tmExportMock');
   var importMockInput = document.getElementById('tmImportMock');
@@ -29,6 +31,29 @@
     if (!apiModeEl) return;
     var mode = Api && Api.getMode ? Api.getMode() : 'mock';
     apiModeEl.textContent = mode === 'mock' ? 'Mock (TMStore · oturum depolaması)' : 'REST API';
+    if (apiHealthEl && mode === 'mock') {
+      apiHealthEl.textContent = 'Health uç noktası: ' + (Api && Api.endpoints ? Api.endpoints.health : '/api/trial-manager/health');
+    }
+  }
+
+  function runApiHealthCheck() {
+    if (!Api || !Api.checkHealth) return;
+    if (apiHealthEl) apiHealthEl.textContent = 'Test ediliyor…';
+    Api.checkHealth().then(function (res) {
+      if (!apiHealthEl) return;
+      if (res.mode === 'mock') {
+        apiHealthEl.textContent = res.message;
+        return;
+      }
+      if (res.ok) {
+        apiHealthEl.textContent = 'REST health OK · v' + (res.data && res.data.version ? res.data.version : '?') +
+          ' · ' + (res.data && res.data.timestamp ? U.formatDateTime(res.data.timestamp) : '');
+        if (window.TMToast) window.TMToast.show('API health başarılı.', 'success');
+      } else {
+        apiHealthEl.textContent = 'REST health hatası: ' + (res.error || 'bilinmiyor');
+        if (U.notifyError) U.notifyError(res.error || 'API health başarısız.');
+      }
+    });
   }
 
   function exportMockJson() {
