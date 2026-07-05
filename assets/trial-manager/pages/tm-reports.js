@@ -58,6 +58,30 @@
     return Store.getCommunicationLogs().filter(function (l) { return inRange(l.createdAt.slice(0, 10)); });
   }
 
+  function auditInRange() {
+    return Store.getAuditLogs().filter(function (l) { return inRange(l.createdAt.slice(0, 10)); });
+  }
+
+  function userLabel(userId) {
+    if (!userId) return '—';
+    var u = Store.getUsers().find(function (x) { return x.id === userId; });
+    return u ? U.fullName(u.firstName, u.lastName) : userId;
+  }
+
+  function auditRows() {
+    return auditInRange().map(function (l) {
+      return {
+        date: l.createdAt,
+        entityType: SL.auditEntityLabel(l.entityType),
+        entityId: l.entityId,
+        action: SL.auditActionLabel(l.action),
+        description: l.description || '',
+        reason: l.reason || '',
+        user: userLabel(l.createdByUserId)
+      };
+    });
+  }
+
   function computeSummary() {
     var sessions = sessionsInRange();
     var reservations = reservationsInRange();
@@ -185,7 +209,8 @@
       card(m.linkSentRate + '%', 'Link gönderim oranı') +
       card(m.approvalRate + '%', 'Veli onay oranı') +
       card(m.unreachable, 'Ulaşılamayan veli', 'warn') +
-      card(m.callAgain, 'Tekrar aranacak', 'warn');
+      card(m.callAgain, 'Tekrar aranacak', 'warn') +
+      card(auditInRange().length, 'Denetim kaydı (aralık)');
     if (Store.getDataConsistencySnapshot) {
       var snap = Store.getDataConsistencySnapshot();
       var om = snap.metrics;
@@ -242,6 +267,14 @@
         ['Tarih', 'Kanal', 'Sonuç', 'Özet'],
         logs.map(function (l) { return [U.formatDateKey(l.date), l.channel, l.result, l.summary]; })
       );
+    } else if (activeTab === 'audit') {
+      var audits = auditRows();
+      tableEl.innerHTML = tableHtml(
+        ['Tarih', 'Varlık', 'Kayıt ID', 'İşlem', 'Açıklama', 'Neden', 'Kullanıcı'],
+        audits.map(function (l) {
+          return [U.formatDateTime(l.date), l.entityType, l.entityId, l.action, l.description, l.reason || '—', l.user];
+        })
+      );
     } else {
       tableEl.hidden = true;
       tableEl.innerHTML = '';
@@ -255,7 +288,8 @@
       { id: 'daily', label: 'Günlük' },
       { id: 'sessions', label: 'Dersler' },
       { id: 'teachers', label: 'Öğretmenler' },
-      { id: 'comm', label: 'İletişim' }
+      { id: 'comm', label: 'İletişim' },
+      { id: 'audit', label: 'Denetim' }
     ];
     tabsEl.innerHTML = tabs.map(function (t) {
       return '<button type="button" class="tm-comm-tab' + (activeTab === t.id ? ' is-active' : '') + '" data-tab="' + t.id + '">' + t.label + '</button>';
@@ -278,7 +312,7 @@
       tabBtn.hidden = true;
     } else {
       tabBtn.hidden = false;
-      var labels = { daily: 'Günlük', sessions: 'Dersler', teachers: 'Öğretmenler', comm: 'İletişim' };
+      var labels = { daily: 'Günlük', sessions: 'Dersler', teachers: 'Öğretmenler', comm: 'İletişim', audit: 'Denetim' };
       tabBtn.textContent = (labels[activeTab] || 'Sekme') + ' CSV';
     }
   }
@@ -317,6 +351,16 @@
         { key: 'channel', label: 'Kanal' },
         { key: 'result', label: 'Sonuç' },
         { key: 'summary', label: 'Özet' }
+      ]);
+    } else if (activeTab === 'audit') {
+      Export.exportTable('rapor-denetim.csv', auditRows(), [
+        { key: 'date', label: 'Tarih', value: function (r) { return U.formatDateTime(r.date); } },
+        { key: 'entityType', label: 'Varlık' },
+        { key: 'entityId', label: 'Kayıt ID' },
+        { key: 'action', label: 'İşlem' },
+        { key: 'description', label: 'Açıklama' },
+        { key: 'reason', label: 'Neden' },
+        { key: 'user', label: 'Kullanıcı' }
       ]);
     }
   }
@@ -414,6 +458,19 @@
           { key: 'channel', label: 'Kanal' },
           { key: 'result', label: 'Sonuç' },
           { key: 'summary', label: 'Özet' }
+        ]
+      },
+      {
+        name: 'Denetim',
+        rows: auditRows(),
+        columns: [
+          { key: 'date', label: 'Tarih', value: function (r) { return U.formatDateTime(r.date); } },
+          { key: 'entityType', label: 'Varlık' },
+          { key: 'entityId', label: 'Kayıt ID' },
+          { key: 'action', label: 'İşlem' },
+          { key: 'description', label: 'Açıklama' },
+          { key: 'reason', label: 'Neden' },
+          { key: 'user', label: 'Kullanıcı' }
         ]
       }
     ]);

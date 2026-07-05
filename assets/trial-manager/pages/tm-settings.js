@@ -16,6 +16,34 @@
   var resetBtn = document.getElementById('tmResetMock');
   var userSelect = document.getElementById('tmMockUserSelect');
   var switchUserBtn = document.getElementById('tmSwitchUser');
+  var apiModeEl = document.getElementById('tmApiModeLabel');
+  var exportAuditBtn = document.getElementById('tmExportAudit');
+
+  var Export = window.TMExportUtils;
+  var SL = window.TMStatusLabels;
+  var Api = window.TMApi;
+
+  function renderApiMode() {
+    if (!apiModeEl) return;
+    var mode = Api && Api.getMode ? Api.getMode() : 'mock';
+    apiModeEl.textContent = mode === 'mock' ? 'Mock (TMStore · oturum depolaması)' : 'REST API';
+  }
+
+  function exportAuditLog() {
+    if (!Export || !Store.getAuditLogs) return;
+    if (Perms && !Perms.guard('export')) return;
+    var logs = Store.getAuditLogs();
+    Export.exportTable('denetim-gunlugu.csv', logs, [
+      { key: 'createdAt', label: 'Tarih', value: function (l) { return U.formatDateTime(l.createdAt); } },
+      { key: 'entityType', label: 'Varlık', value: function (l) { return SL ? SL.auditEntityLabel(l.entityType) : l.entityType; } },
+      { key: 'entityId', label: 'Kayıt ID' },
+      { key: 'action', label: 'İşlem', value: function (l) { return SL ? SL.auditActionLabel(l.action) : l.action; } },
+      { key: 'description', label: 'Açıklama' },
+      { key: 'reason', label: 'Neden' },
+      { key: 'createdByUserId', label: 'Kullanıcı ID' }
+    ]);
+    if (window.TMToast) window.TMToast.show('Denetim günlüğü indirildi (' + logs.length + ' kayıt).', 'success');
+  }
 
   function statRow(label, val, tone, href) {
     var valHtml = href
@@ -28,7 +56,7 @@
 
   function renderStats() {
     if (!statsEl) return;
-    var s = Store.getMockStats();
+    var s = Api && Api.getMockStats ? Api.getMockStats() : Store.getMockStats();
     statsEl.innerHTML =
       '<div class="tm-detail-grid" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">' +
       statRow('Öğrenci', s.students) +
@@ -72,7 +100,9 @@
   }
 
   if (switchUserBtn) switchUserBtn.addEventListener('click', switchUser);
+  if (exportAuditBtn) exportAuditBtn.addEventListener('click', exportAuditLog);
   renderUserSelect();
+  renderApiMode();
 
   if (simulateBtn) {
     simulateBtn.addEventListener('click', function () {
@@ -105,5 +135,6 @@
 
   renderStats();
   renderUserSelect();
+  renderApiMode();
   window.TMOnSessionChange = function () { renderStats(); renderUserSelect(); };
 })();

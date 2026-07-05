@@ -111,6 +111,16 @@
     permission_changed: 'Yetki değiştirildi'
   };
 
+  var AUDIT_ENTITY = {
+    trial_lesson_session: 'Ders',
+    reservation: 'Rezervasyon',
+    trial_lesson_request: 'Talep',
+    student: 'Öğrenci',
+    parent: 'Veli',
+    teacher: 'Öğretmen',
+    user: 'Kullanıcı'
+  };
+
   function badgeHtml(map, key, fallback) {
     var item = map[key];
     if (!item) return '<span class="tm-badge tm-badge--muted">' + (fallback || key || '—') + '</span>';
@@ -134,6 +144,9 @@
     COMM_CHANNEL: COMM_CHANNEL,
     COMM_RESULT: COMM_RESULT,
     AUDIT_ACTION: AUDIT_ACTION,
+    AUDIT_ENTITY: AUDIT_ENTITY,
+    auditActionLabel: function (a) { return label(AUDIT_ACTION, a); },
+    auditEntityLabel: function (e) { return label(AUDIT_ENTITY, e); },
     sessionBadge: function (s) { return badgeHtml(SESSION_STATUS, s); },
     reservationBadge: function (s) { return badgeHtml(RESERVATION_STATUS, s); },
     parentApprovalBadge: function (s) { return badgeHtml(PARENT_APPROVAL, s); },

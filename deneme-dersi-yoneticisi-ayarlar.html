@@ -44,6 +44,9 @@
         <a class="tm-btn tm-btn--ghost" href="deneme-dersi-yoneticisi-raporlar.html">Raporları aç</a>
         <a class="tm-btn tm-btn--ghost" href="deneme-dersi-yoneticisi-planlanmis-dersler.html">Ders listesi</a>
       </div>
+      <h2 class="tm-panel-title" style="margin:24px 0 12px">Veri kaynağı</h2>
+      <p style="font-size:13px;color:#64748b;margin:0 0 8px">İşlemler <code>TMApi</code> adapter üzerinden mock depoya gider. REST API bağlandığında aynı arayüz kullanılacak.</p>
+      <p style="font-size:13px;margin:0 0 16px">Aktif mod: <strong id="tmApiModeLabel">—</strong></p>
       <h2 class="tm-panel-title" style="margin:24px 0 12px">Mock kullanıcı (geliştirme)</h2>
       <p style="font-size:13px;color:#64748b;margin:0 0 12px">Yetki testi için oturum kullanıcısını değiştirin. Gözlemci rolünde düzenleme butonları kilitlenir.</p>
       <div class="tm-detail-actions" style="margin-bottom:20px;align-items:center;flex-wrap:wrap;gap:8px">
@@ -57,10 +60,11 @@
       <div class="tm-detail-actions">
         <button type="button" class="tm-btn tm-btn--primary" id="tmSimulateRequest">Web formu talebi simüle et</button>
         <button type="button" class="tm-btn tm-btn--ghost" id="tmResetMock">Mock veriyi sıfırla</button>
+        <button type="button" class="tm-btn tm-btn--ghost" id="tmExportAudit" data-tm-export>Denetim günlüğü CSV</button>
         <a class="tm-btn tm-btn--ghost" href="deneme-dersi-yoneticisi-rezervasyonlar.html">Talepleri gör</a>
       </div>
       <h2 class="tm-panel-title" style="margin:24px 0 12px">Dışa aktarım</h2>
-      <p style="font-size:13px;color:#64748b;margin:0">Tüm listelerde CSV butonu bulunur. Kapsamlı özet ve çok sayfalı rapor için <strong>Raporlar</strong> ekranındaki Excel paketini kullanın.</p>
+      <p style="font-size:13px;color:#64748b;margin:0">Tüm listelerde CSV butonu bulunur. Kapsamlı özet, denetim günlüğü ve çok sayfalı rapor için <strong>Raporlar</strong> ekranını kullanın.</p>
     </section>
   </main>
 </div>
@@ -68,6 +72,8 @@
 <script src="assets/trial-manager/lib/status-labels.js"></script>
 <script src="assets/trial-manager/lib/audit-utils.js"></script>
 <script src="assets/trial-manager/lib/mock-data.js"></script>
+<script src="assets/trial-manager/lib/tm-api.js"></script>
+<script src="assets/trial-manager/lib/export-utils.js"></script>
 <script src="assets/trial-manager/lib/scheduling-rules.js"></script>
 <script src="assets/trial-manager/components/tm-utils.js"></script>
 <script src="assets/trial-manager/components/tm-confirm-dialog.js"></script>
