@@ -64,7 +64,7 @@
     { key: 'veli', href: 'veli-dashboard.html', label: 'Veli Dashboard', short: 'Veli', icon: ICON_VELI, cls: 'is-veli' },
     { key: 'student', href: 'ogrenci-dashboard.html', label: 'Öğrenci Dashboard', short: 'Öğrenci', icon: ICON_STUDENT, cls: 'is-student' },
     { key: 'teacher', href: 'ogretmen-dashboard.html', label: 'Öğretmen Dashboard', short: 'Öğretmen', icon: ICON_TEACHER, cls: 'is-teacher' },
-    { key: 'trial-manager', href: 'deneme-dersi-yoneticisi-dashboard.html', label: 'Deneme Dersi Yöneticisi', short: 'D.D. Yön.', icon: ICON_TRIAL_MANAGER, cls: 'is-trial-manager' }
+    { key: 'trial-manager', href: 'deneme-dersi-yoneticisi-dashboard.html', label: 'Deneme Dersi Yöneticisi', short: 'Deneme', icon: ICON_TRIAL_MANAGER, cls: 'is-trial-manager' }
   ];
 
   function pageName() {
