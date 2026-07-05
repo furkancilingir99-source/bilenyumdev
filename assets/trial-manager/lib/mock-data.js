@@ -45,6 +45,7 @@
     return {
       students: state.students.length,
       parents: state.parents.length,
+      teachers: state.teachers.length,
       sessions: state.sessions.length,
       meetings: state.meetings.length,
       requests: state.requests.length,
@@ -1373,28 +1374,46 @@
 
   function createSimulatedRequest(draft) {
     draft = draft || {};
+    var hasCustom = draft.studentFirstName || draft.parentPhone;
+    if (hasCustom && (!draft.studentFirstName || !draft.studentLastName || !draft.parentFirstName || !draft.parentPhone)) {
+      return { ok: false, error: 'Öğrenci adı/soyadı ve veli adı/telefon zorunludur.' };
+    }
     var seq = state.requests.length + 1;
     var id = 'request-' + String(seq).padStart(4, '0');
     var pools = [
-      { studentFirstName: 'Melis', studentLastName: 'Ergin', studentAge: 10, studentGrade: '4. Sınıf', studentLevel: 'Başlangıç', requestedLessonTypeId: 'lt-mat', parentFirstName: 'Umut', parentLastName: 'Ergin', parentPhone: '0531 220 8891', parentEmail: 'umut.ergin@mail.com' },
+      { studentFirstName: 'Melis', studentLastName: 'Ergin', studentAge: 10, studentGrade: '5. Sınıf', studentLevel: 'Başlangıç', requestedLessonTypeId: 'lt-mat', parentFirstName: 'Umut', parentLastName: 'Ergin', parentPhone: '0531 220 8891', parentEmail: 'umut.ergin@mail.com' },
       { studentFirstName: 'Kaan', studentLastName: 'Polat', studentAge: 12, studentGrade: '6. Sınıf', studentLevel: 'Orta', requestedLessonTypeId: 'lt-fen', parentFirstName: 'İrem', parentLastName: 'Polat', parentPhone: '0538 441 0021', parentEmail: 'irem.polat@mail.com' }
     ];
     var sample = pools[seq % pools.length];
-    var sessions = getAvailableSessionsForLessonType(sample.requestedLessonTypeId);
-    var session = sessions[0] || state.sessions.find(function (s) { return s.status !== 'cancelled'; });
+    var ltId = draft.requestedLessonTypeId || sample.requestedLessonTypeId;
+    var sessions = getAvailableSessionsForLessonType(ltId);
+    var session = null;
+    if (draft.selectedSessionId) {
+      session = find(state.sessions, draft.selectedSessionId);
+      if (!session || session.lessonTypeId !== ltId) {
+        return { ok: false, error: 'Seçilen ders slotu geçersiz veya ders türüyle uyumsuz.' };
+      }
+      if (session.status === 'cancelled' || session.status === 'completed') {
+        return { ok: false, error: 'Seçilen ders slotu artık uygun değil.' };
+      }
+    } else if (draft.selectedSessionId === undefined && !hasCustom) {
+      session = sessions[0] || state.sessions.find(function (s) { return s.status !== 'cancelled'; });
+    }
     var req = {
       id: id,
       studentFirstName: draft.studentFirstName || sample.studentFirstName,
       studentLastName: draft.studentLastName || sample.studentLastName,
-      studentAge: draft.studentAge || sample.studentAge,
+      studentAge: parseInt(draft.studentAge, 10) || sample.studentAge,
       studentGrade: draft.studentGrade || sample.studentGrade,
       studentLevel: draft.studentLevel || sample.studentLevel,
-      requestedLessonTypeId: draft.requestedLessonTypeId || sample.requestedLessonTypeId,
+      requestedLessonTypeId: ltId,
       parentFirstName: draft.parentFirstName || sample.parentFirstName,
       parentLastName: draft.parentLastName || sample.parentLastName,
       parentPhone: draft.parentPhone || sample.parentPhone,
       parentEmail: draft.parentEmail || sample.parentEmail,
-      selectedSessionId: draft.selectedSessionId || (session ? session.id : undefined),
+      selectedSessionId: draft.selectedSessionId !== undefined
+        ? (draft.selectedSessionId || undefined)
+        : (session ? session.id : undefined),
       status: 'new',
       source: 'website_form',
       createdAt: new Date().toISOString(),
@@ -1471,6 +1490,7 @@
     var orphanRequests = state.requests.filter(function (r) {
       return isOrphanRequest(r.id);
     });
+    var newRequests = state.requests.filter(function (r) { return r.status === 'new'; });
     var studentCountToday = 0;
     todaySessions.forEach(function (s) { studentCountToday += s.enrolledStudentIds.length; });
     var actionableCount = pendingApproval.length + linkNotSent.length + orphanRequests.length +
@@ -1486,13 +1506,15 @@
       needsAttendanceCount: needsAttendance.length,
       conversionCount: enrolled.length,
       orphanRequestCount: orphanRequests.length,
+      newRequestCount: newRequests.length,
       actionableCount: actionableCount,
       todaySessions: todaySessions,
       pendingApproval: pendingApproval,
       linkNotSent: linkNotSent,
       teacherNotInformed: teacherNotInformed,
       needsAttendance: needsAttendance,
-      orphanRequests: orphanRequests
+      orphanRequests: orphanRequests,
+      newRequests: newRequests
     };
   }
 

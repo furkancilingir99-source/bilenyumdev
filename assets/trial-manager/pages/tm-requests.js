@@ -131,18 +131,16 @@
       ]);
     });
   }
-  if (simulateBtn && Store.createSimulatedRequest) {
+  if (simulateBtn && window.TMSimulateRequest) {
     simulateBtn.addEventListener('click', function () {
-      if (Perms && !Perms.guard('create')) return;
-      var res = Store.createSimulatedRequest();
-      if (!res.ok) {
-        if (U.notifyError) U.notifyError(res.error || 'Talep oluşturulamadı.');
-        return;
-      }
-      page = 1;
-      if (window.TMToast) window.TMToast.show('Yeni talep eklendi.', 'success');
-      notifyChange();
-      render();
+      window.TMSimulateRequest.open({
+        onSuccess: function (res) {
+          page = 1;
+          notifyChange();
+          render();
+          if (RequestDrawer && res && res.request) RequestDrawer.open(res.request.id);
+        }
+      });
     });
   }
   render();

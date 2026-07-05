@@ -33,6 +33,7 @@
       '<div class="tm-detail-grid" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">' +
       statRow('Öğrenci', s.students) +
       statRow('Veli', s.parents) +
+      statRow('Öğretmen', s.teachers) +
       statRow('Ders', s.sessions) +
       statRow('Toplantı', s.meetings) +
       statRow('Talep', s.requests) +
@@ -75,16 +76,9 @@
 
   if (simulateBtn) {
     simulateBtn.addEventListener('click', function () {
-      if (Perms && !Perms.guard('create')) return;
-      var res = Store.createSimulatedRequest();
-      if (!res.ok) {
-        if (U.notifyError) U.notifyError(res.error || 'Talep oluşturulamadı.');
-        return;
+      if (window.TMSimulateRequest) {
+        window.TMSimulateRequest.open({ onSuccess: function () { renderStats(); } });
       }
-      var name = res.request.studentFirstName + ' ' + res.request.studentLastName;
-      if (window.TMToast) window.TMToast.show('Yeni talep: ' + name, 'success');
-      renderStats();
-      if (window.TMOnSessionChange) window.TMOnSessionChange();
     });
   }
 
