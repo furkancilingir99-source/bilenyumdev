@@ -153,6 +153,27 @@
     );
   }
 
+  function renderLessonIdBlock() {
+    var id = draft.id || Planner.previewLessonId(draft.subject, draft.grade);
+    if (!id) {
+      return (
+        '<div class="tm-lesson-id-card is-placeholder">' +
+          '<span class="tm-filter-field-label">Ders ID</span>' +
+          '<p class="tm-lesson-id-hint">Branş ve sınıf seçildiğinde ders ID oluşturulur.</p>' +
+        '</div>'
+      );
+    }
+    var desc = Planner.describeLessonId(id);
+    return (
+      '<div class="tm-lesson-id-card">' +
+        '<span class="tm-filter-field-label">Ders ID</span>' +
+        '<span class="tm-record-id tm-record-id--lg">' + escapeHtml(id) + '</span>' +
+        '<p class="tm-lesson-id-desc">' + escapeHtml(desc.subject) + ' · ' + escapeHtml(desc.grade) + ' · ' + escapeHtml(desc.year) + '</p>' +
+        (!draft.id ? '<small class="tm-lesson-id-hint">Kayıt sonrası bu ID ile planlanmış derslerde görünür.</small>' : '') +
+      '</div>'
+    );
+  }
+
   function renderEditor() {
     if (!editorEl || !draft) return;
     syncSlotFromPicker();
@@ -165,12 +186,12 @@
           '<div class="tm-planner-editor-head-row">' +
             '<div>' +
               '<h2 class="tm-planner-editor-title">' + (isEdit ? 'Dersi Düzenle' : 'Yeni Deneme Dersi Planla') + '</h2>' +
-              (isEdit ? '<p class="tm-planner-lesson-id">Ders ID: <span class="tm-record-id">' + escapeHtml(draft.id) + '</span></p>' : '') +
               '<p class="tm-planner-editor-sub">Branş, sınıf ve öğretmen seçin; uygun öğrencileri ekleyerek sınıf oluşturun.</p>' +
             '</div>' +
             '<a class="tm-panel-link" href="deneme-dersi-yoneticisi-planlanmis-dersler.html">Planlanmış derslere git →</a>' +
           '</div>' +
         '</header>' +
+        renderLessonIdBlock() +
         '<div class="tm-planner-form-grid">' +
           '<label class="tm-filter-field">' +
             '<span class="tm-filter-field-label">Branş</span>' +

@@ -8,8 +8,67 @@
   var GRADES = ['5. Sınıf', '6. Sınıf', '7. Sınıf', '8. Sınıf'];
   var ID_PREFIX = 'DERS';
 
-  function formatLessonId(year, seq) {
-    return ID_PREFIX + '-' + year + '-' + String(seq).padStart(4, '0');
+  var SUBJECT_CODES = {
+    'Matematik': 'MAT',
+    'Fen Bilimleri': 'FEN',
+    'Türkçe': 'TUR',
+    'İngilizce': 'ING',
+    'Sosyal Bilgiler': 'SOS'
+  };
+
+  var CODE_SUBJECTS = {
+    MAT: 'Matematik',
+    FEN: 'Fen Bilimleri',
+    TUR: 'Türkçe',
+    ING: 'İngilizce',
+    SOS: 'Sosyal Bilgiler'
+  };
+
+  function gradeCode(grade) {
+    var m = /^(\d+)/.exec(grade || '');
+    return m ? m[1] : '0';
+  }
+
+  function formatLessonId(subject, grade, year, seq) {
+    var code = SUBJECT_CODES[subject] || 'GEN';
+    return ID_PREFIX + '-' + code + '-' + gradeCode(grade) + '-' + year + '-' + String(seq).padStart(4, '0');
+  }
+
+  function lessonIdPrefix(subject, grade, year) {
+    var code = SUBJECT_CODES[subject] || 'GEN';
+    return ID_PREFIX + '-' + code + '-' + gradeCode(grade) + '-' + year + '-';
+  }
+
+  function nextLessonSeq(subject, grade, year) {
+    var prefix = lessonIdPrefix(subject, grade, year);
+    var max = 0;
+    PLANNED_LESSONS.forEach(function (l) {
+      if (l.id.indexOf(prefix) !== 0) return;
+      var seq = parseInt(l.id.slice(prefix.length), 10);
+      if (!isNaN(seq)) max = Math.max(max, seq);
+    });
+    return max + 1;
+  }
+
+  function previewLessonId(subject, grade) {
+    if (!subject || !grade) return null;
+    var year = new Date().getFullYear();
+    return formatLessonId(subject, grade, year, nextLessonSeq(subject, grade, year));
+  }
+
+  function describeLessonId(id) {
+    var m = /^DERS-([A-Z]+)-(\d)-(\d{4})-(\d+)$/.exec(id || '');
+    if (!m) {
+      return { id: id, subject: '—', grade: '—', year: '—', seq: '—' };
+    }
+    return {
+      id: id,
+      code: m[1],
+      subject: CODE_SUBJECTS[m[1]] || m[1],
+      grade: m[2] + '. Sınıf',
+      year: m[3],
+      seq: m[4]
+    };
   }
 
   var TEACHERS = [
@@ -22,7 +81,7 @@
 
   var PLANNED_LESSONS = [
     {
-      id: 'DERS-2026-0001',
+      id: 'DERS-MAT-5-2026-0001',
       subject: 'Matematik',
       grade: '5. Sınıf',
       teacherId: 't1',
@@ -33,7 +92,7 @@
       updatedAt: '2026-07-05T10:00:00+03:00'
     },
     {
-      id: 'DERS-2026-0002',
+      id: 'DERS-FEN-6-2026-0001',
       subject: 'Fen Bilimleri',
       grade: '6. Sınıf',
       teacherId: 't5',
@@ -44,7 +103,7 @@
       updatedAt: '2026-07-05T08:30:00+03:00'
     },
     {
-      id: 'DERS-2026-0003',
+      id: 'DERS-TUR-6-2026-0001',
       subject: 'Türkçe',
       grade: '6. Sınıf',
       teacherId: 't3',
@@ -55,7 +114,7 @@
       updatedAt: '2026-07-04T18:20:00+03:00'
     },
     {
-      id: 'DERS-2026-0004',
+      id: 'DERS-MAT-5-2026-0002',
       subject: 'Matematik',
       grade: '5. Sınıf',
       teacherId: 't2',
@@ -66,7 +125,7 @@
       updatedAt: '2026-07-04T14:10:00+03:00'
     },
     {
-      id: 'DERS-2026-0005',
+      id: 'DERS-ING-7-2026-0001',
       subject: 'İngilizce',
       grade: '7. Sınıf',
       teacherId: 't4',
@@ -77,7 +136,7 @@
       updatedAt: '2026-07-03T16:45:00+03:00'
     },
     {
-      id: 'DERS-2026-0006',
+      id: 'DERS-FEN-7-2026-0001',
       subject: 'Fen Bilimleri',
       grade: '7. Sınıf',
       teacherId: 't2',
@@ -88,7 +147,7 @@
       updatedAt: '2026-07-03T11:30:00+03:00'
     },
     {
-      id: 'DERS-2026-0007',
+      id: 'DERS-SOS-8-2026-0001',
       subject: 'Sosyal Bilgiler',
       grade: '8. Sınıf',
       teacherId: 't4',
@@ -99,7 +158,7 @@
       updatedAt: '2026-07-02T09:15:00+03:00'
     },
     {
-      id: 'DERS-2026-0008',
+      id: 'DERS-MAT-8-2026-0001',
       subject: 'Matematik',
       grade: '8. Sınıf',
       teacherId: 't1',
@@ -110,7 +169,7 @@
       updatedAt: '2026-07-01T20:00:00+03:00'
     },
     {
-      id: 'DERS-2026-0009',
+      id: 'DERS-TUR-8-2026-0001',
       subject: 'Türkçe',
       grade: '8. Sınıf',
       teacherId: 't3',
@@ -121,7 +180,7 @@
       updatedAt: '2026-06-30T15:40:00+03:00'
     },
     {
-      id: 'DERS-2026-0010',
+      id: 'DERS-ING-5-2026-0001',
       subject: 'İngilizce',
       grade: '5. Sınıf',
       teacherId: 't4',
@@ -132,7 +191,7 @@
       updatedAt: '2026-06-29T12:20:00+03:00'
     },
     {
-      id: 'DERS-2026-0011',
+      id: 'DERS-MAT-6-2026-0001',
       subject: 'Matematik',
       grade: '6. Sınıf',
       teacherId: 't2',
@@ -143,7 +202,7 @@
       updatedAt: '2026-07-05T07:10:00+03:00'
     },
     {
-      id: 'DERS-2026-0012',
+      id: 'DERS-FEN-8-2026-0001',
       subject: 'Fen Bilimleri',
       grade: '8. Sınıf',
       teacherId: 't5',
@@ -262,16 +321,24 @@
     return issues;
   }
 
-  function nextLessonId() {
+  function nextLessonId(subject, grade) {
     var year = new Date().getFullYear();
-    var max = 0;
-    PLANNED_LESSONS.forEach(function (l) {
-      var m = new RegExp('^' + ID_PREFIX + '-(\\d{4})-(\\d+)$').exec(l.id);
-      if (m && parseInt(m[1], 10) === year) {
-        max = Math.max(max, parseInt(m[2], 10));
-      }
+    return formatLessonId(subject, grade, year, nextLessonSeq(subject, grade, year));
+  }
+
+  function updatePlannedLessonStudents(id, studentIds) {
+    var lesson = getPlannedLessonById(id);
+    if (!lesson) return { ok: false, error: 'Ders bulunamadı.' };
+    return savePlannedLesson({
+      id: lesson.id,
+      subject: lesson.subject,
+      grade: lesson.grade,
+      teacherId: lesson.teacherId,
+      slotLabel: lesson.slotLabel,
+      slotDateKey: lesson.slotDateKey,
+      slotTime: lesson.slotTime,
+      studentIds: (studentIds || []).slice()
     });
-    return formatLessonId(year, max + 1);
   }
 
   function savePlannedLesson(draft) {
@@ -304,7 +371,7 @@
       }
     }
 
-    payload.id = nextLessonId();
+    payload.id = nextLessonId(draft.subject, draft.grade);
     PLANNED_LESSONS.push(payload);
     return { ok: true, lesson: payload };
   }
@@ -388,7 +455,10 @@
 
   global.TrialLessonPlannerMock = {
     ID_PREFIX: ID_PREFIX,
+    SUBJECT_CODES: SUBJECT_CODES,
     formatLessonId: formatLessonId,
+    previewLessonId: previewLessonId,
+    describeLessonId: describeLessonId,
     nextLessonId: nextLessonId,
     SUBJECTS: SUBJECTS,
     GRADES: GRADES,
@@ -399,6 +469,7 @@
     getEligibleStudents: getEligibleStudents,
     checkConflicts: checkConflicts,
     savePlannedLesson: savePlannedLesson,
+    updatePlannedLessonStudents: updatePlannedLessonStudents,
     deletePlannedLesson: deletePlannedLesson,
     getEnrichedPlannedLesson: getEnrichedPlannedLesson,
     getFilterOptions: getFilterOptions

@@ -571,6 +571,61 @@
   color: #64748b;
 }
 
+.tm-lesson-id-card {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(2, 132, 199, 0.06);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+  margin-bottom: 4px;
+}
+
+.tm-lesson-id-card.is-placeholder {
+  background: rgba(148, 163, 184, 0.08);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.tm-lesson-id-card--compact {
+  margin-bottom: 12px;
+}
+
+.tm-lesson-id-desc {
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-lesson-id-hint {
+  display: block;
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.tm-record-id--lg {
+  font-size: 13px;
+  padding: 5px 10px;
+}
+
+.tm-planned-students-edit-hint {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.tm-planner-students--drawer {
+  max-height: 320px;
+}
+
+.tm-planned-drawer-student-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
 .tm-cell-date {
   font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
   font-size: 12px;

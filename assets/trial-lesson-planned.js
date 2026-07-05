@@ -26,17 +26,27 @@
   var drawerBody = document.getElementById('tmPlannedDrawerBody');
   var drawerTitle = document.getElementById('tmPlannedDrawerTitle');
   var dateClearBtn = document.getElementById('tmPlannedDateClear');
+  var toastEl = document.getElementById('tmPlannedToast');
 
   var allRows = [];
   var currentPage = 1;
   var dateRange = { start: null, end: null };
   var openDatePop = null;
   var currentDrawerId = null;
+  var drawerStudentIds = [];
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
+  }
+
+  function showToast(msg) {
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.hidden = false;
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(function () { toastEl.hidden = true; }, 2800);
   }
 
   function formatUpdatedAt(iso) {
@@ -381,58 +391,105 @@
     renderPagination(meta);
   }
 
-  function renderStudentCards(students) {
+  function renderLessonIdBlock(l) {
+    var desc = Planner.describeLessonId(l.id);
+    return (
+      '<div class="tm-lesson-id-card tm-lesson-id-card--compact">' +
+        '<span class="tm-filter-field-label">Ders ID</span>' +
+        '<span class="tm-record-id tm-record-id--lg">' + escapeHtml(l.id) + '</span>' +
+        '<p class="tm-lesson-id-desc">' + escapeHtml(desc.subject) + ' · ' + escapeHtml(desc.grade) + '</p>' +
+      '</div>'
+    );
+  }
+
+  function renderDrawerStudentEditor(l) {
+    var students = Planner.getEligibleStudents(l.subject, l.grade, l.id, l.slotDateKey, l.slotTime);
     if (!students.length) {
-      return '<p class="tm-planned-no-students">Bu derse henüz öğrenci eklenmemiş.</p>';
+      return '<p class="tm-planned-no-students">Bu branş ve sınıf için eklenebilecek uygun rezervasyon yok.</p>';
     }
-    return students.map(function (s) {
-      var statusLabel = ResMock.STATUS_LABELS[s.status] || s.status || '—';
-      return (
-        '<div class="tm-detail-card is-student tm-planned-student-card">' +
-          '<div class="tm-detail-card-head">' +
-            '<span class="tm-detail-card-icon" aria-hidden="true">🎓</span>' +
-            '<h4 class="tm-detail-card-title">' + escapeHtml(s.name) + '</h4>' +
-          '</div>' +
-          '<dl class="tm-detail-dl">' +
-            '<div><dt>Rezervasyon ID</dt><dd><span class="tm-record-id">' + escapeHtml(s.reservationId) + '</span></dd></div>' +
-            '<div><dt>Sınıf</dt><dd>' + escapeHtml(s.grade) + '</dd></div>' +
-            '<div><dt>Veli</dt><dd>' + escapeHtml(s.parent) + '</dd></div>' +
-            '<div><dt>Telefon</dt><dd><a href="tel:' + escapeHtml(String(s.phone).replace(/\s/g, '')) + '">' + escapeHtml(s.phone) + '</a></dd></div>' +
-            '<div><dt>E-posta</dt><dd><a href="mailto:' + escapeHtml(s.email) + '">' + escapeHtml(s.email) + '</a></dd></div>' +
-            '<div><dt>Tercih ettiği slot</dt><dd>' + escapeHtml(s.preferredSlot) + '</dd></div>' +
-            '<div><dt>Rezervasyon durumu</dt><dd><span class="tm-status is-' + escapeHtml(s.status) + '">' + escapeHtml(statusLabel) + '</span></dd></div>' +
-          '</dl>' +
-        '</div>'
-      );
-    }).join('');
+    return (
+      '<div class="tm-planner-students tm-planner-students--drawer">' +
+        students.map(function (s) {
+          var checked = drawerStudentIds.indexOf(s.reservationId) !== -1;
+          var disabled = s.hasConflict && !checked ? ' disabled' : '';
+          return (
+            '<label class="tm-planner-student' + (checked ? ' is-checked' : '') + (s.hasConflict && !checked ? ' is-blocked' : '') + '">' +
+              '<input type="checkbox" data-drawer-student-id="' + escapeHtml(s.reservationId) + '"' + (checked ? ' checked' : '') + disabled + '>' +
+              '<span class="tm-planner-student-body">' +
+                '<strong>' + escapeHtml(s.name) + '</strong>' +
+                '<small class="tm-record-id tm-record-id--inline">' + escapeHtml(s.reservationId) + '</small>' +
+                '<small>Veli: ' + escapeHtml(s.parent) + ' · Tercih: ' + escapeHtml(s.preferredSlot) + '</small>' +
+                (s.hasConflict && !checked ? '<small class="tm-planner-student-warn">' + escapeHtml(s.conflictMsg) + '</small>' : '') +
+              '</span>' +
+            '</label>'
+          );
+        }).join('') +
+      '</div>'
+    );
+  }
+
+  function renderDrawerConflicts(l) {
+    var draft = {
+      id: l.id,
+      subject: l.subject,
+      grade: l.grade,
+      teacherId: l.teacherId,
+      slotDateKey: l.slotDateKey,
+      slotTime: l.slotTime,
+      studentIds: drawerStudentIds.slice()
+    };
+    var issues = Planner.checkConflicts(draft);
+    if (!issues.length) {
+      return '<div class="tm-planner-conflicts is-ok">Çakışma yok — öğrenci listesi kaydedilebilir.</div>';
+    }
+    return (
+      '<div class="tm-planner-conflicts is-error">' +
+        '<strong>Çakışma uyarısı</strong>' +
+        '<ul>' + issues.map(function (i) { return '<li>' + escapeHtml(i.message) + '</li>'; }).join('') + '</ul>' +
+      '</div>'
+    );
+  }
+
+  function collectDrawerStudentIds() {
+    if (!drawerBody) return drawerStudentIds.slice();
+    var ids = [];
+    drawerBody.querySelectorAll('[data-drawer-student-id]:checked').forEach(function (cb) {
+      ids.push(cb.getAttribute('data-drawer-student-id'));
+    });
+    return ids;
+  }
+
+  function saveDrawerStudents() {
+    if (!currentDrawerId) return;
+    drawerStudentIds = collectDrawerStudentIds();
+    var result = Planner.updatePlannedLessonStudents(currentDrawerId, drawerStudentIds);
+    if (!result.ok) {
+      showToast(result.error || 'Kaydedilemedi.');
+      renderDrawerDetail(Planner.getEnrichedPlannedLesson(currentDrawerId));
+      return;
+    }
+    showToast('Öğrenci listesi güncellendi.');
+    refreshAllRows();
+    applyFilters(false);
+    renderDrawerDetail(Planner.getEnrichedPlannedLesson(currentDrawerId));
   }
 
   function renderDrawerDetail(l) {
     if (!drawerBody || !drawerTitle) return;
     drawerTitle.textContent = l.subject + ' · ' + l.grade;
 
-    var conflictBlock = '';
-    if (l.conflicts && l.conflicts.length) {
-      conflictBlock =
-        '<div class="tm-planned-conflict-alert">' +
-          '<strong>Çakışma uyarısı</strong>' +
-          '<ul>' + l.conflicts.map(function (c) { return '<li>' + escapeHtml(c.message) + '</li>'; }).join('') + '</ul>' +
-        '</div>';
-    }
-
     drawerBody.innerHTML =
-      conflictBlock +
+      renderLessonIdBlock(l) +
       '<div class="tm-detail-card is-lesson">' +
         '<div class="tm-detail-card-head">' +
           '<span class="tm-detail-card-icon" aria-hidden="true">📚</span>' +
           '<h4 class="tm-detail-card-title">Ders</h4>' +
         '</div>' +
         '<dl class="tm-detail-dl">' +
-          '<div><dt>Ders ID</dt><dd><span class="tm-record-id">' + escapeHtml(l.id) + '</span></dd></div>' +
           '<div><dt>Branş</dt><dd>' + escapeHtml(l.subject) + '</dd></div>' +
           '<div><dt>Sınıf</dt><dd>' + escapeHtml(l.grade) + '</dd></div>' +
           '<div><dt>Ders tarihi / saat</dt><dd><strong>' + escapeHtml(l.slotLabel) + '</strong></dd></div>' +
-          '<div><dt>Öğrenci sayısı</dt><dd>' + l.studentIds.length + '</dd></div>' +
+          '<div><dt>Öğrenci sayısı</dt><dd id="tmDrawerStudentCount">' + drawerStudentIds.length + '</dd></div>' +
           '<div><dt>Son güncelleme</dt><dd>' + escapeHtml(formatUpdatedAt(l.updatedAt)) + '</dd></div>' +
         '</dl>' +
       '</div>' +
@@ -447,11 +504,19 @@
         '</dl>' +
       '</div>' +
       '<section class="tm-planned-students-section">' +
-        '<h3 class="tm-planned-students-heading">Derse katılacak öğrenciler (' + l.students.length + ')</h3>' +
-        renderStudentCards(l.students) +
+        '<div class="tm-planner-section-head">' +
+          '<h3 class="tm-planned-students-heading">Öğrenciler</h3>' +
+          '<span class="tm-planner-section-count" id="tmDrawerStudentBadge">' + drawerStudentIds.length + ' seçili</span>' +
+        '</div>' +
+        '<p class="tm-planned-students-edit-hint">Derse katılacak öğrencileri ekleyin veya çıkarın; değişiklikleri kaydedin.</p>' +
+        renderDrawerStudentEditor(l) +
+        renderDrawerConflicts(l) +
+        '<div class="tm-planned-drawer-student-actions">' +
+          '<button type="button" class="tm-planner-btn is-primary" id="tmDrawerSaveStudents">Öğrenci listesini kaydet</button>' +
+        '</div>' +
       '</section>' +
       '<div class="tm-planned-drawer-actions">' +
-        '<a class="tm-planner-btn is-primary" href="deneme-dersi-yoneticisi-ders-planla.html?edit=' + encodeURIComponent(l.id) + '">Dersi düzenle</a>' +
+        '<a class="tm-planner-btn is-ghost" href="deneme-dersi-yoneticisi-ders-planla.html?edit=' + encodeURIComponent(l.id) + '">Tüm dersi düzenle</a>' +
       '</div>';
   }
 
@@ -459,6 +524,7 @@
     currentDrawerId = id;
     var l = Planner.getEnrichedPlannedLesson(id);
     if (!l) return;
+    drawerStudentIds = l.studentIds.slice();
     renderDrawerDetail(l);
     if (drawer) {
       drawer.classList.add('is-open');
@@ -469,6 +535,7 @@
 
   function closeDrawer() {
     currentDrawerId = null;
+    drawerStudentIds = [];
     if (drawer) {
       drawer.classList.remove('is-open');
       drawer.setAttribute('aria-hidden', 'true');
@@ -513,6 +580,13 @@
     if (drawer) {
       drawer.addEventListener('click', function (e) {
         if (e.target.closest('[data-tm-drawer-close]')) closeDrawer();
+        if (e.target.closest('#tmDrawerSaveStudents')) saveDrawerStudents();
+      });
+      drawer.addEventListener('change', function (e) {
+        if (!e.target.matches('[data-drawer-student-id]')) return;
+        drawerStudentIds = collectDrawerStudentIds();
+        var l = Planner.getEnrichedPlannedLesson(currentDrawerId);
+        if (l) renderDrawerDetail(l);
       });
     }
     document.addEventListener('keydown', function (e) {
