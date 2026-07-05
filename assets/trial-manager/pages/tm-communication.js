@@ -29,7 +29,8 @@
     { id: 'pending', label: 'Onay bekleyenler' },
     { id: 'call_again', label: 'Tekrar aranacaklar' },
     { id: 'link', label: 'Link gönderilecekler' },
-    { id: 'teacher', label: 'Öğretmen bilgilendirilecekler' },
+    { id: 'pdr_teacher', label: 'PDR bilgilendirilecekler' },
+    { id: 'branch_teacher', label: 'Branş bilgilendirilecekler' },
     { id: 'all', label: 'Tüm geçmiş' }
   ];
 
@@ -56,18 +57,26 @@
         email: pa.email
       });
     });
-    Store.getSessions().filter(function (s) { return !s.teacherInformed && s.status !== 'cancelled'; }).forEach(function (s) {
-      var t = Store.getTeacherById(s.teacherId);
+    function pushTeacherRow(s, role) {
+      var tid = role === 'pdr' ? s.pdrTeacherId : s.branchTeacherId;
+      var informed = role === 'pdr' ? s.pdrTeacherInformed : s.branchTeacherInformed;
+      if (!tid || informed) return;
+      var t = Store.getTeacherById(tid);
       if (!t) return;
       rows.push({
         session: s,
         teacher: t,
+        teacherRole: role,
         person: U.fullName(t.firstName, t.lastName),
-        role: 'Öğretmen',
+        role: role === 'pdr' ? 'PDR öğretmeni' : 'Branş öğretmeni',
         phone: t.phone,
         email: t.email,
         reservation: null
       });
+    }
+    Store.getSessions().filter(function (s) { return s.status !== 'cancelled'; }).forEach(function (s) {
+      pushTeacherRow(s, 'pdr');
+      pushTeacherRow(s, 'branch');
     });
     return rows;
   }
@@ -79,7 +88,8 @@
     if (tabId === 'pending') return rows.filter(function (x) { return x.reservation && (x.reservation.parentApprovalStatus === 'not_called' || x.reservation.status === 'pending'); });
     if (tabId === 'call_again') return rows.filter(function (x) { return x.reservation && x.reservation.parentApprovalStatus === 'call_again'; });
     if (tabId === 'link') return rows.filter(function (x) { return x.reservation && x.reservation.parentApprovalStatus === 'approved' && !x.reservation.linkSent; });
-    if (tabId === 'teacher') return rows.filter(function (x) { return x.role === 'Öğretmen'; });
+    if (tabId === 'pdr_teacher') return rows.filter(function (x) { return x.teacherRole === 'pdr'; });
+    if (tabId === 'branch_teacher') return rows.filter(function (x) { return x.teacherRole === 'branch'; });
     if (tabId === 'today') return rows.filter(function (x) {
       return x.reservation && x.session && x.session.date === today;
     });
@@ -136,7 +146,7 @@
           entry.studentId = rowCtx.student ? rowCtx.student.id : rowCtx.reservation.studentId;
         } else if (rowCtx.session) {
           entry.sessionId = rowCtx.session.id;
-          entry.teacherId = rowCtx.teacher ? rowCtx.teacher.id : rowCtx.session.teacherId;
+          entry.teacherId = rowCtx.teacher ? rowCtx.teacher.id : (rowCtx.teacherRole === 'pdr' ? rowCtx.session.pdrTeacherId : rowCtx.session.branchTeacherId);
         }
         Store.addCommunicationLog(entry);
         if (window.TMOnSessionChange) window.TMOnSessionChange();
@@ -148,18 +158,25 @@
 
   function openWhatsApp(row) {
     if (!QuickMsg || !row.phone) return;
-    if (row.role === 'Öğretmen' && row.teacher && row.session) {
+    if ((row.role === 'PDR öğretmeni' || row.role === 'Branş öğretmeni') && row.teacher && row.session) {
       var lt = Store.getLessonTypeById(row.session.lessonTypeId);
-      var enrolled = row.session.enrolledStudentIds ? row.session.enrolledStudentIds.length : 0;
-      QuickMsg.openForTeacher({
+      var meeting = Store.getMeetingBySessionId(row.session.id);
+      var payload = {
         teacherName: U.fullName(row.teacher.firstName, row.teacher.lastName),
         date: U.formatDateKey(row.session.date),
         time: row.session.startTime,
         lessonType: lt ? lt.name : '—',
-        studentCount: enrolled,
+        meetingUrl: meeting ? meeting.meetingUrl : '',
+        meetingId: meeting ? meeting.meetingId : '',
+        passcode: meeting ? meeting.passcode : '',
         phone: row.teacher.phone,
         email: row.teacher.email
-      });
+      };
+      if (row.teacherRole === 'pdr') QuickMsg.openForPdrTeacher(payload);
+      else {
+        payload.studentCount = row.session.enrolledStudentIds ? row.session.enrolledStudentIds.length : 0;
+        QuickMsg.openForBranchTeacher(payload);
+      }
       return;
     }
     if (!row.parent) return;
@@ -242,8 +259,8 @@
       if (activeTab !== 'all') {
         parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '" data-tm-require="edit">Kayıt ekle</button>');
       }
-    } else if (x.session && x.role === 'Öğretmen') {
-      if (activeTab === 'teacher') {
+    } else if (x.session && (x.role === 'PDR öğretmeni' || x.role === 'Branş öğretmeni')) {
+      if (activeTab === 'pdr_teacher' || activeTab === 'branch_teacher') {
         parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-act-inform="' + i + '" data-tm-require="edit">Bilgilendirildi</button>');
         parts.push('<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-act-session="' + x.session.id + '">Ders</button>');
       }
@@ -314,7 +331,9 @@
         if (Perms && !Perms.guard('edit')) return;
         var row = lastItems[parseInt(btn.getAttribute('data-act-inform'), 10)];
         if (!row || !row.session) return;
-        Store.markTeacherInformed(row.session.id);
+        if (row.teacherRole === 'pdr') Store.markPdrTeacherInformed(row.session.id);
+        else if (row.teacherRole === 'branch') Store.markBranchTeacherInformed(row.session.id);
+        else Store.markTeacherInformed(row.session.id);
         U.notifySuccess('Öğretmen bilgilendirildi.');
         if (window.TMOnSessionChange) window.TMOnSessionChange();
         render();
@@ -381,10 +400,19 @@
       tbody.innerHTML = p.items.map(function (x, i) {
         var stName = x.student ? U.fullName(x.student.firstName, x.student.lastName) : '—';
         var sessLabel = x.session ? U.formatDateKey(x.session.date) + ' ' + x.session.startTime : '—';
-        var result = x.reservation ? SL.parentApprovalLabel(x.reservation.parentApprovalStatus) : 'Bilgilendirilmedi';
+        var pdrName = '—';
+        var branchName = '—';
+        if (x.session) {
+          var pdrT = Store.getTeacherById(x.session.pdrTeacherId);
+          var branchT = Store.getTeacherById(x.session.branchTeacherId);
+          pdrName = pdrT ? U.fullName(pdrT.firstName, pdrT.lastName) : '—';
+          branchName = branchT ? U.fullName(branchT.firstName, branchT.lastName) : '—';
+        }
+        var result = x.reservation ? SL.parentApprovalLabel(x.reservation.parentApprovalStatus) : (x.teacherRole === 'pdr' ? 'PDR bilgilendirilmedi' : (x.teacherRole === 'branch' ? 'Branş bilgilendirilmedi' : 'Bilgilendirilmedi'));
         var actions = rowActions(x, i);
         return '<tr><td>' + U.escapeHtml(x.person) + '</td><td>' + x.role + '</td><td>' + U.escapeHtml(stName) + '</td><td>' + U.escapeHtml(sessLabel) + '</td>' +
-          '<td>' + U.escapeHtml(x.phone) + '</td><td>—</td><td>' + U.escapeHtml(result) + '</td><td>—</td><td>—</td><td>' + U.escapeHtml(resp) + '</td>' +
+          '<td>' + U.escapeHtml(pdrName) + '</td><td>' + U.escapeHtml(branchName) + '</td>' +
+          '<td>' + U.escapeHtml(x.phone) + '</td><td>—</td><td>' + U.escapeHtml(result) + '</td><td>—</td><td>' + U.escapeHtml(resp) + '</td>' +
           '<td style="white-space:nowrap">' + actions + '</td></tr>';
       }).join('');
     }

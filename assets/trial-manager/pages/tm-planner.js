@@ -18,7 +18,8 @@
   var typeSelect = document.getElementById('tmPlanType');
   var dateInput = document.getElementById('tmPlanDate');
   var timeSelect = document.getElementById('tmPlanTime');
-  var teacherSelect = document.getElementById('tmPlanTeacher');
+  var pdrTeacherSelect = document.getElementById('tmPlanPdrTeacher');
+  var branchTeacherSelect = document.getElementById('tmPlanBranchTeacher');
   var notesInput = document.getElementById('tmPlanNotes');
   var conflictEl = document.getElementById('tmPlanConflict');
   var saveBtn = document.getElementById('tmPlanSave');
@@ -72,30 +73,40 @@
     if (subEl) {
       subEl.textContent = editId
         ? 'Tarih, saat veya öğretmen değişiklikleri mevcut rezervasyonları etkileyebilir.'
-        : 'Matematik veya Fen · Saat başı 50 dakika · Kapasite 20 · Otomatik meeting linki oluşturulur.';
+        : 'Matematik veya Fen · Saat başı 50 dakika · PDR + branş öğretmeni · Kapasite 20 · Otomatik meeting linki oluşturulur.';
     }
     refreshTeachers();
     renderSlots();
   }
 
   function refreshTeachers() {
-    if (!teacherSelect) return;
     var ltId = typeSelect ? typeSelect.value : '';
     var date = dateInput ? dateInput.value : '';
     var time = timeSelect ? timeSelect.value : '';
     var end = Rules.addMinutes(time, 50);
-    var teachers = Store.getTeachers().filter(function (t) {
-      return t.isActive &&
-        Rules.isTeacherEligibleForLessonType(t.id, ltId) &&
-        Rules.isTeacherAvailable(t.id, date, time, end) &&
-        !Rules.hasTeacherConflict(t.id, date, time, end, editId || undefined);
+    var pdrTeachers = Store.getTeachers().filter(function (t) {
+      return t.isActive && Rules.isTeacherPdr(t.id) &&
+        Rules.isPdrTeacherAvailable(t.id, date, time, end) &&
+        !Rules.hasPdrTeacherConflict(t.id, date, time, end, editId || undefined);
     });
-    var prev = teacherSelect.value;
-    teacherSelect.innerHTML = '<option value="">Öğretmen seçin</option>' + teachers.map(function (t) {
-      return '<option value="' + t.id + '">' + U.fullName(t.firstName, t.lastName) + '</option>';
-    }).join('');
-    if (prev && teachers.some(function (t) { return t.id === prev; })) {
-      teacherSelect.value = prev;
+    var branchTeachers = Store.getTeachers().filter(function (t) {
+      return t.isActive && Rules.isBranchTeacherEligibleForLessonType(t.id, ltId) &&
+        Rules.isBranchTeacherAvailable(t.id, date, time, end) &&
+        !Rules.hasBranchTeacherConflict(t.id, date, time, end, editId || undefined);
+    });
+    var prevPdr = pdrTeacherSelect ? pdrTeacherSelect.value : '';
+    var prevBranch = branchTeacherSelect ? branchTeacherSelect.value : '';
+    if (pdrTeacherSelect) {
+      pdrTeacherSelect.innerHTML = '<option value="">PDR öğretmeni seçin</option>' + pdrTeachers.map(function (t) {
+        return '<option value="' + t.id + '">' + U.fullName(t.firstName, t.lastName) + '</option>';
+      }).join('');
+      if (prevPdr && pdrTeachers.some(function (t) { return t.id === prevPdr; })) pdrTeacherSelect.value = prevPdr;
+    }
+    if (branchTeacherSelect) {
+      branchTeacherSelect.innerHTML = '<option value="">Branş öğretmeni seçin</option>' + branchTeachers.map(function (t) {
+        return '<option value="' + t.id + '">' + U.fullName(t.firstName, t.lastName) + '</option>';
+      }).join('');
+      if (prevBranch && branchTeachers.some(function (t) { return t.id === prevBranch; })) branchTeacherSelect.value = prevBranch;
     }
     checkConflict();
     renderSlots();
@@ -118,10 +129,12 @@
         if (selected) cls += ' is-selected';
         if (!o.isFree) cls += ' is-busy';
         if (o.availableTeachers === 0 && o.isFree) cls += ' is-warn';
-        var teacher = o.session ? Store.getTeacherById(o.session.teacherId) : null;
+        var teacher = o.session ? Store.getTeacherById(o.session.branchTeacherId) : null;
+        var pdr = o.session ? Store.getTeacherById(o.session.pdrTeacherId) : null;
         var status = o.isFree
-          ? (o.availableTeachers ? o.availableTeachers + ' müsait öğretmen' : 'Öğretmen yok')
-          : (teacher ? U.fullName(teacher.firstName, teacher.lastName) : 'Dolu') + ' · ' + o.enrolled + '/20';
+          ? ('PDR: ' + o.availablePdrTeachers + ' · Branş: ' + o.availableBranchTeachers)
+          : ((pdr ? U.fullName(pdr.firstName, pdr.lastName) : '—') + ' / ' +
+            (teacher ? U.fullName(teacher.firstName, teacher.lastName) : '—')) + ' · ' + o.enrolled + '/20';
         return '<button type="button" class="' + cls + '" data-slot="' + o.slot + '">' +
           '<span class="tm-plan-slot-time">' + o.slot + '</span>' +
           '<span class="tm-plan-slot-meta">' + U.escapeHtml(status) + '</span></button>';
@@ -163,7 +176,8 @@
     return {
       id: editId || undefined,
       lessonTypeId: typeSelect ? typeSelect.value : '',
-      teacherId: teacherSelect ? teacherSelect.value : '',
+      pdrTeacherId: pdrTeacherSelect ? pdrTeacherSelect.value : '',
+      branchTeacherId: branchTeacherSelect ? branchTeacherSelect.value : '',
       date: dateInput ? dateInput.value : '',
       startTime: time,
       endTime: Rules.addMinutes(time, 50),
@@ -196,7 +210,8 @@
     if (dateInput) dateInput.value = s.date;
     if (timeSelect) timeSelect.value = s.startTime;
     refreshTeachers();
-    if (teacherSelect) teacherSelect.value = s.teacherId;
+    if (pdrTeacherSelect) pdrTeacherSelect.value = s.pdrTeacherId || '';
+    if (branchTeacherSelect) branchTeacherSelect.value = s.branchTeacherId || '';
     if (notesInput) notesInput.value = s.notes || '';
     renderPlanRoster();
   }
@@ -320,8 +335,12 @@
         var res = Store.rescheduleSession(editId, draft.date, draft.startTime, 'Planlama formundan güncellendi');
         if (!res.ok) { U.notifyError(res.error); return; }
       }
-      if (s && s.teacherId !== draft.teacherId) {
-        var res2 = Store.changeSessionTeacher(editId, draft.teacherId, 'Planlama formundan güncellendi');
+      if (s && s.pdrTeacherId !== draft.pdrTeacherId) {
+        var resPdr = Store.changeSessionPdrTeacher(editId, draft.pdrTeacherId, 'Planlama formundan güncellendi');
+        if (!resPdr.ok) { U.notifyError(resPdr.error); return; }
+      }
+      if (s && s.branchTeacherId !== draft.branchTeacherId) {
+        var res2 = Store.changeSessionBranchTeacher(editId, draft.branchTeacherId, 'Planlama formundan güncellendi');
         if (!res2.ok) { U.notifyError(res2.error); return; }
       }
       if (s && (s.notes || '') !== (draft.notes || '')) {
@@ -339,7 +358,8 @@
   if (typeSelect) typeSelect.addEventListener('change', refreshTeachers);
   if (dateInput) dateInput.addEventListener('change', refreshTeachers);
   if (timeSelect) timeSelect.addEventListener('change', refreshTeachers);
-  if (teacherSelect) teacherSelect.addEventListener('change', checkConflict);
+  if (pdrTeacherSelect) pdrTeacherSelect.addEventListener('change', checkConflict);
+  if (branchTeacherSelect) branchTeacherSelect.addEventListener('change', checkConflict);
   if (notesInput) notesInput.addEventListener('input', U.debounce(checkConflict, 200));
 
   if (saveBtn) {
@@ -350,13 +370,17 @@
       var issues = Rules.validateSessionDraft(draft);
       if (issues.length) { U.notifyError(issues.join(' · ')); return; }
       var lt = Store.getLessonTypeById(draft.lessonTypeId);
-      var teacher = Store.getTeacherById(draft.teacherId);
+      var pdr = Store.getTeacherById(draft.pdrTeacherId);
+      var branch = Store.getTeacherById(draft.branchTeacherId);
       var label = (lt ? lt.name : 'Ders') + ' · ' + U.formatDateKey(draft.date) + ' ' + draft.startTime;
+      var teacherLabel = '';
+      if (pdr) teacherLabel += ' · PDR: ' + U.fullName(pdr.firstName, pdr.lastName);
+      if (branch) teacherLabel += ' · Branş: ' + U.fullName(branch.firstName, branch.lastName);
       if (Confirm) {
         Confirm.open({
           title: editId ? 'Dersi güncelle' : 'Dersi planla',
           current: editId ? 'Mevcut kayıt düzenleniyor' : '—',
-          next: label + (teacher ? ' · ' + U.fullName(teacher.firstName, teacher.lastName) : ''),
+          next: label + teacherLabel,
           warning: editId ? 'Değişiklikler rezervasyonlara yansır.' : 'Online meeting linki otomatik oluşturulacak.',
           requireReason: !!editId,
           danger: false,

@@ -58,24 +58,37 @@
         <div class="tm-dg-toolbar-row tm-dg-toolbar-row--filters">
           <input type="date" class="tm-dg-control" id="tmSessionsDateFrom" title="Başlangıç tarihi" aria-label="Başlangıç tarihi">
           <input type="date" class="tm-dg-control" id="tmSessionsDateTo" title="Bitiş tarihi" aria-label="Bitiş tarihi">
-          <select class="tm-dg-control tm-dg-select" id="tmSessionsTeacher">
-            <option value="all">Tüm öğretmenler</option>
+          <select class="tm-dg-control tm-dg-select" id="tmSessionsPdrTeacher">
+            <option value="all">Tüm PDR öğretmenleri</option>
+          </select>
+          <select class="tm-dg-control tm-dg-select" id="tmSessionsBranchTeacher">
+            <option value="all">Tüm branş öğretmenleri</option>
           </select>
           <select class="tm-dg-control tm-dg-select" id="tmSessionsLinkFilter">
             <option value="all">Tüm link durumları</option>
             <option value="link_pending">Link gönderilmeyen</option>
             <option value="parent_pending">Veli onayı bekleyen</option>
           </select>
-          <select class="tm-dg-control tm-dg-select" id="tmSessionsInformedFilter">
-            <option value="all">Öğretmen bilgisi</option>
-            <option value="yes">Bilgilendirildi</option>
-            <option value="no">Bilgilendirilmedi</option>
+          <select class="tm-dg-control tm-dg-select" id="tmSessionsPdrInformedFilter">
+            <option value="all">PDR bilgilendirme</option>
+            <option value="yes">PDR bilgilendirildi</option>
+            <option value="no">PDR bilgilendirilmedi</option>
+          </select>
+          <select class="tm-dg-control tm-dg-select" id="tmSessionsBranchInformedFilter">
+            <option value="all">Branş bilgilendirme</option>
+            <option value="yes">Branş bilgilendirildi</option>
+            <option value="no">Branş bilgilendirilmedi</option>
+          </select>
+          <select class="tm-dg-control tm-dg-select" id="tmSessionsMissingTeacherFilter">
+            <option value="all">Tüm atamalar</option>
+            <option value="yes">Eksik öğretmen ataması</option>
           </select>
           <select class="tm-dg-control tm-dg-select tm-dg-select--sort" id="tmSessionsSort">
             <option value="date_asc">Tarih ↑</option>
             <option value="date_desc">Tarih ↓</option>
             <option value="updated_desc">Son güncelleme</option>
-            <option value="teacher_asc">Öğretmen A→Z</option>
+            <option value="pdr_teacher_asc">PDR öğretmeni A→Z</option>
+            <option value="branch_teacher_asc">Branş öğretmeni A→Z</option>
           </select>
         </div>
       </header>
@@ -87,9 +100,9 @@
         <table class="tm-res-table tm-res-table--rich">
           <thead>
             <tr>
-              <th>Tarih</th><th>Saat</th><th>Ders türü</th><th>Öğretmen</th>
+              <th>Tarih</th><th>Saat</th><th>Ders türü</th><th>PDR öğretmeni</th><th>Branş öğretmeni</th>
               <th>Öğrenci</th><th>Kapasite</th><th>Boş</th><th>Link</th><th>Meeting ID</th>
-              <th>Veli onay bekleyen</th><th>Link gönderilmeyen</th><th>Öğrt.bilgi</th><th>Durum</th><th>Güncelleme</th><th>İşlem</th>
+              <th>Veli onay bekleyen</th><th>Link gönderilmeyen</th><th>PDR bilgi</th><th>Branş bilgi</th><th>Durum</th><th>Güncelleme</th><th>İşlem</th>
             </tr>
           </thead>
           <tbody id="tmSessionsBody"></tbody>

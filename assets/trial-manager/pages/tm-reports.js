@@ -115,6 +115,9 @@
       return Store.isOrphanRequest ? Store.isOrphanRequest(r.id) : false;
     }).length;
     var newRequests = requests.filter(function (r) { return r.status === 'new'; }).length;
+    var pdrInformedRate = sessions.length ? Math.round((sessions.filter(function (s) { return s.pdrTeacherInformed; }).length / sessions.length) * 100) : 0;
+    var branchInformedRate = sessions.length ? Math.round((sessions.filter(function (s) { return s.branchTeacherInformed; }).length / sessions.length) * 100) : 0;
+    var missingTeachers = sessions.filter(function (s) { return !s.pdrTeacherId || !s.branchTeacherId; }).length;
     return {
       sessionCount: sessions.length,
       completedSessions: completedSessions,
@@ -134,7 +137,10 @@
       callAgain: reservations.filter(function (r) { return r.parentApprovalStatus === 'call_again'; }).length,
       avgFill: sessions.length ? Math.round(sessions.reduce(function (a, s) {
         return a + (s.enrolledStudentIds || []).length;
-      }, 0) / sessions.length) : 0
+      }, 0) / sessions.length) : 0,
+      pdrInformedRate: pdrInformedRate,
+      branchInformedRate: branchInformedRate,
+      missingTeacherAssignments: missingTeachers
     };
   }
 
@@ -149,24 +155,32 @@
     return Object.keys(map).sort().map(function (k) { return map[k]; });
   }
 
+  function addTeacherMetric(map, teacherId, session, role) {
+    if (!teacherId) return;
+    if (!map[teacherId]) {
+      var t = Store.getTeacherById(teacherId);
+      map[teacherId] = {
+        teacherId: teacherId,
+        name: t ? U.fullName(t.firstName, t.lastName) : teacherId,
+        teacherType: t ? SL.teacherTypeLabel(t.teacherType) : '—',
+        sessions: 0,
+        students: 0,
+        cancelled: 0,
+        informed: 0
+      };
+    }
+    map[teacherId].sessions += 1;
+    map[teacherId].students += (session.enrolledStudentIds || []).length;
+    if (session.status === 'cancelled') map[teacherId].cancelled += 1;
+    if (role === 'pdr' && session.pdrTeacherInformed) map[teacherId].informed += 1;
+    if (role === 'branch' && session.branchTeacherInformed) map[teacherId].informed += 1;
+  }
+
   function teacherRows() {
     var map = {};
     sessionsInRange().forEach(function (s) {
-      if (!map[s.teacherId]) {
-        var t = Store.getTeacherById(s.teacherId);
-        map[s.teacherId] = {
-          teacherId: s.teacherId,
-          name: t ? U.fullName(t.firstName, t.lastName) : s.teacherId,
-          sessions: 0,
-          students: 0,
-          cancelled: 0,
-          informed: 0
-        };
-      }
-      map[s.teacherId].sessions += 1;
-      map[s.teacherId].students += (s.enrolledStudentIds || []).length;
-      if (s.status === 'cancelled') map[s.teacherId].cancelled += 1;
-      if (s.teacherInformed) map[s.teacherId].informed += 1;
+      addTeacherMetric(map, s.pdrTeacherId, s, 'pdr');
+      addTeacherMetric(map, s.branchTeacherId, s, 'branch');
     });
     return Object.keys(map).map(function (k) { return map[k]; }).sort(function (a, b) { return b.sessions - a.sessions; });
   }
@@ -174,15 +188,19 @@
   function sessionRows() {
     return sessionsInRange().map(function (s) {
       var d = Store.getSessionWithDetails(s.id);
+      var pdrName = d.pdrTeacher ? U.fullName(d.pdrTeacher.firstName, d.pdrTeacher.lastName) : '—';
+      var branchName = d.branchTeacher ? U.fullName(d.branchTeacher.firstName, d.branchTeacher.lastName) : '—';
       return {
         id: s.id,
         date: s.date,
         time: s.startTime,
         lesson: d.lessonType ? d.lessonType.name : '—',
-        teacher: d.teacher ? U.fullName(d.teacher.firstName, d.teacher.lastName) : '—',
+        pdrTeacher: pdrName,
+        branchTeacher: branchName,
         enrolled: (s.enrolledStudentIds || []).length,
         status: SL.sessionLabel(s.status),
-        informed: s.teacherInformed ? 'Evet' : 'Hayır'
+        pdrInformed: s.pdrTeacherInformed ? 'Evet' : 'Hayır',
+        branchInformed: s.branchTeacherInformed ? 'Evet' : 'Hayır'
       };
     });
   }
@@ -224,6 +242,9 @@
       card(m.approvalRate + '%', 'Veli onay oranı') +
       card(m.unreachable, 'Ulaşılamayan veli', 'warn') +
       card(m.callAgain, 'Tekrar aranacak', 'warn') +
+      card(m.pdrInformedRate + '%', 'PDR bilgilendirme oranı') +
+      card(m.branchInformedRate + '%', 'Branş bilgilendirme oranı') +
+      card(m.missingTeacherAssignments, 'Eksik öğretmen ataması', m.missingTeacherAssignments ? 'warn' : '') +
       card(auditInRange().length, 'Denetim kaydı (aralık)');
     if (Store.getDataConsistencySnapshot) {
       var snap = Store.getDataConsistencySnapshot();
@@ -264,15 +285,15 @@
     } else if (activeTab === 'teachers') {
       var teachers = teacherRows();
       tableEl.innerHTML = tableHtml(
-        ['Öğretmen', 'Ders', 'Öğrenci', 'İptal', 'Bilgilendirildi'],
-        teachers.map(function (t) { return [t.name, t.sessions, t.students, t.cancelled, t.informed]; })
+        ['Öğretmen', 'Tip', 'Ders', 'Öğrenci', 'İptal', 'Bilgilendirildi'],
+        teachers.map(function (t) { return [t.name, t.teacherType, t.sessions, t.students, t.cancelled, t.informed]; })
       );
     } else if (activeTab === 'sessions') {
       var sessions = sessionRows();
       tableEl.innerHTML = tableHtml(
-        ['Tarih', 'Saat', 'Ders', 'Öğretmen', 'Öğrenci', 'Durum', 'Öğrt.bilgi'],
+        ['Tarih', 'Saat', 'Ders', 'PDR öğretmeni', 'Branş öğretmeni', 'Öğrenci', 'Durum', 'PDR bilgi', 'Branş bilgi'],
         sessions.map(function (s) {
-          return [U.formatDateKey(s.date), s.time, s.lesson, s.teacher, s.enrolled, s.status, s.informed];
+          return [U.formatDateKey(s.date), s.time, s.lesson, s.pdrTeacher, s.branchTeacher, s.enrolled, s.status, s.pdrInformed, s.branchInformed];
         })
       );
     } else if (activeTab === 'comm') {
@@ -357,14 +378,17 @@
         { key: 'date', label: 'Tarih' },
         { key: 'time', label: 'Saat' },
         { key: 'lesson', label: 'Ders türü' },
-        { key: 'teacher', label: 'Öğretmen' },
+        { key: 'pdrTeacher', label: 'PDR öğretmeni' },
+        { key: 'branchTeacher', label: 'Branş öğretmeni' },
         { key: 'enrolled', label: 'Öğrenci' },
         { key: 'status', label: 'Durum' },
-        { key: 'informed', label: 'Öğrt.bilgi' }
+        { key: 'pdrInformed', label: 'PDR bilgi' },
+        { key: 'branchInformed', label: 'Branş bilgi' }
       ]);
     } else if (activeTab === 'teachers') {
       Export.exportTable('rapor-ogretmenler.csv', teacherRows(), [
         { key: 'name', label: 'Öğretmen' },
+        { key: 'teacherType', label: 'Tip' },
         { key: 'sessions', label: 'Ders' },
         { key: 'students', label: 'Öğrenci' },
         { key: 'cancelled', label: 'İptal' },
@@ -458,10 +482,12 @@
           { key: 'date', label: 'Tarih' },
           { key: 'time', label: 'Saat' },
           { key: 'lesson', label: 'Ders türü' },
-          { key: 'teacher', label: 'Öğretmen' },
+          { key: 'pdrTeacher', label: 'PDR öğretmeni' },
+          { key: 'branchTeacher', label: 'Branş öğretmeni' },
           { key: 'enrolled', label: 'Öğrenci' },
           { key: 'status', label: 'Durum' },
-          { key: 'informed', label: 'Öğrt.bilgi' }
+          { key: 'pdrInformed', label: 'PDR bilgi' },
+          { key: 'branchInformed', label: 'Branş bilgi' }
         ]
       },
       {
@@ -469,6 +495,7 @@
         rows: teacherRows(),
         columns: [
           { key: 'name', label: 'Öğretmen' },
+          { key: 'teacherType', label: 'Tip' },
           { key: 'sessions', label: 'Ders' },
           { key: 'students', label: 'Öğrenci' },
           { key: 'cancelled', label: 'İptal' },

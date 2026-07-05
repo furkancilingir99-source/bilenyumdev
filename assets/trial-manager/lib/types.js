@@ -125,7 +125,8 @@
    * @property {string} id
    * @property {string} title
    * @property {string} lessonTypeId
-   * @property {string} teacherId
+   * @property {string} branchTeacherId
+   * @property {string} pdrTeacherId
    * @property {string} date
    * @property {string} startTime
    * @property {string} endTime
@@ -136,9 +137,12 @@
    * @property {TrialLessonSessionStatus} status
    * @property {20} parentPresentationMinutes
    * @property {30} studentTrialMinutes
-   * @property {boolean} teacherInformed
-   * @property {string} [teacherInformedAt]
-   * @property {string} [teacherInformedByUserId]
+   * @property {boolean} pdrTeacherInformed
+   * @property {string} [pdrTeacherInformedAt]
+   * @property {string} [pdrTeacherInformedByUserId]
+   * @property {boolean} branchTeacherInformed
+   * @property {string} [branchTeacherInformedAt]
+   * @property {string} [branchTeacherInformedByUserId]
    * @property {string} [notes]
    * @property {string} createdByUserId
    * @property {string} createdAt

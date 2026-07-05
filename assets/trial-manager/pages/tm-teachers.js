@@ -20,10 +20,22 @@
   var paginationEl = document.getElementById('tmTeachersPagination');
   var pageSizeSelect = document.getElementById('tmTeachersPageSize');
   var exportBtn = document.getElementById('tmTeachersExport');
+  var typeFilter = document.getElementById('tmTeachersType');
   var page = 1;
   var today = Store.todayKey();
 
+  function isPdrTeacher(t) {
+    return t.teacherType === 'pdr_teacher' || t.teacherType === 'pdr';
+  }
+
+  function sessionInformedForTeacher(s, teacherId) {
+    if (s.pdrTeacherId === teacherId) return !!s.pdrTeacherInformed;
+    if (s.branchTeacherId === teacherId) return !!s.branchTeacherInformed;
+    return false;
+  }
+
   function branchLabel(t) {
+    if (isPdrTeacher(t)) return 'Veli sunumu (PDR)';
     return t.branchLessonTypeIds.map(function (id) {
       var lt = Store.getLessonTypeById(id);
       return lt ? lt.name : id;
@@ -95,7 +107,8 @@
             '<div><div class="tm-detail-cell-label">Öğretmen tipi</div><div class="tm-detail-cell-value">' + SL.teacherTypeBadge(teacher.teacherType || 'branch') + '</div></div>' +
             '<div><div class="tm-detail-cell-label">Branş</div><div class="tm-detail-cell-value">' + U.escapeHtml(branchLabel(teacher)) + '</div></div>' +
             '<div><div class="tm-detail-cell-label">Dashboard</div><div class="tm-detail-cell-value">' + (teacher.dashboardEnabled ? 'Aktif' : 'Kapalı') + '</div></div>' +
-            '<div><div class="tm-detail-cell-label">Bugünkü ders</div><div class="tm-detail-cell-value">' + todaySessions.length + ' ders</div></div>' +
+            '<div><div class="tm-detail-cell-label">Bugünkü ' + (isPdrTeacher(teacher) ? 'veli sunumu' : 'deneme dersi') + '</div><div class="tm-detail-cell-value">' + todaySessions.length + ' ders</div></div>' +
+            '<div><div class="tm-detail-cell-label">Bu hafta ' + (isPdrTeacher(teacher) ? 'veli sunumu' : 'deneme dersi') + '</div><div class="tm-detail-cell-value">' + weekCount(teacher.id) + ' ders</div></div>' +
             '<div><div class="tm-detail-cell-label">Bugün müsaitlik</div><div class="tm-detail-cell-value">' + U.escapeHtml(previewText) + '</div></div>' +
             (teacher.informedNote ? '<div><div class="tm-detail-cell-label">Bilgilendirme notu</div><div class="tm-detail-cell-value">' + U.escapeHtml(teacher.informedNote) + '</div></div>' : '') +
             (teacher.trialLessonNotes ? '<div><div class="tm-detail-cell-label">Deneme dersi notu</div><div class="tm-detail-cell-value">' + U.escapeHtml(teacher.trialLessonNotes) + '</div></div>' : '') +
@@ -105,15 +118,22 @@
             waBtn.addEventListener('click', function () {
               var next = upcoming[0] || sessions[0];
               var lt = next ? Store.getLessonTypeById(next.lessonTypeId) : null;
-              QuickMsg.openForTeacher({
+              var meeting = next ? Store.getMeetingBySessionId(next.id) : null;
+              var base = {
                 teacherName: U.fullName(teacher.firstName, teacher.lastName),
                 date: next ? U.formatDateKey(next.date) : '—',
                 time: next ? next.startTime : '—',
                 lessonType: lt ? lt.name : branchLabel(teacher),
-                studentCount: next ? next.enrolledStudentIds.length : 0,
+                meetingUrl: meeting ? meeting.meetingUrl : '',
+                meetingId: meeting ? meeting.meetingId : '',
+                passcode: meeting ? meeting.passcode : '',
                 phone: teacher.phone,
                 email: teacher.email
-              });
+              };
+              if (isPdrTeacher(teacher)) QuickMsg.openForPdrTeacher(base);
+              else QuickMsg.openForBranchTeacher(Object.assign(base, {
+                studentCount: next ? next.enrolledStudentIds.length : 0
+              }));
             });
           }
           body.querySelector('[data-op-notes]') && body.querySelector('[data-op-notes]').addEventListener('click', function () {
@@ -122,7 +142,7 @@
         } else if (idx === 1) {
           body.innerHTML = upcoming.length ? '<table class="tm-inner-table"><tbody>' + upcoming.map(function (s) {
             var lt = Store.getLessonTypeById(s.lessonTypeId);
-            return '<tr data-session-row="' + s.id + '" style="cursor:pointer"><td>' + U.formatDateKey(s.date) + ' ' + s.startTime + '</td><td>' + (lt ? lt.name : '') + '</td><td>' + s.enrolledStudentIds.length + '/20</td><td>' + (s.teacherInformed ? 'Bilgilendirildi' : '—') + '</td></tr>';
+            return '<tr data-session-row="' + s.id + '" style="cursor:pointer"><td>' + U.formatDateKey(s.date) + ' ' + s.startTime + '</td><td>' + (lt ? lt.name : '') + '</td><td>' + s.enrolledStudentIds.length + '/20</td><td>' + (sessionInformedForTeacher(s, teacher.id) ? 'Bilgilendirildi' : '—') + '</td></tr>';
           }).join('') + '</tbody></table>' : '<p class="tm-empty">Yaklaşan ders yok.</p>';
           body.querySelectorAll('[data-session-row]').forEach(function (row) {
             row.addEventListener('click', function () {
@@ -135,7 +155,7 @@
           body.innerHTML = trialSessions.length ? '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Ders</th><th>Durum</th><th>Bilgi</th></tr></thead><tbody>' +
             trialSessions.slice(0, 20).map(function (s) {
               var lt = Store.getLessonTypeById(s.lessonTypeId);
-              return '<tr data-session-row="' + s.id + '" style="cursor:pointer"><td>' + U.formatDateKey(s.date) + ' ' + s.startTime + '</td><td>' + (lt ? lt.name : '') + '</td><td>' + SL.sessionBadge(s.status) + '</td><td>' + (s.teacherInformed ? '✓' : '—') + '</td></tr>';
+              return '<tr data-session-row="' + s.id + '" style="cursor:pointer"><td>' + U.formatDateKey(s.date) + ' ' + s.startTime + '</td><td>' + (lt ? lt.name : '') + '</td><td>' + SL.sessionBadge(s.status) + '</td><td>' + (sessionInformedForTeacher(s, teacher.id) ? '✓' : '—') + '</td></tr>';
             }).join('') + '</tbody></table>' : '<p class="tm-empty">Atanmış deneme dersi yok.</p>';
           body.querySelectorAll('[data-session-row]').forEach(function (row) {
             row.addEventListener('click', function () {
@@ -143,7 +163,7 @@
             });
           });
         } else {
-          var informedSessions = sessions.filter(function (s) { return s.teacherInformed; });
+          var informedSessions = sessions.filter(function (s) { return sessionInformedForTeacher(s, teacher.id); });
           var commLogs = Store.getCommunicationLogs().filter(function (l) {
             return l.teacherId === teacher.id || (l.summary && l.summary.indexOf(teacher.lastName) >= 0);
           });
@@ -175,8 +195,13 @@
   }
 
   function filtered() {
+    var type = typeFilter ? typeFilter.value : 'all';
     return U.filterSearch(Store.getTeachers(), searchInput ? searchInput.value : '', function (t) {
       return t.firstName + ' ' + t.lastName + ' ' + branchLabel(t);
+    }).filter(function (t) {
+      if (type === 'pdr') return isPdrTeacher(t);
+      if (type === 'branch') return !isPdrTeacher(t);
+      return true;
     });
   }
 
@@ -221,6 +246,7 @@
   }
 
   if (searchInput) searchInput.addEventListener('input', U.debounce(function () { page = 1; render(); }, 200));
+  if (typeFilter) typeFilter.addEventListener('change', function () { page = 1; render(); });
   if (pageSizeSelect) pageSizeSelect.addEventListener('change', function () { page = 1; render(); });
   if (exportBtn && Export) exportBtn.addEventListener('click', function () {
     if (Perms && !Perms.guard('export')) return;

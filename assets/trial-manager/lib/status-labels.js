@@ -102,6 +102,8 @@
   };
 
   var TEACHER_TYPE = {
+    branch_teacher: { label: 'Branş Öğretmeni', badge: 'tm-badge--blue' },
+    pdr_teacher: { label: 'PDR / Rehberlik', badge: 'tm-badge--green' },
     branch: { label: 'Branş Öğretmeni', badge: 'tm-badge--blue' },
     pdr: { label: 'PDR / Rehberlik', badge: 'tm-badge--green' }
   };
@@ -112,6 +114,12 @@
     application_contact_corrected: 'Başvuru iletişimi düzeltildi',
     application_student_corrected: 'Başvuru öğrenci bilgisi düzeltildi',
     operational_note_updated: 'Operasyon notu güncellendi',
+    pdr_teacher_assigned: 'PDR öğretmeni atandı',
+    pdr_teacher_changed: 'PDR öğretmeni değiştirildi',
+    branch_teacher_assigned: 'Branş öğretmeni atandı',
+    branch_teacher_changed: 'Branş öğretmeni değiştirildi',
+    pdr_teacher_informed: 'PDR öğretmeni bilgilendirildi',
+    branch_teacher_informed: 'Branş öğretmeni bilgilendirildi',
     cancelled: 'İptal edildi',
     rescheduled: 'Yeniden planlandı',
     teacher_changed: 'Öğretmen değiştirildi',

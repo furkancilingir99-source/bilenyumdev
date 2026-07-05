@@ -40,7 +40,8 @@
         metric(m.linkNotSentCount, 'Link gönderilmemiş', 'deneme-dersi-yoneticisi-iletisim.html?tab=link', 'warn') +
         metric(m.orphanRequestCount, 'Rezervasyonsuz talep', 'deneme-dersi-yoneticisi-rezervasyonlar.html?filter=orphan', 'warn') +
         metric(m.newRequestCount, 'Yeni web talebi', 'deneme-dersi-yoneticisi-rezervasyonlar.html?status=new', 'warn') +
-        metric(m.teacherNotInformedCount, 'Öğretmen bilgilendirilmemiş', 'deneme-dersi-yoneticisi-iletisim.html?tab=teacher', 'warn') +
+        metric(m.teacherNotInformedCount, 'Öğretmen bilgilendirilmemiş', 'deneme-dersi-yoneticisi-iletisim.html?tab=pdr_teacher', 'warn') +
+        metric(m.missingTeacherAssignmentCount || 0, 'Eksik öğretmen ataması', 'deneme-dersi-yoneticisi-planlanmis-dersler.html?missingTeachers=1', 'warn') +
         metric(m.cancelledCount, 'İptal edilen ders', 'deneme-dersi-yoneticisi-planlanmis-dersler.html?status=cancelled', 'danger') +
         metric(m.needsAttendanceCount, 'Katılım girilmemiş', 'deneme-dersi-yoneticisi-planlanmis-dersler.html?needsAttendance=1', 'warn') +
         metric(m.conversionCount, 'Kayıta dönüşüm', 'deneme-dersi-yoneticisi-ogrenciler.html');
@@ -84,18 +85,20 @@
     var rows = sessions.map(function (s) {
       var d = Store.getSessionWithDetails(s.id);
       var lt = d.lessonType ? d.lessonType.name : '—';
-      var teacher = d.teacher ? U.fullName(d.teacher.firstName, d.teacher.lastName) : '—';
+      var pdrName = d.pdrTeacher ? U.fullName(d.pdrTeacher.firstName, d.pdrTeacher.lastName) : '—';
+      var branchName = d.branchTeacher ? U.fullName(d.branchTeacher.firstName, d.branchTeacher.lastName) : '—';
       var cap = s.enrolledStudentIds.length + '/20';
       var linkOk = d.meeting && d.meeting.status === 'active';
       return '<tr data-session="' + s.id + '" style="cursor:pointer">' +
-        '<td>' + s.startTime + '</td><td>' + lt + '</td><td>' + U.escapeHtml(teacher) + '</td>' +
+        '<td>' + s.startTime + '</td><td>' + lt + '</td>' +
+        '<td>' + U.escapeHtml(pdrName) + ' / ' + U.escapeHtml(branchName) + '</td>' +
         '<td>' + cap + '</td><td>' + s.enrolledStudentIds.length + '</td>' +
         '<td>' + (linkOk ? '<span class="tm-badge tm-badge--green">Aktif</span>' : '<span class="tm-badge tm-badge--red">Pasif</span>') + '</td>' +
-        '<td>' + (s.teacherInformed ? 'Evet' : 'Hayır') + '</td>' +
+        '<td>' + (s.pdrTeacherInformed && s.branchTeacherInformed ? 'Evet' : 'Kısmi/Hayır') + '</td>' +
         '<td>' + SL.sessionBadge(s.status) + '</td>' +
         '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-open-session="' + s.id + '">Detay</button></td></tr>';
     }).join('');
-    wrap.innerHTML = '<table class="tm-inner-table"><thead><tr><th>Saat</th><th>Ders</th><th>Öğretmen</th><th>Kapasite</th><th>Öğrenci</th><th>Link</th><th>Öğrt.bilgi</th><th>Durum</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+    wrap.innerHTML = '<table class="tm-inner-table"><thead><tr><th>Saat</th><th>Ders</th><th>PDR / Branş</th><th>Kapasite</th><th>Öğrenci</th><th>Link</th><th>Öğrt.bilgi</th><th>Durum</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
     wrap.querySelectorAll('[data-open-session]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
@@ -128,9 +131,17 @@
         requestId: r.requestId
       });
     });
-    m.teacherNotInformed.slice(0, 3).forEach(function (s) {
-      items.push({ text: 'Öğretmen bilgilendir: ' + s.title, href: '#', sessionId: s.id });
+    m.pdrNotInformed && m.pdrNotInformed.slice(0, 2).forEach(function (s) {
+      items.push({ text: 'PDR bilgilendir: ' + s.title, href: '#', sessionId: s.id });
     });
+    m.branchNotInformed && m.branchNotInformed.slice(0, 2).forEach(function (s) {
+      items.push({ text: 'Branş bilgilendir: ' + s.title, href: '#', sessionId: s.id });
+    });
+    if (!m.pdrNotInformed && !m.branchNotInformed) {
+      m.teacherNotInformed.slice(0, 3).forEach(function (s) {
+        items.push({ text: 'Öğretmen bilgilendir: ' + s.title, href: '#', sessionId: s.id });
+      });
+    }
     m.orphanRequests.slice(0, 3).forEach(function (r) {
       items.push({
         text: 'Rezervasyonsuz: ' + r.studentFirstName + ' ' + r.studentLastName,
@@ -191,30 +202,42 @@
       if (s.enrolledStudentIds.length >= 20) {
         alerts.push({ msg: 'Kapasite dolu: ' + s.title, type: 'warn', sessionId: s.id });
       }
-      var teacher = Store.getTeacherById(s.teacherId);
-      if (teacher && !RulesEligible(s)) {
+      if (!s.pdrTeacherId || !s.branchTeacherId) {
+        alerts.push({ msg: 'Eksik öğretmen ataması: ' + s.title, type: 'danger', sessionId: s.id });
+      }
+      var pdr = Store.getTeacherById(s.pdrTeacherId);
+      var branch = Store.getTeacherById(s.branchTeacherId);
+      if (branch && !RulesEligibleBranch(s)) {
         alerts.push({ msg: 'Branş uyumsuzluğu: ' + s.title, type: 'danger', sessionId: s.id });
       }
-      if (R && R.hasTeacherConflict(s.teacherId, s.date, s.startTime, s.endTime, s.id)) {
-        var ckey = s.teacherId + '|' + s.date + '|' + s.startTime;
-        if (!conflictKeys[ckey]) {
-          conflictKeys[ckey] = true;
-          var tName = teacher ? U.fullName(teacher.firstName, teacher.lastName) : s.teacherId;
+      if (pdr && R && !R.isTeacherPdr(s.pdrTeacherId)) {
+        alerts.push({ msg: 'PDR rolü uyumsuz: ' + s.title, type: 'danger', sessionId: s.id });
+      }
+      [pdr, branch].forEach(function (teacher) {
+        if (!teacher) return;
+        var tid = teacher.id;
+        if (R && R.hasTeacherConflict(tid, s.date, s.startTime, s.endTime, s.id)) {
+          var ckey = tid + '|' + s.date + '|' + s.startTime;
+          if (!conflictKeys[ckey]) {
+            conflictKeys[ckey] = true;
+            alerts.push({
+              msg: 'Öğretmen çakışması: ' + U.fullName(teacher.firstName, teacher.lastName) + ' · ' + U.formatDateKey(s.date) + ' ' + s.startTime,
+              type: 'danger',
+              sessionId: s.id
+            });
+          }
+        }
+        if (R && !R.isTeacherAvailable(tid, s.date, s.startTime, s.endTime)) {
           alerts.push({
-            msg: 'Öğretmen çakışması: ' + tName + ' · ' + U.formatDateKey(s.date) + ' ' + s.startTime,
-            type: 'danger',
-            sessionId: s.id
+            msg: 'Müsaitlik dışı ders: ' + U.fullName(teacher.firstName, teacher.lastName) + ' · ' + U.formatDateKey(s.date) + ' ' + s.startTime,
+            type: 'warn',
+            sessionId: s.id,
+            teacherId: tid
           });
         }
-      }
-      if (R && teacher && !R.isTeacherAvailable(s.teacherId, s.date, s.startTime, s.endTime)) {
-        var tName2 = U.fullName(teacher.firstName, teacher.lastName);
-        alerts.push({
-          msg: 'Müsaitlik dışı ders: ' + tName2 + ' · ' + U.formatDateKey(s.date) + ' ' + s.startTime,
-          type: 'warn',
-          sessionId: s.id,
-          teacherId: s.teacherId
-        });
+      });
+      if (s.pdrTeacherId && s.branchTeacherId && s.pdrTeacherId === s.branchTeacherId) {
+        alerts.push({ msg: 'PDR ve branş aynı kişi: ' + s.title, type: 'danger', sessionId: s.id });
       }
     });
     Store.getReservations().forEach(function (r) {
@@ -241,9 +264,9 @@
     });
   }
 
-  function RulesEligible(s) {
+  function RulesEligibleBranch(s) {
     var R = window.TMSchedulingRules;
-    return R ? R.isTeacherEligibleForLessonType(s.teacherId, s.lessonTypeId) : true;
+    return R ? R.isBranchTeacherEligibleForLessonType(s.branchTeacherId, s.lessonTypeId) : true;
   }
 
   window.TMOnSessionChange = render;

@@ -124,43 +124,55 @@
   var GRADES = ['5. Sınıf', '6. Sınıf', '7. Sınıf', '8. Sınıf'];
   var LEVELS = ['Başlangıç', 'Orta', 'İleri'];
 
-  var TEACHER_NAMES = [
-    ['Furkan', 'Çilingir', 'lt-mat'], ['Zeynep', 'Arslan', 'lt-mat'], ['Ayşe', 'Özkan', 'lt-mat'],
-    ['Burak', 'Yılmaz', 'lt-mat'], ['Koray', 'Şen', 'lt-mat'], ['Selin', 'Korkmaz', 'lt-mat'],
-    ['Can', 'Demir', 'lt-fen'], ['Emre', 'Yalçın', 'lt-fen'], ['Deniz', 'Kara', 'lt-fen'],
-    ['Melis', 'Aktaş', 'lt-fen'], ['Hakan', 'Gürbüz', 'lt-fen'], ['Ebru', 'Çetin', 'lt-fen']
+  var PDR_NAMES = [
+    ['Ayşe', 'Yılmaz'], ['Zeynep', 'Demir'], ['Selin', 'Korkmaz'], ['Burak', 'Özkan'], ['Elif', 'Şahin']
   ];
 
+  var BRANCH_NAMES = [
+    ['Furkan', 'Çilingir', 'lt-mat'], ['Koray', 'Şen', 'lt-mat'], ['Ayşe', 'Özkan', 'lt-mat'],
+    ['Can', 'Demir', 'lt-mat'], ['Melis', 'Aktaş', 'lt-mat'], ['Hakan', 'Gürbüz', 'lt-mat'],
+    ['Emre', 'Yalçın', 'lt-fen'], ['Deniz', 'Kara', 'lt-fen'], ['Ebru', 'Çetin', 'lt-fen'],
+    ['Arda', 'Polat', 'lt-fen'], ['Gül', 'Tekin', 'lt-fen'], ['Mert', 'Acar', 'lt-fen']
+  ];
+
+  function buildTeacherRecord(id, firstName, lastName, teacherType, branchLessonTypeIds, idx) {
+    var avail = [];
+    for (var dow = 1; dow <= 5; dow++) {
+      avail.push({
+        id: id + '-av-' + dow,
+        teacherId: id,
+        dayOfWeek: dow,
+        startTime: '11:00',
+        endTime: '15:00',
+        isAvailable: true
+      });
+    }
+    return {
+      id: id,
+      source: 'admin_panel',
+      firstName: firstName,
+      lastName: lastName,
+      phone: '053' + String(idx + 2) + ' ' + String(100 + idx * 11) + ' ' + String(20 + idx),
+      email: firstName.toLowerCase() + '.' + lastName.toLowerCase().replace('ç', 'c').replace('ğ', 'g').replace('ı', 'i').replace('ö', 'o').replace('ş', 's').replace('ü', 'u') + '@bilenyum.com',
+      teacherType: teacherType,
+      branchLessonTypeIds: branchLessonTypeIds || [],
+      availability: avail,
+      dashboardEnabled: true,
+      isActive: true,
+      trialLessonNotes: '',
+      informedNote: ''
+    };
+  }
+
   function buildTeachers() {
-    return TEACHER_NAMES.map(function (t, i) {
-      var id = 'teacher-' + (i + 1);
-      var avail = [];
-      for (var dow = 1; dow <= 5; dow++) {
-        avail.push({
-          id: id + '-av-' + dow,
-          teacherId: id,
-          dayOfWeek: dow,
-          startTime: '11:00',
-          endTime: '15:00',
-          isAvailable: true
-        });
-      }
-      return {
-        id: id,
-        source: 'admin_panel',
-        firstName: t[0],
-        lastName: t[1],
-        phone: '053' + String(i + 2) + ' ' + String(100 + i * 11) + ' ' + String(20 + i),
-        email: t[0].toLowerCase() + '.' + t[1].toLowerCase().replace('ç', 'c').replace('ğ', 'g').replace('ı', 'i').replace('ö', 'o').replace('ş', 's').replace('ü', 'u') + '@bilenyum.com',
-        teacherType: i % 4 === 0 ? 'pdr' : 'branch',
-        branchLessonTypeIds: [t[2]],
-        availability: avail,
-        dashboardEnabled: true,
-        isActive: true,
-        trialLessonNotes: '',
-        informedNote: ''
-      };
+    var teachers = [];
+    PDR_NAMES.forEach(function (t, i) {
+      teachers.push(buildTeacherRecord('teacher-pdr-' + (i + 1), t[0], t[1], 'pdr_teacher', [], i));
     });
+    BRANCH_NAMES.forEach(function (t, i) {
+      teachers.push(buildTeacherRecord('teacher-branch-' + (i + 1), t[0], t[1], 'branch_teacher', [t[2]], i + 10));
+    });
+    return teachers;
   }
 
   var STUDENT_FIRST = ['Mira', 'Can', 'Elif', 'Arda', 'Selin', 'Emir', 'Lina', 'Kerem', 'Defne', 'Yiğit', 'Zeynep', 'Berk', 'Ece', 'Alp', 'Damla', 'Kaan', 'Asya', 'Deniz', 'Eren', 'Gizem', 'Baran', 'Ceren', 'Doruk', 'Fulya', 'Gökhan', 'Hazal', 'Ilgın', 'Jale', 'Kuzey', 'Lara', 'Mete', 'Nil', 'Ozan', 'Pelin', 'Rüya', 'Sarp', 'Tuana', 'Umut', 'Vildan', 'Yasin', 'Zara', 'Atlas', 'Belinay', 'Cemre', 'Dilan', 'Efe', 'Fırat', 'Gülce', 'Alper', 'Buse', 'Cem', 'Derya', 'Eda', 'Fahri', 'Gamze'];
@@ -235,8 +247,13 @@
     var meetings = [];
     var slots = Rules ? Rules.HOURLY_SLOTS : ['11:00', '12:00', '13:00', '14:00'];
     var seq = 0;
-    var matTeachers = teachers.filter(function (t) { return t.branchLessonTypeIds.indexOf('lt-mat') >= 0; });
-    var fenTeachers = teachers.filter(function (t) { return t.branchLessonTypeIds.indexOf('lt-fen') >= 0; });
+    var matTeachers = teachers.filter(function (t) {
+      return t.teacherType === 'branch_teacher' && t.branchLessonTypeIds.indexOf('lt-mat') >= 0;
+    });
+    var fenTeachers = teachers.filter(function (t) {
+      return t.teacherType === 'branch_teacher' && t.branchLessonTypeIds.indexOf('lt-fen') >= 0;
+    });
+    var pdrTeachers = teachers.filter(function (t) { return t.teacherType === 'pdr_teacher'; });
 
     for (var day = 0; day < 4; day++) {
       var date = dateKeyOffset(day);
@@ -244,7 +261,8 @@
         ['lt-mat', 'lt-fen'].forEach(function (ltId, ltIdx) {
           seq++;
           var teacherPool = ltId === 'lt-mat' ? matTeachers : fenTeachers;
-          var teacher = teacherPool[(seq + slotIdx) % teacherPool.length];
+          var branchTeacher = teacherPool[(seq + slotIdx) % teacherPool.length];
+          var pdrTeacher = pdrTeachers[(seq + ltIdx) % pdrTeachers.length];
           var endTime = Rules ? Rules.addMinutes(startTime, 50) : startTime.replace(':00', ':50');
           var sid = 'session-' + String(seq).padStart(4, '0');
           var mid = 'meeting-' + String(seq).padStart(4, '0');
@@ -271,7 +289,8 @@
             id: sid,
             title: ltName + ' · ' + date + ' · ' + startTime,
             lessonTypeId: ltId,
-            teacherId: teacher.id,
+            pdrTeacherId: seq % 17 === 0 ? null : pdrTeacher.id,
+            branchTeacherId: branchTeacher.id,
             date: date,
             startTime: startTime,
             endTime: endTime,
@@ -282,9 +301,12 @@
             status: status,
             parentPresentationMinutes: 20,
             studentTrialMinutes: 30,
-            teacherInformed: seq % 3 !== 0,
-            teacherInformedAt: seq % 3 !== 0 ? isoAt(-2, 10, 0) : undefined,
-            teacherInformedByUserId: seq % 3 !== 0 ? CURRENT_USER_ID : undefined,
+            pdrTeacherInformed: seq % 5 !== 0,
+            pdrTeacherInformedAt: seq % 5 !== 0 ? isoAt(-2, 10, 0) : undefined,
+            pdrTeacherInformedByUserId: seq % 5 !== 0 ? CURRENT_USER_ID : undefined,
+            branchTeacherInformed: seq % 4 !== 0,
+            branchTeacherInformedAt: seq % 4 !== 0 ? isoAt(-2, 10, 0) : undefined,
+            branchTeacherInformedByUserId: seq % 4 !== 0 ? CURRENT_USER_ID : undefined,
             createdByUserId: CURRENT_USER_ID,
             createdAt: isoAt(-14, 8, 0),
             updatedAt: isoAt(-day, 8, 30)
@@ -400,7 +422,6 @@
           linkSent: linkSent,
           linkSentAt: linkSent ? isoAt(-1, 15, 0) : undefined,
           linkSentByUserId: linkSent ? CURRENT_USER_ID : undefined,
-          teacherInformed: session.teacherInformed,
           communicationLogIds: [],
           enrolled: status === 'attended' && j % 5 === 0,
           createdAt: isoAt(-5, 10, 0),
@@ -485,10 +506,49 @@
     currentUserId: CURRENT_USER_ID
   };
 
+  function migrateDualTeacherModel() {
+    var defaultPdr = state.teachers.find(function (t) {
+      return t.teacherType === 'pdr_teacher' || t.teacherType === 'pdr';
+    });
+    state.teachers.forEach(function (t) {
+      if (t.teacherType === 'pdr') t.teacherType = 'pdr_teacher';
+      if (t.teacherType === 'branch') t.teacherType = 'branch_teacher';
+    });
+    state.sessions.forEach(function (s) {
+      if (s.teacherId && (!s.branchTeacherId || !s.pdrTeacherId)) {
+        var legacy = find(state.teachers, s.teacherId);
+        if (legacy && (legacy.teacherType === 'pdr_teacher' || legacy.teacherType === 'pdr')) {
+          s.pdrTeacherId = s.teacherId;
+          if (!s.branchTeacherId) {
+            var branch = state.teachers.find(function (t) {
+              return t.teacherType === 'branch_teacher' &&
+                (t.branchLessonTypeIds || []).indexOf(s.lessonTypeId) >= 0;
+            });
+            s.branchTeacherId = branch ? branch.id : s.teacherId;
+          }
+        } else {
+          s.branchTeacherId = s.branchTeacherId || s.teacherId;
+          if (!s.pdrTeacherId && defaultPdr) s.pdrTeacherId = defaultPdr.id;
+        }
+        delete s.teacherId;
+      }
+      if (s.teacherInformed !== undefined) {
+        if (s.branchTeacherInformed === undefined) s.branchTeacherInformed = !!s.teacherInformed;
+        if (s.branchTeacherInformedAt === undefined) s.branchTeacherInformedAt = s.teacherInformedAt;
+        if (s.branchTeacherInformedByUserId === undefined) s.branchTeacherInformedByUserId = s.teacherInformedByUserId;
+        if (s.pdrTeacherInformed === undefined) s.pdrTeacherInformed = !!s.teacherInformed;
+        delete s.teacherInformed;
+        delete s.teacherInformedAt;
+        delete s.teacherInformedByUserId;
+      }
+    });
+  }
+
   function ensureDataSourceMetadata() {
+    migrateDualTeacherModel();
     state.teachers.forEach(function (t) {
       if (!t.source) t.source = 'admin_panel';
-      if (!t.teacherType) t.teacherType = 'branch';
+      if (!t.teacherType) t.teacherType = 'branch_teacher';
       if (t.trialLessonNotes === undefined) t.trialLessonNotes = '';
       if (t.informedNote === undefined) t.informedNote = '';
     });
@@ -563,7 +623,8 @@
       id: sid,
       title: (lt ? lt.name : 'Ders') + ' · ' + draft.date + ' · ' + draft.startTime,
       lessonTypeId: draft.lessonTypeId,
-      teacherId: draft.teacherId,
+      pdrTeacherId: draft.pdrTeacherId,
+      branchTeacherId: draft.branchTeacherId,
       date: draft.date,
       startTime: draft.startTime,
       endTime: draft.endTime,
@@ -574,7 +635,8 @@
       status: draft.status || 'scheduled',
       parentPresentationMinutes: 20,
       studentTrialMinutes: 30,
-      teacherInformed: false,
+      pdrTeacherInformed: false,
+      branchTeacherInformed: false,
       notes: draft.notes,
       createdByUserId: state.currentUserId,
       createdAt: new Date().toISOString(),
@@ -625,30 +687,32 @@
     return { ok: true, session: session };
   }
 
-  function changeSessionTeacher(sessionId, newTeacherId, reason) {
+  function changeSessionPdrTeacher(sessionId, newTeacherId, reason) {
     var session = find(state.sessions, sessionId);
     if (!session) return { ok: false, error: 'Ders bulunamadı.' };
     if (!reason || !reason.trim()) return { ok: false, error: 'Değişiklik nedeni zorunludur.' };
     if (!Rules) return { ok: false, error: 'Planlama kuralları yüklenemedi.' };
-    if (!Rules.isTeacherEligibleForLessonType(newTeacherId, session.lessonTypeId)) {
-      return { ok: false, error: 'Öğretmen branş uyumsuz.' };
+    if (!Rules.isTeacherPdr(newTeacherId)) return { ok: false, error: 'Seçilen öğretmen PDR/Rehberlik öğretmeni değil.' };
+    if (newTeacherId === session.branchTeacherId) return { ok: false, error: 'PDR ve branş öğretmeni aynı kişi olamaz.' };
+    if (!Rules.isPdrTeacherAvailable(newTeacherId, session.date, session.startTime, session.endTime)) {
+      return { ok: false, error: 'PDR öğretmeni bu saatte müsait değil.' };
     }
-    if (!Rules.isTeacherAvailable(newTeacherId, session.date, session.startTime, session.endTime)) {
-      return { ok: false, error: 'Öğretmen bu saatte müsait değil.' };
+    if (Rules.hasPdrTeacherConflict(newTeacherId, session.date, session.startTime, session.endTime, sessionId)) {
+      return { ok: false, error: 'PDR öğretmeninin aynı saatte başka dersi var.' };
     }
-    if (Rules.hasTeacherConflict(newTeacherId, session.date, session.startTime, session.endTime, sessionId)) {
-      return { ok: false, error: 'Öğretmen aynı saatte başka derste.' };
-    }
-    var prev = session.teacherId;
-    session.teacherId = newTeacherId;
-    session.teacherInformed = false;
+    var prev = session.pdrTeacherId;
+    var prevTeacher = find(state.teachers, prev);
+    var newTeacher = find(state.teachers, newTeacherId);
+    session.pdrTeacherId = newTeacherId;
+    session.pdrTeacherInformed = false;
     session.updatedAt = new Date().toISOString();
     if (Audit) {
       Audit.append(state, {
         entityType: 'trial_lesson_session',
         entityId: sessionId,
-        action: 'teacher_changed',
-        description: 'Öğretmen değiştirildi.',
+        action: 'pdr_teacher_changed',
+        description: 'PDR öğretmeni ' + (prevTeacher ? prevTeacher.firstName + ' ' + prevTeacher.lastName : prev) +
+          ' → ' + (newTeacher ? newTeacher.firstName + ' ' + newTeacher.lastName : newTeacherId) + ' olarak değiştirildi.',
         reason: reason,
         previousValue: prev,
         newValue: newTeacherId
@@ -656,6 +720,47 @@
     }
     touch();
     return { ok: true, session: session };
+  }
+
+  function changeSessionBranchTeacher(sessionId, newTeacherId, reason) {
+    var session = find(state.sessions, sessionId);
+    if (!session) return { ok: false, error: 'Ders bulunamadı.' };
+    if (!reason || !reason.trim()) return { ok: false, error: 'Değişiklik nedeni zorunludur.' };
+    if (!Rules) return { ok: false, error: 'Planlama kuralları yüklenemedi.' };
+    if (!Rules.isBranchTeacherEligibleForLessonType(newTeacherId, session.lessonTypeId)) {
+      return { ok: false, error: 'Branş öğretmeni ders türüyle uyumlu değil.' };
+    }
+    if (newTeacherId === session.pdrTeacherId) return { ok: false, error: 'PDR ve branş öğretmeni aynı kişi olamaz.' };
+    if (!Rules.isBranchTeacherAvailable(newTeacherId, session.date, session.startTime, session.endTime)) {
+      return { ok: false, error: 'Branş öğretmeni bu saatte müsait değil.' };
+    }
+    if (Rules.hasBranchTeacherConflict(newTeacherId, session.date, session.startTime, session.endTime, sessionId)) {
+      return { ok: false, error: 'Branş öğretmeninin aynı saatte başka dersi var.' };
+    }
+    var prev = session.branchTeacherId;
+    var prevTeacher = find(state.teachers, prev);
+    var newTeacher = find(state.teachers, newTeacherId);
+    session.branchTeacherId = newTeacherId;
+    session.branchTeacherInformed = false;
+    session.updatedAt = new Date().toISOString();
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'trial_lesson_session',
+        entityId: sessionId,
+        action: 'branch_teacher_changed',
+        description: 'Branş öğretmeni ' + (prevTeacher ? prevTeacher.firstName + ' ' + prevTeacher.lastName : prev) +
+          ' → ' + (newTeacher ? newTeacher.firstName + ' ' + newTeacher.lastName : newTeacherId) + ' olarak değiştirildi.',
+        reason: reason,
+        previousValue: prev,
+        newValue: newTeacherId
+      });
+    }
+    touch();
+    return { ok: true, session: session };
+  }
+
+  function changeSessionTeacher(sessionId, newTeacherId, reason) {
+    return changeSessionBranchTeacher(sessionId, newTeacherId, reason);
   }
 
   function rescheduleSession(sessionId, newDate, newStartTime, reason) {
@@ -670,17 +775,25 @@
     if (Rules.hasSessionSlotConflict(newDate, session.lessonTypeId, newStartTime, sessionId)) {
       return { ok: false, error: 'Aynı tarih ve saatte bu ders türünde başka oturum var.' };
     }
-    if (!Rules.isTeacherAvailable(session.teacherId, newDate, newStartTime, newEnd)) {
-      return { ok: false, error: 'Öğretmen yeni saatte müsait değil.' };
+    if (!Rules.isPdrTeacherAvailable(session.pdrTeacherId, newDate, newStartTime, newEnd)) {
+      return { ok: false, error: 'PDR öğretmeni yeni saatte müsait değil.' };
     }
-    if (Rules.hasTeacherConflict(session.teacherId, newDate, newStartTime, newEnd, sessionId)) {
-      return { ok: false, error: 'Öğretmen çakışması.' };
+    if (!Rules.isBranchTeacherAvailable(session.branchTeacherId, newDate, newStartTime, newEnd)) {
+      return { ok: false, error: 'Branş öğretmeni yeni saatte müsait değil.' };
+    }
+    if (Rules.hasPdrTeacherConflict(session.pdrTeacherId, newDate, newStartTime, newEnd, sessionId)) {
+      return { ok: false, error: 'PDR öğretmeni çakışması.' };
+    }
+    if (Rules.hasBranchTeacherConflict(session.branchTeacherId, newDate, newStartTime, newEnd, sessionId)) {
+      return { ok: false, error: 'Branş öğretmeni çakışması.' };
     }
     var prev = { date: session.date, startTime: session.startTime };
     session.date = newDate;
     session.startTime = newStartTime;
     session.endTime = newEnd;
     session.status = session.status === 'cancelled' ? session.status : 'rescheduled';
+    session.pdrTeacherInformed = false;
+    session.branchTeacherInformed = false;
     session.updatedAt = new Date().toISOString();
     if (Audit) {
       Audit.append(state, {
@@ -703,8 +816,8 @@
     if (!reason || !reason.trim()) return { ok: false, error: 'Değişiklik nedeni zorunludur.' };
     if (session.lessonTypeId === newLessonTypeId) return { ok: true, session: session };
     if (!Rules) return { ok: false, error: 'Planlama kuralları yüklenemedi.' };
-    if (!Rules.isTeacherEligibleForLessonType(session.teacherId, newLessonTypeId)) {
-      return { ok: false, error: 'Mevcut öğretmen seçilen ders türüne uygun değil. Önce öğretmeni değiştirin.' };
+    if (!Rules.isBranchTeacherEligibleForLessonType(session.branchTeacherId, newLessonTypeId)) {
+      return { ok: false, error: 'Mevcut branş öğretmeni seçilen ders türüne uygun değil. Önce branş öğretmenini değiştirin.' };
     }
     if (Rules.hasSessionSlotConflict(session.date, newLessonTypeId, session.startTime, sessionId)) {
       return { ok: false, error: 'Bu tarih ve saatte seçilen ders türü için zaten oturum var.' };
@@ -713,7 +826,8 @@
     var lt = find(state.lessonTypes, newLessonTypeId);
     session.lessonTypeId = newLessonTypeId;
     session.title = (lt ? lt.name : 'Ders') + ' · ' + session.date + ' · ' + session.startTime;
-    session.teacherInformed = false;
+    session.branchTeacherInformed = false;
+    session.pdrTeacherInformed = false;
     session.updatedAt = new Date().toISOString();
     state.reservations.filter(function (r) { return r.sessionId === sessionId; }).forEach(function (r) {
       r.lessonTypeId = newLessonTypeId;
@@ -787,23 +901,47 @@
     return { ok: true, reservation: r };
   }
 
-  function markTeacherInformed(sessionId) {
+  function markPdrTeacherInformed(sessionId) {
     var session = find(state.sessions, sessionId);
     if (!session) return { ok: false };
-    session.teacherInformed = true;
-    session.teacherInformedAt = new Date().toISOString();
-    session.teacherInformedByUserId = state.currentUserId;
+    session.pdrTeacherInformed = true;
+    session.pdrTeacherInformedAt = new Date().toISOString();
+    session.pdrTeacherInformedByUserId = state.currentUserId;
     session.updatedAt = new Date().toISOString();
     if (Audit) {
       Audit.append(state, {
         entityType: 'trial_lesson_session',
         entityId: sessionId,
-        action: 'teacher_informed',
-        description: 'Öğretmen bilgilendirildi olarak işaretlendi.'
+        action: 'pdr_teacher_informed',
+        description: 'PDR öğretmeni bilgilendirildi olarak işaretlendi.'
       });
     }
     touch();
     return { ok: true, session: session };
+  }
+
+  function markBranchTeacherInformed(sessionId) {
+    var session = find(state.sessions, sessionId);
+    if (!session) return { ok: false };
+    session.branchTeacherInformed = true;
+    session.branchTeacherInformedAt = new Date().toISOString();
+    session.branchTeacherInformedByUserId = state.currentUserId;
+    session.updatedAt = new Date().toISOString();
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'trial_lesson_session',
+        entityId: sessionId,
+        action: 'branch_teacher_informed',
+        description: 'Branş öğretmeni bilgilendirildi olarak işaretlendi.'
+      });
+    }
+    touch();
+    return { ok: true, session: session };
+  }
+
+  function markTeacherInformed(sessionId) {
+    markPdrTeacherInformed(sessionId);
+    return markBranchTeacherInformed(sessionId);
   }
 
   function addCommunicationLog(entry) {
@@ -995,7 +1133,6 @@
       status: 'pending',
       parentApprovalStatus: 'not_called',
       linkSent: false,
-      teacherInformed: session.teacherInformed,
       communicationLogIds: [],
       enrolled: false,
       createdAt: new Date().toISOString(),
@@ -1271,7 +1408,7 @@
         if (sess && sess.lessonTypeId !== patch.requestedLessonTypeId) {
           warnings.push('Mevcut atanmış ders yeni ders türüyle uyumsuz — ders değişikliği gerekebilir.');
         }
-        if (sess && Rules && !Rules.isTeacherEligibleForLessonType(sess.teacherId, patch.requestedLessonTypeId)) {
+        if (sess && Rules && !Rules.isBranchTeacherEligibleForLessonType(sess.branchTeacherId, patch.requestedLessonTypeId)) {
           warnings.push('Mevcut öğretmen yeni ders türüne uygun değil.');
         }
       }
@@ -1392,7 +1529,6 @@
       status: 'pending',
       parentApprovalStatus: 'not_called',
       linkSent: false,
-      teacherInformed: session.teacherInformed,
       communicationLogIds: [],
       enrolled: false,
       createdAt: new Date().toISOString(),
@@ -1499,7 +1635,6 @@
       status: res.parentApprovalStatus === 'approved' ? 'confirmed' : 'pending',
       parentApprovalStatus: res.parentApprovalStatus,
       linkSent: false,
-      teacherInformed: newSession.teacherInformed,
       communicationLogIds: [],
       enrolled: false,
       changeReason: reasonText,
@@ -1805,7 +1940,8 @@
     var session = find(state.sessions, sessionId);
     if (!session) return null;
     var meeting = find(state.meetings, session.onlineMeetingId);
-    var teacher = find(state.teachers, session.teacherId);
+    var pdrTeacher = find(state.teachers, session.pdrTeacherId);
+    var branchTeacher = find(state.teachers, session.branchTeacherId);
     var lessonType = find(state.lessonTypes, session.lessonTypeId);
     var reservations = state.reservations.filter(function (r) { return r.sessionId === sessionId; });
     var participants = reservations.map(function (r) {
@@ -1813,7 +1949,16 @@
       var pa = find(state.parents, r.parentId);
       return { reservation: r, student: st, parent: pa };
     });
-    return { session: session, meeting: meeting, teacher: teacher, lessonType: lessonType, reservations: reservations, participants: participants };
+    return {
+      session: session,
+      meeting: meeting,
+      pdrTeacher: pdrTeacher,
+      branchTeacher: branchTeacher,
+      teacher: branchTeacher,
+      lessonType: lessonType,
+      reservations: reservations,
+      participants: participants
+    };
   }
 
   function getOperationMetrics() {
@@ -1825,9 +1970,18 @@
     var linkNotSent = state.reservations.filter(function (r) {
       return r.status === 'confirmed' && r.parentApprovalStatus === 'approved' && !r.linkSent;
     });
-    var teacherNotInformed = state.sessions.filter(function (s) {
-      return s.status !== 'cancelled' && s.status !== 'completed' && !s.teacherInformed;
+    var pdrNotInformed = state.sessions.filter(function (s) {
+      return s.status !== 'cancelled' && s.status !== 'completed' && s.pdrTeacherId && !s.pdrTeacherInformed;
     });
+    var branchNotInformed = state.sessions.filter(function (s) {
+      return s.status !== 'cancelled' && s.status !== 'completed' && s.branchTeacherId && !s.branchTeacherInformed;
+    });
+    var missingTeachers = state.sessions.filter(function (s) {
+      return s.status !== 'cancelled' && (!s.pdrTeacherId || !s.branchTeacherId);
+    });
+    var teacherNotInformed = pdrNotInformed.concat(branchNotInformed.filter(function (s) {
+      return pdrNotInformed.indexOf(s) < 0;
+    }));
     var cancelled = state.sessions.filter(function (s) { return s.status === 'cancelled'; });
     var needsAttendance = state.sessions.filter(function (s) {
       return s.status === 'completed' || (s.date < today && s.status === 'confirmed');
@@ -1844,7 +1998,7 @@
     var studentCountToday = 0;
     todaySessions.forEach(function (s) { studentCountToday += s.enrolledStudentIds.length; });
     var actionableCount = pendingApproval.length + linkNotSent.length + orphanRequests.length +
-      teacherNotInformed.length + needsAttendance.length;
+      teacherNotInformed.length + needsAttendance.length + missingTeachers.length;
 
     return {
       todaySessionCount: todaySessions.length,
@@ -1852,6 +2006,9 @@
       pendingApprovalCount: pendingApproval.length,
       linkNotSentCount: linkNotSent.length,
       teacherNotInformedCount: teacherNotInformed.length,
+      pdrNotInformedCount: pdrNotInformed.length,
+      branchNotInformedCount: branchNotInformed.length,
+      missingTeacherAssignmentCount: missingTeachers.length,
       cancelledCount: cancelled.length,
       needsAttendanceCount: needsAttendance.length,
       conversionCount: enrolled.length,
@@ -1862,6 +2019,9 @@
       pendingApproval: pendingApproval,
       linkNotSent: linkNotSent,
       teacherNotInformed: teacherNotInformed,
+      pdrNotInformed: pdrNotInformed,
+      branchNotInformed: branchNotInformed,
+      missingTeacherAssignments: missingTeachers,
       needsAttendance: needsAttendance,
       orphanRequests: orphanRequests,
       newRequests: newRequests
@@ -1934,17 +2094,23 @@
       return state.reservations.filter(function (r) { return r.parentId === parentId; });
     },
     getSessionsForTeacher: function (teacherId) {
-      return state.sessions.filter(function (s) { return s.teacherId === teacherId; });
+      return state.sessions.filter(function (s) {
+        return s.pdrTeacherId === teacherId || s.branchTeacherId === teacherId;
+      });
     },
     todayKey: todayKey,
     createSession: createSession,
     cancelSession: cancelSession,
     changeSessionTeacher: changeSessionTeacher,
+    changeSessionPdrTeacher: changeSessionPdrTeacher,
+    changeSessionBranchTeacher: changeSessionBranchTeacher,
     changeSessionLessonType: changeSessionLessonType,
     rescheduleSession: rescheduleSession,
     refreshMeetingPasscode: refreshMeetingPasscode,
     markLinkSent: markLinkSent,
     markTeacherInformed: markTeacherInformed,
+    markPdrTeacherInformed: markPdrTeacherInformed,
+    markBranchTeacherInformed: markBranchTeacherInformed,
     addCommunicationLog: addCommunicationLog,
     markAttendance: markAttendance,
     updateUserPermissions: updateUserPermissions,

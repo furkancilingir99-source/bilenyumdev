@@ -69,36 +69,44 @@
     document.body.classList.add('tm-drawer-open');
   }
 
-  function openForTeacher(opts) {
+  function openForPdrTeacher(opts) {
     if (!Msg || !opts) return;
-    var text = Msg.teacherInfo({
+    var text = Msg.pdrTeacherInfo({
       teacherName: opts.teacherName,
       date: opts.date,
       time: opts.time,
       lessonType: opts.lessonType,
-      studentCount: opts.studentCount
+      meetingUrl: opts.meetingUrl || '',
+      meetingId: opts.meetingId || '',
+      passcode: opts.passcode || ''
     });
-    showChooser(opts.teacherName, opts.phone, opts.email, text, 'Deneme dersi öğretmen bilgilendirme');
+    showChooser(opts.teacherName, opts.phone, opts.email, text, 'PDR veli sunumu bilgilendirme');
   }
 
-  function openReschedule(opts) {
+  function openForBranchTeacher(opts) {
     if (!Msg || !opts) return;
-    var text = Msg.reschedule({
-      parentName: opts.parentName,
-      studentName: opts.studentName,
+    var text = Msg.branchTeacherInfo({
+      teacherName: opts.teacherName,
+      date: opts.date,
+      time: opts.time,
       lessonType: opts.lessonType,
-      newDate: opts.newDate,
-      newTime: opts.newTime,
-      meetingUrl: opts.meetingUrl,
-      meetingId: opts.meetingId,
-      passcode: opts.passcode
+      studentCount: opts.studentCount,
+      meetingUrl: opts.meetingUrl || '',
+      meetingId: opts.meetingId || '',
+      passcode: opts.passcode || ''
     });
-    showChooser(opts.parentName, opts.phone, opts.email, text, 'Deneme dersi planı güncellendi');
+    showChooser(opts.teacherName, opts.phone, opts.email, text, 'Branş öğretmeni bilgilendirme');
+  }
+
+  function openForTeacher(opts) {
+    openForBranchTeacher(opts);
   }
 
   global.TMQuickMessage = {
     openForParent: openForParent,
     openForTeacher: openForTeacher,
+    openForPdrTeacher: openForPdrTeacher,
+    openForBranchTeacher: openForBranchTeacher,
     openReschedule: openReschedule,
     show: showChooser
   };

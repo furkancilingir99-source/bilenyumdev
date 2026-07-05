@@ -9,8 +9,10 @@
       'Merhaba ' + data.parentName + ',\n\n' +
       data.studentName + ' için ücretsiz online ' + data.lessonType + ' deneme dersiniz ' +
       data.date + ' tarihinde saat ' + data.time + ' olarak planlanmıştır.\n\n' +
-      'Ders akışı:\nİlk 20 dakika veli bilgilendirme sunumu,\nsonraki 30 dakika öğrenci deneme dersi şeklindedir.\n\n' +
-      'Derse aynı bilgisayardan katılabilirsiniz.\n\n' +
+      'Ders akışı:\n' +
+      'İlk 20 dakika PDR/Rehberlik Öğretmeni tarafından veli bilgilendirme sunumu yapılacaktır.\n' +
+      'Sonraki 30 dakika Branş Öğretmeni tarafından öğrenci ücretsiz deneme dersi yapılacaktır.\n\n' +
+      'Derse öğrenci ve veli olarak aynı bilgisayardan katılabilirsiniz.\n\n' +
       'Katılım linki:\n' + data.meetingUrl + '\n\n' +
       'Toplantı ID:\n' + data.meetingId + '\n\n' +
       'Şifre:\n' + data.passcode + '\n\n' +
@@ -41,18 +43,41 @@
     );
   }
 
-  function teacherInfoMessage(data) {
+  function pdrTeacherInfoMessage(data) {
     return (
       'Merhaba ' + data.teacherName + ',\n\n' +
-      data.date + ' tarihinde saat ' + data.time + ' için online ' + data.lessonType +
-      ' ücretsiz deneme dersi tarafınıza atanmıştır.\n\n' +
-      'Ders süresi: 50 dakika\n' +
-      'İlk 20 dakika: Veli sunumu\n' +
-      'Son 30 dakika: Öğrenci deneme dersi\n' +
-      'Katılımcı öğrenci sayısı: ' + data.studentCount + '\n\n' +
+      data.date + ' tarihinde saat ' + data.time + ' için online ücretsiz deneme dersi kapsamında veli sunumu tarafınıza atanmıştır.\n\n' +
+      'Ders türü: ' + data.lessonType + '\n' +
+      'Süre: İlk 20 dakika\n' +
+      'Göreviniz: Velilere platformu, süreci ve deneme dersi akışını anlatmak.\n\n' +
       'Ders, öğretmen dashboard\'ınızda görüntülenecektir.\n\n' +
+      'Online ders bilgileri:\n' +
+      'Katılım linki: ' + data.meetingUrl + '\n' +
+      'Toplantı ID: ' + data.meetingId + '\n' +
+      'Şifre: ' + data.passcode + '\n\n' +
       'İyi çalışmalar.'
     );
+  }
+
+  function branchTeacherInfoMessage(data) {
+    return (
+      'Merhaba ' + data.teacherName + ',\n\n' +
+      data.date + ' tarihinde saat ' + data.time + ' için online ücretsiz ' + data.lessonType + ' deneme dersi tarafınıza atanmıştır.\n\n' +
+      'Ders akışı:\n' +
+      'İlk 20 dakika PDR/Rehberlik Öğretmeni veli sunumu yapacaktır.\n' +
+      'Son 30 dakika sizin tarafınızdan öğrencilere ücretsiz deneme dersi yapılacaktır.\n\n' +
+      'Katılımcı öğrenci sayısı: ' + data.studentCount + '\n\n' +
+      'Ders, öğretmen dashboard\'ınızda görüntülenecektir.\n\n' +
+      'Online ders bilgileri:\n' +
+      'Katılım linki: ' + data.meetingUrl + '\n' +
+      'Toplantı ID: ' + data.meetingId + '\n' +
+      'Şifre: ' + data.passcode + '\n\n' +
+      'İyi çalışmalar.'
+    );
+  }
+
+  function teacherInfoMessage(data) {
+    return branchTeacherInfoMessage(data);
   }
 
   function parentContactMessage(data) {
@@ -81,10 +106,12 @@
 
   global.TMMessageTemplates = {
     parentTrial: parentTrialMessage,
-    parentContact: parentContactMessage,
     reschedule: rescheduleMessage,
     cancel: cancelMessage,
     teacherInfo: teacherInfoMessage,
+    pdrTeacherInfo: pdrTeacherInfoMessage,
+    branchTeacherInfo: branchTeacherInfoMessage,
+    parentContact: parentContactMessage,
     whatsappUrl: whatsappUrl,
     mailtoUrl: mailtoUrl
   };
