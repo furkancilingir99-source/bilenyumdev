@@ -26,6 +26,7 @@
   }
 
   var tbody = document.getElementById('tmUsersBody');
+  var cardsEl = document.getElementById('tmUsersCards');
   var exportBtn = document.getElementById('tmUsersExport');
 
   function roleLabel(role) {
@@ -123,28 +124,24 @@
     });
   }
 
-  function render() {
-    if (!tbody) return;
-    var loading = document.getElementById('tmUsersLoading');
-    var wrap = document.getElementById('tmUsersTableWrap');
-    try {
-      var editable = canEditUsers();
-      tbody.innerHTML = getUsers().map(function (u) {
-        var locked = u.role === 'super_admin' || !editable;
-        var current = getCurrentUser();
-        var isCurrent = current && current.id === u.id;
-        return '<tr data-user="' + u.id + '" style="cursor:pointer">' +
-          '<td>' + U.escapeHtml(U.fullName(u.firstName, u.lastName)) + (isCurrent ? ' <span class="tm-badge tm-badge--blue">Aktif oturum</span>' : '') + '</td>' +
-          '<td>' + U.escapeHtml(u.email) + '</td>' +
-          '<td>' + U.escapeHtml(roleLabel(u.role)) + '</td>' +
-          switchCell(u, 'canView', locked) +
-          switchCell(u, 'canCreate', locked) +
-          switchCell(u, 'canEdit', locked) +
-          switchCell(u, 'canCancel', locked) +
-          switchCell(u, 'canExport', locked) +
-          '<td>' + (u.isActive ? 'Aktif' : 'Pasif') + '</td>' +
-          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + u.id + '">Detay</button></td></tr>';
-      }).join('');
+  function cardHtml(u) {
+    var current = getCurrentUser();
+    var isCurrent = current && current.id === u.id;
+    return '<article class="tm-list-card" data-user="' + u.id + '">' +
+      '<div class="tm-list-card-head"><div><strong>' + U.escapeHtml(U.fullName(u.firstName, u.lastName)) + '</strong>' +
+        (isCurrent ? ' <span class="tm-badge tm-badge--blue">Aktif</span>' : '') + '</div>' +
+        '<span class="tm-badge tm-badge--muted">' + U.escapeHtml(roleLabel(u.role)) + '</span></div>' +
+      '<div class="tm-list-card-body">' +
+        '<div><span class="tm-list-card-label">E-posta</span> ' + U.escapeHtml(u.email) + '</div>' +
+        '<div><span class="tm-list-card-label">Durum</span> ' + (u.isActive ? 'Aktif' : 'Pasif') + '</div>' +
+      '</div>' +
+      '<div class="tm-list-card-foot">' +
+        '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-detail="' + u.id + '">Yetkiler</button>' +
+      '</div></article>';
+  }
+
+  function bindRowActions() {
+    if (tbody) {
       tbody.querySelectorAll('.tm-switch').forEach(function (lab) {
         lab.addEventListener('click', function (e) { e.stopPropagation(); });
       });
@@ -168,8 +165,52 @@
           if (u) openDetail(u);
         });
       });
+    }
+    if (cardsEl) {
+      cardsEl.querySelectorAll('[data-detail]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var u = getUsers().find(function (x) { return x.id === btn.getAttribute('data-detail'); });
+          if (u) openDetail(u);
+        });
+      });
+      cardsEl.querySelectorAll('.tm-list-card[data-user]').forEach(function (card) {
+        card.addEventListener('click', function (e) {
+          if (e.target.closest('button')) return;
+          var u = getUsers().find(function (x) { return x.id === card.getAttribute('data-user'); });
+          if (u) openDetail(u);
+        });
+      });
+    }
+  }
+
+  function render() {
+    if (!tbody) return;
+    var loading = document.getElementById('tmUsersLoading');
+    var wrap = document.getElementById('tmUsersTableWrap');
+    try {
+      var editable = canEditUsers();
+      tbody.innerHTML = getUsers().map(function (u) {
+        var locked = u.role === 'super_admin' || !editable;
+        var current = getCurrentUser();
+        var isCurrent = current && current.id === u.id;
+        return '<tr data-user="' + u.id + '" style="cursor:pointer">' +
+          '<td>' + U.escapeHtml(U.fullName(u.firstName, u.lastName)) + (isCurrent ? ' <span class="tm-badge tm-badge--blue">Aktif oturum</span>' : '') + '</td>' +
+          '<td>' + U.escapeHtml(u.email) + '</td>' +
+          '<td>' + U.escapeHtml(roleLabel(u.role)) + '</td>' +
+          switchCell(u, 'canView', locked) +
+          switchCell(u, 'canCreate', locked) +
+          switchCell(u, 'canEdit', locked) +
+          switchCell(u, 'canCancel', locked) +
+          switchCell(u, 'canExport', locked) +
+          '<td>' + (u.isActive ? 'Aktif' : 'Pasif') + '</td>' +
+          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + u.id + '">Detay</button></td></tr>';
+      }).join('');
+      if (cardsEl) cardsEl.innerHTML = getUsers().map(cardHtml).join('');
+      bindRowActions();
       if (loading) loading.hidden = true;
       if (wrap) wrap.hidden = false;
+      if (cardsEl) cardsEl.hidden = false;
     } catch (err) {
       if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
       console.error(err);

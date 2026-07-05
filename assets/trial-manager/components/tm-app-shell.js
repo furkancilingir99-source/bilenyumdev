@@ -254,8 +254,32 @@
     var btn = document.getElementById('tmMobileMenuBtn');
     var sidebar = document.querySelector('.tm-sidebar');
     if (!btn || !sidebar) return;
-    btn.addEventListener('click', function () {
-      sidebar.classList.toggle('is-mobile-open');
+
+    var backdrop = document.querySelector('.tm-sidebar-backdrop');
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.className = 'tm-sidebar-backdrop';
+      backdrop.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(backdrop);
+    }
+
+    function closeSidebar() {
+      sidebar.classList.remove('is-mobile-open');
+      backdrop.classList.remove('is-visible');
+    }
+
+    function toggleSidebar() {
+      var open = sidebar.classList.toggle('is-mobile-open');
+      backdrop.classList.toggle('is-visible', open);
+    }
+
+    btn.addEventListener('click', toggleSidebar);
+    backdrop.addEventListener('click', closeSidebar);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeSidebar();
+    });
+    sidebar.querySelectorAll('.tm-sidebar-link').forEach(function (link) {
+      link.addEventListener('click', closeSidebar);
     });
   }
 

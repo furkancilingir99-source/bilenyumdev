@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="tr">
+<html lang="tr" class="tm-admin-root">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -9,9 +9,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/tokens.css">
-<link rel="stylesheet" href="assets/shell.css">
-<link rel="stylesheet" href="assets/dashboard-light.css">
-<link rel="stylesheet" href="assets/trial-lesson-manager.css">
 <link rel="stylesheet" href="assets/trial-manager/styles/trial-manager-admin.css">
 <script src="assets/auth-tab-session.js"></script>
 </head>
@@ -96,7 +93,7 @@
       <p id="tmSessionsFilterHint" class="tm-alert-row" style="margin:0 16px 12px" hidden></p>
 
       <div id="tmSessionsLoading" class="td-state">Yükleniyor…</div>
-      <div id="tmSessionsTableWrap" class="tm-res-table-wrap tm-sessions-table-wrap" hidden>
+      <div id="tmSessionsTableWrap" class="tm-res-table-wrap tm-sessions-table-wrap tm-mobile-table-wrap" hidden>
         <table class="tm-res-table tm-res-table--rich">
           <thead>
             <tr>
@@ -108,7 +105,7 @@
           <tbody id="tmSessionsBody"></tbody>
         </table>
       </div>
-      <div id="tmSessionsCards" class="tm-list-cards tm-sessions-cards" hidden></div>
+      <div id="tmSessionsCards" class="tm-list-cards tm-sessions-cards tm-mobile-cards" hidden></div>
       <div id="tmSessionsPagination" class="tm-pagination" hidden></div>
     </section>
   </main>

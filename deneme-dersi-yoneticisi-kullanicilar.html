@@ -1,17 +1,14 @@
 <!doctype html>
-<html lang="tr">
+<html lang="tr" class="tm-admin-root">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Kullanıcılar ve Yetkiler · Deneme Dersi Yöneticisi · Bilenyum</title>
 <link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
 <link rel="stylesheet" href="assets/tokens.css">
-<link rel="stylesheet" href="assets/shell.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/dashboard-light.css">
-<link rel="stylesheet" href="assets/trial-lesson-manager.css">
 <link rel="stylesheet" href="assets/trial-manager/styles/trial-manager-admin.css">
 <script src="assets/auth-tab-session.js"></script>
 </head>
@@ -31,11 +28,12 @@
         <button type="button" class="tm-dg-action" id="tmUsersExport" data-tm-export style="border:none;cursor:pointer">CSV</button>
       </div></header>
       <div id="tmUsersLoading" class="td-state">Yükleniyor…</div>
-      <div id="tmUsersTableWrap" class="tm-res-table-wrap" hidden>
+      <div id="tmUsersTableWrap" class="tm-res-table-wrap tm-mobile-table-wrap" hidden>
         <table class="tm-res-table"><thead><tr>
           <th>Ad</th><th>E-posta</th><th>Rol</th><th>Görüntüle</th><th>Oluştur</th><th>Düzenle</th><th>İptal</th><th>Dışa aktar</th><th>Durum</th><th></th>
         </tr></thead><tbody id="tmUsersBody"></tbody></table>
       </div>
+      <div id="tmUsersCards" class="tm-list-cards tm-mobile-cards" hidden></div>
     </section>
   </main>
 </div>

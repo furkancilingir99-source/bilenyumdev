@@ -98,7 +98,7 @@
         '<td>' + SL.sessionBadge(s.status) + '</td>' +
         '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-open-session="' + s.id + '">Detay</button></td></tr>';
     }).join('');
-    wrap.innerHTML = '<table class="tm-inner-table"><thead><tr><th>Saat</th><th>Ders</th><th>PDR / Branş</th><th>Kapasite</th><th>Öğrenci</th><th>Link</th><th>Öğrt.bilgi</th><th>Durum</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+    wrap.innerHTML = '<div class="tm-res-table-wrap"><table class="tm-inner-table"><thead><tr><th>Saat</th><th>Ders</th><th>PDR / Branş</th><th>Kapasite</th><th>Öğrenci</th><th>Link</th><th>Öğrt.bilgi</th><th>Durum</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>';
     wrap.querySelectorAll('[data-open-session]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();

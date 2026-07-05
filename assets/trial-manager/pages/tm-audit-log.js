@@ -13,6 +13,7 @@
   if (!Store) return;
 
   var tbody = document.getElementById('tmAuditBody');
+  var cardsEl = document.getElementById('tmAuditCards');
   var searchInput = document.getElementById('tmAuditSearch');
   var entityFilter = document.getElementById('tmAuditEntity');
   var actionFilter = document.getElementById('tmAuditAction');
@@ -96,6 +97,33 @@
     };
   }
 
+  function cardHtml(l) {
+    var r = rowData(l);
+    return '<article class="tm-list-card" data-audit-id="' + l.id + '">' +
+      '<div class="tm-list-card-head"><div><strong>' + U.escapeHtml(r.action) + '</strong></div>' +
+      '<span class="tm-badge tm-badge--muted">' + U.escapeHtml(r.entityType) + '</span></div>' +
+      '<div class="tm-list-card-body">' +
+        '<div><span class="tm-list-card-label">Tarih</span> ' + U.formatDateTime(r.date) + '</div>' +
+        '<div><span class="tm-list-card-label">Kayıt</span> ' + U.escapeHtml(r.entityId) + '</div>' +
+        '<div><span class="tm-list-card-label">Açıklama</span> ' + U.escapeHtml(r.description) + '</div>' +
+        '<div><span class="tm-list-card-label">Kullanıcı</span> ' + U.escapeHtml(r.user) + '</div>' +
+      '</div>' +
+      '<div class="tm-list-card-foot">' +
+        '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-open-entity data-type="' +
+          U.escapeHtml(l.entityType) + '" data-id="' + U.escapeHtml(l.entityId) + '">Kayda git</button>' +
+      '</div></article>';
+  }
+
+  function bindRowActions(root) {
+    if (!root) return;
+    root.querySelectorAll('[data-open-entity]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (AuditNav) AuditNav.openEntity(btn.getAttribute('data-type'), btn.getAttribute('data-id'));
+      });
+    });
+  }
+
   function render() {
     if (!tbody) return;
     var loading = document.getElementById('tmAuditLoading');
@@ -117,14 +145,13 @@
           '<td>' + U.escapeHtml(r.reason || '—') + '</td>' +
           '<td>' + U.escapeHtml(r.user) + '</td></tr>';
       }).join('');
+      if (cardsEl) cardsEl.innerHTML = p.items.map(cardHtml).join('');
       U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
-      tbody.querySelectorAll('[data-open-entity]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          if (AuditNav) AuditNav.openEntity(btn.getAttribute('data-type'), btn.getAttribute('data-id'));
-        });
-      });
+      bindRowActions(tbody);
+      bindRowActions(cardsEl);
       if (loading) loading.hidden = true;
       if (wrap) wrap.hidden = false;
+      if (cardsEl) cardsEl.hidden = false;
     } catch (err) {
       if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
       console.error(err);
