@@ -76,7 +76,18 @@
     { id: 't2', name: 'Zeynep Arslan', subjects: ['Matematik', 'Fen Bilimleri'], phone: '0533 221 44 90', email: 'zeynep.arslan@bilenyum.com' },
     { id: 't3', name: 'Mehmet Koç', subjects: ['Türkçe'], phone: '0534 880 12 55', email: 'mehmet.koc@bilenyum.com' },
     { id: 't4', name: 'Elif Yıldız', subjects: ['İngilizce', 'Sosyal Bilgiler'], phone: '0535 902 33 71', email: 'elif.yildiz@bilenyum.com' },
-    { id: 't5', name: 'Can Demir', subjects: ['Fen Bilimleri'], phone: '0536 114 77 02', email: 'can.demir@bilenyum.com' }
+    { id: 't5', name: 'Can Demir', subjects: ['Fen Bilimleri'], phone: '0536 114 77 02', email: 'can.demir@bilenyum.com' },
+    { id: 't6', name: 'Ayşe Özkan', subjects: ['Matematik'], phone: '0537 650 18 44', email: 'ayse.ozkan@bilenyum.com' },
+    { id: 't7', name: 'Burak Yılmaz', subjects: ['Matematik', 'Sosyal Bilgiler'], phone: '0538 771 09 63', email: 'burak.yilmaz@bilenyum.com' },
+    { id: 't8', name: 'Selin Korkmaz', subjects: ['Fen Bilimleri', 'Matematik'], phone: '0539 302 55 81', email: 'selin.korkmaz@bilenyum.com' },
+    { id: 't9', name: 'Emre Yalçın', subjects: ['Fen Bilimleri'], phone: '0541 884 27 16', email: 'emre.yalcin@bilenyum.com' },
+    { id: 't10', name: 'Deniz Kara', subjects: ['Türkçe', 'Sosyal Bilgiler'], phone: '0542 119 66 40', email: 'deniz.kara@bilenyum.com' },
+    { id: 't11', name: 'Sibel Tunç', subjects: ['Türkçe'], phone: '0543 556 91 72', email: 'sibel.tunc@bilenyum.com' },
+    { id: 't12', name: 'Oğuz Deniz', subjects: ['İngilizce'], phone: '0544 208 34 58', email: 'oguz.deniz@bilenyum.com' },
+    { id: 't13', name: 'Melis Aktaş', subjects: ['İngilizce', 'Türkçe'], phone: '0545 673 42 09', email: 'melis.aktas@bilenyum.com' },
+    { id: 't14', name: 'Hakan Gürbüz', subjects: ['Sosyal Bilgiler'], phone: '0546 990 15 37', email: 'hakan.gurbuz@bilenyum.com' },
+    { id: 't15', name: 'Ebru Çetin', subjects: ['Sosyal Bilgiler', 'İngilizce'], phone: '0547 441 88 24', email: 'ebru.cetin@bilenyum.com' },
+    { id: 't16', name: 'Koray Şen', subjects: ['Matematik', 'Fen Bilimleri'], phone: '0548 725 03 61', email: 'koray.sen@bilenyum.com' }
   ];
 
   var PLANNED_LESSONS = [
@@ -211,6 +222,127 @@
       slotTime: '14:30',
       studentIds: ['REZ-2026-0017', 'REZ-2026-0037'],
       updatedAt: '2026-06-28T17:55:00+03:00'
+    },
+    {
+      id: 'DERS-MAT-7-2026-0001',
+      subject: 'Matematik',
+      grade: '7. Sınıf',
+      teacherId: 't6',
+      slotLabel: 'Çarşamba, 9 Tem · 19:00',
+      slotDateKey: '2026-07-09',
+      slotTime: '19:00',
+      studentIds: ['REZ-2026-0011', 'REZ-2026-0031', 'REZ-2026-0051'],
+      updatedAt: '2026-07-04T11:05:00+03:00'
+    },
+    {
+      id: 'DERS-TUR-5-2026-0001',
+      subject: 'Türkçe',
+      grade: '5. Sınıf',
+      teacherId: 't11',
+      slotLabel: 'Bugün · 11:30',
+      slotDateKey: '2026-07-05',
+      slotTime: '11:30',
+      studentIds: ['REZ-2026-0003', 'REZ-2026-0023', 'REZ-2026-0043'],
+      updatedAt: '2026-07-05T09:40:00+03:00'
+    },
+    {
+      id: 'DERS-ING-8-2026-0001',
+      subject: 'İngilizce',
+      grade: '8. Sınıf',
+      teacherId: 't12',
+      slotLabel: 'Salı, 8 Tem · 17:30',
+      slotDateKey: '2026-07-08',
+      slotTime: '17:30',
+      studentIds: ['REZ-2026-0019', 'REZ-2026-0039', 'REZ-2026-0059'],
+      updatedAt: '2026-07-03T13:25:00+03:00'
+    },
+    {
+      id: 'DERS-SOS-6-2026-0001',
+      subject: 'Sosyal Bilgiler',
+      grade: '6. Sınıf',
+      teacherId: 't14',
+      slotLabel: 'Pazartesi, 7 Tem · 19:00',
+      slotDateKey: '2026-07-07',
+      slotTime: '19:00',
+      studentIds: ['REZ-2026-0010', 'REZ-2026-0030', 'REZ-2026-0050'],
+      updatedAt: '2026-07-02T16:10:00+03:00'
+    },
+    {
+      id: 'DERS-FEN-5-2026-0001',
+      subject: 'Fen Bilimleri',
+      grade: '5. Sınıf',
+      teacherId: 't9',
+      slotLabel: 'Cuma, 11 Tem · 19:00',
+      slotDateKey: '2026-07-11',
+      slotTime: '19:00',
+      studentIds: ['REZ-2026-0002', 'REZ-2026-0022', 'REZ-2026-0042'],
+      updatedAt: '2026-06-27T10:30:00+03:00'
+    },
+    {
+      id: 'DERS-MAT-8-2026-0002',
+      subject: 'Matematik',
+      grade: '8. Sınıf',
+      teacherId: 't7',
+      slotLabel: 'Cumartesi, 12 Tem · 17:30',
+      slotDateKey: '2026-07-12',
+      slotTime: '17:30',
+      studentIds: ['REZ-2026-0016', 'REZ-2026-0036', 'REZ-2026-0056'],
+      updatedAt: '2026-07-01T08:50:00+03:00'
+    },
+    {
+      id: 'DERS-TUR-7-2026-0001',
+      subject: 'Türkçe',
+      grade: '7. Sınıf',
+      teacherId: 't10',
+      slotLabel: 'Perşembe, 10 Tem · 17:30',
+      slotDateKey: '2026-07-10',
+      slotTime: '17:30',
+      studentIds: ['REZ-2026-0013', 'REZ-2026-0033', 'REZ-2026-0053'],
+      updatedAt: '2026-06-26T19:15:00+03:00'
+    },
+    {
+      id: 'DERS-ING-6-2026-0001',
+      subject: 'İngilizce',
+      grade: '6. Sınıf',
+      teacherId: 't13',
+      slotLabel: 'Bugün · 10:00',
+      slotDateKey: '2026-07-05',
+      slotTime: '10:00',
+      studentIds: ['REZ-2026-0009', 'REZ-2026-0029', 'REZ-2026-0049'],
+      updatedAt: '2026-07-05T06:20:00+03:00'
+    },
+    {
+      id: 'DERS-SOS-7-2026-0001',
+      subject: 'Sosyal Bilgiler',
+      grade: '7. Sınıf',
+      teacherId: 't15',
+      slotLabel: 'Salı, 8 Tem · 11:30',
+      slotDateKey: '2026-07-08',
+      slotTime: '11:30',
+      studentIds: ['REZ-2026-0015', 'REZ-2026-0035', 'REZ-2026-0055'],
+      updatedAt: '2026-06-25T14:00:00+03:00'
+    },
+    {
+      id: 'DERS-FEN-7-2026-0002',
+      subject: 'Fen Bilimleri',
+      grade: '7. Sınıf',
+      teacherId: 't8',
+      slotLabel: 'Cuma, 11 Tem · 10:00',
+      slotDateKey: '2026-07-11',
+      slotTime: '10:00',
+      studentIds: ['REZ-2026-0012', 'REZ-2026-0052', 'REZ-2026-0072'],
+      updatedAt: '2026-06-24T12:45:00+03:00'
+    },
+    {
+      id: 'DERS-MAT-6-2026-0002',
+      subject: 'Matematik',
+      grade: '6. Sınıf',
+      teacherId: 't16',
+      slotLabel: 'Pazartesi, 7 Tem · 14:30',
+      slotDateKey: '2026-07-07',
+      slotTime: '14:30',
+      studentIds: ['REZ-2026-0026', 'REZ-2026-0046', 'REZ-2026-0086'],
+      updatedAt: '2026-06-23T17:30:00+03:00'
     }
   ];
 

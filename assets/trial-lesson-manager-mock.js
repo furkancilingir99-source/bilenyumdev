@@ -73,6 +73,40 @@
     { s: 'Gülce', l: 'Ceylan', p: 'Okan', pl: 'Ceylan' }
   ];
 
+  var EXTRA_STUDENT_FIRST = [
+    'Alper', 'Buse', 'Cem', 'Derya', 'Eda', 'Fahri', 'Gamze', 'Haluk', 'Irmak', 'Janset',
+    'Kıvanç', 'Lale', 'Mert', 'Naz', 'Okan', 'Poyraz', 'Rana', 'Sude', 'Tuna', 'Umay',
+    'Veli', 'Yaren', 'Zehra', 'Ahmet', 'Beste', 'Cihan', 'Dilara', 'Eylül', 'Feride', 'Görkem',
+    'Hülya', 'İrem', 'Kadir', 'Leyla', 'Mina', 'Nehir', 'Onur', 'Pınar', 'Rıza', 'Simay',
+    'Tarık', 'Ufuk', 'Vera', 'Yusuf', 'Zümra', 'Aras', 'Beren', 'Ceyda', 'Doğa', 'Esin', 'Figen', 'Güneş'
+  ];
+  var EXTRA_STUDENT_LAST = [
+    'Avcı', 'Başaran', 'Candan', 'Dağlı', 'Ergün', 'Fidan', 'Gökalp', 'Hacıoğlu', 'İnce', 'Jaleli',
+    'Keskin', 'Liman', 'Mutlu', 'Narin', 'Okur', 'Parlak', 'Rüstem', 'Sarı', 'Tunç', 'Uslu',
+    'Vatan', 'Yalın', 'Zengin', 'Aslan', 'Bilgin', 'Ceylan', 'Duran', 'Ekici', 'Fındık', 'Güler',
+    'Han', 'Işık', 'Kaplan', 'Kurt', 'Laleli', 'Mavi', 'Nazlı', 'Orhan', 'Pektaş', 'Rençber',
+    'Sönmez', 'Türk', 'Uçar', 'Vural', 'Yavuz', 'Aksoy', 'Boz', 'Çetin', 'Demirci', 'Ergin', 'Güven', 'Helvacı'
+  ];
+  var EXTRA_PARENT_FIRST = [
+    'Ali', 'Banu', 'Cengiz', 'Dilek', 'Erkan', 'Filiz', 'Gökhan', 'Hacer', 'İbrahim', 'Jale',
+    'Kemal', 'Leman', 'Murat', 'Nur', 'Osman', 'Pelin', 'Recep', 'Sevgi', 'Turgut', 'Ümit',
+    'Vedat', 'Yıldız', 'Zeki', 'Arzu', 'Bekir', 'Cemile', 'Davut', 'Emine', 'Fatih', 'Gonca',
+    'Hasan', 'Işıl', 'Kenan', 'Leyla', 'Mustafa', 'Nalan', 'Orhan', 'Perihan', 'Rıdvan', 'Serap',
+    'Tamer', 'Uğur', 'Volkan', 'Yasemin', 'Zafer', 'Aylin', 'Baran', 'Cansu', 'Doğan', 'Elvan', 'Ferit', 'Gülşen'
+  ];
+  var EXTRA_PARENT_LAST = EXTRA_STUDENT_LAST;
+
+  function personForIndex(i) {
+    if (i < DEMO_PEOPLE.length) return DEMO_PEOPLE[i];
+    var j = i - DEMO_PEOPLE.length;
+    return {
+      s: EXTRA_STUDENT_FIRST[j % EXTRA_STUDENT_FIRST.length],
+      l: EXTRA_STUDENT_LAST[Math.floor(j / EXTRA_STUDENT_FIRST.length) % EXTRA_STUDENT_LAST.length],
+      p: EXTRA_PARENT_FIRST[j % EXTRA_PARENT_FIRST.length],
+      pl: EXTRA_PARENT_LAST[Math.floor(j / EXTRA_PARENT_FIRST.length) % EXTRA_PARENT_LAST.length]
+    };
+  }
+
   var DEMO_SUBJECTS = ['Matematik', 'Fen Bilimleri', 'Türkçe', 'İngilizce', 'Sosyal Bilgiler'];
   var DEMO_GRADES = ['5. Sınıf', '6. Sınıf', '7. Sınıf', '8. Sınıf'];
   var DEMO_STATUSES = [
@@ -102,20 +136,19 @@
 
   function buildDemoReservations() {
     var list = [];
-    var total = 48;
+    var total = 100;
     for (var i = 0; i < total; i++) {
-      var person = DEMO_PEOPLE[i];
+      var person = personForIndex(i);
       var seq = i + 1;
-      var combo = i % 20;
-      var gradeIdx = Math.floor(combo / 5);
-      var subjectIdx = combo % 5;
+      var gradeIdx = Math.floor(i / DEMO_SUBJECTS.length) % DEMO_GRADES.length;
+      var subjectIdx = i % DEMO_SUBJECTS.length;
       var phoneMid = String(100 + (i * 17) % 900);
       var phoneEnd = String(10 + (i * 13) % 90).padStart(2, '0');
       var day = String(Math.max(1, 30 - (i % 28))).padStart(2, '0');
       var hour = String(8 + (i % 14)).padStart(2, '0');
       var minute = (i % 2) ? '30' : '00';
       var createdAt = '2026-06-' + day + 'T' + hour + ':' + minute + ':00+03:00';
-      if (i < 8) {
+      if (i < 12) {
         createdAt = '2026-07-0' + (1 + (i % 5)) + 'T' + hour + ':' + minute + ':00+03:00';
       }
 
@@ -128,24 +161,29 @@
         parentFirstName: person.p,
         parentLastName: person.pl,
         phone: '05' + String(30 + (i % 50)).padStart(2, '0') + ' ' + phoneMid + ' ' + phoneEnd + ' ' + String(10 + (i % 89)).padStart(2, '0'),
-        email: slugify(person.p) + '.' + slugify(person.pl) + '@' + DEMO_DOMAINS[i % DEMO_DOMAINS.length],
+        email: slugify(person.s) + '.' + slugify(person.l) + '.' + seq + '@' + DEMO_DOMAINS[i % DEMO_DOMAINS.length],
         slotLabel: DEMO_SLOTS[i % DEMO_SLOTS.length],
         status: DEMO_STATUSES[i % DEMO_STATUSES.length],
         createdAt: createdAt
       });
     }
 
-    /* Özel senaryolar — drawer / filtre demo */
+    /* Özel senaryolar — filtre / koordinasyon demo */
     list[2].requestedSlotLabel = 'Salı, 8 Tem · 11:30';
     list[2].slotConfirmedByParent = false;
     list[5].status = 'completed';
     list[7].status = 'cancelled';
-    list[37].status = 'cancelled';
+    list[77].status = 'cancelled';
+    list[88].status = 'cancelled';
     list[8].status = 'confirmed';
     list[8].slotLabel = 'Bugün · 11:30';
     list[0].status = 'pending';
     list[1].status = 'confirmed';
     list[1].slotLabel = 'Bugün · 16:00';
+    list[48].slotConfirmedByParent = false;
+    list[48].requestedSlotLabel = 'Pazartesi, 7 Tem · 10:00';
+    list[63].status = 'pending';
+    list[91].status = 'confirmed';
 
     return list;
   }
