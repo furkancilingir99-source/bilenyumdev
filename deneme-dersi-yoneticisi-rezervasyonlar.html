@@ -7,16 +7,25 @@
 <link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
 <link rel="stylesheet" href="assets/tokens.css">
 <link rel="stylesheet" href="assets/shell.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/dashboard-light.css">
 <link rel="stylesheet" href="assets/trial-lesson-manager.css">
 <link rel="stylesheet" href="assets/trial-manager/styles/trial-manager-admin.css">
 <script src="assets/auth-tab-session.js"></script>
 </head>
 <body data-tm-page="rezervasyon-talepleri" class="tm-admin-body">
 
-<header class="hud" data-trial-manager-hud></header>
+<div id="tmHudMount" data-trial-manager-hud></div>
 
-<main class="stage tm-stage">
-  <div class="tm-main-col">
+<div class="tm-admin-layout">
+  <aside id="tmSidebarMount" class="tm-sidebar" aria-label="Deneme dersi yönetim menüsü"></aside>
+  <main class="tm-admin-main">
+
+
+
+
     <div class="tm-page-head">
       <h1 class="tm-page-title">Rezervasyon Talepleri</h1>
       <p class="tm-page-sub">Web sitesinden gelen ücretsiz online deneme dersi form talepleri.</p>
@@ -56,8 +65,8 @@
       </div>
       <div id="tmRequestsPagination" class="tm-pagination" hidden></div>
     </section>
-  </div>
-</main>
+  </main>
+</div>
 
 <script src="assets/trial-manager/lib/types.js"></script>
 <script src="assets/trial-manager/lib/status-labels.js"></script>
@@ -68,6 +77,7 @@
 <script src="assets/trial-manager/lib/export-utils.js"></script>
 <script src="assets/trial-manager/components/tm-utils.js"></script>
 <script src="assets/trial-manager/components/tm-app-shell.js"></script>
+<script src="assets/trial-manager/components/tm-page-boot.js"></script>
 <script src="assets/trial-manager/pages/tm-requests.js"></script>
 </body>
 </html>

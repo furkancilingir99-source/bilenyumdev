@@ -7,14 +7,23 @@
 <link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
 <link rel="stylesheet" href="assets/tokens.css">
 <link rel="stylesheet" href="assets/shell.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/dashboard-light.css">
 <link rel="stylesheet" href="assets/trial-lesson-manager.css">
 <link rel="stylesheet" href="assets/trial-manager/styles/trial-manager-admin.css">
 <script src="assets/auth-tab-session.js"></script>
 </head>
 <body data-tm-page="ayarlar" class="tm-admin-body">
-<header class="hud" data-trial-manager-hud></header>
-<main class="stage tm-stage">
-  <div class="tm-main-col">
+
+<div id="tmHudMount" data-trial-manager-hud></div>
+
+<div class="tm-admin-layout">
+  <aside id="tmSidebarMount" class="tm-sidebar" aria-label="Deneme dersi yönetim menüsü"></aside>
+  <main class="tm-admin-main">
+
+
     <div class="tm-page-head"><h1 class="tm-page-title">Ayarlar</h1><p class="tm-page-sub">Online deneme dersi operasyon kuralları ve sistem yapılandırması.</p></div>
     <section class="tm-panel" style="padding:20px;max-width:720px">
       <h2 class="tm-panel-title" style="margin:0 0 16px">Operasyon kuralları</h2>
@@ -32,8 +41,9 @@
       <p style="font-size:13px;color:#64748b">Yönetici önümüzdeki 4 günün derslerini planlamalıdır. Web sitesi uygun slotları bu planlamadan gösterir.</p>
       <a class="tm-btn tm-btn--primary" href="deneme-dersi-yoneticisi-ders-planla.html" style="margin-top:12px">Ders planla</a>
     </section>
-  </div>
-</main>
+  </main>
+</div>
 <script src="assets/trial-manager/components/tm-app-shell.js"></script>
+<script src="assets/trial-manager/components/tm-page-boot.js"></script>
 </body>
 </html>

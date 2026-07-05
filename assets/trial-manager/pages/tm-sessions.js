@@ -59,6 +59,7 @@
 
   function render() {
     if (!tbody) return;
+    try {
     var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
     var all = filtered();
     var p = U.paginate(all, page, pageSize);

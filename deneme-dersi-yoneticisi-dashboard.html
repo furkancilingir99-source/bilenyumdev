@@ -5,18 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Operasyon Merkezi · Deneme Dersi Yöneticisi · Bilenyum</title>
 <link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/tokens.css">
 <link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
 <link rel="stylesheet" href="assets/trial-lesson-manager.css">
 <link rel="stylesheet" href="assets/trial-manager/styles/trial-manager-admin.css">
 <script src="assets/auth-tab-session.js"></script>
 </head>
 <body data-tm-page="operasyon" class="tm-admin-body">
 
-<header class="hud" data-trial-manager-hud></header>
+<div id="tmHudMount" data-trial-manager-hud></div>
 
-<main class="stage tm-stage">
-  <div class="tm-main-col">
+<div class="tm-admin-layout">
+  <aside id="tmSidebarMount" class="tm-sidebar" aria-label="Deneme dersi yönetim menüsü"></aside>
+
+  <main class="tm-admin-main">
     <div class="tm-page-head">
       <h1 class="tm-page-title">Operasyon Merkezi</h1>
       <p class="tm-page-sub">Günlük online deneme dersi operasyonlarının özeti ve aksiyon bekleyen kayıtlar.</p>
@@ -46,9 +52,7 @@
           <div id="tmDashAlerts"></div>
         </section>
         <section class="tm-panel">
-          <div class="tm-panel-head">
-            <h2 class="tm-panel-title">Hızlı erişim</h2>
-          </div>
+          <div class="tm-panel-head"><h2 class="tm-panel-title">Hızlı erişim</h2></div>
           <div style="padding:12px 16px;display:flex;flex-wrap:wrap;gap:8px">
             <a class="tm-btn tm-btn--primary" href="deneme-dersi-yoneticisi-ders-planla.html">+ Yeni ders planla</a>
             <a class="tm-btn tm-btn--ghost" href="deneme-dersi-yoneticisi-rezervasyonlar.html">Rezervasyon talepleri</a>
@@ -57,8 +61,8 @@
         </section>
       </div>
     </div>
-  </div>
-</main>
+  </main>
+</div>
 
 <script src="assets/trial-manager/lib/types.js"></script>
 <script src="assets/trial-manager/lib/status-labels.js"></script>
@@ -71,6 +75,7 @@
 <script src="assets/trial-manager/components/tm-confirm-dialog.js"></script>
 <script src="assets/trial-manager/components/tm-detail-drawer.js"></script>
 <script src="assets/trial-manager/components/tm-app-shell.js"></script>
+<script src="assets/trial-manager/components/tm-page-boot.js"></script>
 <script src="assets/trial-manager/pages/tm-session-detail.js"></script>
 <script src="assets/trial-manager/pages/tm-operation-center.js"></script>
 </body>

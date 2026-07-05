@@ -13,6 +13,7 @@
   var root = document.getElementById('tmDashRoot');
 
   function render() {
+    try {
     var m = Store.getOperationMetrics();
     var statsEl = document.getElementById('tmDashStats');
     if (statsEl) {
@@ -32,6 +33,13 @@
     renderAlerts(m);
     if (loading) loading.hidden = true;
     if (root) root.hidden = false;
+    } catch (err) {
+      if (loading) {
+        loading.hidden = false;
+        loading.textContent = 'Özet yüklenemedi: ' + (err.message || err);
+      }
+      console.error(err);
+    }
   }
 
   function metric(val, label, href, tone) {

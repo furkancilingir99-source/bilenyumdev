@@ -5,21 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Talep Detayı · Deneme Dersi Yöneticisi · Bilenyum</title>
 <link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/tokens.css">
 <link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
 <link rel="stylesheet" href="assets/trial-lesson-manager.css">
 <link rel="stylesheet" href="assets/trial-manager/styles/trial-manager-admin.css">
 <script src="assets/auth-tab-session.js"></script>
 </head>
 <body data-tm-page="rezervasyon-talepleri" class="tm-admin-body">
-<header class="hud" data-trial-manager-hud></header>
-<main class="stage tm-stage">
-  <div class="tm-main-col" id="tmRequestDetail"></div>
-</main>
+
+<div id="tmHudMount" data-trial-manager-hud></div>
+
+<div class="tm-admin-layout">
+  <aside id="tmSidebarMount" class="tm-sidebar" aria-label="Deneme dersi yönetim menüsü"></aside>
+  <main class="tm-admin-main">
+    <div id="tmRequestDetail"></div>
+  </main>
+</div>
+
 <script src="assets/trial-manager/lib/status-labels.js"></script>
 <script src="assets/trial-manager/lib/mock-data.js"></script>
 <script src="assets/trial-manager/components/tm-utils.js"></script>
 <script src="assets/trial-manager/components/tm-app-shell.js"></script>
+<script src="assets/trial-manager/components/tm-page-boot.js"></script>
 <script src="assets/trial-manager/pages/tm-request-detail.js"></script>
 </body>
 </html>

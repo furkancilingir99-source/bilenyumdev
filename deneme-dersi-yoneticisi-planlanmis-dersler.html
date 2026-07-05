@@ -5,18 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Deneme Dersleri · Deneme Dersi Yöneticisi · Bilenyum</title>
 <link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/tokens.css">
 <link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
 <link rel="stylesheet" href="assets/trial-lesson-manager.css">
 <link rel="stylesheet" href="assets/trial-manager/styles/trial-manager-admin.css">
 <script src="assets/auth-tab-session.js"></script>
 </head>
 <body data-tm-page="deneme-dersleri" class="tm-admin-body">
 
-<header class="hud" data-trial-manager-hud></header>
+<div id="tmHudMount" data-trial-manager-hud></div>
 
-<main class="stage tm-stage">
-  <div class="tm-main-col">
+<div class="tm-admin-layout">
+  <aside id="tmSidebarMount" class="tm-sidebar" aria-label="Deneme dersi yönetim menüsü"></aside>
+
+  <main class="tm-admin-main">
     <div class="tm-page-head">
       <h1 class="tm-page-title">Deneme Dersleri</h1>
       <p class="tm-page-sub">Online deneme dersi oturumları — kapasite, link, öğretmen ve katılımcı yönetimi.</p>
@@ -45,7 +51,7 @@
             <option value="20">20</option>
             <option value="50">50</option>
           </select>
-          <button type="button" class="tm-dg-action" id="tmSessionsExport" style="border:none;cursor:pointer">CSV</button>
+          <button type="button" class="tm-dg-action" id="tmSessionsExport" style="border:none;cursor:pointer;background:transparent">CSV</button>
           <a class="tm-dg-action" href="deneme-dersi-yoneticisi-ders-planla.html">+ Planla</a>
           <span class="tm-dg-count" id="tmSessionsCount">—</span>
         </div>
@@ -66,8 +72,8 @@
       </div>
       <div id="tmSessionsPagination" class="tm-pagination" hidden></div>
     </section>
-  </div>
-</main>
+  </main>
+</div>
 
 <script src="assets/trial-manager/lib/types.js"></script>
 <script src="assets/trial-manager/lib/status-labels.js"></script>
@@ -80,6 +86,7 @@
 <script src="assets/trial-manager/components/tm-confirm-dialog.js"></script>
 <script src="assets/trial-manager/components/tm-detail-drawer.js"></script>
 <script src="assets/trial-manager/components/tm-app-shell.js"></script>
+<script src="assets/trial-manager/components/tm-page-boot.js"></script>
 <script src="assets/trial-manager/pages/tm-session-detail.js"></script>
 <script src="assets/trial-manager/pages/tm-sessions.js"></script>
 </body>
