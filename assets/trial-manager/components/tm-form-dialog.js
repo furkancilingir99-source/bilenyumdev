@@ -52,7 +52,8 @@
     }
     if (f.type === 'textarea') {
       return '<label class="tm-form-field" for="' + id + '">' + f.label +
-        '<textarea class="tm-dg-control" id="' + id + '" name="' + f.name + '" rows="' + (f.rows || 3) + '" required>' +
+        '<textarea class="tm-dg-control" id="' + id + '" name="' + f.name + '" rows="' + (f.rows || 3) + '"' +
+        (f.required !== false ? ' required' : '') + '>' +
         (f.value || '') + '</textarea></label>';
     }
     return '<label class="tm-form-field" for="' + id + '">' + f.label +

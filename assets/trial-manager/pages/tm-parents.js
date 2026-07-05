@@ -20,7 +20,33 @@
   var paginationEl = document.getElementById('tmParentsPagination');
   var pageSizeSelect = document.getElementById('tmParentsPageSize');
   var exportBtn = document.getElementById('tmParentsExport');
+  var createBtn = document.getElementById('tmParentsCreate');
   var page = 1;
+
+  function openCreateParent() {
+    if (!Form || !Perms || !Perms.guard('create')) return;
+    Form.open({
+      title: 'Yeni veli',
+      fields: [
+        { type: 'text', name: 'firstName', label: 'Ad', value: '', required: true },
+        { type: 'text', name: 'lastName', label: 'Soyad', value: '', required: true },
+        { type: 'text', name: 'phone', label: 'Telefon', value: '', required: true },
+        { type: 'text', name: 'email', label: 'E-posta', value: '' },
+        { type: 'textarea', name: 'notes', label: 'Not', value: '', rows: 3, required: false }
+      ],
+      submitLabel: 'Oluştur',
+      onSubmit: function (data) {
+        var result = Store.createParent(data);
+        if (!result.ok) U.notifyError(result.error);
+        else {
+          U.notifySuccess('Veli oluşturuldu.');
+          if (window.TMOnSessionChange) window.TMOnSessionChange();
+          render();
+          openDetail(result.parent);
+        }
+      }
+    });
+  }
 
   function openParentWhatsApp(pa) {
     if (!QuickMsg || !pa) return;
@@ -160,6 +186,7 @@
     if (window.TMPermissions && !window.TMPermissions.guard('export')) return;
     Export.exportTable('veliler.csv', filtered(), [{ key: 'firstName', label: 'Ad' }, { key: 'phone', label: 'Telefon' }]);
   });
+  if (createBtn) createBtn.addEventListener('click', openCreateParent);
   window.TMOnSessionChange = render;
   render();
 })();

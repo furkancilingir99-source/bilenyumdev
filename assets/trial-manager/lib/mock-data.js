@@ -1241,6 +1241,136 @@
     };
   }
 
+  function nextId(prefix, collection) {
+    var max = 0;
+    collection.forEach(function (item) {
+      var m = String(item.id || '').match(new RegExp('^' + prefix + '-(\\d+)$'));
+      if (m) max = Math.max(max, parseInt(m[1], 10));
+    });
+    return prefix + '-' + String(max + 1).padStart(collection.length >= 100 ? 4 : 2, '0');
+  }
+
+  function createParent(draft) {
+    if (!draft || !draft.firstName || !draft.lastName || !draft.phone) {
+      return { ok: false, error: 'Veli adı, soyadı ve telefon zorunludur.' };
+    }
+    var id = nextId('parent', state.parents);
+    var pa = {
+      id: id,
+      firstName: String(draft.firstName).trim(),
+      lastName: String(draft.lastName).trim(),
+      phone: String(draft.phone).trim(),
+      email: String(draft.email || '').trim(),
+      studentIds: [],
+      preferredChannels: ['phone', 'whatsapp'],
+      notes: draft.notes || '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    state.parents.push(pa);
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'parent',
+        entityId: id,
+        action: 'created',
+        description: 'Yeni veli kaydı oluşturuldu.'
+      });
+    }
+    touch();
+    return { ok: true, parent: pa };
+  }
+
+  function createStudent(draft) {
+    if (!draft || !draft.firstName || !draft.lastName) {
+      return { ok: false, error: 'Öğrenci adı ve soyadı zorunludur.' };
+    }
+    var parentId = draft.parentId;
+    if (!parentId && draft.parentFirstName && draft.parentPhone) {
+      var pRes = createParent({
+        firstName: draft.parentFirstName,
+        lastName: draft.parentLastName || draft.lastName,
+        phone: draft.parentPhone,
+        email: draft.parentEmail || ''
+      });
+      if (!pRes.ok) return pRes;
+      parentId = pRes.parent.id;
+    }
+    if (!parentId) return { ok: false, error: 'Veli seçin veya yeni veli bilgilerini doldurun.' };
+    var parent = find(state.parents, parentId);
+    if (!parent) return { ok: false, error: 'Veli bulunamadı.' };
+    var id = nextId('student', state.students);
+    var st = {
+      id: id,
+      firstName: String(draft.firstName).trim(),
+      lastName: String(draft.lastName).trim(),
+      age: parseInt(draft.age, 10) || 11,
+      grade: draft.grade || GRADES[0],
+      level: draft.level || LEVELS[0],
+      requestedLessonTypeId: draft.requestedLessonTypeId || 'lt-mat',
+      parentIds: [parentId],
+      status: 'new_request',
+      hasUsedFreeTrialForLessonTypeIds: [],
+      notes: draft.notes || '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    state.students.push(st);
+    if (parent.studentIds.indexOf(id) < 0) parent.studentIds.push(id);
+    parent.updatedAt = new Date().toISOString();
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'student',
+        entityId: id,
+        action: 'created',
+        description: 'Yeni öğrenci kaydı oluşturuldu.'
+      });
+    }
+    touch();
+    return { ok: true, student: st, parent: parent };
+  }
+
+  function createTeacher(draft) {
+    if (!draft || !draft.firstName || !draft.lastName || !draft.phone) {
+      return { ok: false, error: 'Öğretmen adı, soyadı ve telefon zorunludur.' };
+    }
+    var ltId = draft.lessonTypeId || 'lt-mat';
+    var id = nextId('teacher', state.teachers);
+    var avail = [];
+    for (var dow = 1; dow <= 5; dow++) {
+      avail.push({
+        id: id + '-av-' + dow,
+        teacherId: id,
+        dayOfWeek: dow,
+        startTime: '11:00',
+        endTime: '15:00',
+        isAvailable: true
+      });
+    }
+    var t = {
+      id: id,
+      firstName: String(draft.firstName).trim(),
+      lastName: String(draft.lastName).trim(),
+      phone: String(draft.phone).trim(),
+      email: String(draft.email || '').trim(),
+      branchLessonTypeIds: [ltId],
+      availability: avail,
+      dashboardEnabled: true,
+      isActive: true,
+      notes: draft.notes || ''
+    };
+    state.teachers.push(t);
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'teacher',
+        entityId: id,
+        action: 'created',
+        description: 'Yeni öğretmen kaydı oluşturuldu.'
+      });
+    }
+    touch();
+    return { ok: true, teacher: t };
+  }
+
   function createSimulatedRequest(draft) {
     draft = draft || {};
     var seq = state.requests.length + 1;
@@ -1368,6 +1498,8 @@
 
   global.TMStore = {
     getLessonTypes: function () { return state.lessonTypes.slice(); },
+    getGrades: function () { return GRADES.slice(); },
+    getLevels: function () { return LEVELS.slice(); },
     getTeachers: function () { return state.teachers.slice(); },
     getStudents: function () { return state.students.slice(); },
     getParents: function () { return state.parents.slice(); },
@@ -1400,6 +1532,9 @@
     updateStudent: updateStudent,
     updateParent: updateParent,
     updateTeacher: updateTeacher,
+    createStudent: createStudent,
+    createParent: createParent,
+    createTeacher: createTeacher,
     getEligibleStudentsForSession: getEligibleStudentsForSession,
     addStudentToSession: addStudentToSession,
     removeStudentFromSession: removeStudentFromSession,

@@ -19,7 +19,72 @@
   var paginationEl = document.getElementById('tmStudentsPagination');
   var pageSizeSelect = document.getElementById('tmStudentsPageSize');
   var exportBtn = document.getElementById('tmStudentsExport');
+  var createBtn = document.getElementById('tmStudentsCreate');
   var page = 1;
+
+  function openCreateStudent() {
+    if (!Form || !Perms || !Perms.guard('create')) return;
+    var parents = Store.getParents();
+    Form.open({
+      title: 'Yeni öğrenci',
+      description: 'Mevcut veli seçin veya yeni veli bilgilerini doldurun.',
+      fields: [
+        {
+          type: 'select',
+          name: 'parentId',
+          label: 'Veli',
+          value: '',
+          options: [{ value: '', label: '— Yeni veli oluştur —' }].concat(parents.map(function (p) {
+            return { value: p.id, label: U.fullName(p.firstName, p.lastName) + ' · ' + p.phone };
+          }))
+        },
+        { type: 'text', name: 'parentFirstName', label: 'Veli adı (yeni)', value: '', required: false },
+        { type: 'text', name: 'parentLastName', label: 'Veli soyadı (yeni)', value: '', required: false },
+        { type: 'text', name: 'parentPhone', label: 'Veli telefon (yeni)', value: '', required: false },
+        { type: 'text', name: 'parentEmail', label: 'Veli e-posta (yeni)', value: '', required: false },
+        { type: 'text', name: 'firstName', label: 'Öğrenci adı', value: '', required: true },
+        { type: 'text', name: 'lastName', label: 'Öğrenci soyadı', value: '', required: true },
+        { type: 'text', name: 'age', label: 'Yaş', value: '11' },
+        {
+          type: 'select',
+          name: 'grade',
+          label: 'Sınıf',
+          value: Store.getGrades()[0],
+          options: Store.getGrades().map(function (g) { return { value: g, label: g }; })
+        },
+        {
+          type: 'select',
+          name: 'level',
+          label: 'Seviye',
+          value: Store.getLevels()[0],
+          options: Store.getLevels().map(function (l) { return { value: l, label: l }; })
+        },
+        {
+          type: 'select',
+          name: 'requestedLessonTypeId',
+          label: 'Talep edilen ders',
+          value: 'lt-mat',
+          options: Store.getLessonTypes().map(function (lt) { return { value: lt.id, label: lt.name }; })
+        },
+        { type: 'textarea', name: 'notes', label: 'Not', value: '', rows: 2, required: false }
+      ],
+      submitLabel: 'Oluştur',
+      onSubmit: function (data) {
+        if (!data.parentId && (!data.parentFirstName || !data.parentPhone)) {
+          U.notifyError('Veli seçin veya yeni veli adı ve telefon girin.');
+          return;
+        }
+        var result = Store.createStudent(data);
+        if (!result.ok) U.notifyError(result.error);
+        else {
+          U.notifySuccess('Öğrenci oluşturuldu.');
+          if (window.TMOnSessionChange) window.TMOnSessionChange();
+          render();
+          openDetail(result.student);
+        }
+      }
+    });
+  }
 
   function currentReservation(studentId) {
     var res = Store.getReservationsForStudent(studentId).filter(function (r) {
@@ -159,6 +224,7 @@
       { key: 'firstName', label: 'Ad' }, { key: 'lastName', label: 'Soyad' }, { key: 'grade', label: 'Sınıf' }, { key: 'status', label: 'Durum' }
     ]);
   });
+  if (createBtn) createBtn.addEventListener('click', openCreateStudent);
   window.TMOnSessionChange = render;
   render();
 })();

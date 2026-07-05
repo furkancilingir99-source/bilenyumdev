@@ -19,8 +19,41 @@
   var paginationEl = document.getElementById('tmTeachersPagination');
   var pageSizeSelect = document.getElementById('tmTeachersPageSize');
   var exportBtn = document.getElementById('tmTeachersExport');
+  var createBtn = document.getElementById('tmTeachersCreate');
   var page = 1;
   var today = Store.todayKey();
+
+  function openCreateTeacher() {
+    if (!Form || !Perms || !Perms.guard('create')) return;
+    Form.open({
+      title: 'Yeni öğretmen',
+      fields: [
+        { type: 'text', name: 'firstName', label: 'Ad', value: '', required: true },
+        { type: 'text', name: 'lastName', label: 'Soyad', value: '', required: true },
+        { type: 'text', name: 'phone', label: 'Telefon', value: '', required: true },
+        { type: 'text', name: 'email', label: 'E-posta', value: '', required: false },
+        {
+          type: 'select',
+          name: 'lessonTypeId',
+          label: 'Branş',
+          value: 'lt-mat',
+          options: Store.getLessonTypes().map(function (lt) { return { value: lt.id, label: lt.name }; })
+        },
+        { type: 'textarea', name: 'notes', label: 'Not', value: '', rows: 3, required: false }
+      ],
+      submitLabel: 'Oluştur',
+      onSubmit: function (data) {
+        var result = Store.createTeacher(data);
+        if (!result.ok) U.notifyError(result.error);
+        else {
+          U.notifySuccess('Öğretmen oluşturuldu.');
+          if (window.TMOnSessionChange) window.TMOnSessionChange();
+          render();
+          openDetail(result.teacher);
+        }
+      }
+    });
+  }
 
   function branchLabel(t) {
     return t.branchLessonTypeIds.map(function (id) {
@@ -160,6 +193,7 @@
     if (window.TMPermissions && !window.TMPermissions.guard('export')) return;
     Export.exportTable('ogretmenler.csv', filtered(), [{ key: 'firstName', label: 'Ad' }, { key: 'email', label: 'E-posta' }]);
   });
+  if (createBtn) createBtn.addEventListener('click', openCreateTeacher);
   window.TMOnSessionChange = render;
   render();
 })();

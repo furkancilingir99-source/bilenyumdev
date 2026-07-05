@@ -9,6 +9,8 @@
   var U = window.TMUtils;
   var Confirm = window.TMConfirmDialog;
   var Perms = window.TMPermissions;
+  var Form = window.TMFormDialog;
+  var SL = window.TMStatusLabels;
   if (!Store || !Rules) return;
 
   var editId = U.qs('edit');
@@ -23,6 +25,9 @@
   var slotsEl = document.getElementById('tmPlanSlots');
   var titleEl = document.getElementById('tmPlanTitle');
   var subEl = document.getElementById('tmPlanSub');
+  var rosterPanel = document.getElementById('tmPlanRoster');
+  var rosterBody = document.getElementById('tmPlanRosterBody');
+  var rosterDetailLink = document.getElementById('tmPlanRosterDetailLink');
   var editLocked = false;
 
   function canSave() {
@@ -184,6 +189,7 @@
       }
       if (saveBtn) saveBtn.disabled = true;
     }
+    renderPlanRoster();
     if (typeSelect) {
       typeSelect.value = s.lessonTypeId;
     }
@@ -192,6 +198,111 @@
     refreshTeachers();
     if (teacherSelect) teacherSelect.value = s.teacherId;
     if (notesInput) notesInput.value = s.notes || '';
+    renderPlanRoster();
+  }
+
+  function showAddStudentToPlan(sessionId) {
+    if (!Form) return;
+    if (Perms && !Perms.guard('edit')) return;
+    var eligible = Store.getEligibleStudentsForSession(sessionId);
+    if (!eligible.length) {
+      U.notifyError('Eklenebilecek uygun öğrenci yok (kapasite, branş veya daha önce deneme almış olabilir).');
+      return;
+    }
+    Form.open({
+      title: 'Derse öğrenci ekle',
+      description: 'Kapasite ve ücretsiz deneme kurallarına uygun öğrenciler listelenir.',
+      fields: [{
+        type: 'select',
+        name: 'studentId',
+        label: 'Öğrenci',
+        options: eligible.map(function (st) {
+          return {
+            value: st.id,
+            label: U.fullName(st.firstName, st.lastName) + ' · ' + st.grade + ' · ' + st.level
+          };
+        })
+      }],
+      onSubmit: function (data) {
+        var result = Store.addStudentToSession(sessionId, data.studentId);
+        if (!result.ok) U.notifyError(result.error);
+        else {
+          U.notifySuccess('Öğrenci derse eklendi.');
+          if (window.TMOnSessionChange) window.TMOnSessionChange();
+          renderPlanRoster();
+          renderSlots();
+        }
+      }
+    });
+  }
+
+  function bindPlanRosterActions(sessionId) {
+    if (!rosterBody) return;
+    rosterBody.querySelector('[data-add-participant]') && rosterBody.querySelector('[data-add-participant]').addEventListener('click', function () {
+      showAddStudentToPlan(sessionId);
+    });
+    rosterBody.querySelectorAll('[data-remove-res]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (Perms && !Perms.guard('cancel')) return;
+        var resId = btn.getAttribute('data-remove-res');
+        if (!Confirm) return;
+        Confirm.open({
+          title: 'Öğrenciyi dersten çıkar',
+          warning: 'Rezervasyon iptal edilecek ve kapasite açılacak.',
+          requireReason: true,
+          danger: true,
+          confirmLabel: 'Çıkar',
+          onConfirm: function (reason) {
+            var result = Store.removeStudentFromSession(sessionId, resId, reason);
+            if (!result.ok) U.notifyError(result.error);
+            else {
+              U.notifySuccess('Öğrenci dersten çıkarıldı.');
+              if (window.TMOnSessionChange) window.TMOnSessionChange();
+              renderPlanRoster();
+              renderSlots();
+            }
+          }
+        });
+      });
+    });
+    if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(rosterBody);
+  }
+
+  function renderPlanRoster() {
+    if (!rosterPanel || !rosterBody || !editId) {
+      if (rosterPanel) rosterPanel.hidden = true;
+      return;
+    }
+    var s = Store.getSessionById(editId);
+    if (!s || s.status === 'cancelled' || s.status === 'completed' || editLocked) {
+      rosterPanel.hidden = true;
+      return;
+    }
+    rosterPanel.hidden = false;
+    if (rosterDetailLink) {
+      rosterDetailLink.href = 'deneme-dersi-yoneticisi-planlanmis-ders-detay.html?id=' +
+        encodeURIComponent(editId) + '&tab=2';
+    }
+    var reservations = Store.getReservations().filter(function (r) {
+      return r.sessionId === editId && r.status !== 'cancelled';
+    });
+    var remaining = Rules.getSessionRemainingCapacity(editId);
+    var rows = reservations.map(function (r) {
+      var st = Store.getStudentById(r.studentId);
+      var pa = st && st.parentIds[0] ? Store.getParentById(st.parentIds[0]) : null;
+      return '<tr><td>' + U.escapeHtml(st ? U.fullName(st.firstName, st.lastName) : '—') + '</td>' +
+        '<td>' + U.escapeHtml(st ? st.grade : '—') + '</td>' +
+        '<td>' + U.escapeHtml(pa ? U.fullName(pa.firstName, pa.lastName) : '—') + '</td>' +
+        '<td>' + (SL ? SL.reservationBadge(r.status) : U.escapeHtml(r.status)) + '</td>' +
+        '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--danger" data-remove-res="' + r.id + '" data-tm-require="cancel">Çıkar</button></td></tr>';
+    }).join('');
+    rosterBody.innerHTML =
+      '<p class="tm-detail-cell-label" style="margin-bottom:8px">Boş kapasite: ' + remaining + ' / 20 · Kayıtlı: ' + reservations.length + '</p>' +
+      '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-add-participant data-tm-require="edit" style="margin-bottom:12px">Öğrenci ekle</button>' +
+      (reservations.length
+        ? '<table class="tm-inner-table"><thead><tr><th>Öğrenci</th><th>Sınıf</th><th>Veli</th><th>Durum</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>'
+        : '<p class="tm-empty">Henüz katılımcı yok. Öğrenci ekleyerek başlayın.</p>');
+    bindPlanRosterActions(editId);
   }
 
   function doSave() {
@@ -262,4 +373,9 @@
   loadEdit();
   applyPermissionUi();
   checkConflict();
+  renderPlanRoster();
+  window.TMOnSessionChange = function () {
+    renderPlanRoster();
+    renderSlots();
+  };
 })();

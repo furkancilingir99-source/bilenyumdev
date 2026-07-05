@@ -62,10 +62,17 @@
         </form>
       </section>
     </div>
+
+    <section class="tm-panel" id="tmPlanRoster" hidden style="padding:20px;margin-top:16px">
+      <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px">
+        <h2 class="tm-panel-title" style="margin:0">Katılımcı öğrenciler</h2>
+        <a class="tm-btn tm-btn--ghost tm-btn--sm" id="tmPlanRosterDetailLink" href="#">Tam sayfa detay</a>
+      </header>
+      <div id="tmPlanRosterBody"></div>
+    </section>
   </main>
 </div>
 
-<script src="assets/trial-manager/lib/types.js"></script>
 <script src="assets/trial-manager/lib/status-labels.js"></script>
 <script src="assets/trial-manager/lib/audit-utils.js"></script>
 <script src="assets/trial-manager/lib/mock-data.js"></script>
@@ -73,6 +80,7 @@
 <script src="assets/trial-manager/components/tm-utils.js"></script>
 <script src="assets/trial-manager/components/tm-toast.js"></script>
 <script src="assets/trial-manager/components/tm-permissions.js"></script>
+<script src="assets/trial-manager/components/tm-form-dialog.js"></script>
 <script src="assets/trial-manager/components/tm-confirm-dialog.js"></script>
 <script src="assets/trial-manager/components/tm-app-shell.js"></script>
 <script src="assets/trial-manager/components/tm-page-boot.js"></script>
