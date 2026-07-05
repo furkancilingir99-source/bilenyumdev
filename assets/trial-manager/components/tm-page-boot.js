@@ -4,6 +4,12 @@
 (function () {
   'use strict';
 
+  var LOAD_IDS = [
+    'tmDashRoot', 'tmSessionsTableWrap', 'tmRequestsTableWrap', 'tmStudentsTableWrap',
+    'tmParentsTableWrap', 'tmTeachersTableWrap', 'tmMeetingsTableWrap', 'tmCommTableWrap',
+    'tmUsersTableWrap', 'tmReportGrid', 'tmRequestDetail', 'tmFullDetail'
+  ];
+
   function showBootError(msg) {
     var el = document.getElementById('tmBootError');
     if (!el) {
@@ -17,6 +23,18 @@
     el.hidden = false;
   }
 
+  function findContentRoot() {
+    for (var i = 0; i < LOAD_IDS.length; i++) {
+      var el = document.getElementById(LOAD_IDS[i]);
+      if (el) return el;
+    }
+    return null;
+  }
+
+  function findLoadingEl() {
+    return document.querySelector('.td-state:not([hidden])');
+  }
+
   window.addEventListener('error', function (e) {
     if (e.filename && e.filename.indexOf('trial-manager') >= 0) {
       showBootError('Panel modülü yüklenemedi: ' + (e.message || 'bilinmeyen hata'));
@@ -25,19 +43,16 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     setTimeout(function () {
-      if (!window.TMStore) {
+      if (!window.TMStore && document.querySelector('[data-tm-page]')) {
         showBootError('Veri deposu (TMStore) yüklenemedi. Sayfayı yenileyin veya önbelleği temizleyin.');
         return;
       }
-      var loading = document.querySelector('.td-state:not([hidden])');
-      var root = document.getElementById('tmDashRoot') ||
-        document.getElementById('tmSessionsTableWrap') ||
-        document.getElementById('tmRequestsTableWrap');
+      var loading = findLoadingEl();
+      var root = findContentRoot();
       if (loading && root && root.hidden && loading.textContent.indexOf('Yükleniyor') >= 0) {
         loading.hidden = true;
         root.hidden = false;
-        if (root.id === 'tmDashRoot') root.hidden = false;
       }
-    }, 800);
+    }, 900);
   });
 })();

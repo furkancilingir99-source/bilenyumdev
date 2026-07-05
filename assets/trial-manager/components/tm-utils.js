@@ -95,6 +95,16 @@
     });
   }
 
+  function notifyError(msg) {
+    if (global.TMToast) global.TMToast.error(msg);
+    else alert(msg);
+  }
+
+  function notifySuccess(msg) {
+    if (global.TMToast) global.TMToast.success(msg);
+    else if (msg) alert(msg);
+  }
+
   global.TMUtils = {
     MONTHS: MONTHS,
     MONTHS_FULL: MONTHS_FULL,
@@ -109,6 +119,8 @@
     paginate: paginate,
     renderPagination: renderPagination,
     sortBy: sortBy,
-    filterSearch: filterSearch
+    filterSearch: filterSearch,
+    notifyError: notifyError,
+    notifySuccess: notifySuccess
   };
 })(typeof window !== 'undefined' ? window : this);

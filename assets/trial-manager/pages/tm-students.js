@@ -41,7 +41,15 @@
             '<div><div class="tm-detail-cell-label">Yaş</div><div class="tm-detail-cell-value">' + st.age + '</div></div>' +
             '<div><div class="tm-detail-cell-label">Seviye</div><div class="tm-detail-cell-value">' + U.escapeHtml(st.level) + '</div></div>' +
             '<div><div class="tm-detail-cell-label">Durum</div><div class="tm-detail-cell-value">' + SL.studentBadge(st.status) + '</div></div>' +
-            '<div><div class="tm-detail-cell-label">Veli</div><div class="tm-detail-cell-value">' + parents.map(function (p) { return U.escapeHtml(U.fullName(p.firstName, p.lastName)); }).join(', ') + '</div></div></div>';
+            '<div><div class="tm-detail-cell-label">Veli</div><div class="tm-detail-cell-value">' + parents.map(function (p) { return U.escapeHtml(U.fullName(p.firstName, p.lastName)); }).join(', ') + '</div></div></div>' +
+            (st.status === 'attended' || st.status === 'confirmed' ?
+              '<div class="tm-detail-actions" style="margin-top:12px"><button type="button" class="tm-btn tm-btn--primary" data-enroll="' + st.id + '">Kayda dönüştür</button></div>' : '');
+          body.querySelector('[data-enroll]') && body.querySelector('[data-enroll]').addEventListener('click', function () {
+            if (window.TMPermissions && !window.TMPermissions.guard('edit')) return;
+            var result = Store.convertStudentToEnrollment(st.id);
+            if (!result.ok) U.notifyError(result.error);
+            else U.notifySuccess('Öğrenci kayda dönüştürüldü.');
+          });
         } else if (idx === 1) {
           body.innerHTML = resHistory.length ? '<table class="tm-inner-table"><thead><tr><th>Rezervasyon</th><th>Durum</th><th>Link</th></tr></thead><tbody>' +
             resHistory.map(function (r) {

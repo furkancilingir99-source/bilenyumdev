@@ -63,6 +63,7 @@
 
   function renderParticipants(d) {
     if (!d.participants.length) return '<p class="tm-empty">Katılımcı yok.</p>';
+    var notSent = d.reservations.filter(function (r) { return r.parentApprovalStatus === 'approved' && !r.linkSent; }).length;
     var rows = d.participants.map(function (p) {
       var st = p.student;
       var pa = p.parent;
@@ -81,7 +82,9 @@
         '</td>' +
       '</tr>';
     }).join('');
-    return '<table class="tm-inner-table"><thead><tr><th>Öğrenci</th><th>Sınıf</th><th>Veli</th><th>Telefon</th><th>Veli onay</th><th>Link</th><th>Durum</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+    return (notSent ? '<p class="tm-alert-row" style="margin-bottom:8px">Onaylı ancak link gönderilmemiş: ' + notSent + ' veli</p>' +
+      '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-bulk-link style="margin-bottom:12px">Tüm onaylılara link gönderildi işaretle</button>' : '') +
+      '<table class="tm-inner-table"><thead><tr><th>Öğrenci</th><th>Sınıf</th><th>Veli</th><th>Telefon</th><th>Veli onay</th><th>Link</th><th>Durum</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
   function renderOnlineLink(d) {
@@ -211,6 +214,15 @@
       });
     }
     if (idx === 1) {
+      bodyEl.querySelector('[data-bulk-link]') && bodyEl.querySelector('[data-bulk-link]').addEventListener('click', function () {
+        if (window.TMPermissions && !window.TMPermissions.guard('edit')) return;
+        var result = Store.markBulkLinksSentForSession(d.session.id);
+        if (!result.ok) U.notifyError(result.error || 'İşlem başarısız.');
+        else {
+          U.notifySuccess(result.count + ' veli için link gönderildi işaretlendi.');
+          renderTab(1, bodyEl);
+        }
+      });
       bodyEl.querySelectorAll('[data-wa-parent]').forEach(function (btn) {
         btn.addEventListener('click', function () {
           var rid = btn.getAttribute('data-wa-parent');
@@ -233,7 +245,7 @@
       bodyEl.querySelectorAll('[data-link-sent]').forEach(function (btn) {
         btn.addEventListener('click', function () {
           var res = Store.markLinkSent(btn.getAttribute('data-link-sent'));
-          if (!res.ok) alert(res.error);
+          if (!res.ok) U.notifyError(res.error);
           else renderTab(1, bodyEl);
         });
       });
@@ -290,7 +302,7 @@
           });
         });
         Store.markAttendance(d.session.id, results);
-        alert('Katılım sonuçları kaydedildi.');
+        U.notifySuccess('Katılım sonuçları kaydedildi.');
         if (global.TMOnSessionChange) global.TMOnSessionChange();
         open(currentSessionId);
       });
@@ -304,7 +316,7 @@
         t.id !== d.session.teacherId &&
         !Rules.hasTeacherConflict(t.id, d.session.date, d.session.startTime, d.session.endTime, d.session.id);
     });
-    if (!eligible.length) { alert('Uygun öğretmen bulunamadı.'); return; }
+    if (!eligible.length) { U.notifyError('Uygun öğretmen bulunamadı.'); return; }
     Form.open({
       title: 'Öğretmen değiştir',
       description: 'Ders için uygun öğretmenler listelenmiştir.',
@@ -329,7 +341,7 @@
           warning: 'Online link aynı kalacak. Öğretmen bilgilendirme sıfırlanabilir.',
           onConfirm: function (reason) {
             var res = Store.changeSessionTeacher(d.session.id, newT.id, reason);
-            if (!res.ok) alert(res.error);
+            if (!res.ok) U.notifyError(res.error);
             else open(currentSessionId);
             if (global.TMOnSessionChange) global.TMOnSessionChange();
           }
@@ -363,7 +375,7 @@
           warning: 'Dersteki tüm veliler bilgilendirilmelidir.',
           onConfirm: function (reason) {
             var res = Store.rescheduleSession(d.session.id, data.date, data.time, reason);
-            if (!res.ok) alert(res.error);
+            if (!res.ok) U.notifyError(res.error);
             else open(currentSessionId);
             if (global.TMOnSessionChange) global.TMOnSessionChange();
           }

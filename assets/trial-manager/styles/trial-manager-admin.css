@@ -1119,3 +1119,38 @@ body.tm-admin-body .tm-admin-header-actions {
   gap: 8px;
   align-items: center;
 }
+
+/* Toast bildirimleri */
+.tm-toast-host {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 600;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  max-width: min(360px, calc(100vw - 32px));
+}
+
+.tm-toast {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #fff;
+  background: #334155;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.tm-toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tm-toast.is-success { background: #15803d; }
+.tm-toast.is-error { background: #dc2626; }
+.tm-toast.is-info { background: #2563eb; }

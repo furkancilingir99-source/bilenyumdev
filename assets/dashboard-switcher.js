@@ -83,6 +83,7 @@
   function detectPersona() {
     if (isWebsitePage()) return 'website';
     if (document.body && document.body.getAttribute('data-trial-manager-active') !== null) return 'trial-manager';
+    if (document.body && (document.body.getAttribute('data-tm-page') || document.body.classList.contains('tm-admin-body'))) return 'trial-manager';
     if (document.body && document.body.getAttribute('data-teacher-active') !== null) return 'teacher';
     if (document.body && document.body.classList.contains('is-veli-parent')) return 'veli';
     var file = pageName().toLowerCase();

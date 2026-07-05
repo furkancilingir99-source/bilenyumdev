@@ -165,11 +165,38 @@
     });
   }
 
+  function loadScript(src, key, onload) {
+    if (document.querySelector('script[data-tm-load="' + key + '"]')) {
+      if (onload) onload();
+      return;
+    }
+    var s = document.createElement('script');
+    s.src = src;
+    s.dataset.tmLoad = key;
+    s.onload = function () { if (onload) onload(); };
+    document.head.appendChild(s);
+  }
+
+  function mountSwitcher() {
+    function run() {
+      if (global.DashboardSwitcher) global.DashboardSwitcher.mount();
+    }
+    if (global.DashboardSwitcher) run();
+    else loadScript('assets/dashboard-switcher.js', 'switcher', run);
+  }
+
+  function mountToast() {
+    if (global.TMToast) return;
+    loadScript('assets/trial-manager/components/tm-toast.js', 'toast');
+  }
+
   function init() {
     document.body.classList.add('tm-admin-body');
     document.documentElement.classList.add('tm-admin-root');
     mountHud();
     mountSidebar();
+    mountToast();
+    mountSwitcher();
     initProfileMenu();
     initMobileMenu();
     var oldNav = document.querySelector('.stage-nav, [data-trial-manager-nav], .nav-rail');

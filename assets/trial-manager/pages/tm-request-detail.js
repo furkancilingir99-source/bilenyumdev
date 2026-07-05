@@ -1,5 +1,5 @@
 /**
- * Rezervasyon talebi tam sayfa detay
+ * Rezervasyon talebi tam sayfa detay — tüm aksiyonlar
  */
 (function () {
   'use strict';
@@ -8,28 +8,33 @@
   var U = window.TMUtils;
   var SL = window.TMStatusLabels;
   var QuickMsg = window.TMQuickMessage;
+  var Form = window.TMFormDialog;
+  var Confirm = window.TMConfirmDialog;
+  var Perms = window.TMPermissions;
   var id = U.qs('id');
   if (!Store || !id) return;
 
-  var req = Store.getRequestById(id);
-  var root = document.getElementById('tmRequestDetail');
-  if (!req || !root) {
-    if (root) root.innerHTML = '<p class="tm-empty">Talep bulunamadı.</p>';
-    return;
-  }
+  function req() { return Store.getRequestById(id); }
 
   function paint() {
-    var lt = Store.getLessonTypeById(req.requestedLessonTypeId);
-    var res = Store.getReservationByRequestId ? Store.getReservationByRequestId(id) :
-      Store.getReservations().find(function (r) { return r.requestId === id; });
-    var sess = req.selectedSessionId ? Store.getSessionById(req.selectedSessionId) : (res ? Store.getSessionById(res.sessionId) : null);
+    var r = req();
+    var root = document.getElementById('tmRequestDetail');
+    if (!r || !root) {
+      if (root) root.innerHTML = '<p class="tm-empty">Talep bulunamadı.</p>';
+      return;
+    }
+
+    var lt = Store.getLessonTypeById(r.requestedLessonTypeId);
+    var res = Store.getReservationByRequestId(id);
+    var sess = r.selectedSessionId ? Store.getSessionById(r.selectedSessionId) : (res ? Store.getSessionById(res.sessionId) : null);
     var meeting = sess ? Store.getMeetingBySessionId(sess.id) : null;
+    var rejected = r.status === 'rejected' || r.status === 'cancelled';
 
     root.innerHTML =
       '<div class="tm-admin-header">' +
         '<div class="tm-admin-header-main">' +
-          '<h1 class="tm-admin-header-title">' + U.escapeHtml(req.studentFirstName + ' ' + req.studentLastName) + '</h1>' +
-          '<p class="tm-admin-header-meta">' + req.id + ' · ' + SL.requestLabel(req.status) + '</p>' +
+          '<h1 class="tm-admin-header-title">' + U.escapeHtml(r.studentFirstName + ' ' + r.studentLastName) + '</h1>' +
+          '<p class="tm-admin-header-meta">' + r.id + ' · ' + SL.requestLabel(r.status) + ' · Talep: ' + U.formatDateTime(r.createdAt) + '</p>' +
         '</div>' +
         '<div class="tm-admin-header-actions">' +
           (meeting ? '<button type="button" class="tm-btn tm-btn--primary" id="tmWaParent">Veliye WhatsApp</button>' : '') +
@@ -39,127 +44,254 @@
       '<nav class="tm-drawer-tabs" id="tmReqTabs">' +
         '<button type="button" class="tm-drawer-tab is-active" data-tab="info">Talep bilgisi</button>' +
         '<button type="button" class="tm-drawer-tab" data-tab="comm">İletişim</button>' +
+        '<button type="button" class="tm-drawer-tab" data-tab="audit">Geçmiş</button>' +
       '</nav>' +
       '<div class="tm-panel" id="tmReqBody" style="padding:20px;margin-top:12px"></div>';
 
     var body = document.getElementById('tmReqBody');
-    body.innerHTML = renderInfo(req, lt, res, sess, meeting);
+    var activeTab = 'info';
+
+    function showTab(tab) {
+      activeTab = tab;
+      document.getElementById('tmReqTabs').querySelectorAll('.tm-drawer-tab').forEach(function (b) {
+        b.classList.toggle('is-active', b.getAttribute('data-tab') === tab);
+      });
+      if (tab === 'comm') body.innerHTML = renderComm(res, sess);
+      else if (tab === 'audit') body.innerHTML = renderAudit();
+      else body.innerHTML = renderInfo(r, lt, res, sess, meeting, rejected);
+      bindActions(r, lt, res, sess, meeting, rejected, body);
+    }
 
     document.getElementById('tmReqTabs').querySelectorAll('[data-tab]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        document.getElementById('tmReqTabs').querySelectorAll('.tm-drawer-tab').forEach(function (b) {
-          b.classList.remove('is-active');
-        });
-        btn.classList.add('is-active');
-        var tab = btn.getAttribute('data-tab');
-        if (tab === 'comm') body.innerHTML = renderComm(req, res, sess);
-        else body.innerHTML = renderInfo(req, lt, res, sess, meeting);
-        bindActions(req, res, sess, meeting, body);
-      });
+      btn.addEventListener('click', function () { showTab(btn.getAttribute('data-tab')); });
     });
 
-    bindActions(req, res, sess, meeting, body);
+    showTab('info');
 
     var waBtn = document.getElementById('tmWaParent');
     if (waBtn && meeting && QuickMsg) {
       waBtn.addEventListener('click', function () {
         QuickMsg.openForParent({
-          parentName: req.parentFirstName + ' ' + req.parentLastName,
-          studentName: req.studentFirstName + ' ' + req.studentLastName,
+          parentName: r.parentFirstName + ' ' + r.parentLastName,
+          studentName: r.studentFirstName + ' ' + r.studentLastName,
           lessonType: lt ? lt.name : '—',
           date: sess ? U.formatDateKey(sess.date) : '—',
           time: sess ? sess.startTime : '—',
           meetingUrl: meeting.meetingUrl,
           meetingId: meeting.meetingId,
           passcode: meeting.passcode,
-          phone: req.parentPhone,
-          email: req.parentEmail
+          phone: r.parentPhone,
+          email: r.parentEmail
         });
       });
     }
   }
 
-  function renderInfo(req, lt, res, sess, meeting) {
+  function renderInfo(r, lt, res, sess, meeting, rejected) {
     return (
       '<div class="tm-detail-grid">' +
-        detail('Öğrenci', req.studentFirstName + ' ' + req.studentLastName) +
-        detail('Yaş / Sınıf', req.studentAge + ' · ' + req.studentGrade) +
-        detail('Seviye', req.studentLevel) +
+        detail('Öğrenci', r.studentFirstName + ' ' + r.studentLastName) +
+        detail('Yaş / Sınıf', r.studentAge + ' · ' + r.studentGrade) +
+        detail('Seviye', r.studentLevel) +
         detail('Ders türü', lt ? lt.name : '—') +
-        detail('Veli', req.parentFirstName + ' ' + req.parentLastName) +
-        detail('Telefon', req.parentPhone) +
-        detail('E-posta', req.parentEmail) +
-        detail('Seçilen ders', sess ? U.formatDateKey(sess.date) + ' ' + sess.startTime : '—') +
-        detail('Veli onay', res ? SL.parentApprovalLabel(res.parentApprovalStatus) : '—') +
-        detail('Link gönderildi', res && res.linkSent ? 'Evet' : 'Hayır') +
+        detail('Veli', r.parentFirstName + ' ' + r.parentLastName) +
+        detail('Telefon', r.parentPhone) +
+        detail('E-posta', r.parentEmail) +
+        detail('Kaynak', r.source === 'website_form' ? 'Web formu' : r.source) +
+        detail('Seçilen ders', sess ? U.formatDateKey(sess.date) + ' ' + sess.startTime + ' (' + sess.id + ')' : '—') +
+        detail('Veli onay', res ? SL.parentApprovalBadge(res.parentApprovalStatus) : '—') +
+        detail('Rezervasyon', res ? SL.reservationBadge(res.status) : '—') +
+        detail('Link gönderildi', res && res.linkSent ? 'Evet · ' + U.formatDateTime(res.linkSentAt) : 'Hayır') +
       '</div>' +
-      (meeting ? '<div class="tm-link-box" style="margin-top:16px"><strong>Online link</strong><br>' + U.escapeHtml(meeting.meetingUrl) + '<br>ID: ' + meeting.meetingId + ' · Şifre: ' + meeting.passcode + '</div>' : '') +
-      '<div class="tm-detail-actions" style="margin-top:16px">' +
-        (!res && req.selectedSessionId ? '<button type="button" class="tm-btn tm-btn--primary" id="tmCreateRes">Rezervasyon oluştur</button>' : '') +
-        '<button type="button" class="tm-btn tm-btn--primary" id="tmApproveParent"' + (!res ? ' disabled title="Önce rezervasyon oluşturun"' : '') + '>Veli onayladı</button>' +
-        '<button type="button" class="tm-btn tm-btn--ghost" id="tmUnreachable">Ulaşılamadı</button>' +
-        '<button type="button" class="tm-btn tm-btn--ghost" id="tmCallAgain">Tekrar aranacak</button>' +
-        (res ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmMarkLink">Link gönderildi</button>' : '') +
+      (meeting ? '<div class="tm-link-box" style="margin-top:16px"><strong>Online link</strong><br>' + U.escapeHtml(meeting.meetingUrl) +
+        '<br>ID: ' + meeting.meetingId + ' · Şifre: ' + meeting.passcode + '</div>' : '') +
+      (rejected ? '<p class="tm-alert-row is-danger" style="margin-top:16px">Bu talep reddedilmiş veya iptal edilmiştir.</p>' : '') +
+      '<div class="tm-detail-actions" style="margin-top:16px;flex-wrap:wrap">' +
+        (!rejected ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmAssignSession">Derse ata / değiştir</button>' : '') +
+        (!res && r.selectedSessionId && !rejected ? '<button type="button" class="tm-btn tm-btn--primary" id="tmCreateRes">Rezervasyon oluştur</button>' : '') +
+        (!rejected ? '<button type="button" class="tm-btn tm-btn--primary" id="tmApproveParent"' + (!res ? ' disabled title="Önce rezervasyon oluşturun"' : '') + '>Veli onayladı</button>' : '') +
+        (!rejected ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmUnreachable"' + (!res ? ' disabled' : '') + '>Ulaşılamadı</button>' : '') +
+        (!rejected ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmCallAgain"' + (!res ? ' disabled' : '') + '>Tekrar aranacak</button>' : '') +
+        (res && !rejected ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmMarkLink">Link gönderildi</button>' : '') +
+        (!rejected ? '<button type="button" class="tm-btn tm-btn--danger" id="tmRejectReq">Talebi reddet</button>' : '') +
+        '<button type="button" class="tm-btn tm-btn--ghost" id="tmAddComm">İletişim kaydı ekle</button>' +
       '</div>'
     );
   }
 
-  function renderComm(req, res, sess) {
+  function renderComm(res, sess) {
     var logs = Store.getCommunicationLogs().filter(function (l) {
-      return l.reservationId === (res && res.id) || (sess && l.sessionId === sess.id);
+      return (res && l.reservationId === res.id) || (sess && l.sessionId === sess.id);
     });
-    if (!logs.length) return '<p class="tm-empty">Bu talep için iletişim kaydı yok.</p>';
+    var addBtn = '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmAddCommTab" style="margin-bottom:12px">Kayıt ekle</button>';
+    if (!logs.length) return addBtn + '<p class="tm-empty">Bu talep için iletişim kaydı yok.</p>';
     var rows = logs.map(function (l) {
       return '<tr><td>' + U.formatDateTime(l.createdAt) + '</td><td>' + U.escapeHtml(SL.COMM_CHANNEL[l.channel] || l.channel) +
-        '</td><td>' + U.escapeHtml(SL.COMM_RESULT[l.result] || l.result) + '</td><td>' + U.escapeHtml(l.summary) + '</td></tr>';
+        '</td><td>' + U.escapeHtml(SL.COMM_RESULT[l.result] || l.result) + '</td><td>' + U.escapeHtml(l.summary) + '</td><td>' + U.escapeHtml(l.nextAction || '—') + '</td></tr>';
     }).join('');
-    return '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Kanal</th><th>Sonuç</th><th>Özet</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    return addBtn + '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Kanal</th><th>Sonuç</th><th>Özet</th><th>Sonraki aksiyon</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  function renderAudit() {
+    var logs = Store.getAuditLogs().filter(function (l) {
+      return l.entityType === 'trial_lesson_request' && l.entityId === id;
+    });
+    if (!logs.length) return '<p class="tm-empty">Değişiklik geçmişi yok.</p>';
+    var rows = logs.map(function (l) {
+      return '<tr><td>' + U.formatDateTime(l.createdAt) + '</td><td>' + U.escapeHtml(SL.AUDIT_ACTION[l.action] || l.action) +
+        '</td><td>' + U.escapeHtml(l.description) + '</td><td>' + U.escapeHtml(l.reason || '—') + '</td></tr>';
+    }).join('');
+    return '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>İşlem</th><th>Açıklama</th><th>Neden</th></tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
   function detail(l, v) {
-    return '<div><div class="tm-detail-cell-label">' + l + '</div><div class="tm-detail-cell-value">' + U.escapeHtml(String(v)) + '</div></div>';
+    return '<div><div class="tm-detail-cell-label">' + l + '</div><div class="tm-detail-cell-value">' + (String(v).indexOf('<') >= 0 ? v : U.escapeHtml(String(v))) + '</div></div>';
   }
 
-  function bindActions(req, res, sess, meeting, body) {
+  function openCommForm(r, res, sess) {
+    if (!Form || !Perms.guard('edit')) return;
+    var channelOpts = Object.keys(SL.COMM_CHANNEL).map(function (k) {
+      return { value: k, label: SL.COMM_CHANNEL[k] };
+    });
+    var resultOpts = Object.keys(SL.COMM_RESULT).map(function (k) {
+      return { value: k, label: SL.COMM_RESULT[k] };
+    });
+    Form.open({
+      title: 'İletişim kaydı ekle',
+      fields: [
+        { type: 'select', name: 'channel', label: 'Kanal', options: channelOpts, value: 'phone' },
+        { type: 'select', name: 'result', label: 'Sonuç', options: resultOpts, value: 'message_sent' },
+        { type: 'textarea', name: 'summary', label: 'Özet', rows: 4, required: true },
+        { type: 'text', name: 'nextAction', label: 'Sonraki aksiyon', required: false }
+      ],
+      onSubmit: function (data) {
+        Store.addCommunicationLog({
+          summary: data.summary,
+          channel: data.channel,
+          result: data.result,
+          nextAction: data.nextAction || '',
+          reservationId: res ? res.id : undefined,
+          sessionId: sess ? sess.id : undefined,
+          parentId: res ? res.parentId : undefined,
+          studentId: res ? res.studentId : undefined
+        });
+        U.notifySuccess('İletişim kaydı eklendi.');
+        paint();
+      }
+    });
+  }
+
+  function openAssignSession(r) {
+    if (!Form || !Perms.guard('edit')) return;
+    var sessions = Store.getAvailableSessionsForLessonType(r.requestedLessonTypeId);
+    if (!sessions.length) {
+      U.notifyError('Uygun ders bulunamadı. Önce ders planlayın.');
+      return;
+    }
+    Form.open({
+      title: 'Derse ata',
+      description: 'Talebin ders türüne uygun ve kapasitesi olan oturumlar listelenir.',
+      fields: [{
+        type: 'select',
+        name: 'sessionId',
+        label: 'Ders oturumu',
+        value: r.selectedSessionId || '',
+        options: sessions.map(function (s) {
+          var lt = Store.getLessonTypeById(s.lessonTypeId);
+          var rem = window.TMSchedulingRules ? window.TMSchedulingRules.getSessionRemainingCapacity(s.id) : 0;
+          return {
+            value: s.id,
+            label: U.formatDateKey(s.date) + ' ' + s.startTime + ' · ' + (lt ? lt.name : '') + ' (boş: ' + rem + ')'
+          };
+        })
+      }],
+      onSubmit: function (data) {
+        var result = Store.assignRequestToSession(id, data.sessionId);
+        if (!result.ok) U.notifyError(result.error);
+        else {
+          U.notifySuccess('Talep derse atandı.');
+          paint();
+        }
+      }
+    });
+  }
+
+  function bindActions(r, lt, res, sess, meeting, rejected, body) {
+    var assignBtn = body.querySelector('#tmAssignSession');
+    if (assignBtn && !rejected) assignBtn.onclick = function () { openAssignSession(r); };
+
     var createBtn = body.querySelector('#tmCreateRes');
     if (createBtn) {
       createBtn.onclick = function () {
-        var r = Store.createReservationFromRequest(id);
-        if (!r.ok) alert(r.error);
-        else paint();
+        if (!Perms.guard('create')) return;
+        var result = Store.createReservationFromRequest(id);
+        if (!result.ok) U.notifyError(result.error);
+        else {
+          U.notifySuccess('Rezervasyon oluşturuldu.');
+          paint();
+        }
       };
     }
-    var approveBtn = body.querySelector('#tmApproveParent') || document.getElementById('tmApproveParent');
+
+    var approveBtn = body.querySelector('#tmApproveParent');
     if (approveBtn) {
       approveBtn.onclick = function () {
-        if (!res) { alert('Henüz rezervasyon oluşturulmamış.'); return; }
-        var r = Store.approveParentForRequest(id);
-        if (!r.ok) alert(r.error);
-        else paint();
+        if (!Perms.guard('edit')) return;
+        if (!res) { U.notifyError('Henüz rezervasyon oluşturulmamış.'); return; }
+        var result = Store.approveParentForRequest(id);
+        if (!result.ok) U.notifyError(result.error);
+        else { U.notifySuccess('Veli onayı kaydedildi.'); paint(); }
       };
     }
+
     var unreach = body.querySelector('#tmUnreachable');
     if (unreach && res) {
       unreach.onclick = function () {
+        if (!Perms.guard('edit')) return;
         Store.updateParentApproval(res.id, 'unreachable');
+        U.notifySuccess('Ulaşılamadı olarak işaretlendi.');
         paint();
       };
     }
+
     var callAgain = body.querySelector('#tmCallAgain');
     if (callAgain && res) {
       callAgain.onclick = function () {
+        if (!Perms.guard('edit')) return;
         Store.updateParentApproval(res.id, 'call_again');
+        U.notifySuccess('Tekrar aranacak olarak işaretlendi.');
         paint();
       };
     }
+
     var linkBtn = body.querySelector('#tmMarkLink');
     if (linkBtn && res) {
       linkBtn.onclick = function () {
-        var r = Store.markLinkSent(res.id);
-        if (!r.ok) alert(r.error);
-        else paint();
+        if (!Perms.guard('edit')) return;
+        var result = Store.markLinkSent(res.id);
+        if (!result.ok) U.notifyError(result.error);
+        else { U.notifySuccess('Link gönderildi işaretlendi.'); paint(); }
       };
     }
+
+    var rejectBtn = body.querySelector('#tmRejectReq');
+    if (rejectBtn && Confirm) {
+      rejectBtn.onclick = function () {
+        if (!Perms.guard('cancel')) return;
+        Confirm.open({
+          title: 'Talebi reddet',
+          warning: 'Bağlı rezervasyon varsa iptal edilecektir.',
+          onConfirm: function (reason) {
+            var result = Store.rejectRequest(id, reason);
+            if (!result.ok) U.notifyError(result.error);
+            else { U.notifySuccess('Talep reddedildi.'); paint(); }
+          }
+        });
+      };
+    }
+
+    var commBtn = body.querySelector('#tmAddComm') || body.querySelector('#tmAddCommTab');
+    if (commBtn) commBtn.onclick = function () { openCommForm(r, res, sess); };
   }
 
   paint();

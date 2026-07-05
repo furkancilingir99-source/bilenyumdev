@@ -155,11 +155,11 @@
       var s = Store.getSessionById(editId);
       if (s && (s.date !== draft.date || s.startTime !== draft.startTime)) {
         var res = Store.rescheduleSession(editId, draft.date, draft.startTime, 'Planlama formundan güncellendi');
-        if (!res.ok) { alert(res.error); return; }
+        if (!res.ok) { U.notifyError(res.error); return; }
       }
       if (s && s.teacherId !== draft.teacherId) {
         var res2 = Store.changeSessionTeacher(editId, draft.teacherId, 'Planlama formundan güncellendi');
-        if (!res2.ok) { alert(res2.error); return; }
+        if (!res2.ok) { U.notifyError(res2.error); return; }
       }
       if (s && (s.notes || '') !== (draft.notes || '')) {
         Store.updateSessionNotes(editId, draft.notes);
@@ -167,7 +167,7 @@
       window.location.href = 'deneme-dersi-yoneticisi-planlanmis-dersler.html';
     } else {
       var result = Store.createSession(Object.assign({}, draft, { status: 'scheduled' }));
-      if (!result.ok) { alert(result.error); return; }
+      if (!result.ok) { U.notifyError(result.error); return; }
       window.location.href = 'deneme-dersi-yoneticisi-planlanmis-ders-detay.html?id=' +
         encodeURIComponent(result.session.id) + '&tab=2';
     }
@@ -183,7 +183,7 @@
     saveBtn.addEventListener('click', function () {
       var draft = getDraft();
       var issues = Rules.validateSessionDraft(draft);
-      if (issues.length) { alert(issues.join('\n')); return; }
+      if (issues.length) { U.notifyError(issues.join(' · ')); return; }
       var lt = Store.getLessonTypeById(draft.lessonTypeId);
       var teacher = Store.getTeacherById(draft.teacherId);
       var label = (lt ? lt.name : 'Ders') + ' · ' + U.formatDateKey(draft.date) + ' ' + draft.startTime;

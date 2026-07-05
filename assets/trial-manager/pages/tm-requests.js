@@ -51,7 +51,7 @@
       var lt = Store.getLessonTypeById(r.requestedLessonTypeId);
       var res = Store.getReservationByRequestId ? Store.getReservationByRequestId(r.id) :
         Store.getReservations().find(function (x) { return x.requestId === r.id; });
-      return '<tr>' +
+      return '<tr data-req="' + r.id + '" style="cursor:pointer">' +
         '<td>' + U.formatDateTime(r.createdAt) + '</td>' +
         '<td>' + U.escapeHtml(r.studentFirstName + ' ' + r.studentLastName) + '</td>' +
         '<td>' + r.studentAge + '</td><td>' + U.escapeHtml(r.studentGrade) + '</td><td>' + U.escapeHtml(r.studentLevel) + '</td>' +
@@ -66,6 +66,12 @@
         '<td><a class="tm-btn tm-btn--sm tm-btn--ghost" href="deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(r.id) + '">İncele</a></td></tr>';
     }).join('');
     U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
+    tbody.querySelectorAll('tr[data-req]').forEach(function (tr) {
+      tr.addEventListener('click', function (e) {
+        if (e.target.closest('a')) return;
+        window.location.href = 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(tr.getAttribute('data-req'));
+      });
+    });
     if (loading) loading.hidden = true;
     if (wrap) wrap.hidden = false;
     } catch (err) {

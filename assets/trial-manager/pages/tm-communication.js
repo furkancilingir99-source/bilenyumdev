@@ -166,7 +166,9 @@
         var result = x.reservation ? SL.parentApprovalLabel(x.reservation.parentApprovalStatus) : 'Bilgilendirilmedi';
         return '<tr><td>' + U.escapeHtml(x.person) + '</td><td>' + x.role + '</td><td>' + U.escapeHtml(stName) + '</td><td>' + U.escapeHtml(sessLabel) + '</td>' +
           '<td>' + U.escapeHtml(x.phone) + '</td><td>—</td><td>' + U.escapeHtml(result) + '</td><td>—</td><td>—</td><td>Elif Y.</td>' +
-          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '">Kayıt ekle</button></td></tr>';
+          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '">Kayıt ekle</button> ' +
+          (x.phone && x.role === 'Veli' ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-wa-idx="' + i + '">WhatsApp</button>' : '') +
+        '</td></tr>';
       }).join('');
     }
     U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
@@ -174,6 +176,29 @@
       btn.addEventListener('click', function () {
         var idx = parseInt(btn.getAttribute('data-log-idx'), 10);
         if (lastItems[idx]) openLogForm(lastItems[idx]);
+      });
+    });
+    tbody.querySelectorAll('[data-wa-idx]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var idx = parseInt(btn.getAttribute('data-wa-idx'), 10);
+        var row = lastItems[idx];
+        if (!row || !row.parent || !window.TMQuickMessage) return;
+        var sess = row.session;
+        var meeting = sess ? Store.getMeetingBySessionId(sess.id) : null;
+        if (!meeting) { U.notifyError('Bu kayıt için meeting bilgisi yok.'); return; }
+        var lt = sess ? Store.getLessonTypeById(sess.lessonTypeId) : null;
+        window.TMQuickMessage.openForParent({
+          parentName: U.fullName(row.parent.firstName, row.parent.lastName),
+          studentName: row.student ? U.fullName(row.student.firstName, row.student.lastName) : '—',
+          lessonType: lt ? lt.name : '—',
+          date: sess ? U.formatDateKey(sess.date) : '—',
+          time: sess ? sess.startTime : '—',
+          meetingUrl: meeting.meetingUrl,
+          meetingId: meeting.meetingId,
+          passcode: meeting.passcode,
+          phone: row.parent.phone,
+          email: row.parent.email
+        });
       });
     });
     if (loading) loading.hidden = true;

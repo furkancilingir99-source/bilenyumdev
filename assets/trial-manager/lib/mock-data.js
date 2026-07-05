@@ -805,6 +805,109 @@
     return { ok: true, session: session };
   }
 
+  function rejectRequest(requestId, reason) {
+    var req = find(state.requests, requestId);
+    if (!req) return { ok: false, error: 'Talep bulunamadı.' };
+    if (!reason || !reason.trim()) return { ok: false, error: 'Red nedeni zorunludur.' };
+    req.status = 'rejected';
+    req.updatedAt = new Date().toISOString();
+    var res = getReservationByRequestId(requestId);
+    if (res && res.status !== 'cancelled') {
+      res.status = 'cancelled';
+      res.cancellationReason = reason;
+      res.updatedAt = new Date().toISOString();
+      var session = find(state.sessions, res.sessionId);
+      if (session) {
+        var idx = session.enrolledStudentIds.indexOf(res.studentId);
+        if (idx >= 0) session.enrolledStudentIds.splice(idx, 1);
+        var ridx = session.reservationIds.indexOf(res.id);
+        if (ridx >= 0) session.reservationIds.splice(ridx, 1);
+      }
+    }
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'trial_lesson_request',
+        entityId: requestId,
+        action: 'parent_rejected',
+        description: 'Talep reddedildi.',
+        reason: reason
+      });
+    }
+    return { ok: true, request: req };
+  }
+
+  function assignRequestToSession(requestId, sessionId) {
+    var req = find(state.requests, requestId);
+    if (!req) return { ok: false, error: 'Talep bulunamadı.' };
+    var session = find(state.sessions, sessionId);
+    if (!session) return { ok: false, error: 'Ders bulunamadı.' };
+    if (session.status === 'cancelled') return { ok: false, error: 'Ders iptal edilmiş.' };
+    if (session.lessonTypeId !== req.requestedLessonTypeId) {
+      return { ok: false, error: 'Ders türü taleple uyuşmuyor.' };
+    }
+    if (Rules && Rules.getSessionRemainingCapacity(sessionId) <= 0) {
+      return { ok: false, error: 'Seçilen dersin kapasitesi dolu.' };
+    }
+    req.selectedSessionId = sessionId;
+    if (req.status === 'new') req.status = 'reviewing';
+    req.updatedAt = new Date().toISOString();
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'trial_lesson_request',
+        entityId: requestId,
+        action: 'updated',
+        description: 'Talep derse atandı: ' + sessionId
+      });
+    }
+    return { ok: true, request: req, session: session };
+  }
+
+  function getAvailableSessionsForLessonType(lessonTypeId) {
+    var today = todayKey();
+    return state.sessions.filter(function (s) {
+      if (s.lessonTypeId !== lessonTypeId) return false;
+      if (s.status === 'cancelled' || s.status === 'completed') return false;
+      if (s.date < today) return false;
+      if (Rules && Rules.getSessionRemainingCapacity(s.id) <= 0) return false;
+      return true;
+    }).sort(function (a, b) {
+      return a.date === b.date ? a.startTime.localeCompare(b.startTime) : a.date.localeCompare(b.date);
+    });
+  }
+
+  function convertStudentToEnrollment(studentId) {
+    var st = find(state.students, studentId);
+    if (!st) return { ok: false, error: 'Öğrenci bulunamadı.' };
+    st.status = 'enrolled';
+    st.updatedAt = new Date().toISOString();
+    state.reservations.filter(function (r) {
+      return r.studentId === studentId && r.status === 'attended';
+    }).forEach(function (r) {
+      r.enrolled = true;
+      r.updatedAt = new Date().toISOString();
+    });
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'student',
+        entityId: studentId,
+        action: 'converted_to_enrollment',
+        description: 'Öğrenci kayda dönüştürüldü.'
+      });
+    }
+    return { ok: true, student: st };
+  }
+
+  function markBulkLinksSentForSession(sessionId) {
+    var count = 0;
+    state.reservations.filter(function (r) {
+      return r.sessionId === sessionId && r.parentApprovalStatus === 'approved' && !r.linkSent;
+    }).forEach(function (r) {
+      var res = markLinkSent(r.id);
+      if (res.ok) count += 1;
+    });
+    return { ok: true, count: count };
+  }
+
   function updateUserPermissions(userId, perms) {
     var user = find(state.users, userId);
     if (!user) return { ok: false };
@@ -905,6 +1008,11 @@
     updateParentApproval: updateParentApproval,
     createReservationFromRequest: createReservationFromRequest,
     updateSessionNotes: updateSessionNotes,
+    rejectRequest: rejectRequest,
+    assignRequestToSession: assignRequestToSession,
+    getAvailableSessionsForLessonType: getAvailableSessionsForLessonType,
+    convertStudentToEnrollment: convertStudentToEnrollment,
+    markBulkLinksSentForSession: markBulkLinksSentForSession,
     getMeetingBySessionId: function (sessionId) {
       var s = find(state.sessions, sessionId);
       return s ? find(state.meetings, s.onlineMeetingId) : null;
