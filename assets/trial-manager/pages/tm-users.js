@@ -18,6 +18,9 @@
 
   function render() {
     if (!tbody) return;
+    var loading = document.getElementById('tmUsersLoading');
+    var wrap = document.getElementById('tmUsersTableWrap');
+    try {
     tbody.innerHTML = Store.getUsers().map(function (u) {
       return '<tr data-user="' + u.id + '">' +
         '<td>' + U.escapeHtml(U.fullName(u.firstName, u.lastName)) + '</td>' +
@@ -35,8 +38,12 @@
         permSwitch(inp.getAttribute('data-user'), inp.getAttribute('data-field'), inp.checked);
       });
     });
-    document.getElementById('tmUsersLoading').hidden = true;
-    document.getElementById('tmUsersTableWrap').hidden = false;
+    if (loading) loading.hidden = true;
+    if (wrap) wrap.hidden = false;
+    } catch (err) {
+      if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
+      console.error(err);
+    }
   }
 
   function switchCell(u, field) {

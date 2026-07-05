@@ -789,6 +789,22 @@
     return { ok: true, reservation: reservation, created: true };
   }
 
+  function updateSessionNotes(sessionId, notes) {
+    var session = find(state.sessions, sessionId);
+    if (!session) return { ok: false, error: 'Ders bulunamadı.' };
+    session.notes = notes || '';
+    session.updatedAt = new Date().toISOString();
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'trial_lesson_session',
+        entityId: sessionId,
+        action: 'updated',
+        description: 'Ders notu güncellendi.'
+      });
+    }
+    return { ok: true, session: session };
+  }
+
   function updateUserPermissions(userId, perms) {
     var user = find(state.users, userId);
     if (!user) return { ok: false };
@@ -888,6 +904,7 @@
     approveParentForRequest: approveParentForRequest,
     updateParentApproval: updateParentApproval,
     createReservationFromRequest: createReservationFromRequest,
+    updateSessionNotes: updateSessionNotes,
     getMeetingBySessionId: function (sessionId) {
       var s = find(state.sessions, sessionId);
       return s ? find(state.meetings, s.onlineMeetingId) : null;

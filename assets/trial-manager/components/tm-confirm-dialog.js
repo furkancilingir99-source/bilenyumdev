@@ -53,18 +53,25 @@
       body += '</ul></div>';
     }
     if (opts.warning) body += '<p class="tm-crit-warn">' + U.escapeHtml(opts.warning) + '</p>';
-    body += '<label class="tm-crit-label">Açıklama / neden <span class="tm-req">*</span>' +
-      '<textarea class="tm-crit-input" data-crit-reason rows="3" placeholder="Zorunlu"></textarea></label>';
+    var needReason = opts.requireReason !== false;
+    if (needReason) {
+      body += '<label class="tm-crit-label">Açıklama / neden <span class="tm-req">*</span>' +
+        '<textarea class="tm-crit-input" data-crit-reason rows="3" placeholder="Zorunlu"></textarea></label>';
+    }
     el.querySelector('[data-crit-body]').innerHTML = body;
     var confirmBtn = el.querySelector('[data-crit-confirm]');
     confirmBtn.textContent = opts.confirmLabel || 'Onayla';
     confirmBtn.className = 'tm-btn ' + (opts.danger !== false ? 'tm-btn--danger' : 'tm-btn--primary');
     confirmBtn.onclick = function () {
-      var reason = el.querySelector('[data-crit-reason]').value.trim();
-      if (!reason) {
-        el.querySelector('[data-crit-reason]').focus();
-        el.querySelector('[data-crit-reason]').classList.add('is-error');
-        return;
+      var reason = '';
+      var reasonEl = el.querySelector('[data-crit-reason]');
+      if (reasonEl) {
+        reason = reasonEl.value.trim();
+        if (needReason && !reason) {
+          reasonEl.focus();
+          reasonEl.classList.add('is-error');
+          return;
+        }
       }
       close();
       if (opts.onConfirm) opts.onConfirm(reason);

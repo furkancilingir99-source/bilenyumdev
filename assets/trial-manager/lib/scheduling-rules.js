@@ -8,6 +8,7 @@
   var DURATION_MIN = 50;
   var PARENT_MIN = 20;
   var STUDENT_MIN = 30;
+  var HOURLY_SLOTS = ['11:00', '12:00', '13:00', '14:00'];
 
   function parseTime(t) {
     var p = (t || '').split(':');
@@ -150,6 +151,9 @@
     if (draft.startTime && draft.endTime && !isValidTrialLessonDuration(draft.startTime, draft.endTime)) {
       issues.push('Ders saat başına 50 dakika olmalı (ör. 11:00–11:50).');
     }
+    if (draft.lessonTypeId && draft.date && draft.startTime && hasSessionSlotConflict(draft.date, draft.lessonTypeId, draft.startTime, draft.id)) {
+      issues.push('Bu tarih ve saatte aynı ders türü için zaten bir oturum var.');
+    }
     if (draft.teacherId && draft.lessonTypeId && !isTeacherEligibleForLessonType(draft.teacherId, draft.lessonTypeId)) {
       issues.push('Öğretmen bu ders türüne atanamaz (branş uyumsuz).');
     }
@@ -161,7 +165,48 @@
         issues.push('Öğretmen aynı saatte başka derste.');
       }
     }
+    if (!draft.teacherId) issues.push('Öğretmen seçimi zorunlu.');
     return issues;
+  }
+
+  function hasSessionSlotConflict(date, lessonTypeId, startTime, sessionIdToIgnore) {
+    var store = getStore();
+    if (!store) return false;
+    return store.getSessions().some(function (s) {
+      if (s.id === sessionIdToIgnore) return false;
+      if (s.status === 'cancelled') return false;
+      return s.date === date && s.lessonTypeId === lessonTypeId && s.startTime === startTime;
+    });
+  }
+
+  function getSlotsOverview(date, lessonTypeId, sessionIdToIgnore) {
+    var store = getStore();
+    if (!store) return [];
+    return HOURLY_SLOTS.map(function (slot) {
+      var end = addMinutes(slot, 50);
+      var session = store.getSessions().find(function (s) {
+        if (s.id === sessionIdToIgnore) return false;
+        if (s.status === 'cancelled') return false;
+        return s.date === date && s.lessonTypeId === lessonTypeId && s.startTime === slot;
+      }) || null;
+      var enrolled = session ? (session.enrolledStudentIds || []).length : 0;
+      var teachers = store.getTeachers().filter(function (t) {
+        return t.isActive &&
+          isTeacherEligibleForLessonType(t.id, lessonTypeId) &&
+          isTeacherAvailable(t.id, date, slot, end) &&
+          !hasTeacherConflict(t.id, date, slot, end, sessionIdToIgnore);
+      });
+      return {
+        slot: slot,
+        endTime: end,
+        session: session,
+        enrolled: enrolled,
+        remaining: session ? Math.max(0, CAPACITY - enrolled) : CAPACITY,
+        availableTeachers: teachers.length,
+        isFree: !session,
+        hasConflict: hasSessionSlotConflict(date, lessonTypeId, slot, sessionIdToIgnore)
+      };
+    });
   }
 
   global.TMSchedulingRules = {
@@ -169,7 +214,7 @@
     DURATION_MIN: DURATION_MIN,
     PARENT_MIN: PARENT_MIN,
     STUDENT_MIN: STUDENT_MIN,
-    HOURLY_SLOTS: ['11:00', '12:00', '13:00', '14:00'],
+    HOURLY_SLOTS: HOURLY_SLOTS,
     addMinutes: addMinutes,
     isHourlySlot: isHourlySlot,
     isValidTrialLessonDuration: isValidTrialLessonDuration,
@@ -180,6 +225,8 @@
     hasStudentAlreadyUsedFreeTrialForLessonType: hasStudentAlreadyUsedFreeTrialForLessonType,
     canAssignStudentToSession: canAssignStudentToSession,
     getAffectedPeopleForSessionChange: getAffectedPeopleForSessionChange,
-    validateSessionDraft: validateSessionDraft
+    validateSessionDraft: validateSessionDraft,
+    hasSessionSlotConflict: hasSessionSlotConflict,
+    getSlotsOverview: getSlotsOverview
   };
 })(typeof window !== 'undefined' ? window : this);

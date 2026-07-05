@@ -23,18 +23,27 @@
   <aside id="tmSidebarMount" class="tm-sidebar" aria-label="Deneme dersi yönetim menüsü"></aside>
   <main class="tm-admin-main">
 
+    <div class="tm-page-head">
+      <h1 class="tm-page-title">Raporlar</h1>
+      <p class="tm-page-sub">Katılım, dönüşüm, talep dağılımı, öğretmen performansı ve iletişim metrikleri.</p>
+    </div>
 
-    <div class="tm-page-head"><h1 class="tm-page-title">Raporlar</h1><p class="tm-page-sub">Katılım, dönüşüm, talep dağılımı ve iletişim metrikleri.</p></div>
-    <section class="tm-panel" style="padding:16px">
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-bottom:16px">
+    <section class="tm-panel tm-report-panel">
+      <div class="tm-report-toolbar">
         <label>Başlangıç <input type="date" class="tm-dg-control" id="tmReportStart"></label>
         <label>Bitiş <input type="date" class="tm-dg-control" id="tmReportEnd"></label>
-        <button type="button" class="tm-btn tm-btn--ghost" id="tmReportExport">CSV dışa aktar</button>
+        <span class="tm-dg-spacer"></span>
+        <button type="button" class="tm-btn tm-btn--ghost" id="tmReportExportCsv">Özet CSV</button>
+        <button type="button" class="tm-btn tm-btn--primary" id="tmReportExportXls">Excel paketi (.xls)</button>
       </div>
+      <div class="tm-comm-tabs" id="tmReportTabs"></div>
       <div id="tmReportGrid" class="tm-report-grid"></div>
+      <div id="tmReportTable" class="tm-report-table-wrap" hidden></div>
     </section>
   </main>
 </div>
+
+<script src="assets/trial-manager/lib/status-labels.js"></script>
 <script src="assets/trial-manager/lib/mock-data.js"></script>
 <script src="assets/trial-manager/lib/export-utils.js"></script>
 <script src="assets/trial-manager/components/tm-utils.js"></script>

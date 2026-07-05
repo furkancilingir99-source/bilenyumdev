@@ -712,6 +712,134 @@ body.tm-drawer-open { overflow: hidden; }
   margin-top: 4px;
 }
 
+.tm-report-card.is-ok .tm-report-card-value { color: #15803d; }
+.tm-report-card.is-warn .tm-report-card-value { color: #b45309; }
+.tm-report-card.is-danger .tm-report-card-value { color: #dc2626; }
+
+.tm-report-panel { padding: 16px; }
+
+.tm-report-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+.tm-report-table-wrap {
+  margin-top: 12px;
+}
+
+.tm-alert-row.is-ok {
+  background: #dcfce7;
+  color: #15803d;
+  border-color: #86efac;
+}
+
+/* Planlayıcı */
+.tm-plan-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.tm-plan-slots-panel,
+.tm-plan-form-panel {
+  padding: 16px 20px;
+}
+
+.tm-plan-slots-head {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 12px;
+}
+
+.tm-plan-slots-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.tm-plan-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.tm-plan-slot:hover {
+  border-color: #93c5fd;
+}
+
+.tm-plan-slot.is-selected {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.tm-plan-slot.is-busy {
+  background: #f8fafc;
+}
+
+.tm-plan-slot.is-warn {
+  border-color: #fcd34d;
+}
+
+.tm-plan-slot-time {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.tm-plan-slot-meta {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.tm-plan-fields {
+  display: grid;
+  gap: 14px;
+}
+
+.tm-plan-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.tm-plan-fields .tm-dg-control {
+  width: 100%;
+}
+
+.tm-plan-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tm-panel-title {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+@media (max-width: 900px) {
+  .tm-plan-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 .tm-comm-tabs {
   display: flex;
   flex-wrap: wrap;

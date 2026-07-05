@@ -23,40 +23,45 @@
   <aside id="tmSidebarMount" class="tm-sidebar" aria-label="Deneme dersi yönetim menüsü"></aside>
   <main class="tm-admin-main">
 
-
-
-
     <div class="tm-page-head">
-      <h1 class="tm-page-title">Yeni Online Deneme Dersi Planla</h1>
-      <p class="tm-page-sub">Matematik veya Fen · Saat başı 50 dakika · Kapasite 20 · Otomatik meeting linki oluşturulur.</p>
+      <h1 class="tm-page-title" id="tmPlanTitle">Yeni Online Deneme Dersi Planla</h1>
+      <p class="tm-page-sub" id="tmPlanSub">Matematik veya Fen · Saat başı 50 dakika · Kapasite 20 · Otomatik meeting linki oluşturulur.</p>
     </div>
 
-    <section class="tm-panel" style="padding:20px;max-width:640px">
-      <div id="tmPlanConflict" class="tm-alert-row" hidden></div>
-      <form id="tmPlanForm" onsubmit="return false">
-        <div style="display:grid;gap:14px">
-          <label>Ders türü
-            <select class="tm-dg-control" id="tmPlanType" style="width:100%;margin-top:4px"></select>
-          </label>
-          <label>Tarih
-            <input type="date" class="tm-dg-control" id="tmPlanDate" style="width:100%;margin-top:4px">
-          </label>
-          <label>Saat slotu
-            <select class="tm-dg-control" id="tmPlanTime" style="width:100%;margin-top:4px"></select>
-          </label>
-          <label>Öğretmen
-            <select class="tm-dg-control" id="tmPlanTeacher" style="width:100%;margin-top:4px"></select>
-          </label>
-          <label>Not
-            <textarea class="tm-dg-control" id="tmPlanNotes" rows="2" style="width:100%;margin-top:4px"></textarea>
-          </label>
-        </div>
-        <div style="margin-top:20px;display:flex;gap:8px">
-          <button type="button" class="tm-btn tm-btn--primary" id="tmPlanSave">Kaydet</button>
-          <a class="tm-btn tm-btn--ghost" href="deneme-dersi-yoneticisi-planlanmis-dersler.html">İptal</a>
-        </div>
-      </form>
-    </section>
+    <div class="tm-plan-layout">
+      <section class="tm-panel tm-plan-slots-panel">
+        <h2 class="tm-panel-title">Slot önizleme</h2>
+        <div id="tmPlanSlots"></div>
+      </section>
+
+      <section class="tm-panel tm-plan-form-panel" style="padding:20px">
+        <h2 class="tm-panel-title">Ders bilgileri</h2>
+        <div id="tmPlanConflict" class="tm-alert-row" hidden></div>
+        <form id="tmPlanForm" onsubmit="return false">
+          <div class="tm-plan-fields">
+            <label>Ders türü
+              <select class="tm-dg-control" id="tmPlanType"></select>
+            </label>
+            <label>Tarih
+              <input type="date" class="tm-dg-control" id="tmPlanDate">
+            </label>
+            <label>Saat slotu
+              <select class="tm-dg-control" id="tmPlanTime"></select>
+            </label>
+            <label>Öğretmen
+              <select class="tm-dg-control" id="tmPlanTeacher"></select>
+            </label>
+            <label>Not
+              <textarea class="tm-dg-control" id="tmPlanNotes" rows="2"></textarea>
+            </label>
+          </div>
+          <div class="tm-plan-actions">
+            <button type="button" class="tm-btn tm-btn--primary" id="tmPlanSave">Kaydet</button>
+            <a class="tm-btn tm-btn--ghost" href="deneme-dersi-yoneticisi-planlanmis-dersler.html">İptal</a>
+          </div>
+        </form>
+      </section>
+    </div>
   </main>
 </div>
 
@@ -66,6 +71,7 @@
 <script src="assets/trial-manager/lib/mock-data.js"></script>
 <script src="assets/trial-manager/lib/scheduling-rules.js"></script>
 <script src="assets/trial-manager/components/tm-utils.js"></script>
+<script src="assets/trial-manager/components/tm-confirm-dialog.js"></script>
 <script src="assets/trial-manager/components/tm-app-shell.js"></script>
 <script src="assets/trial-manager/components/tm-page-boot.js"></script>
 <script src="assets/trial-manager/pages/tm-planner.js"></script>
