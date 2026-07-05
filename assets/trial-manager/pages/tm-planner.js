@@ -32,9 +32,9 @@
 
   function applyPermissionUi() {
     if (!saveBtn) return;
-    if (!canSave()) {
+    if (editLocked || !canSave()) {
       saveBtn.disabled = true;
-      if (conflictEl) {
+      if (conflictEl && !editLocked) {
         conflictEl.hidden = false;
         conflictEl.textContent = 'Bu işlem için yetkiniz yok.';
         conflictEl.className = 'tm-alert-row is-danger';
@@ -181,8 +181,6 @@
     }
     if (typeSelect) {
       typeSelect.value = s.lessonTypeId;
-      typeSelect.disabled = true;
-      typeSelect.title = 'Düzenlemede ders türü değiştirilemez.';
     }
     if (dateInput) dateInput.value = s.date;
     if (timeSelect) timeSelect.value = s.startTime;
@@ -197,6 +195,11 @@
     var draft = getDraft();
     if (editId) {
       var s = Store.getSessionById(editId);
+      if (s && s.lessonTypeId !== draft.lessonTypeId) {
+        var resLt = Store.changeSessionLessonType(editId, draft.lessonTypeId, 'Planlama formundan güncellendi');
+        if (!resLt.ok) { U.notifyError(resLt.error); return; }
+        s = Store.getSessionById(editId);
+      }
       if (s && (s.date !== draft.date || s.startTime !== draft.startTime)) {
         var res = Store.rescheduleSession(editId, draft.date, draft.startTime, 'Planlama formundan güncellendi');
         if (!res.ok) { U.notifyError(res.error); return; }

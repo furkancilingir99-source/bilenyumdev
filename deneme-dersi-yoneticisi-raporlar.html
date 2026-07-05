@@ -33,8 +33,9 @@
         <label>Başlangıç <input type="date" class="tm-dg-control" id="tmReportStart"></label>
         <label>Bitiş <input type="date" class="tm-dg-control" id="tmReportEnd"></label>
         <span class="tm-dg-spacer"></span>
-        <button type="button" class="tm-btn tm-btn--ghost" id="tmReportExportCsv">Özet CSV</button>
-        <button type="button" class="tm-btn tm-btn--primary" id="tmReportExportXls">Excel paketi (.xls)</button>
+        <button type="button" class="tm-btn tm-btn--ghost" id="tmReportExportCsv" data-tm-export>Özet CSV</button>
+        <button type="button" class="tm-btn tm-btn--ghost" id="tmReportExportTabCsv" data-tm-export hidden>Sekme CSV</button>
+        <button type="button" class="tm-btn tm-btn--primary" id="tmReportExportXls" data-tm-export>Excel paketi (.xls)</button>
       </div>
       <div class="tm-comm-tabs" id="tmReportTabs"></div>
       <div id="tmReportGrid" class="tm-report-grid"></div>

@@ -14,6 +14,8 @@
   var persistEl = document.getElementById('tmMockPersist');
   var simulateBtn = document.getElementById('tmSimulateRequest');
   var resetBtn = document.getElementById('tmResetMock');
+  var userSelect = document.getElementById('tmMockUserSelect');
+  var switchUserBtn = document.getElementById('tmSwitchUser');
 
   function statRow(label, val, tone, href) {
     var valHtml = href
@@ -44,6 +46,32 @@
         : 'Henüz kayıt yok; ilk işlemde oturum depolamasına yazılır.';
     }
   }
+
+  function renderUserSelect() {
+    if (!userSelect || !Store.getUsers) return;
+    var current = Store.getCurrentUser();
+    userSelect.innerHTML = Store.getUsers().filter(function (u) { return u.isActive; }).map(function (u) {
+      return '<option value="' + u.id + '"' + (current && current.id === u.id ? ' selected' : '') + '>' +
+        U.escapeHtml(u.firstName + ' ' + u.lastName) + ' · ' + u.role + '</option>';
+    }).join('');
+  }
+
+  function switchUser() {
+    if (!userSelect || !Store.switchCurrentUser) return;
+    var res = Store.switchCurrentUser(userSelect.value);
+    if (!res.ok) {
+      if (U.notifyError) U.notifyError(res.error);
+      return;
+    }
+    if (window.TMToast) window.TMToast.show('Kullanıcı: ' + res.user.firstName + ' ' + res.user.lastName, 'success');
+    if (Perms && Perms.applyPageChrome) Perms.applyPageChrome();
+    if (window.TMAppShell && window.TMAppShell.refreshSidebarBadges) window.TMAppShell.refreshSidebarBadges();
+    if (window.TMOnSessionChange) window.TMOnSessionChange();
+    renderUserSelect();
+  }
+
+  if (switchUserBtn) switchUserBtn.addEventListener('click', switchUser);
+  renderUserSelect();
 
   if (simulateBtn) {
     simulateBtn.addEventListener('click', function () {
@@ -82,5 +110,6 @@
   }
 
   renderStats();
-  window.TMOnSessionChange = renderStats;
+  renderUserSelect();
+  window.TMOnSessionChange = function () { renderStats(); renderUserSelect(); };
 })();

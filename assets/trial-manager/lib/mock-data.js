@@ -629,6 +629,52 @@
     return { ok: true, session: session };
   }
 
+  function changeSessionLessonType(sessionId, newLessonTypeId, reason) {
+    var session = find(state.sessions, sessionId);
+    if (!session) return { ok: false, error: 'Ders bulunamadı.' };
+    if (!reason || !reason.trim()) return { ok: false, error: 'Değişiklik nedeni zorunludur.' };
+    if (session.lessonTypeId === newLessonTypeId) return { ok: true, session: session };
+    if (!Rules) return { ok: false, error: 'Planlama kuralları yüklenemedi.' };
+    if (!Rules.isTeacherEligibleForLessonType(session.teacherId, newLessonTypeId)) {
+      return { ok: false, error: 'Mevcut öğretmen seçilen ders türüne uygun değil. Önce öğretmeni değiştirin.' };
+    }
+    if (Rules.hasSessionSlotConflict(session.date, newLessonTypeId, session.startTime, sessionId)) {
+      return { ok: false, error: 'Bu tarih ve saatte seçilen ders türü için zaten oturum var.' };
+    }
+    var prev = session.lessonTypeId;
+    var lt = find(state.lessonTypes, newLessonTypeId);
+    session.lessonTypeId = newLessonTypeId;
+    session.title = (lt ? lt.name : 'Ders') + ' · ' + session.date + ' · ' + session.startTime;
+    session.teacherInformed = false;
+    session.updatedAt = new Date().toISOString();
+    state.reservations.filter(function (r) { return r.sessionId === sessionId; }).forEach(function (r) {
+      r.lessonTypeId = newLessonTypeId;
+      r.updatedAt = new Date().toISOString();
+    });
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'trial_lesson_session',
+        entityId: sessionId,
+        action: 'lesson_type_changed',
+        description: 'Ders türü değiştirildi.',
+        reason: reason,
+        previousValue: prev,
+        newValue: newLessonTypeId
+      });
+    }
+    touch();
+    return { ok: true, session: session };
+  }
+
+  function switchCurrentUser(userId) {
+    var user = find(state.users, userId);
+    if (!user) return { ok: false, error: 'Kullanıcı bulunamadı.' };
+    if (!user.isActive) return { ok: false, error: 'Kullanıcı pasif.' };
+    state.currentUserId = userId;
+    touch();
+    return { ok: true, user: user };
+  }
+
   function refreshMeetingPasscode(meetingId, reason) {
     var meeting = find(state.meetings, meetingId);
     if (!meeting) return { ok: false, error: 'Toplantı bulunamadı.' };
@@ -1126,6 +1172,8 @@
     });
     var studentCountToday = 0;
     todaySessions.forEach(function (s) { studentCountToday += s.enrolledStudentIds.length; });
+    var actionableCount = pendingApproval.length + linkNotSent.length + orphanRequests.length +
+      teacherNotInformed.length + needsAttendance.length;
 
     return {
       todaySessionCount: todaySessions.length,
@@ -1137,6 +1185,7 @@
       needsAttendanceCount: needsAttendance.length,
       conversionCount: enrolled.length,
       orphanRequestCount: orphanRequests.length,
+      actionableCount: actionableCount,
       todaySessions: todaySessions,
       pendingApproval: pendingApproval,
       linkNotSent: linkNotSent,
@@ -1200,6 +1249,7 @@
     createSession: createSession,
     cancelSession: cancelSession,
     changeSessionTeacher: changeSessionTeacher,
+    changeSessionLessonType: changeSessionLessonType,
     rescheduleSession: rescheduleSession,
     refreshMeetingPasscode: refreshMeetingPasscode,
     markLinkSent: markLinkSent,
@@ -1210,6 +1260,7 @@
     resetMockData: resetMockData,
     getMockStats: getMockStats,
     createSimulatedRequest: createSimulatedRequest,
+    switchCurrentUser: switchCurrentUser,
     _state: state
   };
 })(typeof window !== 'undefined' ? window : this);

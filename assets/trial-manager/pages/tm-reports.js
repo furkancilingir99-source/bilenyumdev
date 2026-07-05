@@ -249,8 +249,60 @@
         activeTab = btn.getAttribute('data-tab');
         renderTabs();
         render();
+        updateTabExportButton();
       });
     });
+    updateTabExportButton();
+  }
+
+  function updateTabExportButton() {
+    var tabBtn = document.getElementById('tmReportExportTabCsv');
+    if (!tabBtn) return;
+    if (activeTab === 'summary') {
+      tabBtn.hidden = true;
+    } else {
+      tabBtn.hidden = false;
+      var labels = { daily: 'Günlük', sessions: 'Dersler', teachers: 'Öğretmenler', comm: 'İletişim' };
+      tabBtn.textContent = (labels[activeTab] || 'Sekme') + ' CSV';
+    }
+  }
+
+  function exportActiveTabCsv() {
+    if (!Export) return;
+    if (Perms && !Perms.guard('export')) return;
+    if (activeTab === 'daily') {
+      Export.exportTable('rapor-gunluk.csv', dailyRows(), [
+        { key: 'date', label: 'Tarih' },
+        { key: 'sessions', label: 'Ders' },
+        { key: 'students', label: 'Öğrenci' },
+        { key: 'cancelled', label: 'İptal' }
+      ]);
+    } else if (activeTab === 'sessions') {
+      Export.exportTable('rapor-dersler.csv', sessionRows(), [
+        { key: 'date', label: 'Tarih' },
+        { key: 'time', label: 'Saat' },
+        { key: 'lesson', label: 'Ders türü' },
+        { key: 'teacher', label: 'Öğretmen' },
+        { key: 'enrolled', label: 'Öğrenci' },
+        { key: 'status', label: 'Durum' },
+        { key: 'informed', label: 'Öğrt.bilgi' }
+      ]);
+    } else if (activeTab === 'teachers') {
+      Export.exportTable('rapor-ogretmenler.csv', teacherRows(), [
+        { key: 'name', label: 'Öğretmen' },
+        { key: 'sessions', label: 'Ders' },
+        { key: 'students', label: 'Öğrenci' },
+        { key: 'cancelled', label: 'İptal' },
+        { key: 'informed', label: 'Bilgilendirildi' }
+      ]);
+    } else if (activeTab === 'comm') {
+      Export.exportTable('rapor-iletisim.csv', commRows(), [
+        { key: 'date', label: 'Tarih' },
+        { key: 'channel', label: 'Kanal' },
+        { key: 'result', label: 'Sonuç' },
+        { key: 'summary', label: 'Özet' }
+      ]);
+    }
   }
 
   function render() {
@@ -361,7 +413,9 @@
   if (endInput) endInput.addEventListener('change', render);
 
   var csvBtn = document.getElementById('tmReportExportCsv');
+  var tabCsvBtn = document.getElementById('tmReportExportTabCsv');
   var xlsBtn = document.getElementById('tmReportExportXls');
   if (csvBtn) csvBtn.addEventListener('click', exportSummaryCsv);
+  if (tabCsvBtn) tabCsvBtn.addEventListener('click', exportActiveTabCsv);
   if (xlsBtn) xlsBtn.addEventListener('click', exportExcelPack);
 })();

@@ -25,7 +25,7 @@
   };
 
   var NAV_ITEMS = [
-    { key: 'operasyon', href: 'deneme-dersi-yoneticisi-dashboard.html', label: 'Operasyon Merkezi', icon: ICON.home },
+    { key: 'operasyon', href: 'deneme-dersi-yoneticisi-dashboard.html', label: 'Operasyon Merkezi', icon: ICON.home, badgeMetric: 'actionableCount' },
     { key: 'deneme-dersleri', href: 'deneme-dersi-yoneticisi-planlanmis-dersler.html', label: 'Deneme Dersleri', icon: ICON.calendar, badgeMetric: 'needsAttendanceCount' },
     { key: 'rezervasyon-talepleri', href: 'deneme-dersi-yoneticisi-rezervasyonlar.html', label: 'Rezervasyon Talepleri', icon: ICON.inbox, badgeMetric: 'orphanRequestCount' },
     { key: 'ogrenciler', href: 'deneme-dersi-yoneticisi-ogrenciler.html', label: 'Öğrenciler', icon: ICON.user },
@@ -90,8 +90,27 @@
     );
   }
 
+  function refreshHudProfile() {
+    if (!global.TMStore || !global.TMStore.getCurrentUser) return;
+    var u = global.TMStore.getCurrentUser();
+    if (!u) return;
+    var nameEl = document.querySelector('.player-name');
+    var clanEl = document.querySelector('.player-clan');
+    var avatarEl = document.querySelector('.player-avatar span');
+    var full = u.firstName + ' ' + u.lastName;
+    if (nameEl) nameEl.textContent = full;
+    if (clanEl) {
+      clanEl.textContent = u.role === 'viewer' ? 'Gözlemci · salt okunur' :
+        (u.role === 'super_admin' ? 'Süper yönetici' : MANAGER_ROLE);
+    }
+    if (avatarEl) {
+      avatarEl.textContent = (String(u.firstName || 'D')[0] + String(u.lastName || 'D')[0]).toUpperCase();
+    }
+  }
+
   function refreshSidebarBadges() {
     if (!global.TMStore || !global.TMStore.getOperationMetrics) return;
+    refreshHudProfile();
     var m = global.TMStore.getOperationMetrics();
     NAV_ITEMS.forEach(function (item) {
       if (!item.badgeMetric) return;
@@ -246,6 +265,7 @@
     NAV_ITEMS: NAV_ITEMS,
     getActiveKey: getActiveKey,
     refreshSidebarBadges: refreshSidebarBadges,
+    refreshHudProfile: refreshHudProfile,
     init: init
   };
 
