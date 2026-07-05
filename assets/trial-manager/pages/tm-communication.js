@@ -333,15 +333,24 @@
     });
   }
 
+  function initFromUrl() {
+    var tab = U.qs('tab');
+    if (tab && TAB_DEFS.some(function (t) { return t.id === tab; })) activeTab = tab;
+  }
+
   function renderTabs() {
     if (!tabsEl) return;
+    var allRows = taskRows();
     tabsEl.innerHTML = TAB_DEFS.map(function (t) {
-      return '<button type="button" class="tm-comm-tab' + (activeTab === t.id ? ' is-active' : '') + '" data-tab="' + t.id + '">' + t.label + '</button>';
+      var count = filterTab(allRows, t.id).length;
+      var badge = count > 0 && t.id !== 'all' ? ' <span class="tm-sidebar-badge" style="position:static;display:inline-flex;margin-left:4px">' + count + '</span>' : '';
+      return '<button type="button" class="tm-comm-tab' + (activeTab === t.id ? ' is-active' : '') + '" data-tab="' + t.id + '">' + t.label + badge + '</button>';
     }).join('');
     tabsEl.querySelectorAll('[data-tab]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         activeTab = btn.getAttribute('data-tab');
         page = 1;
+        if (U.setQueryParam) U.setQueryParam('tab', activeTab === 'all' ? '' : activeTab);
         renderTabs();
         render();
       });
@@ -384,6 +393,9 @@
     if (loading) loading.hidden = true;
     if (wrap) wrap.hidden = false;
     if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(tbody);
+    if (bulkLinksBtn) {
+      bulkLinksBtn.hidden = activeTab !== 'link';
+    }
     } catch (err) {
       if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
       console.error(err);
@@ -420,6 +432,21 @@
       }
     });
   }
+  if (bulkLinksBtn) {
+    bulkLinksBtn.addEventListener('click', function () {
+      if (Perms && !Perms.guard('edit')) return;
+      if (!Store.markAllApprovedLinksSent) return;
+      var result = Store.markAllApprovedLinksSent();
+      if (!result.ok) U.notifyError(result.error || 'İşlem başarısız.');
+      else {
+        U.notifySuccess(result.count + ' veliye link gönderildi işaretlendi.');
+        if (window.TMOnSessionChange) window.TMOnSessionChange();
+        renderTabs();
+        render();
+      }
+    });
+  }
+  initFromUrl();
   renderTabs();
   render();
 })();

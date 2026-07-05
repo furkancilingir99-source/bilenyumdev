@@ -19,6 +19,9 @@
   var apiModeEl = document.getElementById('tmApiModeLabel');
   var apiHealthEl = document.getElementById('tmApiHealthStatus');
   var apiHealthBtn = document.getElementById('tmApiHealthCheck');
+  var apiMetricsBtn = document.getElementById('tmApiMetricsCheck');
+  var apiModeMockBtn = document.getElementById('tmApiModeMock');
+  var apiModeApiBtn = document.getElementById('tmApiModeApi');
   var exportAuditBtn = document.getElementById('tmExportAudit');
   var exportMockBtn = document.getElementById('tmExportMock');
   var importMockInput = document.getElementById('tmImportMock');
@@ -30,30 +33,65 @@
   function renderApiMode() {
     if (!apiModeEl) return;
     var mode = Api && Api.getMode ? Api.getMode() : 'mock';
-    apiModeEl.textContent = mode === 'mock' ? 'Mock (TMStore · oturum depolaması)' : 'REST API';
+    apiModeEl.textContent = mode === 'mock' ? 'Mock (TMStore · oturum depolaması)' : 'REST API (hibrit · veri mock)';
     if (apiHealthEl && mode === 'mock') {
-      apiHealthEl.textContent = 'Health uç noktası: ' + (Api && Api.endpoints ? Api.endpoints.health : '/api/trial-manager/health');
+      var ep = Api && Api.endpoints ? Api.endpoints : {};
+      apiHealthEl.textContent = 'Uç noktalar: ' + (ep.health || '/api/trial-manager/health') +
+        ' · ' + (ep.metrics || '/api/trial-manager/metrics');
     }
   }
 
   function runApiHealthCheck() {
-    if (!Api || !Api.checkHealth) return;
-    if (apiHealthEl) apiHealthEl.textContent = 'Test ediliyor…';
-    Api.checkHealth().then(function (res) {
+    if (!Api) return;
+    if (apiHealthEl) apiHealthEl.textContent = 'Health test ediliyor…';
+    var probe = Api.probeHealth || Api.checkHealth;
+    probe().then(function (res) {
       if (!apiHealthEl) return;
-      if (res.mode === 'mock') {
-        apiHealthEl.textContent = res.message;
-        return;
-      }
-      if (res.ok) {
-        apiHealthEl.textContent = 'REST health OK · v' + (res.data && res.data.version ? res.data.version : '?') +
-          ' · ' + (res.data && res.data.timestamp ? U.formatDateTime(res.data.timestamp) : '');
+      var mode = Api.getMode ? Api.getMode() : 'mock';
+      if (res.ok && res.data) {
+        apiHealthEl.textContent = 'REST health OK · v' + (res.data.version || '?') +
+          ' · ' + (res.data.timestamp ? U.formatDateTime(res.data.timestamp) : '') +
+          ' · aktif mod: ' + mode;
         if (window.TMToast) window.TMToast.show('API health başarılı.', 'success');
+      } else if (res.mode === 'mock' && res.message) {
+        apiHealthEl.textContent = res.message + ' (REST testi için probe kullanılamadı.)';
       } else {
         apiHealthEl.textContent = 'REST health hatası: ' + (res.error || 'bilinmiyor');
         if (U.notifyError) U.notifyError(res.error || 'API health başarısız.');
       }
     });
+  }
+
+  function runApiMetricsCheck() {
+    if (!Api || !Api.probeMetrics) return;
+    if (apiHealthEl) apiHealthEl.textContent = 'Metrik uç noktası test ediliyor…';
+    Api.probeMetrics().then(function (res) {
+      if (!apiHealthEl) return;
+      if (!res.ok) {
+        apiHealthEl.textContent = 'Metrik hatası: ' + (res.error || 'bilinmiyor');
+        if (U.notifyError) U.notifyError(res.error || 'Metrik uç noktası başarısız.');
+        return;
+      }
+      var m = res.data && res.data.metrics ? res.data.metrics : {};
+      var stub = res.data && res.data.stub ? ' (stub)' : '';
+      apiHealthEl.textContent = 'Metrik OK' + stub + ' · aksiyon: ' + (m.actionableCount != null ? m.actionableCount : '?') +
+        ' · bugün ders: ' + (m.todaySessionCount != null ? m.todaySessionCount : '?');
+      if (window.TMToast) window.TMToast.show('Metrik uç noktası yanıt verdi.', 'success');
+    });
+  }
+
+  function switchApiMode(mode) {
+    if (!Api || !Api.setMode) return;
+    var res = Api.setMode(mode);
+    if (!res.ok) {
+      if (U.notifyError) U.notifyError(res.error);
+      return;
+    }
+    renderApiMode();
+    if (window.TMToast) {
+      window.TMToast.show(mode === 'api' ? 'API mod (hibrit) aktif.' : 'Mock mod aktif.', 'success');
+    }
+    if (res.note && apiHealthEl) apiHealthEl.textContent = res.note;
   }
 
   function exportMockJson() {
@@ -169,6 +207,10 @@
   }
 
   if (switchUserBtn) switchUserBtn.addEventListener('click', switchUser);
+  if (apiHealthBtn) apiHealthBtn.addEventListener('click', runApiHealthCheck);
+  if (apiMetricsBtn) apiMetricsBtn.addEventListener('click', runApiMetricsCheck);
+  if (apiModeMockBtn) apiModeMockBtn.addEventListener('click', function () { switchApiMode('mock'); });
+  if (apiModeApiBtn) apiModeApiBtn.addEventListener('click', function () { switchApiMode('api'); });
   if (exportAuditBtn) exportAuditBtn.addEventListener('click', exportAuditLog);
   if (exportMockBtn) exportMockBtn.addEventListener('click', exportMockJson);
   if (importMockInput) {

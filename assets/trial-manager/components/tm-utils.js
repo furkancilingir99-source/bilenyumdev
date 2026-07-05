@@ -41,6 +41,15 @@
     return new URLSearchParams(window.location.search).get(name);
   }
 
+  function setQueryParam(name, value) {
+    var params = new URLSearchParams(window.location.search);
+    if (value == null || value === '') params.delete(name);
+    else params.set(name, value);
+    var q = params.toString();
+    var url = window.location.pathname + (q ? '?' + q : '') + window.location.hash;
+    window.history.replaceState(null, '', url);
+  }
+
   function debounce(fn, ms) {
     var t;
     return function () {
@@ -115,6 +124,7 @@
     formatTimeRange: formatTimeRange,
     fullName: fullName,
     qs: qs,
+    setQueryParam: setQueryParam,
     debounce: debounce,
     paginate: paginate,
     renderPagination: renderPagination,

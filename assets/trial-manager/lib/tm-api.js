@@ -31,12 +31,15 @@
     if (mode !== 'mock' && mode !== 'api') {
       return { ok: false, error: 'Geçersiz mod.' };
     }
-    if (mode === 'api') {
-      return { ok: false, error: 'REST API henüz bağlı değil. Mock mod kullanın.' };
-    }
     try {
       sessionStorage.setItem(MODE_KEY, mode);
-      return { ok: true, mode: mode };
+      return {
+        ok: true,
+        mode: mode,
+        note: mode === 'api'
+          ? 'Health ve metrik uçları REST üzerinden; veri işlemleri mock TMStore ile devam eder.'
+          : null
+      };
     } catch (e) {
       return { ok: false, error: 'Mod kaydedilemedi.' };
     }
@@ -105,6 +108,37 @@
     });
   }
 
+  function probeHealth() {
+    return fetchJson(ENDPOINTS.health).then(function (data) {
+      return { ok: true, data: data };
+    }).catch(function (err) {
+      return { ok: false, error: err.message || 'Bağlantı başarısız.' };
+    });
+  }
+
+  function fetchOperationMetrics() {
+    if (getMode() === 'mock') {
+      return Promise.resolve(store().getOperationMetrics());
+    }
+    return fetchJson(ENDPOINTS.metrics).then(function (body) {
+      if (!body || !body.ok) {
+        throw new Error((body && body.error) || 'Metrik alınamadı.');
+      }
+      return body.metrics;
+    });
+  }
+
+  function probeMetrics() {
+    return fetchJson(ENDPOINTS.metrics).then(function (body) {
+      if (!body || !body.ok) {
+        throw new Error((body && body.error) || 'Metrik alınamadı.');
+      }
+      return { ok: true, data: body };
+    }).catch(function (err) {
+      return { ok: false, error: err.message || 'Bağlantı başarısız.' };
+    });
+  }
+
   global.TMApi = {
     getMode: getMode,
     setMode: setMode,
@@ -114,6 +148,9 @@
     invoke: invoke,
     fetchJson: fetchJson,
     checkHealth: checkHealth,
+    probeHealth: probeHealth,
+    fetchOperationMetrics: fetchOperationMetrics,
+    probeMetrics: probeMetrics,
     getOperationMetrics: callStore('getOperationMetrics'),
     getMockStats: callStore('getMockStats'),
     getAuditLogs: callStore('getAuditLogs'),
