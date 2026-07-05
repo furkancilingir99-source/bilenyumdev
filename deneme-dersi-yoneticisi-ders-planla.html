@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Ders Planla · Deneme Dersi Yöneticisi · Bilenyum</title>
+<meta name="description" content="Deneme dersi planlama — branş, sınıf, öğretmen ve öğrenci yönetimi." />
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/dashboard-d3-mega.css">
+<link rel="stylesheet" href="assets/dashboard-light.css">
+<link rel="stylesheet" href="assets/dashboard-polish.css">
+<link rel="stylesheet" href="assets/teacher-dashboard.css">
+<link rel="stylesheet" href="assets/trial-lesson-manager.css">
+<script src="assets/auth-tab-session.js"></script>
+<script src="assets/dashboard-switcher.js" defer></script>
+<script src="assets/trial-lesson-manager-shell.js" defer></script>
+<script src="assets/shell.js" defer></script>
+</head>
+<body data-trial-manager-active="ders-planla">
+
+<div class="scene" aria-hidden="true">
+  <div class="scene-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
+<header class="hud" data-trial-manager-hud></header>
+
+<main class="stage thw-stage tm-stage">
+  <div class="stage-nav" data-trial-manager-nav></div>
+
+  <div class="tm-main-col">
+    <div class="thw-context-panel">
+      <div class="thw-page-head">
+        <h1 class="thw-page-title">Ders Planla</h1>
+        <p class="thw-page-subtitle">Branş, sınıf ve öğretmen seçerek deneme dersi oluşturun; uygun öğrencileri ekleyin ve çakışmaları önleyin.</p>
+      </div>
+    </div>
+
+    <div class="tm-planner-layout">
+      <aside class="tm-planner-sidebar tm-panel" aria-label="Planlanmış dersler">
+        <div class="tm-planner-sidebar-head">
+          <h2 class="tm-panel-title">Planlanmış Dersler</h2>
+          <button type="button" class="tm-planner-btn is-primary is-compact" id="tmPlannerNewBtn">+ Yeni ders</button>
+        </div>
+        <div class="tm-planner-list" id="tmPlannerList"></div>
+      </aside>
+
+      <section class="tm-planner-editor-wrap tm-panel" id="tmPlannerEditor" aria-label="Ders planlama formu"></section>
+    </div>
+  </div>
+</main>
+
+<div class="tm-planner-toast" id="tmPlannerToast" role="status" aria-live="polite" hidden></div>
+
+<script src="assets/trial-lesson-manager-mock.js"></script>
+<script src="assets/trial-lesson-planner-mock.js"></script>
+<script src="assets/trial-lesson-planner.js"></script>
+</body>
+</html>

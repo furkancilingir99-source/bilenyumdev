@@ -1065,3 +1065,356 @@
 @media (max-width: 420px) {
   .tm-slot-day-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* ── Ders Planla ── */
+.tm-planner-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.tm-planner-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: calc(100vh - 220px);
+  overflow: hidden;
+}
+
+.tm-planner-sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.tm-planner-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding-right: 4px;
+  min-height: 120px;
+}
+
+.tm-planner-empty {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.tm-planner-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(62, 58, 142, 0.12);
+  background: rgba(255, 255, 255, 0.85);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.tm-planner-card:hover {
+  border-color: rgba(2, 132, 199, 0.35);
+  box-shadow: 0 4px 14px rgba(40, 38, 90, 0.08);
+}
+
+.tm-planner-card.is-active {
+  border-color: #0284c7;
+  background: rgba(2, 132, 199, 0.06);
+  box-shadow: 0 0 0 1px rgba(2, 132, 199, 0.2);
+}
+
+.tm-planner-card-warn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #b45309;
+  font-size: 12px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tm-planner-card-subject {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-planner-card-meta,
+.tm-planner-card-slot,
+.tm-planner-card-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.tm-planner-editor-wrap {
+  min-height: 420px;
+}
+
+.tm-planner-editor-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.tm-planner-editor-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tm-planner-editor-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-planner-editor-sub {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.tm-planner-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.tm-planner-slot-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tm-planner-slot-selected {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-planner-students-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tm-planner-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tm-planner-section-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-planner-section-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.1);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.tm-planner-students-hint {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.tm-planner-students {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.tm-planner-student {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(62, 58, 142, 0.1);
+  background: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.tm-planner-student:hover:not(.is-blocked) {
+  border-color: rgba(2, 132, 199, 0.3);
+}
+
+.tm-planner-student.is-checked {
+  border-color: rgba(2, 132, 199, 0.45);
+  background: rgba(2, 132, 199, 0.06);
+}
+
+.tm-planner-student.is-blocked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.tm-planner-student input {
+  margin-top: 3px;
+  accent-color: #0284c7;
+}
+
+.tm-planner-student-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tm-planner-student-body strong {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-planner-student-body small {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.tm-planner-student-warn {
+  color: #b45309 !important;
+}
+
+.tm-planner-conflicts {
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tm-planner-conflicts.is-ok {
+  background: rgba(16, 185, 129, 0.1);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.tm-planner-conflicts.is-error {
+  background: rgba(245, 158, 11, 0.1);
+  color: #92400e;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.tm-planner-conflicts ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.tm-planner-conflicts li {
+  margin: 4px 0;
+}
+
+.tm-planner-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.tm-planner-actions-spacer {
+  flex: 1;
+}
+
+.tm-planner-btn {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.tm-planner-btn.is-compact {
+  padding: 8px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.tm-planner-btn.is-primary {
+  background: linear-gradient(135deg, #0284c7, #0ea5b7);
+  color: #fff;
+}
+
+.tm-planner-btn.is-ghost {
+  background: rgba(62, 58, 142, 0.08);
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-planner-btn.is-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #b91c1c;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.tm-planner-btn:hover {
+  opacity: 0.92;
+}
+
+.tm-planner-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: var(--brand-navy, #28265a);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(40, 38, 90, 0.25);
+}
+
+@media (max-width: 960px) {
+  .tm-planner-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .tm-planner-sidebar {
+    max-height: none;
+  }
+
+  .tm-planner-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
