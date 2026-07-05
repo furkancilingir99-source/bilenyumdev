@@ -276,6 +276,7 @@
       if (endMs != null && rowDay != null && rowDay > endMs) return false;
       if (!q) return true;
       var hay = [
+        r.id,
         r.studentFirstName, r.studentLastName, r.grade, r.subject,
         r.parentFirstName, r.parentLastName, r.phone, r.email, r.slotLabel,
         formatCreatedAt(r.createdAt)
@@ -381,7 +382,7 @@
       var parent = parentName(r);
       return (
         '<tr>' +
-          '<td>' + (offset + i + 1) + '</td>' +
+          '<td><span class="tm-record-id">' + escapeHtml(r.id) + '</span></td>' +
           '<td>' +
             '<button type="button" class="tm-student-link" data-res-id="' + escapeHtml(r.id) + '">' +
               escapeHtml(student) +
@@ -502,6 +503,7 @@
           '<h4 class="tm-detail-card-title">Rezervasyon</h4>' +
         '</div>' +
         '<dl class="tm-detail-dl">' +
+          '<div><dt>Rezervasyon ID</dt><dd><span class="tm-record-id">' + escapeHtml(r.id) + '</span></dd></div>' +
           '<div><dt>Kayıt tarihi</dt><dd class="tm-detail-readonly">' + escapeHtml(formatCreatedAt(r.createdAt)) + '</dd></div>' +
           '<div class="tm-detail-slot-row"><dt>Ders tarihi / saat</dt><dd>' +
             requestedNote +

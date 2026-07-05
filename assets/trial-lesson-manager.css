@@ -542,6 +542,35 @@
   color: var(--brand-navy, #28265a);
 }
 
+.tm-record-id {
+  display: inline-block;
+  font-family: ui-monospace, 'Cascadia Code', 'Consolas', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #475569;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(62, 58, 142, 0.08);
+  border: 1px solid rgba(62, 58, 142, 0.12);
+  white-space: nowrap;
+}
+
+.tm-record-id--inline {
+  display: block;
+  width: fit-content;
+  margin-top: 2px;
+  padding: 2px 6px;
+  font-size: 10px;
+}
+
+.tm-planner-lesson-id {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
+}
+
 .tm-cell-date {
   font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
   font-size: 12px;

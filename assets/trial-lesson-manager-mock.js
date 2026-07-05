@@ -4,9 +4,27 @@
 (function (global) {
   'use strict';
 
+  var ID_PREFIX = 'REZ';
+
+  function formatReservationId(year, seq) {
+    return ID_PREFIX + '-' + year + '-' + String(seq).padStart(4, '0');
+  }
+
+  function nextReservationId() {
+    var year = new Date().getFullYear();
+    var max = 0;
+    RESERVATIONS.forEach(function (r) {
+      var m = new RegExp('^' + ID_PREFIX + '-(\\d{4})-(\\d+)$').exec(r.id);
+      if (m && parseInt(m[1], 10) === year) {
+        max = Math.max(max, parseInt(m[2], 10));
+      }
+    });
+    return formatReservationId(year, max + 1);
+  }
+
   var RESERVATIONS = [
     {
-      id: 'r1',
+      id: 'REZ-2026-0001',
       studentFirstName: 'Mira',
       studentLastName: 'Yılmaz',
       grade: '7. Sınıf',
@@ -20,7 +38,7 @@
       createdAt: '2026-07-05T08:12:00+03:00'
     },
     {
-      id: 'r2',
+      id: 'REZ-2026-0002',
       studentFirstName: 'Can',
       studentLastName: 'Kaya',
       grade: '8. Sınıf',
@@ -34,7 +52,7 @@
       createdAt: '2026-07-05T07:45:00+03:00'
     },
     {
-      id: 'r3',
+      id: 'REZ-2026-0003',
       studentFirstName: 'Elif',
       studentLastName: 'Demir',
       grade: '6. Sınıf',
@@ -50,7 +68,7 @@
       createdAt: '2026-07-04T19:30:00+03:00'
     },
     {
-      id: 'r4',
+      id: 'REZ-2026-0004',
       studentFirstName: 'Arda',
       studentLastName: 'Öztürk',
       grade: '5. Sınıf',
@@ -64,7 +82,7 @@
       createdAt: '2026-07-04T16:20:00+03:00'
     },
     {
-      id: 'r5',
+      id: 'REZ-2026-0005',
       studentFirstName: 'Selin',
       studentLastName: 'Aksoy',
       grade: '7. Sınıf',
@@ -78,7 +96,7 @@
       createdAt: '2026-07-04T11:05:00+03:00'
     },
     {
-      id: 'r6',
+      id: 'REZ-2026-0006',
       studentFirstName: 'Emir',
       studentLastName: 'Çelik',
       grade: '8. Sınıf',
@@ -92,7 +110,7 @@
       createdAt: '2026-07-03T14:40:00+03:00'
     },
     {
-      id: 'r7',
+      id: 'REZ-2026-0007',
       studentFirstName: 'Lina',
       studentLastName: 'Şahin',
       grade: '6. Sınıf',
@@ -106,7 +124,7 @@
       createdAt: '2026-07-03T09:18:00+03:00'
     },
     {
-      id: 'r8',
+      id: 'REZ-2026-0008',
       studentFirstName: 'Kerem',
       studentLastName: 'Aydın',
       grade: '5. Sınıf',
@@ -120,7 +138,7 @@
       createdAt: '2026-07-02T21:50:00+03:00'
     },
     {
-      id: 'r9',
+      id: 'REZ-2026-0009',
       studentFirstName: 'Defne',
       studentLastName: 'Koç',
       grade: '7. Sınıf',
@@ -134,7 +152,7 @@
       createdAt: '2026-07-05T06:55:00+03:00'
     },
     {
-      id: 'r10',
+      id: 'REZ-2026-0010',
       studentFirstName: 'Yiğit',
       studentLastName: 'Polat',
       grade: '8. Sınıf',
@@ -148,7 +166,7 @@
       createdAt: '2026-07-05T09:30:00+03:00'
     },
     {
-      id: 'r11',
+      id: 'REZ-2026-0011',
       studentFirstName: 'Zeynep',
       studentLastName: 'Arslan',
       grade: '6. Sınıf',
@@ -162,7 +180,7 @@
       createdAt: '2026-07-04T22:10:00+03:00'
     },
     {
-      id: 'r12',
+      id: 'REZ-2026-0012',
       studentFirstName: 'Berk',
       studentLastName: 'Yıldız',
       grade: '7. Sınıf',
@@ -176,7 +194,7 @@
       createdAt: '2026-07-04T08:40:00+03:00'
     },
     {
-      id: 'r13',
+      id: 'REZ-2026-0013',
       studentFirstName: 'Ece',
       studentLastName: 'Güneş',
       grade: '5. Sınıf',
@@ -190,7 +208,7 @@
       createdAt: '2026-07-03T17:25:00+03:00'
     },
     {
-      id: 'r14',
+      id: 'REZ-2026-0014',
       studentFirstName: 'Alp',
       studentLastName: 'Kurt',
       grade: '8. Sınıf',
@@ -204,7 +222,7 @@
       createdAt: '2026-07-02T13:15:00+03:00'
     },
     {
-      id: 'r15',
+      id: 'REZ-2026-0015',
       studentFirstName: 'Damla',
       studentLastName: 'Erdoğan',
       grade: '6. Sınıf',
@@ -218,7 +236,7 @@
       createdAt: '2026-07-01T10:50:00+03:00'
     },
     {
-      id: 'r16',
+      id: 'REZ-2026-0016',
       studentFirstName: 'Kaan',
       studentLastName: 'Tekin',
       grade: '7. Sınıf',
@@ -350,6 +368,9 @@
   }
 
   global.TrialLessonManagerMock = {
+    ID_PREFIX: ID_PREFIX,
+    formatReservationId: formatReservationId,
+    nextReservationId: nextReservationId,
     getReservations: getReservations,
     getReservationById: getReservationById,
     getFilterOptions: getFilterOptions,

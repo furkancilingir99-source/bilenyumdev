@@ -249,6 +249,7 @@
       if (endMs != null && rowDay != null && rowDay > endMs) return false;
       if (!q) return true;
       var hay = [
+        l.id,
         l.subject, l.grade, l.teacherName, l.slotLabel,
         studentNames(l), formatUpdatedAt(l.updatedAt)
       ].join(' ').toLowerCase();
@@ -361,7 +362,7 @@
         : '—';
       return (
         '<tr>' +
-          '<td>' + (offset + i + 1) + '</td>' +
+          '<td><span class="tm-record-id">' + escapeHtml(l.id) + '</span></td>' +
           '<td>' +
             '<button type="button" class="tm-student-link" data-lesson-id="' + escapeHtml(l.id) + '">' +
               escapeHtml(l.subject) +
@@ -393,6 +394,7 @@
             '<h4 class="tm-detail-card-title">' + escapeHtml(s.name) + '</h4>' +
           '</div>' +
           '<dl class="tm-detail-dl">' +
+            '<div><dt>Rezervasyon ID</dt><dd><span class="tm-record-id">' + escapeHtml(s.reservationId) + '</span></dd></div>' +
             '<div><dt>Sınıf</dt><dd>' + escapeHtml(s.grade) + '</dd></div>' +
             '<div><dt>Veli</dt><dd>' + escapeHtml(s.parent) + '</dd></div>' +
             '<div><dt>Telefon</dt><dd><a href="tel:' + escapeHtml(String(s.phone).replace(/\s/g, '')) + '">' + escapeHtml(s.phone) + '</a></dd></div>' +
@@ -426,6 +428,7 @@
           '<h4 class="tm-detail-card-title">Ders</h4>' +
         '</div>' +
         '<dl class="tm-detail-dl">' +
+          '<div><dt>Ders ID</dt><dd><span class="tm-record-id">' + escapeHtml(l.id) + '</span></dd></div>' +
           '<div><dt>Branş</dt><dd>' + escapeHtml(l.subject) + '</dd></div>' +
           '<div><dt>Sınıf</dt><dd>' + escapeHtml(l.grade) + '</dd></div>' +
           '<div><dt>Ders tarihi / saat</dt><dd><strong>' + escapeHtml(l.slotLabel) + '</strong></dd></div>' +

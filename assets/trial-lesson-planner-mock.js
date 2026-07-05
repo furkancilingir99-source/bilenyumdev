@@ -6,6 +6,11 @@
 
   var SUBJECTS = ['Matematik', 'Fen Bilimleri', 'Türkçe', 'İngilizce', 'Sosyal Bilgiler'];
   var GRADES = ['5. Sınıf', '6. Sınıf', '7. Sınıf', '8. Sınıf'];
+  var ID_PREFIX = 'DERS';
+
+  function formatLessonId(year, seq) {
+    return ID_PREFIX + '-' + year + '-' + String(seq).padStart(4, '0');
+  }
 
   var TEACHERS = [
     { id: 't1', name: 'Furkan Çilingir', subjects: ['Matematik'] },
@@ -17,25 +22,25 @@
 
   var PLANNED_LESSONS = [
     {
-      id: 'pl1',
+      id: 'DERS-2026-0001',
       subject: 'Matematik',
       grade: '7. Sınıf',
       teacherId: 't1',
       slotLabel: 'Pazartesi, 7 Tem · 14:30',
       slotDateKey: '2026-07-07',
       slotTime: '14:30',
-      studentIds: ['r1', 'r9'],
+      studentIds: ['REZ-2026-0001', 'REZ-2026-0009'],
       updatedAt: '2026-07-05T10:00:00+03:00'
     },
     {
-      id: 'pl2',
+      id: 'DERS-2026-0002',
       subject: 'Fen Bilimleri',
       grade: '8. Sınıf',
       teacherId: 't5',
       slotLabel: 'Bugün · 16:00',
       slotDateKey: '2026-07-05',
       slotTime: '16:00',
-      studentIds: ['r2'],
+      studentIds: ['REZ-2026-0002'],
       updatedAt: '2026-07-05T08:30:00+03:00'
     }
   ];
@@ -148,7 +153,15 @@
   }
 
   function nextLessonId() {
-    return 'pl' + (Date.now().toString(36));
+    var year = new Date().getFullYear();
+    var max = 0;
+    PLANNED_LESSONS.forEach(function (l) {
+      var m = new RegExp('^' + ID_PREFIX + '-(\\d{4})-(\\d+)$').exec(l.id);
+      if (m && parseInt(m[1], 10) === year) {
+        max = Math.max(max, parseInt(m[2], 10));
+      }
+    });
+    return formatLessonId(year, max + 1);
   }
 
   function savePlannedLesson(draft) {
@@ -264,6 +277,9 @@
   }
 
   global.TrialLessonPlannerMock = {
+    ID_PREFIX: ID_PREFIX,
+    formatLessonId: formatLessonId,
+    nextLessonId: nextLessonId,
     SUBJECTS: SUBJECTS,
     GRADES: GRADES,
     getTeachersForSubject: getTeachersForSubject,

@@ -128,6 +128,7 @@
               '<input type="checkbox" data-student-id="' + escapeHtml(s.reservationId) + '"' + (checked ? ' checked' : '') + disabled + '>' +
               '<span class="tm-planner-student-body">' +
                 '<strong>' + escapeHtml(s.name) + '</strong>' +
+                '<small class="tm-record-id tm-record-id--inline">' + escapeHtml(s.reservationId) + '</small>' +
                 '<small>Tercih: ' + escapeHtml(s.preferredSlot) + ' · Veli: ' + escapeHtml(s.parent) + '</small>' +
                 (s.hasConflict && !checked ? '<small class="tm-planner-student-warn">' + escapeHtml(s.conflictMsg) + '</small>' : '') +
               '</span>' +
@@ -164,6 +165,7 @@
           '<div class="tm-planner-editor-head-row">' +
             '<div>' +
               '<h2 class="tm-planner-editor-title">' + (isEdit ? 'Dersi Düzenle' : 'Yeni Deneme Dersi Planla') + '</h2>' +
+              (isEdit ? '<p class="tm-planner-lesson-id">Ders ID: <span class="tm-record-id">' + escapeHtml(draft.id) + '</span></p>' : '') +
               '<p class="tm-planner-editor-sub">Branş, sınıf ve öğretmen seçin; uygun öğrencileri ekleyerek sınıf oluşturun.</p>' +
             '</div>' +
             '<a class="tm-panel-link" href="deneme-dersi-yoneticisi-planlanmis-dersler.html">Planlanmış derslere git →</a>' +
@@ -260,7 +262,7 @@
       renderEditor();
       return;
     }
-    showToast('Deneme dersi kaydedildi.');
+    showToast('Deneme dersi kaydedildi — ' + result.lesson.id);
     draft = draftFromLesson(result.lesson);
     initSlotFromDraft();
     if (history.replaceState) {
