@@ -201,10 +201,246 @@
   margin-bottom: 14px;
 }
 
+.tm-toolbar-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 10px;
+  margin-bottom: 12px;
+}
+
 .tm-toolbar-meta {
   margin-bottom: 16px;
-  padding-top: 2px;
+  padding-top: 10px;
   border-top: 1px solid rgba(168, 164, 240, 0.12);
+}
+
+.tm-search-compact {
+  flex: 0 1 140px;
+  width: 140px;
+  min-width: 120px;
+  max-width: 160px;
+  padding: 9px 12px;
+  font-size: 12px;
+}
+
+.tm-filter-select {
+  flex: 0 1 auto;
+  min-width: 118px;
+  padding: 9px 28px 9px 10px;
+  font-size: 12px;
+}
+
+.tm-date-range {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 6px 8px;
+  margin-left: auto;
+}
+
+.tm-date-field-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tm-date-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-dark-2, #5c567a);
+}
+
+.tm-date-btn {
+  display: inline-flex;
+  align-items: center;
+  min-width: 118px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(168, 164, 240, 0.28);
+  background: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand-navy, #28265a);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tm-date-btn:hover,
+.tm-date-btn[aria-expanded="true"] {
+  border-color: rgba(91, 84, 201, 0.55);
+  box-shadow: 0 0 0 3px rgba(91, 84, 201, 0.1);
+}
+
+.tm-date-btn-text.is-placeholder {
+  color: var(--ink-dark-2, #5c567a);
+  font-weight: 500;
+}
+
+.tm-date-sep {
+  align-self: center;
+  padding-bottom: 10px;
+  color: var(--ink-dark-2, #5c567a);
+  font-weight: 700;
+}
+
+.tm-date-clear {
+  align-self: flex-end;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(62, 58, 142, 0.08);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand-purple, #3e3a8e);
+  cursor: pointer;
+}
+
+.tm-date-clear:hover {
+  background: rgba(62, 58, 142, 0.14);
+}
+
+.tm-date-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  width: 268px;
+  padding: 10px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid rgba(168, 164, 240, 0.28);
+  box-shadow: 0 12px 36px rgba(40, 38, 90, 0.14);
+}
+
+.tm-date-popover:not([hidden]) {
+  display: block;
+}
+
+.tm-cal-quick {
+  margin-bottom: 8px;
+}
+
+.tm-cal-today {
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+}
+
+.tm-cal-today:hover {
+  filter: brightness(1.05);
+}
+
+.tm-cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.tm-cal-nav-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--brand-navy, #28265a);
+}
+
+.tm-cal-nav-btn {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(168, 164, 240, 0.28);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--brand-navy, #28265a);
+  cursor: pointer;
+}
+
+.tm-cal-nav-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.tm-cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--ink-dark-2, #5c567a);
+}
+
+.tm-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.tm-cal-day,
+.tm-cal-day-empty {
+  min-height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand-navy, #28265a);
+  cursor: pointer;
+}
+
+.tm-cal-day:hover {
+  background: rgba(62, 58, 142, 0.08);
+}
+
+.tm-cal-day.is-selected {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  color: #fff;
+}
+
+.tm-cal-day.is-today:not(.is-selected) {
+  box-shadow: inset 0 0 0 2px rgba(139, 92, 246, 0.45);
+}
+
+.tm-cal-day-empty {
+  cursor: default;
+  pointer-events: none;
+}
+
+@media (max-width: 1100px) {
+  .tm-date-range {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .tm-search-compact {
+    flex: 1 1 100%;
+    max-width: none;
+    width: 100%;
+  }
+  .tm-filter-select {
+    flex: 1 1 calc(50% - 8px);
+    min-width: 0;
+  }
 }
 
 .tm-toolbar-meta .tm-panel-link {
@@ -456,7 +692,8 @@
   color: var(--brand-navy, #28265a);
 }
 
-.tm-search:focus {
+.tm-search:focus,
+.tm-search-compact:focus {
   outline: none;
   border-color: rgba(91, 84, 201, 0.55);
   box-shadow: 0 0 0 3px rgba(91, 84, 201, 0.12);

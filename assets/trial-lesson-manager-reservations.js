@@ -5,6 +5,8 @@
   if (!Mock) return;
 
   var MONTHS = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+  var MONTHS_FULL = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+  var WEEKDAYS = ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'];
 
   var loading = document.getElementById('tmResLoading');
   var empty = document.getElementById('tmResEmpty');
@@ -22,9 +24,12 @@
   var drawerOverlay = document.getElementById('tmResDrawerOverlay');
   var drawerBody = document.getElementById('tmResDrawerBody');
   var drawerTitle = document.getElementById('tmResDrawerTitle');
+  var dateClearBtn = document.getElementById('tmResDateClear');
 
   var allRows = Mock.getReservations();
   var currentPage = 1;
+  var dateRange = { start: null, end: null };
+  var openDatePop = null;
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -42,6 +47,188 @@
     var h = String(d.getHours()).padStart(2, '0');
     var m = String(d.getMinutes()).padStart(2, '0');
     return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() + ' · ' + h + ':' + m;
+  }
+
+  function toDateKey(d) {
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
+
+  function parseDateKey(key) {
+    if (!key) return null;
+    var parts = key.split('-');
+    if (parts.length !== 3) return null;
+    return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+  }
+
+  function formatDateKey(key) {
+    var d = parseDateKey(key);
+    if (!d || isNaN(d.getTime())) return '';
+    return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  function dayStartMs(key) {
+    var d = parseDateKey(key);
+    return d ? d.getTime() : null;
+  }
+
+  function createdAtDayMs(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return null;
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  }
+
+  function updateDateClearBtn() {
+    if (!dateClearBtn) return;
+    dateClearBtn.hidden = !(dateRange.start || dateRange.end);
+  }
+
+  function updateDateBtn(key) {
+    var btn = document.getElementById(key === 'start' ? 'tmResDateStartBtn' : 'tmResDateEndBtn');
+    if (!btn) return;
+    var textEl = btn.querySelector('.tm-date-btn-text');
+    if (!textEl) return;
+    var val = dateRange[key];
+    if (val) {
+      textEl.textContent = formatDateKey(val);
+      textEl.classList.remove('is-placeholder');
+    } else {
+      textEl.textContent = 'Tarih seç';
+      textEl.classList.add('is-placeholder');
+    }
+  }
+
+  function closeDatePopovers() {
+    ['tmResDateStartPop', 'tmResDateEndPop'].forEach(function (id) {
+      var pop = document.getElementById(id);
+      if (pop) pop.hidden = true;
+    });
+    ['tmResDateStartBtn', 'tmResDateEndBtn'].forEach(function (id) {
+      var btn = document.getElementById(id);
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    });
+    openDatePop = null;
+  }
+
+  function renderCalendar(pop, key, viewDate) {
+    if (!pop) return;
+    var selected = dateRange[key];
+    var todayKey = toDateKey(new Date());
+    var year = viewDate.getFullYear();
+    var month = viewDate.getMonth();
+    var first = new Date(year, month, 1);
+    var startOffset = (first.getDay() + 6) % 7;
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    var cells = '';
+    var i;
+    for (i = 0; i < startOffset; i++) {
+      cells += '<span class="tm-cal-day-empty" aria-hidden="true"></span>';
+    }
+    for (i = 1; i <= daysInMonth; i++) {
+      var cellKey = toDateKey(new Date(year, month, i));
+      var cls = 'tm-cal-day';
+      if (cellKey === selected) cls += ' is-selected';
+      if (cellKey === todayKey) cls += ' is-today';
+      cells += '<button type="button" class="' + cls + '" data-cal-day="' + cellKey + '">' + i + '</button>';
+    }
+
+    pop.innerHTML =
+      '<div class="tm-cal">' +
+        '<div class="tm-cal-quick">' +
+          '<button type="button" class="tm-cal-today" data-cal-today="' + key + '">Bugünü seç</button>' +
+        '</div>' +
+        '<div class="tm-cal-nav">' +
+          '<button type="button" class="tm-cal-nav-btn" data-cal-prev aria-label="Önceki ay">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>' +
+          '</button>' +
+          '<span class="tm-cal-nav-label">' + MONTHS_FULL[month] + ' ' + year + '</span>' +
+          '<button type="button" class="tm-cal-nav-btn" data-cal-next aria-label="Sonraki ay">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>' +
+          '</button>' +
+        '</div>' +
+        '<div class="tm-cal-weekdays">' + WEEKDAYS.map(function (w) { return '<span>' + w + '</span>'; }).join('') + '</div>' +
+        '<div class="tm-cal-grid">' + cells + '</div>' +
+      '</div>';
+
+    pop.dataset.calKey = key;
+    pop.dataset.calYear = String(year);
+    pop.dataset.calMonth = String(month);
+  }
+
+  function setDateValue(key, value) {
+    dateRange[key] = value || null;
+    if (dateRange.start && dateRange.end && dayStartMs(dateRange.start) > dayStartMs(dateRange.end)) {
+      if (key === 'start') dateRange.end = dateRange.start;
+      else dateRange.start = dateRange.end;
+      updateDateBtn('start');
+      updateDateBtn('end');
+    }
+    updateDateBtn(key);
+    updateDateClearBtn();
+    closeDatePopovers();
+    applyFilters(true);
+  }
+
+  function initDatePicker(btnId, popId, key) {
+    var btn = document.getElementById(btnId);
+    var pop = document.getElementById(popId);
+    if (!btn || !pop) return;
+
+    var viewDate = new Date();
+    viewDate.setDate(1);
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var isOpen = openDatePop === popId;
+      closeDatePopovers();
+      if (isOpen) return;
+      if (dateRange[key]) {
+        var sel = parseDateKey(dateRange[key]);
+        if (sel) viewDate = new Date(sel.getFullYear(), sel.getMonth(), 1);
+      } else {
+        viewDate = new Date();
+        viewDate.setDate(1);
+      }
+      renderCalendar(pop, key, viewDate);
+      pop.hidden = false;
+      btn.setAttribute('aria-expanded', 'true');
+      openDatePop = popId;
+    });
+
+    pop.addEventListener('click', function (e) {
+      var todayBtn = e.target.closest('[data-cal-today]');
+      if (todayBtn) {
+        setDateValue(key, toDateKey(new Date()));
+        return;
+      }
+      var dayBtn = e.target.closest('[data-cal-day]');
+      if (dayBtn) {
+        setDateValue(key, dayBtn.getAttribute('data-cal-day'));
+        return;
+      }
+      if (e.target.closest('[data-cal-prev]')) {
+        viewDate = new Date(parseInt(pop.dataset.calYear, 10), parseInt(pop.dataset.calMonth, 10) - 1, 1);
+        renderCalendar(pop, key, viewDate);
+        return;
+      }
+      if (e.target.closest('[data-cal-next]')) {
+        viewDate = new Date(parseInt(pop.dataset.calYear, 10), parseInt(pop.dataset.calMonth, 10) + 1, 1);
+        renderCalendar(pop, key, viewDate);
+      }
+    });
+  }
+
+  function clearDateRange() {
+    dateRange.start = null;
+    dateRange.end = null;
+    updateDateBtn('start');
+    updateDateBtn('end');
+    updateDateClearBtn();
+    closeDatePopovers();
+    applyFilters(true);
   }
 
   function studentName(r) {
@@ -75,11 +262,16 @@
     var status = statusFilter ? statusFilter.value : 'all';
     var grade = gradeFilter ? gradeFilter.value : 'all';
     var subject = subjectFilter ? subjectFilter.value : 'all';
+    var startMs = dateRange.start ? dayStartMs(dateRange.start) : null;
+    var endMs = dateRange.end ? dayStartMs(dateRange.end) : null;
 
     return allRows.filter(function (r) {
       if (status !== 'all' && r.status !== status) return false;
       if (grade !== 'all' && r.grade !== grade) return false;
       if (subject !== 'all' && r.subject !== subject) return false;
+      var rowDay = createdAtDayMs(r.createdAt);
+      if (startMs != null && rowDay != null && rowDay < startMs) return false;
+      if (endMs != null && rowDay != null && rowDay > endMs) return false;
       if (!q) return true;
       var hay = [
         r.studentFirstName, r.studentLastName, r.grade, r.subject,
@@ -302,12 +494,27 @@
       el.addEventListener('click', closeDrawer);
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && drawer && drawer.classList.contains('is-open')) closeDrawer();
+      if (e.key === 'Escape') {
+        if (drawer && drawer.classList.contains('is-open')) closeDrawer();
+        else closeDatePopovers();
+      }
     });
+
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.tm-date-field-wrap')) closeDatePopovers();
+    });
+
+    if (dateClearBtn) {
+      dateClearBtn.addEventListener('click', clearDateRange);
+    }
+
+    initDatePicker('tmResDateStartBtn', 'tmResDateStartPop', 'start');
+    initDatePicker('tmResDateEndBtn', 'tmResDateEndPop', 'end');
   }
 
   function init() {
     populateFilterSelects();
+    updateDateClearBtn();
     if (loading) loading.hidden = true;
     applyFilters(true);
     wireEvents();
