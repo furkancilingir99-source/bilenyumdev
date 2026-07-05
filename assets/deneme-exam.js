@@ -55,6 +55,7 @@
       sozel: 'Deneme Sınavı · Sözel Bölüm'
     },
     finishConfirmText: 'Deneme sınavını tamamlamak istediğine emin misin? Onayladığında cevapların kaydedilecek.',
+    examName: 'Deneme Sınavı',
     markAssessmentComplete: false,
     showCompletedOnInit: false,
     finishModalType: 'deneme'

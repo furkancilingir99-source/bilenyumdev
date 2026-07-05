@@ -904,9 +904,15 @@
       var placementData = Scoring ? Scoring.scorePlacement(questions, answers) : null;
 
       if (Scoring && placementData) {
-        lsSet(K.results, JSON.stringify({
-          placement: placementData, answers: answers, completedAt: new Date().toISOString()
-        }));
+        var resultsPayload = {
+          placement: placementData,
+          answers: answers,
+          completedAt: new Date().toISOString()
+        };
+        if (examCfg.examName) {
+          resultsPayload.examName = examCfg.examName;
+        }
+        lsSet(K.results, JSON.stringify(resultsPayload));
       }
       lsSet(K.complete, '1');
       lsRemove(K.sayisalEndAt);

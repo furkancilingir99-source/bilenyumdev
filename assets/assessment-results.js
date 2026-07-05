@@ -216,11 +216,17 @@
     ]);
   }
 
-  function renderDenemeHero(data, student) {
+  function getDenemeExamName(denemeRaw) {
+    if (denemeRaw && denemeRaw.examName) return denemeRaw.examName;
+    var stored = lsGet('denemeExamName');
+    return stored || 'Deneme Sınavı';
+  }
+
+  function renderDenemeHero(data, student, examName) {
     return (
       '<section class="asm-res-hero asm-res-hero--partial">' +
         '<span class="asm-res-hero-emoji">📊</span>' +
-        '<h1 class="asm-res-hero-title">Deneme Sınavı Sonucun</h1>' +
+        '<h1 class="asm-res-hero-title">' + escapeHtml(examName || 'Deneme Sınavı') + '</h1>' +
         '<p class="asm-res-hero-sub">' + escapeHtml(student.name) + ' · ' + escapeHtml(student.gradeLabel) + '</p>' +
         '<div class="asm-res-score-ring">' +
           '<div class="asm-res-score-val">' + data.placementScore + '</div>' +
@@ -287,7 +293,8 @@
     );
   }
 
-  function renderSubjectTable(placement, title) {
+  function renderSubjectTable(placement, title, showFormula) {
+    if (showFormula === undefined) showFormula = true;
     return (
       '<section class="asm-res-card">' +
         '<h2 class="asm-res-card-title">' + title + '</h2>' +
@@ -306,7 +313,9 @@
             '</tr></tfoot>' +
           '</table>' +
         '</div>' +
-        '<p class="asm-res-formula">Net = Doğru − (Yanlış ÷ 3) · 3 yanlış 1 doğruyu götürür. Deneme puanı toplam net üzerinden 500\'e ölçeklenir.</p>' +
+        (showFormula
+          ? '<p class="asm-res-formula">Net = Doğru − (Yanlış ÷ 3) · 3 yanlış 1 doğruyu götürür. Deneme puanı toplam net üzerinden 500\'e ölçeklenir.</p>'
+          : '') +
       '</section>'
     );
   }
@@ -439,13 +448,11 @@
       if (denemeRaw && denemeRaw.placement) {
         var denemeQuestions = getDenemeQuestions();
         var denemePlacement = resolveDenemePlacement(denemeRaw) || denemeRaw.placement;
-        var autoDenemeVideos = new URLSearchParams(location.search).get('videos') === '1';
+        var examName = getDenemeExamName(denemeRaw);
         root.innerHTML =
-          renderDenemeHero(denemePlacement, student) +
-          renderSubjectTable(denemePlacement, 'Ders Bazlı Sonuçlar') +
-          renderPlacementVideoHost() +
+          renderDenemeHero(denemePlacement, student, examName) +
+          renderSubjectTable(denemePlacement, 'Ders Bazlı Sonuçlar', false) +
           renderDenemeActions();
-        bindExamVideos(root, denemeRaw, denemeQuestions, autoDenemeVideos);
         bindFinishVideosButton('asmDenemeVideosBtn', denemeQuestions, denemeRaw);
         return;
       }

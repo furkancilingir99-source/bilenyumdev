@@ -12512,6 +12512,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 
   if (joinBtn) {
     joinBtn.addEventListener('click', function(){
+      localStorage.setItem('bilenyum.denemeExamName', UPCOMING_EXAM.name);
       if (!loadJoinState()) {
         saveJoinState();
         showToast('Kaydın alındı · Deneme sınavına yönlendiriliyorsun.');
