@@ -46,9 +46,6 @@
   }
 
   function store() {
-    if (getMode() !== 'mock') {
-      throw new Error('REST API modu henüz uygulanmadı.');
-    }
     if (!global.TMStore) {
       throw new Error('TMStore yüklenmedi.');
     }

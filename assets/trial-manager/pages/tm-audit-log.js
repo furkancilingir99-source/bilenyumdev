@@ -37,6 +37,15 @@
     return u ? U.fullName(u.firstName, u.lastName) : userId;
   }
 
+  function initFromUrl() {
+    var entity = U.qs('entity');
+    var entityId = U.qs('entityId') || U.qs('id');
+    if (entity && entityFilter && entityFilter.querySelector('option[value="' + entity + '"]')) {
+      entityFilter.value = entity;
+    }
+    if (entityId && searchInput) searchInput.value = entityId;
+  }
+
   function initFilters() {
     if (entityFilter && SL && SL.AUDIT_ENTITY) {
       entityFilter.innerHTML = '<option value="all">Tüm varlıklar</option>' +
@@ -50,6 +59,7 @@
           return '<option value="' + k + '">' + SL.AUDIT_ACTION[k] + '</option>';
         }).join('');
     }
+    initFromUrl();
   }
 
   function filtered() {

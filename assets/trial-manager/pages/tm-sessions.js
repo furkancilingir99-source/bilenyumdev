@@ -82,6 +82,23 @@
     return U.sortBy(items, function (r) { return r.session.date + r.session.startTime; }, 'asc');
   }
 
+  function renderFilterHint() {
+    var hintEl = document.getElementById('tmSessionsFilterHint');
+    if (!hintEl) return;
+    if (needsAttendanceFilter) {
+      hintEl.hidden = false;
+      hintEl.innerHTML = 'Katılım girilmemiş dersler gösteriliyor. <a class="tm-panel-link" href="deneme-dersi-yoneticisi-planlanmis-dersler.html">Filtreyi kaldır</a>';
+      return;
+    }
+    if (todayFilter) {
+      hintEl.hidden = false;
+      hintEl.innerHTML = 'Bugünkü dersler gösteriliyor. <a class="tm-panel-link" href="deneme-dersi-yoneticisi-planlanmis-dersler.html">Filtreyi kaldır</a>';
+      return;
+    }
+    hintEl.hidden = true;
+    hintEl.textContent = '';
+  }
+
   function render() {
     if (!tbody) return;
     var loading = document.getElementById('tmSessionsLoading');

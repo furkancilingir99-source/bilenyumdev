@@ -40,5 +40,12 @@
     }
   }
 
-  global.TMAuditActions = { openEntity: openEntity };
+  function auditFilterHref(entityType, entityId) {
+    var params = [];
+    if (entityType) params.push('entity=' + encodeURIComponent(entityType));
+    if (entityId) params.push('entityId=' + encodeURIComponent(entityId));
+    return 'deneme-dersi-yoneticisi-denetim.html' + (params.length ? '?' + params.join('&') : '');
+  }
+
+  global.TMAuditActions = { openEntity: openEntity, auditFilterHref: auditFilterHref };
 })(typeof window !== 'undefined' ? window : this);
