@@ -56,6 +56,22 @@
     close: function (modalId) {
       var el = get(modalId);
       if (el && el._tmClose) el._tmClose();
+    },
+    confirmDelete: function (opts) {
+      opts = opts || {};
+      var subject = opts.subject || 'Bu kayıt';
+      var detail = opts.detail ? '\n\n' + opts.detail : '';
+      return window.confirm(
+        subject + ' kalıcı olarak silinecek. Bu işlem geri alınamaz.' + detail + '\n\nKesinlikle emin misiniz?'
+      );
+    },
+    confirmRemove: function (opts) {
+      opts = opts || {};
+      var subject = opts.subject || 'Bu öğrenci';
+      var detail = opts.detail ? '\n\n' + opts.detail : '';
+      return window.confirm(
+        subject + ' dersten çıkarılacak.' + detail + '\n\nKesinlikle emin misiniz?'
+      );
     }
   };
 })(typeof window !== 'undefined' ? window : this);

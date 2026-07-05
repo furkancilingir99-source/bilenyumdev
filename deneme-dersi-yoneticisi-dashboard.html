@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Deneme Dersi Yöneticisi · Merkez · Bilenyum</title>
-<meta name="description" content="Bilenyum — Deneme dersi rezervasyonları kontrol merkezi." />
+<meta name="description" content="Bilenyum — Deneme dersi rezervasyon ve planlama özeti." />
 <link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,28 +37,54 @@
     <div class="thw-context-panel">
       <div class="thw-page-head">
         <h1 class="thw-page-title">Merkez</h1>
-        <p class="thw-page-subtitle">Ücretsiz deneme dersi rezervasyonlarını buradan takip edebilirsin.</p>
+        <p class="thw-page-subtitle">Rezervasyon ve planlanmış derslerin özeti. Detay ve düzenleme için satırlara tıklayın.</p>
       </div>
     </div>
 
     <div id="tmDashLoading" class="td-state">
       <div class="td-skeleton"><div class="td-skeleton-bar"></div><div class="td-skeleton-bar"></div></div>
-      Özet yükleniyor...
+      Özet yükleniyor…
     </div>
 
-    <div id="tmKpiGrid" class="tm-kpi-grid" hidden></div>
+    <div id="tmDashRoot" class="tm-dash" hidden>
+      <nav class="tm-dash-nav" aria-label="Hızlı geçiş">
+        <a href="deneme-dersi-yoneticisi-rezervasyonlar.html">Rezervasyonlar</a>
+        <a href="deneme-dersi-yoneticisi-ders-planla.html">Ders Planla</a>
+        <a href="deneme-dersi-yoneticisi-planlanmis-dersler.html">Planlanmış Dersler</a>
+      </nav>
 
-    <section class="tm-panel" aria-labelledby="tmRecentTitle">
-      <div class="tm-panel-head">
-        <h2 class="tm-panel-title" id="tmRecentTitle">Son Rezervasyonlar</h2>
-        <a href="deneme-dersi-yoneticisi-rezervasyonlar.html" class="tm-panel-link">Tümünü gör →</a>
+      <div id="tmDashStats" class="tm-dash-stat-row" aria-label="Özet sayılar"></div>
+
+      <section class="tm-dash-panel" id="tmDashActions" hidden aria-labelledby="tmDashActionsTitle">
+        <div class="tm-dash-panel-head">
+          <h2 class="tm-dash-panel-title" id="tmDashActionsTitle">Dikkat gerektiren</h2>
+        </div>
+        <ul id="tmDashActionsList" class="tm-dash-action-list"></ul>
+      </section>
+
+      <div class="tm-dash-split">
+        <section class="tm-dash-panel" aria-labelledby="tmRecentTitle">
+          <div class="tm-dash-panel-head">
+            <h2 class="tm-dash-panel-title" id="tmRecentTitle">Son başvurular</h2>
+            <a href="deneme-dersi-yoneticisi-rezervasyonlar.html" class="tm-dash-panel-link">Tümü</a>
+          </div>
+          <div id="tmRecentWrap"></div>
+        </section>
+
+        <section class="tm-dash-panel" aria-labelledby="tmUpcomingTitle">
+          <div class="tm-dash-panel-head">
+            <h2 class="tm-dash-panel-title" id="tmUpcomingTitle">Yaklaşan dersler</h2>
+            <a href="deneme-dersi-yoneticisi-planlanmis-dersler.html" class="tm-dash-panel-link">Tümü</a>
+          </div>
+          <div id="tmUpcomingWrap"></div>
+        </section>
       </div>
-      <div id="tmRecentWrap"></div>
-    </section>
+    </div>
   </div>
 </main>
 
 <script src="assets/trial-lesson-manager-mock.js"></script>
+<script src="assets/trial-lesson-planner-mock.js"></script>
 <script src="assets/trial-lesson-manager-dashboard.js"></script>
 </body>
 </html>

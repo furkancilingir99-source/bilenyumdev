@@ -92,7 +92,7 @@
       textEl.textContent = formatDateKey(val);
       textEl.classList.remove('is-placeholder');
     } else {
-      textEl.textContent = 'Tarih seç';
+      textEl.textContent = key === 'start' ? 'Başlangıç' : 'Bitiş';
       textEl.classList.add('is-placeholder');
     }
   }

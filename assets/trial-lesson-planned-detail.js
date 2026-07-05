@@ -54,7 +54,7 @@
     l.students.forEach(function (s) {
       if (s.reservationId === reservationId) name = s.name;
     });
-    if (!confirm((name || reservationId) + ' dersten çıkarılsın mı?')) return;
+    if (!Modal.confirmRemove({ subject: name || 'Bu öğrenci', detail: reservationId })) return;
     var nextIds = l.studentIds.filter(function (id) { return id !== reservationId; });
     var result = Planner.updatePlannedLessonStudents(lessonId, nextIds);
     if (!result.ok) {
@@ -178,6 +178,7 @@
     if (toggleBtn) {
       toggleBtn.addEventListener('click', function () {
         if (isSelected) {
+          if (!Modal.confirmRemove({ subject: applicant.name, detail: applicant.reservationId })) return;
           modalStudentIds = modalStudentIds.filter(function (id) { return id !== reservationId; });
         } else {
           modalStudentIds = modalStudentIds.concat([reservationId]);
@@ -382,6 +383,16 @@
     modal.addEventListener('click', function (e) {
       if (!e.target.closest('#tmModalStudentsSave')) return;
       modalStudentIds = Picker.collectSelectedIds(body);
+      var lesson = Planner.getEnrichedPlannedLesson(lessonId);
+      var removedCount = lesson ? lesson.studentIds.filter(function (id) {
+        return modalStudentIds.indexOf(id) === -1;
+      }).length : 0;
+      if (removedCount && !Modal.confirmRemove({
+        subject: removedCount === 1 ? '1 öğrenci' : removedCount + ' öğrenci',
+        detail: 'Seçim kaydedildiğinde dersten çıkarılacak.'
+      })) {
+        return;
+      }
       var result = Planner.updatePlannedLessonStudents(lessonId, modalStudentIds);
       if (!result.ok) {
         showToast(result.error || 'Kaydedilemedi.');

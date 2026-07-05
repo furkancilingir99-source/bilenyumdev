@@ -11,7 +11,7 @@
   var toastEl = document.getElementById('tmPlannerToast');
 
   var draft = null;
-  var slotEditor = { dayOffset: 0, slot: null };
+  var slotEditor = { dayOffset: 0, slot: null, userPicked: false };
   var applicantSearch = '';
   var modalApplicantSearch = '';
   var applicantFilters = null;
@@ -59,7 +59,7 @@
   }
 
   function syncSlotFromPicker() {
-    if (slotEditor.slot == null) return;
+    if (!draft || slotEditor.slot == null || !slotEditor.userPicked) return;
     var days = ResMock.getOpenLessonSlots().days;
     var day = days[slotEditor.dayOffset] || days[0];
     draft.slotLabel = ResMock.buildSlotLabel(slotEditor.dayOffset, slotEditor.slot);
@@ -70,9 +70,24 @@
     draft.slotTime = slotEditor.slot;
   }
 
+  function isDateInPickerWindow(dateKey) {
+    if (!dateKey) return false;
+    var days = ResMock.getOpenLessonSlots().days;
+    var today = new Date();
+    for (var i = 0; i < days.length; i++) {
+      var d = new Date(today);
+      d.setDate(today.getDate() + days[i].offset);
+      var key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      if (key === dateKey) return true;
+    }
+    return false;
+  }
+
   function initSlotFromDraft() {
-    slotEditor = { dayOffset: 0, slot: draft.slotTime || null };
-    if (draft.slotDateKey) {
+    slotEditor.userPicked = false;
+    slotEditor.slot = draft.slotTime || null;
+    slotEditor.dayOffset = 0;
+    if (draft.slotDateKey && isDateInPickerWindow(draft.slotDateKey)) {
       var days = ResMock.getOpenLessonSlots().days;
       var today = new Date();
       for (var i = 0; i < days.length; i++) {
@@ -118,15 +133,23 @@
     return (
       '<div class="tm-planner-slot-block">' +
         '<span class="tm-filter-field-label">Ders tarihi / saat</span>' +
+        (draft.slotLabel
+          ? '<p class="tm-planner-slot-selected">Kayıtlı ders saati: <strong>' + escapeHtml(draft.slotLabel) + '</strong>' +
+            (draft.slotDateKey && !isDateInPickerWindow(draft.slotDateKey)
+              ? ' <span class="tm-planner-slot-outside">(takvim penceresi dışında — değiştirmek için aşağıdan yeni slot seçin)</span>'
+              : '') +
+          '</p>'
+          : '') +
         '<div class="tm-slot-day-nav">' + dayNav + '</div>' +
         '<div class="tm-slot-grid">' + grid + '</div>' +
-        (draft.slotLabel ? '<p class="tm-planner-slot-selected">Seçili: <strong>' + escapeHtml(draft.slotLabel) + '</strong></p>' : '') +
+        (slotEditor.userPicked && draft.slotLabel
+          ? '<p class="tm-planner-slot-selected">Yeni seçim: <strong>' + escapeHtml(draft.slotLabel) + '</strong></p>'
+          : '') +
       '</div>'
     );
   }
 
   function getApplicants() {
-    syncSlotFromPicker();
     return Planner.getEligibleStudents(
       draft.subject,
       draft.grade,
@@ -152,7 +175,9 @@
       searchId: isModal ? 'tmModalApplicantSearch' : 'tmApplicantSearch',
       filterPrefix: isModal ? 'tmModalApplicant' : 'tmApplicant',
       filters: getApplicantFilters(!!isModal),
-      showSearch: true
+      showSearch: true,
+      embedded: !isModal,
+      showTeacherCoordination: !!isModal
     };
   }
 
@@ -173,12 +198,12 @@
 
   function renderStudents() {
     if (!draft.subject || !draft.grade) {
-      return '<p class="tm-planner-students-hint">Öğrenci listesi için branş ve sınıf seçin.</p>';
+      return '<p class="tm-planner-students-hint">Başvuru listesi için branş ve sınıf seçin.</p>';
     }
-    if (!draft.slotLabel) {
-      return '<p class="tm-planner-students-hint">Başvuru eşleştirmesi için ders tarihi / saat seçin.</p>';
-    }
-    return Picker.renderPickerSection(getApplicants(), draft.studentIds, pickerOpts(applicantSearch, false));
+    var slotHint = !draft.slotLabel
+      ? '<p class="tm-planner-students-hint tm-planner-students-hint--inline">Ders saati seçilmedi — başvurular listelenir; slot eşleştirmesi için yukarıdan saat seçin.</p>'
+      : '';
+    return slotHint + Picker.renderPickerSection(getApplicants(), draft.studentIds, pickerOpts(applicantSearch, false));
   }
 
   function replaceApplicantPicker(container, isModal) {
@@ -194,7 +219,7 @@
       wrap.innerHTML = html;
       picker.replaceWith(wrap.firstElementChild);
     }
-    var countEl = container.querySelector('.tm-planner-section-count');
+    var countEl = container.querySelector('[data-applicant-count]');
     if (countEl) countEl.textContent = draft.studentIds.length + ' seçili';
   }
 
@@ -248,6 +273,7 @@
     if (toggleBtn) {
       toggleBtn.addEventListener('click', function () {
         if (isSelected) {
+          if (Modal && !Modal.confirmRemove({ subject: applicant.name, detail: applicant.reservationId })) return;
           draft.studentIds = draft.studentIds.filter(function (id) { return id !== reservationId; });
           showToast(applicant.name + ' dersten çıkarıldı.');
         } else {
@@ -264,7 +290,9 @@
   }
 
   function renderConflicts() {
-    syncSlotFromPicker();
+    if (!draft.subject || !draft.grade || !draft.teacherId || !draft.slotDateKey || !draft.slotTime) {
+      return '<div class="tm-planner-conflicts is-neutral">Kaydetmek için branş, sınıf, öğretmen ve ders saati zorunludur.</div>';
+    }
     var issues = Planner.checkConflicts(draft);
     if (!issues.length) {
       return '<div class="tm-planner-conflicts is-ok">Çakışma yok — ders kaydedilebilir.</div>';
@@ -300,7 +328,6 @@
 
   function renderEditor() {
     if (!editorEl || !draft) return;
-    syncSlotFromPicker();
     var teachers = Planner.getTeachersForSubject(draft.subject);
     var isEdit = !!draft.id;
 
@@ -352,7 +379,7 @@
           '<div class="tm-planner-section-head">' +
             '<h3 class="tm-planner-section-title">Başvurulardan öğrenci seçimi</h3>' +
             '<div class="tm-planner-section-actions">' +
-              '<span class="tm-planner-section-count">' + draft.studentIds.length + ' seçili</span>' +
+              '<span class="tm-planner-section-count" data-applicant-count>' + draft.studentIds.length + ' seçili</span>' +
               '<button type="button" class="tm-action-link is-primary" id="tmOpenApplicantModal">Geniş ekranda düzenle</button>' +
             '</div>' +
           '</div>' +
@@ -372,17 +399,21 @@
     var lesson = Planner.getPlannedLessonById(id);
     if (!lesson) {
       draft = emptyDraft();
-      slotEditor = { dayOffset: 0, slot: null };
+      slotEditor = { dayOffset: 0, slot: null, userPicked: false };
     } else {
       draft = draftFromLesson(lesson);
       initSlotFromDraft();
+      applicantSearch = '';
+      applicantFilters = Picker.defaultApplicantFilters();
     }
     renderEditor();
   }
 
   function startNew() {
     draft = emptyDraft();
-    slotEditor = { dayOffset: 0, slot: null };
+    slotEditor = { dayOffset: 0, slot: null, userPicked: false };
+    applicantSearch = '';
+    applicantFilters = Picker.defaultApplicantFilters();
     renderEditor();
   }
 
@@ -484,7 +515,6 @@
 
   function openApplicantModal() {
     if (!Modal || !draft.subject || !draft.grade) return;
-    syncSlotFromPicker();
     modalApplicantSearch = modalApplicantSearch || applicantSearch;
     bindModalApplicantEvents();
     Modal.open({
@@ -507,6 +537,27 @@
     draft.teacherId = teacher ? teacher.value : draft.teacherId;
     draft.studentIds = collectStudentIds(false);
     syncSlotFromPicker();
+    if (!draft.slotDateKey || !draft.slotTime) {
+      showToast('Lütfen ders tarihi / saat seçin.');
+      renderEditor();
+      return;
+    }
+
+    if (draft.id) {
+      var originalLesson = Planner.getPlannedLessonById(draft.id);
+      if (originalLesson) {
+        var removedOnSave = originalLesson.studentIds.filter(function (id) {
+          return draft.studentIds.indexOf(id) === -1;
+        }).length;
+        if (removedOnSave && Modal && !Modal.confirmRemove({
+          subject: removedOnSave === 1 ? '1 öğrenci' : removedOnSave + ' öğrenci',
+          detail: 'Kayıt sonrası dersten çıkarılacak.'
+        })) {
+          renderEditor();
+          return;
+        }
+      }
+    }
 
     var result = Planner.savePlannedLesson(draft);
     if (!result.ok) {
@@ -531,12 +582,14 @@
           draft.subject = e.target.value;
           draft.teacherId = '';
           draft.studentIds = [];
+          applicantFilters = Picker.defaultApplicantFilters();
           renderEditor();
           return;
         }
         if (e.target.id === 'tmPlanGrade') {
           draft.grade = e.target.value;
           draft.studentIds = [];
+          applicantFilters = Picker.defaultApplicantFilters();
           renderEditor();
           return;
         }
@@ -548,7 +601,7 @@
         if (e.target.matches('input.tm-applicant-cb')) {
           draft.studentIds = collectStudentIds(false);
           Picker.updatePickerSelectionUI(editorEl, draft.studentIds.length);
-          var countEl = editorEl.querySelector('.tm-planner-section-count');
+          var countEl = editorEl.querySelector('[data-applicant-count]');
           if (countEl) countEl.textContent = draft.studentIds.length + ' seçili';
           return;
         }
@@ -597,7 +650,11 @@
           return;
         }
         if (e.target.closest('#tmPlanDelete')) {
-          if (draft.id && confirm('Bu deneme dersini silmek istediğine emin misin?')) {
+          if (
+            draft.id &&
+            Modal &&
+            Modal.confirmDelete({ subject: 'Bu deneme dersi', detail: draft.id + ' · ' + draft.subject + ' · ' + draft.grade })
+          ) {
             Planner.deletePlannedLesson(draft.id);
             showToast('Ders silindi.');
             window.location.href = 'deneme-dersi-yoneticisi-planlanmis-dersler.html';
@@ -607,7 +664,8 @@
         var dayBtn = e.target.closest('[data-plan-day]');
         if (dayBtn) {
           slotEditor.dayOffset = parseInt(dayBtn.getAttribute('data-plan-day'), 10);
-          slotEditor.slot = null;
+          slotEditor.userPicked = true;
+          if (!slotEditor.slot) slotEditor.slot = draft.slotTime || null;
           syncSlotFromPicker();
           renderEditor();
           return;
@@ -615,6 +673,7 @@
         var slotBtn = e.target.closest('[data-plan-slot]');
         if (slotBtn && !slotBtn.disabled) {
           slotEditor.slot = slotBtn.getAttribute('data-plan-slot');
+          slotEditor.userPicked = true;
           syncSlotFromPicker();
           renderEditor();
         }
@@ -624,8 +683,10 @@
 
   function init() {
     if (Modal) Modal.get('tmModal');
+    if (!editorEl) return;
+    editorEl.innerHTML = '<p class="td-state">Ders planlama formu yükleniyor…</p>';
     var params = new URLSearchParams(window.location.search);
-    var editId = params.get('edit');
+    var editId = params.get('edit') || params.get('id');
     if (editId && Planner.getPlannedLessonById(editId)) {
       loadLesson(editId);
     } else {

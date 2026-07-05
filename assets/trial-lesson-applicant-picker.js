@@ -387,16 +387,22 @@
       : '';
 
     var filteredCount = applyApplicantFilters(applicants, opts, selectedIds).length;
+    var isEmbedded = !!opts.embedded;
+    var showTeacherCoordination = opts.showTeacherCoordination;
+    if (showTeacherCoordination === undefined) showTeacherCoordination = !isEmbedded;
+    var metaClass = 'tm-applicant-picker-meta' + (isEmbedded ? ' tm-applicant-picker-meta--embedded' : '');
 
     return (
-      '<div class="tm-applicant-picker" data-applicant-picker>' +
+      '<div class="tm-applicant-picker' + (isEmbedded ? ' tm-applicant-picker--embedded' : '') + '" data-applicant-picker>' +
         '<p class="tm-applicant-picker-hint">Başvuruları filtreleyin; öğrenci adına tıklayarak veli ve iletişim detaylarını görün. Derse eklemek için satırın solundaki kutuyu işaretleyin.</p>' +
         renderParentCoordinationAlert(applicants, selectedIds, opts.lessonSlotLabel) +
-        (opts.teacher ? renderTeacherCoordination(opts.teacher, ctx) : '') +
+        (showTeacherCoordination && opts.teacher ? renderTeacherCoordination(opts.teacher, ctx) : '') +
         renderApplicantFilters(opts) +
         searchHtml +
-        '<div class="tm-applicant-picker-meta">' +
-          '<span class="tm-planner-section-count" data-applicant-count>' + selectedIds.length + ' seçili</span>' +
+        '<div class="' + metaClass + '">' +
+          (!isEmbedded
+            ? '<span class="tm-planner-section-count" data-applicant-count>' + selectedIds.length + ' seçili</span>'
+            : '') +
           '<span class="tm-applicant-filter-count">' + filteredCount + ' / ' + applicants.length + ' başvuru</span>' +
         '</div>' +
         renderApplicantTable(applicants, selectedIds, opts) +
