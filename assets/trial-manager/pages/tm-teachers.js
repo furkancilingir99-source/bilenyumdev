@@ -104,7 +104,9 @@
   if (searchInput) searchInput.addEventListener('input', U.debounce(function () { page = 1; render(); }, 200));
   if (pageSizeSelect) pageSizeSelect.addEventListener('change', function () { page = 1; render(); });
   if (exportBtn && Export) exportBtn.addEventListener('click', function () {
+    if (window.TMPermissions && !window.TMPermissions.guard('export')) return;
     Export.exportTable('ogretmenler.csv', filtered(), [{ key: 'firstName', label: 'Ad' }, { key: 'email', label: 'E-posta' }]);
   });
+  window.TMOnSessionChange = render;
   render();
 })();

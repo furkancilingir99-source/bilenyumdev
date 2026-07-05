@@ -120,5 +120,6 @@
       { key: 'firstName', label: 'Ad' }, { key: 'lastName', label: 'Soyad' }, { key: 'grade', label: 'Sınıf' }, { key: 'status', label: 'Durum' }
     ]);
   });
+  window.TMOnSessionChange = render;
   render();
 })();

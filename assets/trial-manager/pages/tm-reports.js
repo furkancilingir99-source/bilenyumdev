@@ -8,6 +8,7 @@
   var U = window.TMUtils;
   var SL = window.TMStatusLabels;
   var Export = window.TMExportUtils;
+  var Perms = window.TMPermissions;
   if (!Store) return;
 
   var startInput = document.getElementById('tmReportStart');
@@ -72,10 +73,16 @@
     var fenReq = requests.filter(function (r) { return r.requestedLessonTypeId === 'lt-fen'; }).length;
     var totalRes = reservations.length || 1;
     var completedSessions = sessions.filter(function (s) { return s.status === 'completed'; }).length;
+    var orphanRequests = requests.filter(function (r) {
+      return Store.isOrphanRequest ? Store.isOrphanRequest(r.id) : false;
+    }).length;
+    var newRequests = requests.filter(function (r) { return r.status === 'new'; }).length;
     return {
       sessionCount: sessions.length,
       completedSessions: completedSessions,
       requestCount: requests.length,
+      newRequests: newRequests,
+      orphanRequests: orphanRequests,
       confirmed: confirmed,
       cancelled: cancelled,
       attendanceRate: Math.round((attended / totalRes) * 100),
@@ -166,6 +173,8 @@
       card(m.sessionCount, 'Toplam deneme dersi') +
       card(m.completedSessions, 'Tamamlanan ders') +
       card(m.requestCount, 'Rezervasyon talebi') +
+      card(m.newRequests, 'Yeni talep', m.newRequests ? 'warn' : '') +
+      card(m.orphanRequests, 'Rezervasyonsuz talep', m.orphanRequests ? 'warn' : '') +
       card(m.confirmed, 'Onaylanan rezervasyon', 'ok') +
       card(m.cancelled, 'İptal edilen', 'danger') +
       card(m.attendanceRate + '%', 'Katılım oranı') +
@@ -259,35 +268,41 @@
     }
   }
 
+  var SUMMARY_COLUMNS = [
+    { key: 'sessionCount', label: 'Ders sayısı' },
+    { key: 'completedSessions', label: 'Tamamlanan ders' },
+    { key: 'requestCount', label: 'Talep sayısı' },
+    { key: 'newRequests', label: 'Yeni talep' },
+    { key: 'orphanRequests', label: 'Rezervasyonsuz talep' },
+    { key: 'confirmed', label: 'Onaylanan' },
+    { key: 'cancelled', label: 'İptal edilen' },
+    { key: 'attendanceRate', label: 'Katılım %' },
+    { key: 'noShowRate', label: 'Gelmeme %' },
+    { key: 'conversionRate', label: 'Dönüşüm %' },
+    { key: 'avgFill', label: 'Ort. doluluk' },
+    { key: 'matReq', label: 'Mat talep' },
+    { key: 'fenReq', label: 'Fen talep' },
+    { key: 'linkSentRate', label: 'Link %' },
+    { key: 'approvalRate', label: 'Onay %' },
+    { key: 'unreachable', label: 'Ulaşılamayan' },
+    { key: 'callAgain', label: 'Tekrar aranacak' }
+  ];
+
   function exportSummaryCsv() {
     if (!Export) return;
-    Export.exportTable('rapor-ozet.csv', [computeSummary()], [
-      { key: 'sessionCount', label: 'Ders sayısı' },
-      { key: 'requestCount', label: 'Talep sayısı' },
-      { key: 'confirmed', label: 'Onaylanan' },
-      { key: 'attendanceRate', label: 'Katılım %' },
-      { key: 'conversionRate', label: 'Dönüşüm %' },
-      { key: 'linkSentRate', label: 'Link %' },
-      { key: 'approvalRate', label: 'Onay %' }
-    ]);
+    if (Perms && !Perms.guard('export')) return;
+    Export.exportTable('rapor-ozet.csv', [computeSummary()], SUMMARY_COLUMNS);
   }
 
   function exportExcelPack() {
     if (!Export || !Export.exportExcelWorkbook) return;
+    if (Perms && !Perms.guard('export')) return;
     var summary = computeSummary();
     Export.exportExcelWorkbook('deneme-dersi-raporu.xls', [
       {
         name: 'Özet',
         rows: [summary],
-        columns: [
-          { key: 'sessionCount', label: 'Ders' },
-          { key: 'requestCount', label: 'Talep' },
-          { key: 'confirmed', label: 'Onaylı' },
-          { key: 'attendanceRate', label: 'Katılım %' },
-          { key: 'conversionRate', label: 'Dönüşüm %' },
-          { key: 'linkSentRate', label: 'Link %' },
-          { key: 'approvalRate', label: 'Veli onay %' }
-        ]
+        columns: SUMMARY_COLUMNS
       },
       {
         name: 'Günlük',
@@ -308,7 +323,8 @@
           { key: 'lesson', label: 'Ders türü' },
           { key: 'teacher', label: 'Öğretmen' },
           { key: 'enrolled', label: 'Öğrenci' },
-          { key: 'status', label: 'Durum' }
+          { key: 'status', label: 'Durum' },
+          { key: 'informed', label: 'Öğrt.bilgi' }
         ]
       },
       {
@@ -334,6 +350,8 @@
       }
     ]);
   }
+
+  window.TMOnSessionChange = render;
 
   defaultDates();
   renderTabs();

@@ -82,4 +82,5 @@
   }
 
   renderStats();
+  window.TMOnSessionChange = renderStats;
 })();

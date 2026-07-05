@@ -134,4 +134,5 @@
     });
   }
   render();
+  window.TMOnSessionChange = render;
 })();

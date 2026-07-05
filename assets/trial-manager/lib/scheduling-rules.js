@@ -166,6 +166,10 @@
       }
     }
     if (!draft.teacherId) issues.push('Öğretmen seçimi zorunlu.');
+    var store = getStore();
+    if (!draft.id && draft.date && store && draft.date < store.todayKey()) {
+      issues.push('Geçmiş tarihe yeni ders planlanamaz.');
+    }
     return issues;
   }
 

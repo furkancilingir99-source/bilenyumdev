@@ -8,6 +8,7 @@
   var Rules = window.TMSchedulingRules;
   var U = window.TMUtils;
   var Confirm = window.TMConfirmDialog;
+  var Perms = window.TMPermissions;
   if (!Store || !Rules) return;
 
   var editId = U.qs('edit');
@@ -22,6 +23,24 @@
   var slotsEl = document.getElementById('tmPlanSlots');
   var titleEl = document.getElementById('tmPlanTitle');
   var subEl = document.getElementById('tmPlanSub');
+  var editLocked = false;
+
+  function canSave() {
+    if (!Perms) return true;
+    return editId ? Perms.can('edit') : Perms.can('create');
+  }
+
+  function applyPermissionUi() {
+    if (!saveBtn) return;
+    if (!canSave()) {
+      saveBtn.disabled = true;
+      if (conflictEl) {
+        conflictEl.hidden = false;
+        conflictEl.textContent = 'Bu işlem için yetkiniz yok.';
+        conflictEl.className = 'tm-alert-row is-danger';
+      }
+    }
+  }
 
   function initSelects() {
     if (typeSelect) {
@@ -99,6 +118,7 @@
       }).join('') + '</div>';
     slotsEl.querySelectorAll('[data-slot]').forEach(function (btn) {
       btn.addEventListener('click', function () {
+        if (btn.classList.contains('is-busy')) return;
         if (timeSelect) {
           timeSelect.value = btn.getAttribute('data-slot');
           refreshTeachers();
@@ -109,6 +129,10 @@
 
   function checkConflict() {
     if (!conflictEl || !saveBtn) return;
+    if (editLocked || !canSave()) {
+      saveBtn.disabled = true;
+      return;
+    }
     var draft = getDraft();
     var issues = Rules.validateSessionDraft(draft);
     if (issues.length) {
@@ -141,7 +165,25 @@
     if (!editId) return;
     var s = Store.getSessionById(editId);
     if (!s) return;
-    if (typeSelect) typeSelect.value = s.lessonTypeId;
+    if (s.status === 'cancelled' || s.status === 'completed') {
+      editLocked = true;
+      if (conflictEl) {
+        conflictEl.hidden = false;
+        conflictEl.textContent = 'İptal edilmiş veya tamamlanmış dersler planlayıcıdan düzenlenemez.';
+        conflictEl.className = 'tm-alert-row is-danger';
+      }
+      if (form) {
+        form.querySelectorAll('input, select, textarea, button').forEach(function (el) {
+          if (el.id !== 'tmPlanSave') el.disabled = true;
+        });
+      }
+      if (saveBtn) saveBtn.disabled = true;
+    }
+    if (typeSelect) {
+      typeSelect.value = s.lessonTypeId;
+      typeSelect.disabled = true;
+      typeSelect.title = 'Düzenlemede ders türü değiştirilemez.';
+    }
     if (dateInput) dateInput.value = s.date;
     if (timeSelect) timeSelect.value = s.startTime;
     refreshTeachers();
@@ -150,6 +192,8 @@
   }
 
   function doSave() {
+    if (Perms && !Perms.guard(editId ? 'edit' : 'create')) return;
+    if (editLocked) return;
     var draft = getDraft();
     if (editId) {
       var s = Store.getSessionById(editId);
@@ -181,6 +225,8 @@
 
   if (saveBtn) {
     saveBtn.addEventListener('click', function () {
+      if (Perms && !Perms.guard(editId ? 'edit' : 'create')) return;
+      if (editLocked) return;
       var draft = getDraft();
       var issues = Rules.validateSessionDraft(draft);
       if (issues.length) { U.notifyError(issues.join(' · ')); return; }
@@ -206,5 +252,6 @@
 
   initSelects();
   loadEdit();
+  applyPermissionUi();
   checkConflict();
 })();

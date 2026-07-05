@@ -47,6 +47,9 @@
         showBootError('Veri deposu (TMStore) yüklenemedi. Sayfayı yenileyin veya önbelleği temizleyin.');
         return;
       }
+      if (window.TMAppShell && window.TMAppShell.refreshSidebarBadges) {
+        window.TMAppShell.refreshSidebarBadges();
+      }
       var loading = findLoadingEl();
       var root = findContentRoot();
       if (loading && root && root.hidden && loading.textContent.indexOf('Yükleniyor') >= 0) {

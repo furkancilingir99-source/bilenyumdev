@@ -128,6 +128,7 @@
   if (pageSizeSelect) pageSizeSelect.addEventListener('change', function () { page = 1; render(); });
   if (exportBtn && Export) {
     exportBtn.addEventListener('click', function () {
+      if (window.TMPermissions && !window.TMPermissions.guard('export')) return;
       Export.exportTable('deneme-dersleri.csv', filtered().map(function (r) { return r.session; }), [
         { key: 'id', label: 'ID' },
         { key: 'date', label: 'Tarih' },

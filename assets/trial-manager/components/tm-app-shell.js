@@ -26,13 +26,13 @@
 
   var NAV_ITEMS = [
     { key: 'operasyon', href: 'deneme-dersi-yoneticisi-dashboard.html', label: 'Operasyon Merkezi', icon: ICON.home },
-    { key: 'deneme-dersleri', href: 'deneme-dersi-yoneticisi-planlanmis-dersler.html', label: 'Deneme Dersleri', icon: ICON.calendar },
-    { key: 'rezervasyon-talepleri', href: 'deneme-dersi-yoneticisi-rezervasyonlar.html', label: 'Rezervasyon Talepleri', icon: ICON.inbox },
+    { key: 'deneme-dersleri', href: 'deneme-dersi-yoneticisi-planlanmis-dersler.html', label: 'Deneme Dersleri', icon: ICON.calendar, badgeMetric: 'needsAttendanceCount' },
+    { key: 'rezervasyon-talepleri', href: 'deneme-dersi-yoneticisi-rezervasyonlar.html', label: 'Rezervasyon Talepleri', icon: ICON.inbox, badgeMetric: 'orphanRequestCount' },
     { key: 'ogrenciler', href: 'deneme-dersi-yoneticisi-ogrenciler.html', label: 'Öğrenciler', icon: ICON.user },
     { key: 'veliler', href: 'deneme-dersi-yoneticisi-veliler.html', label: 'Veliler', icon: ICON.users },
     { key: 'ogretmenler', href: 'deneme-dersi-yoneticisi-ogretmenler.html', label: 'Öğretmenler', icon: ICON.teacher },
-    { key: 'online-linkler', href: 'deneme-dersi-yoneticisi-online-linkler.html', label: 'Online Ders Linkleri', icon: ICON.link },
-    { key: 'iletisim', href: 'deneme-dersi-yoneticisi-iletisim.html', label: 'İletişim Takibi', icon: ICON.phone },
+    { key: 'online-linkler', href: 'deneme-dersi-yoneticisi-online-linkler.html', label: 'Online Ders Linkleri', icon: ICON.link, badgeMetric: 'linkNotSentCount' },
+    { key: 'iletisim', href: 'deneme-dersi-yoneticisi-iletisim.html', label: 'İletişim Takibi', icon: ICON.phone, badgeMetric: 'pendingApprovalCount' },
     { key: 'raporlar', href: 'deneme-dersi-yoneticisi-raporlar.html', label: 'Raporlar', icon: ICON.chart },
     { key: 'kullanicilar', href: 'deneme-dersi-yoneticisi-kullanicilar.html', label: 'Kullanıcılar ve Yetkiler', icon: ICON.shield },
     { key: 'ayarlar', href: 'deneme-dersi-yoneticisi-ayarlar.html', label: 'Ayarlar', icon: ICON.settings }
@@ -73,10 +73,14 @@
   function renderSidebar(activeKey) {
     var links = NAV_ITEMS.map(function (item) {
       var active = item.key === activeKey;
+      var badge = item.badgeMetric
+        ? '<span class="tm-sidebar-badge" data-nav-badge="' + item.badgeMetric + '" hidden></span>'
+        : '';
       return (
         '<a class="tm-sidebar-link' + (active ? ' is-active' : '') + '" href="' + item.href + '"' +
+          ' data-nav-key="' + item.key + '"' +
           (active ? ' aria-current="page"' : '') + '>' +
-          item.icon + '<span>' + item.label + '</span>' +
+          item.icon + '<span>' + item.label + '</span>' + badge +
         '</a>'
       );
     }).join('');
@@ -84,6 +88,39 @@
       '<div class="tm-sidebar-brand">Deneme Dersi Yönetimi</div>' +
       '<nav class="tm-sidebar-nav">' + links + '</nav>'
     );
+  }
+
+  function refreshSidebarBadges() {
+    if (!global.TMStore || !global.TMStore.getOperationMetrics) return;
+    var m = global.TMStore.getOperationMetrics();
+    NAV_ITEMS.forEach(function (item) {
+      if (!item.badgeMetric) return;
+      var el = document.querySelector('[data-nav-badge="' + item.badgeMetric + '"]');
+      if (!el) return;
+      var n = m[item.badgeMetric] || 0;
+      if (n > 0) {
+        el.textContent = n > 99 ? '99+' : String(n);
+        el.hidden = false;
+      } else {
+        el.hidden = true;
+        el.textContent = '';
+      }
+    });
+  }
+
+  function installSessionChangeHook() {
+    var wrapped = null;
+    Object.defineProperty(global, 'TMOnSessionChange', {
+      configurable: true,
+      enumerable: true,
+      get: function () { return wrapped; },
+      set: function (fn) {
+        wrapped = function () {
+          refreshSidebarBadges();
+          if (typeof fn === 'function') fn();
+        };
+      }
+    });
   }
 
   function ensureLayout() {
@@ -193,8 +230,10 @@
   function init() {
     document.body.classList.add('tm-admin-body');
     document.documentElement.classList.add('tm-admin-root');
+    installSessionChangeHook();
     mountHud();
     mountSidebar();
+    refreshSidebarBadges();
     mountToast();
     mountSwitcher();
     initProfileMenu();
@@ -206,6 +245,7 @@
   global.TMAppShell = {
     NAV_ITEMS: NAV_ITEMS,
     getActiveKey: getActiveKey,
+    refreshSidebarBadges: refreshSidebarBadges,
     init: init
   };
 
