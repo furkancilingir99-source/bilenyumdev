@@ -145,4 +145,6 @@
   window.TMOnSessionChange = render;
   initFromUrl();
   render();
+  var openSessionId = U.qs('id');
+  if (openSessionId && window.TMSessionDetail) window.TMSessionDetail.open(openSessionId);
 })();

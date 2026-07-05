@@ -196,4 +196,9 @@
   if (createBtn) createBtn.addEventListener('click', openCreateTeacher);
   window.TMOnSessionChange = render;
   render();
+  var openId = U.qs('id');
+  if (openId) {
+    var openT = Store.getTeacherById(openId);
+    if (openT) openDetail(openT);
+  }
 })();

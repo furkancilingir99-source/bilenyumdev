@@ -189,4 +189,9 @@
   if (createBtn) createBtn.addEventListener('click', openCreateParent);
   window.TMOnSessionChange = render;
   render();
+  var openId = U.qs('id');
+  if (openId) {
+    var openPa = Store.getParentById(openId);
+    if (openPa) openDetail(openPa);
+  }
 })();

@@ -14,16 +14,20 @@
       global.TMSessionDetail.open(entityId);
       return;
     }
+    if (rawType === 'trial_lesson_session') {
+      window.location.href = 'deneme-dersi-yoneticisi-planlanmis-dersler.html?id=' + encodeURIComponent(entityId);
+      return;
+    }
     if (rawType === 'student') {
-      window.location.href = 'deneme-dersi-yoneticisi-ogrenciler.html';
+      window.location.href = 'deneme-dersi-yoneticisi-ogrenciler.html?id=' + encodeURIComponent(entityId);
       return;
     }
     if (rawType === 'parent') {
-      window.location.href = 'deneme-dersi-yoneticisi-veliler.html';
+      window.location.href = 'deneme-dersi-yoneticisi-veliler.html?id=' + encodeURIComponent(entityId);
       return;
     }
     if (rawType === 'teacher') {
-      window.location.href = 'deneme-dersi-yoneticisi-ogretmenler.html';
+      window.location.href = 'deneme-dersi-yoneticisi-ogretmenler.html?id=' + encodeURIComponent(entityId);
       return;
     }
     if (rawType === 'reservation') {

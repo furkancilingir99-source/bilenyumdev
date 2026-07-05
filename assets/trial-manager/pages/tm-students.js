@@ -227,4 +227,9 @@
   if (createBtn) createBtn.addEventListener('click', openCreateStudent);
   window.TMOnSessionChange = render;
   render();
+  var openId = U.qs('id');
+  if (openId) {
+    var openSt = Store.getStudentById(openId);
+    if (openSt) openDetail(openSt);
+  }
 })();
