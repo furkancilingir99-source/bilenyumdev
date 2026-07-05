@@ -9,6 +9,8 @@
   var Drawer = window.TMDetailDrawer;
   var Export = window.TMExportUtils;
   var QuickMsg = window.TMQuickMessage;
+  var Form = window.TMFormDialog;
+  var Perms = window.TMPermissions;
   if (!Store) return;
 
   var tbody = document.getElementById('tmTeachersBody');
@@ -27,6 +29,27 @@
     }).join(', ');
   }
 
+  function openEditTeacher(t) {
+    if (!Form || !Perms || !Perms.guard('edit')) return;
+    Form.open({
+      title: 'Öğretmen düzenle',
+      fields: [
+        { type: 'text', name: 'phone', label: 'Telefon', value: t.phone, required: true },
+        { type: 'text', name: 'email', label: 'E-posta', value: t.email },
+        { type: 'textarea', name: 'notes', label: 'Not', value: t.notes || '', rows: 3 }
+      ],
+      onSubmit: function (data) {
+        var result = Store.updateTeacher(t.id, data);
+        if (!result.ok) U.notifyError(result.error);
+        else {
+          U.notifySuccess('Öğretmen güncellendi.');
+          if (window.TMOnSessionChange) window.TMOnSessionChange();
+          render();
+        }
+      }
+    });
+  }
+
   function openDetail(t) {
     if (!Drawer) return;
     var sessions = Store.getSessionsForTeacher(t.id);
@@ -39,7 +62,8 @@
         if (idx === 0) {
           body.innerHTML =
             '<div class="tm-detail-actions" style="margin-bottom:12px">' +
-              (QuickMsg ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-wa-teacher>WhatsApp</button>' : '') +
+              (QuickMsg ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-wa-teacher>WhatsApp</button> ' : '') +
+              '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-edit-teacher data-tm-require="edit">Düzenle</button>' +
             '</div>' +
             '<div class="tm-detail-grid">' +
             '<div><div class="tm-detail-cell-label">Telefon</div><div class="tm-detail-cell-value">' + U.escapeHtml(t.phone) + '</div></div>' +
@@ -61,6 +85,9 @@
               });
             });
           }
+          body.querySelector('[data-edit-teacher]') && body.querySelector('[data-edit-teacher]').addEventListener('click', function () {
+            openEditTeacher(Store.getTeacherById(t.id) || t);
+          });
         } else if (idx === 1) {
           body.innerHTML = upcoming.length ? '<table class="tm-inner-table"><tbody>' + upcoming.map(function (s) {
             var lt = Store.getLessonTypeById(s.lessonTypeId);

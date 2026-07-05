@@ -10,6 +10,8 @@
   var Drawer = window.TMDetailDrawer;
   var Export = window.TMExportUtils;
   var QuickMsg = window.TMQuickMessage;
+  var Form = window.TMFormDialog;
+  var Perms = window.TMPermissions;
   if (!Store) return;
 
   var tbody = document.getElementById('tmParentsBody');
@@ -43,6 +45,29 @@
     });
   }
 
+  function openEditParent(pa) {
+    if (!Form || !Perms || !Perms.guard('edit')) return;
+    Form.open({
+      title: 'Veli düzenle',
+      fields: [
+        { type: 'text', name: 'firstName', label: 'Ad', value: pa.firstName, required: true },
+        { type: 'text', name: 'lastName', label: 'Soyad', value: pa.lastName, required: true },
+        { type: 'text', name: 'phone', label: 'Telefon', value: pa.phone, required: true },
+        { type: 'text', name: 'email', label: 'E-posta', value: pa.email },
+        { type: 'textarea', name: 'notes', label: 'Not', value: pa.notes || '', rows: 3 }
+      ],
+      onSubmit: function (data) {
+        var result = Store.updateParent(pa.id, data);
+        if (!result.ok) U.notifyError(result.error);
+        else {
+          U.notifySuccess('Veli güncellendi.');
+          if (window.TMOnSessionChange) window.TMOnSessionChange();
+          render();
+        }
+      }
+    });
+  }
+
   function openDetail(pa) {
     if (!Drawer) return;
     var students = pa.studentIds.map(function (id) { return Store.getStudentById(id); }).filter(Boolean);
@@ -55,12 +80,16 @@
         if (idx === 0) {
           body.innerHTML =
             '<div class="tm-detail-actions" style="margin-bottom:12px">' +
-              '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-wa-parent>WhatsApp</button>' +
+              '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-wa-parent>WhatsApp</button> ' +
+              '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-edit-parent data-tm-require="edit">Düzenle</button>' +
             '</div>' +
             '<div class="tm-detail-grid">' +
             '<div><div class="tm-detail-cell-label">E-posta</div><div class="tm-detail-cell-value">' + U.escapeHtml(pa.email) + '</div></div>' +
             '<div><div class="tm-detail-cell-label">Öğrenciler</div><div class="tm-detail-cell-value">' + students.map(function (s) { return U.escapeHtml(U.fullName(s.firstName, s.lastName)); }).join(', ') + '</div></div></div>';
           body.querySelector('[data-wa-parent]').addEventListener('click', function () { openParentWhatsApp(pa); });
+          body.querySelector('[data-edit-parent]') && body.querySelector('[data-edit-parent]').addEventListener('click', function () {
+            openEditParent(Store.getParentById(pa.id) || pa);
+          });
         } else {
           body.innerHTML = res.length ? '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Durum</th><th>Onay</th></tr></thead><tbody>' + res.slice(0, 10).map(function (r) {
             var s = Store.getSessionById(r.sessionId);

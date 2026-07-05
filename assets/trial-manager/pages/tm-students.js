@@ -9,6 +9,8 @@
   var SL = window.TMStatusLabels;
   var Export = window.TMExportUtils;
   var Drawer = window.TMDetailDrawer;
+  var Form = window.TMFormDialog;
+  var Perms = window.TMPermissions;
   if (!Store) return;
 
   var tbody = document.getElementById('tmStudentsBody');
@@ -24,6 +26,30 @@
       return r.status === 'confirmed' || r.status === 'pending';
     });
     return res[0] || null;
+  }
+
+  function openEditStudent(st) {
+    if (!Form || !Perms || !Perms.guard('edit')) return;
+    Form.open({
+      title: 'Öğrenci düzenle',
+      fields: [
+        { type: 'text', name: 'firstName', label: 'Ad', value: st.firstName, required: true },
+        { type: 'text', name: 'lastName', label: 'Soyad', value: st.lastName, required: true },
+        { type: 'text', name: 'age', label: 'Yaş', value: String(st.age) },
+        { type: 'text', name: 'grade', label: 'Sınıf', value: st.grade },
+        { type: 'text', name: 'level', label: 'Seviye', value: st.level },
+        { type: 'textarea', name: 'notes', label: 'Not', value: st.notes || '', rows: 3 }
+      ],
+      onSubmit: function (data) {
+        var result = Store.updateStudent(st.id, data);
+        if (!result.ok) U.notifyError(result.error);
+        else {
+          U.notifySuccess('Öğrenci güncellendi.');
+          if (window.TMOnSessionChange) window.TMOnSessionChange();
+          render();
+        }
+      }
+    });
   }
 
   function openDetail(st) {
@@ -43,7 +69,11 @@
             '<div><div class="tm-detail-cell-label">Durum</div><div class="tm-detail-cell-value">' + SL.studentBadge(st.status) + '</div></div>' +
             '<div><div class="tm-detail-cell-label">Veli</div><div class="tm-detail-cell-value">' + parents.map(function (p) { return U.escapeHtml(U.fullName(p.firstName, p.lastName)); }).join(', ') + '</div></div></div>' +
             (st.status === 'attended' || st.status === 'confirmed' ?
-              '<div class="tm-detail-actions" style="margin-top:12px"><button type="button" class="tm-btn tm-btn--primary" data-enroll="' + st.id + '" data-tm-require="edit">Kayda dönüştür</button></div>' : '');
+              '<div class="tm-detail-actions" style="margin-top:12px"><button type="button" class="tm-btn tm-btn--primary" data-enroll="' + st.id + '" data-tm-require="edit">Kayda dönüştür</button></div>' : '') +
+            '<div class="tm-detail-actions" style="margin-top:8px"><button type="button" class="tm-btn tm-btn--ghost" data-edit-student data-tm-require="edit">Bilgileri düzenle</button></div>';
+          body.querySelector('[data-edit-student]') && body.querySelector('[data-edit-student]').addEventListener('click', function () {
+            openEditStudent(Store.getStudentById(st.id) || st);
+          });
           body.querySelector('[data-enroll]') && body.querySelector('[data-enroll]').addEventListener('click', function () {
             if (window.TMPermissions && !window.TMPermissions.guard('edit')) return;
             var result = Store.convertStudentToEnrollment(st.id);

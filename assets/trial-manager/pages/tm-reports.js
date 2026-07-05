@@ -186,6 +186,22 @@
       card(m.approvalRate + '%', 'Veli onay oranı') +
       card(m.unreachable, 'Ulaşılamayan veli', 'warn') +
       card(m.callAgain, 'Tekrar aranacak', 'warn');
+    if (Store.getDataConsistencySnapshot) {
+      var snap = Store.getDataConsistencySnapshot();
+      var om = snap.metrics;
+      gridEl.innerHTML += '<section class="tm-panel" style="margin-top:16px;grid-column:1/-1">' +
+        '<div class="tm-panel-head"><h2 class="tm-panel-title">Veri tutarlılığı (anlık)</h2></div>' +
+        '<div style="padding:12px 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">' +
+        card(om.actionableCount, 'Aksiyon bekleyen (operasyon)') +
+        card(om.orphanRequestCount, 'Rezervasyonsuz (operasyon)') +
+        card(snap.enrolledStudents, 'Kayıtlı öğrenci (durum)') +
+        card(om.conversionCount, 'Dönüşüm metriği') +
+        '</div>' +
+        (snap.issues.length
+          ? '<p class="tm-alert-row is-danger" style="margin:0 16px 12px">' + snap.issues.join(' ') + '</p>'
+          : '<p class="tm-empty" style="padding:0 16px 12px">Operasyon metrikleri ile öğrenci durumları tutarlı.</p>') +
+        '</section>';
+    }
   }
 
   function tableHtml(headers, rows) {

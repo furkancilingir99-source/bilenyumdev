@@ -62,12 +62,20 @@
   }
 
   function renderParticipants(d) {
-    if (!d.participants.length) return '<p class="tm-empty">Katılımcı yok.</p>';
+    var sessionActive = d.session.status !== 'cancelled' && d.session.status !== 'completed';
+    var remaining = Rules.getSessionRemainingCapacity(d.session.id);
+    if (!d.participants.length) {
+      return (sessionActive ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-add-participant data-tm-require="edit" style="margin-bottom:12px">Öğrenci ekle</button>' : '') +
+        '<p class="tm-empty">Katılımcı yok.</p>';
+    }
     var notSent = d.reservations.filter(function (r) { return r.parentApprovalStatus === 'approved' && !r.linkSent; }).length;
     var rows = d.participants.map(function (p) {
       var st = p.student;
       var pa = p.parent;
       var r = p.reservation;
+      var removeBtn = sessionActive && r.status !== 'cancelled'
+        ? ' <button type="button" class="tm-btn tm-btn--sm tm-btn--danger" data-remove-res="' + r.id + '" data-tm-require="cancel">Çıkar</button>'
+        : '';
       return '<tr>' +
         '<td>' + U.escapeHtml(st ? U.fullName(st.firstName, st.lastName) : '—') + '</td>' +
         '<td>' + U.escapeHtml(st ? st.grade : '—') + '</td>' +
@@ -79,10 +87,13 @@
         '<td style="white-space:nowrap">' +
           '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-wa-parent="' + r.id + '">WhatsApp</button> ' +
           '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-link-sent="' + r.id + '" data-tm-require="edit">Link gönderildi</button>' +
+          removeBtn +
         '</td>' +
       '</tr>';
     }).join('');
-    return (notSent ? '<p class="tm-alert-row" style="margin-bottom:8px">Onaylı ancak link gönderilmemiş: ' + notSent + ' veli</p>' +
+    return (sessionActive ? '<p class="tm-detail-cell-label" style="margin-bottom:8px">Boş kapasite: ' + remaining + ' / 20</p>' : '') +
+      (sessionActive ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-add-participant data-tm-require="edit" style="margin-bottom:12px">Öğrenci ekle</button>' : '') +
+      (notSent ? '<p class="tm-alert-row" style="margin-bottom:8px">Onaylı ancak link gönderilmemiş: ' + notSent + ' veli</p>' +
       '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-bulk-link data-tm-require="edit" style="margin-bottom:12px">Tüm onaylılara link gönderildi işaretle</button>' : '') +
       '<table class="tm-inner-table"><thead><tr><th>Öğrenci</th><th>Sınıf</th><th>Veli</th><th>Telefon</th><th>Veli onay</th><th>Link</th><th>Durum</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
   }
@@ -238,6 +249,31 @@
       });
     }
     if (idx === 1) {
+      bodyEl.querySelector('[data-add-participant]') && bodyEl.querySelector('[data-add-participant]').addEventListener('click', function () {
+        showAddStudentPicker(d);
+      });
+      bodyEl.querySelectorAll('[data-remove-res]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          if (global.TMPermissions && !global.TMPermissions.guard('cancel')) return;
+          var resId = btn.getAttribute('data-remove-res');
+          Confirm.open({
+            title: 'Öğrenciyi dersten çıkar',
+            warning: 'Rezervasyon iptal edilecek ve kapasite açılacak.',
+            requireReason: true,
+            danger: true,
+            confirmLabel: 'Çıkar',
+            onConfirm: function (reason) {
+              var result = Store.removeStudentFromSession(d.session.id, resId, reason);
+              if (!result.ok) U.notifyError(result.error);
+              else {
+                U.notifySuccess('Öğrenci dersten çıkarıldı.');
+                if (global.TMOnSessionChange) global.TMOnSessionChange();
+                renderTab(1, bodyEl);
+              }
+            }
+          });
+        });
+      });
       bodyEl.querySelector('[data-bulk-link]') && bodyEl.querySelector('[data-bulk-link]').addEventListener('click', function () {
         if (window.TMPermissions && !window.TMPermissions.guard('edit')) return;
         var result = Store.markBulkLinksSentForSession(d.session.id);
@@ -339,6 +375,40 @@
         open(currentSessionId);
       });
     }
+  }
+
+  function showAddStudentPicker(d) {
+    if (!Form) return;
+    if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
+    var eligible = Store.getEligibleStudentsForSession(d.session.id);
+    if (!eligible.length) {
+      U.notifyError('Eklenebilecek uygun öğrenci yok (kapasite, branş veya daha önce deneme almış olabilir).');
+      return;
+    }
+    Form.open({
+      title: 'Derse öğrenci ekle',
+      description: 'Kapasite ve ücretsiz deneme kurallarına uygun öğrenciler listelenir.',
+      fields: [{
+        type: 'select',
+        name: 'studentId',
+        label: 'Öğrenci',
+        options: eligible.map(function (st) {
+          return {
+            value: st.id,
+            label: U.fullName(st.firstName, st.lastName) + ' · ' + st.grade + ' · ' + st.level
+          };
+        })
+      }],
+      onSubmit: function (data) {
+        var result = Store.addStudentToSession(d.session.id, data.studentId);
+        if (!result.ok) U.notifyError(result.error);
+        else {
+          U.notifySuccess('Öğrenci derse eklendi.');
+          if (global.TMOnSessionChange) global.TMOnSessionChange();
+          open(currentSessionId, 1);
+        }
+      }
+    });
   }
 
   function showTeacherPicker(d) {
