@@ -233,6 +233,9 @@
   }
 
   function mount() {
+    if (document.body && (document.body.classList.contains('tm-admin-body') || document.body.getAttribute('data-tm-page'))) {
+      return false;
+    }
     if (document.querySelector('.hud')) {
       if (document.querySelector('.db-switch')) {
         syncHudHeight();

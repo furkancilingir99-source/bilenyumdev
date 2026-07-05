@@ -1,0 +1,78 @@
+/**
+ * Kritik layout — dosyadan (file://) açılsa bile iskelet bozulmasın.
+ * Ana stillerden önce yüklenir.
+ */
+html.tm-admin-root,
+body.tm-admin-body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body.tm-admin-body *,
+body.tm-admin-body *::before,
+body.tm-admin-body *::after {
+  box-sizing: border-box;
+}
+
+body.tm-admin-body .hud,
+body.tm-admin-body .tm-admin-hud {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-height: 60px !important;
+  padding: 10px 16px !important;
+  background: #fff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+body.tm-admin-body .hud-stats {
+  margin-left: auto !important;
+}
+
+body.tm-admin-body .tm-admin-layout {
+  display: flex !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  min-height: calc(100vh - 60px) !important;
+}
+
+body.tm-admin-body .tm-sidebar {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 240px !important;
+  flex-shrink: 0 !important;
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+  overflow-y: auto !important;
+}
+
+body.tm-admin-body .tm-admin-main {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  display: block !important;
+  padding: 16px 20px 32px !important;
+  background: #f1f5f9 !important;
+}
+
+body.tm-admin-body .tm-sidebar-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 9px 16px !important;
+  color: #cbd5e1 !important;
+  text-decoration: none !important;
+  font-size: 13px !important;
+}
+
+body.tm-admin-body .tm-sidebar-link svg {
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0 !important;
+}
+
+body.tm-admin-body .db-switch,
+body.tm-admin-body .site-persona-rail {
+  display: none !important;
+}

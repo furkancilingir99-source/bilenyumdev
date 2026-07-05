@@ -246,7 +246,7 @@
         } catch (err) {}
       }
       fetch('/api/logout', { method: 'POST', credentials: 'same-origin' })
-        .finally(function () { window.location.href = '/giris'; });
+        .finally(function () { window.location.href = 'giris.html'; });
     });
   }
 
@@ -295,17 +295,22 @@
     document.head.appendChild(s);
   }
 
-  function mountSwitcher() {
-    function run() {
-      if (global.DashboardSwitcher) global.DashboardSwitcher.mount();
-    }
-    if (global.DashboardSwitcher) run();
-    else loadScript('assets/dashboard-switcher.js', 'switcher', run);
-  }
-
   function mountToast() {
     if (global.TMToast) return;
     loadScript('assets/trial-manager/components/tm-toast.js', 'toast');
+  }
+
+  function cleanupForeignChrome() {
+    document.querySelectorAll('.db-switch, .site-persona-rail').forEach(function (el) {
+      el.remove();
+    });
+    var hud = document.querySelector('.hud');
+    if (!hud) return;
+    var hudLeft = hud.querySelector('.hud-left');
+    if (!hudLeft) return;
+    var brand = hudLeft.querySelector('.hud-brand');
+    if (brand) hud.insertBefore(brand, hud.firstChild);
+    hudLeft.remove();
   }
 
   function init() {
@@ -313,10 +318,10 @@
     document.documentElement.classList.add('tm-admin-root');
     installSessionChangeHook();
     mountHud();
+    cleanupForeignChrome();
     mountSidebar();
     refreshSidebarBadges();
     mountToast();
-    mountSwitcher();
     initProfileMenu();
     initMobileMenu();
     var oldNav = document.querySelector('.stage-nav, [data-trial-manager-nav], .nav-rail');

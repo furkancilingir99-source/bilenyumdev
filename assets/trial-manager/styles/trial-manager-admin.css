@@ -26,6 +26,11 @@ body.tm-admin-body {
   -webkit-font-smoothing: antialiased;
 }
 
+body.tm-admin-body .db-switch,
+body.tm-admin-body .site-persona-rail {
+  display: none !important;
+}
+
 /* Eski stage/grid yapısını devre dışı bırak */
 body.tm-admin-body .stage,
 body.tm-admin-body .tm-stage,
