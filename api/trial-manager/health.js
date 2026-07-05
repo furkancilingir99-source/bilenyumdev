@@ -19,8 +19,13 @@ export default async function handler(req, res) {
       metrics: '/api/trial-manager/metrics',
       sessions: '/api/trial-manager/sessions',
       requests: '/api/trial-manager/requests',
-      auditLogs: '/api/trial-manager/audit-logs'
+      reservations: '/api/trial-manager/reservations',
+      students: '/api/trial-manager/students',
+      parents: '/api/trial-manager/parents',
+      teachers: '/api/trial-manager/teachers',
+      auditLogs: '/api/trial-manager/audit-logs',
+      communicationLogs: '/api/trial-manager/communication-logs'
     },
-    note: 'Veri uçları henüz mock TMStore ile eşlenmedi; health kontrolü aktif.'
+    note: 'Liste uçları sözleşme stub; veri işlemleri mock TMStore ile devam eder.'
   }));
 }

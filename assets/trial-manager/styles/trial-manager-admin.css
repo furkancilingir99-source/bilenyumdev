@@ -1208,3 +1208,62 @@ body.tm-admin-body .tm-admin-header-actions {
 .tm-toast.is-success { background: #15803d; }
 .tm-toast.is-error { background: #dc2626; }
 .tm-toast.is-info { background: #2563eb; }
+
+/* Mobil kart listesi (tablolar) */
+.tm-list-cards {
+  display: none;
+  padding: 12px;
+  gap: 10px;
+}
+
+.tm-list-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.tm-list-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.tm-list-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: #334155;
+}
+
+.tm-list-card-label {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.tm-list-card-foot {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+body.tm-admin-body .tm-dg-toolbar-row--filters .tm-dg-control[type="date"] {
+  max-width: 150px;
+  padding: 0 8px;
+}
+
+@media (max-width: 900px) {
+  .tm-sessions-table-wrap {
+    display: none !important;
+  }
+
+  .tm-sessions-cards {
+    display: flex;
+    flex-direction: column;
+  }
+}

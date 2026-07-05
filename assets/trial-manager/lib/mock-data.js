@@ -1184,6 +1184,35 @@
     return { ok: true, teacher: t };
   }
 
+  function updateTeacherAvailability(teacherId, slots) {
+    var t = find(state.teachers, teacherId);
+    if (!t) return { ok: false, error: 'Öğretmen bulunamadı.' };
+    if (!Array.isArray(slots) || !slots.length) {
+      return { ok: false, error: 'Müsaitlik listesi geçersiz.' };
+    }
+    t.availability = slots.map(function (s) {
+      var dow = parseInt(s.dayOfWeek, 10);
+      return {
+        id: s.id || (teacherId + '-av-' + dow),
+        teacherId: teacherId,
+        dayOfWeek: dow,
+        startTime: String(s.startTime || '11:00').trim(),
+        endTime: String(s.endTime || '15:00').trim(),
+        isAvailable: !!s.isAvailable
+      };
+    });
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'teacher',
+        entityId: teacherId,
+        action: 'availability_updated',
+        description: 'Öğretmen müsaitlik programı güncellendi.'
+      });
+    }
+    touch();
+    return { ok: true, teacher: t };
+  }
+
   function getEligibleStudentsForSession(sessionId) {
     if (!Rules) return state.students.slice();
     return state.students.filter(function (st) {
@@ -1716,6 +1745,7 @@
     updateStudent: updateStudent,
     updateParent: updateParent,
     updateTeacher: updateTeacher,
+    updateTeacherAvailability: updateTeacherAvailability,
     createStudent: createStudent,
     createParent: createParent,
     createTeacher: createTeacher,

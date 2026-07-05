@@ -136,6 +136,33 @@
     });
   }
 
+  function probeResource(resourceKey) {
+    var path = ENDPOINTS[resourceKey];
+    if (!path) {
+      return Promise.resolve({ ok: false, resource: resourceKey, error: 'Bilinmeyen kaynak.' });
+    }
+    return fetchJson(path).then(function (body) {
+      return { ok: !!(body && body.ok), resource: resourceKey, data: body };
+    }).catch(function (err) {
+      return { ok: false, resource: resourceKey, error: err.message || 'Bağlantı başarısız.' };
+    });
+  }
+
+  function probeAllEndpoints() {
+    var keys = [
+      'health', 'metrics', 'sessions', 'requests', 'reservations',
+      'students', 'parents', 'teachers', 'auditLogs', 'communicationLogs'
+    ];
+    return Promise.all(keys.map(function (key) {
+      if (key === 'health') return probeHealth();
+      if (key === 'metrics') return probeMetrics();
+      return probeResource(key);
+    })).then(function (results) {
+      var passed = results.filter(function (r) { return r.ok; }).length;
+      return { ok: passed === results.length, passed: passed, total: results.length, results: results };
+    });
+  }
+
   global.TMApi = {
     getMode: getMode,
     setMode: setMode,
@@ -146,6 +173,8 @@
     fetchJson: fetchJson,
     checkHealth: checkHealth,
     probeHealth: probeHealth,
+    probeResource: probeResource,
+    probeAllEndpoints: probeAllEndpoints,
     fetchOperationMetrics: fetchOperationMetrics,
     probeMetrics: probeMetrics,
     getOperationMetrics: callStore('getOperationMetrics'),
@@ -168,7 +197,8 @@
     updateUserPermissions: callStore('updateUserPermissions'),
     markAllApprovedLinksSent: callStore('markAllApprovedLinksSent'),
     markBulkLinksSentForSession: callStore('markBulkLinksSentForSession'),
-    moveReservationToSession: callStore('moveReservationToSession')
+    moveReservationToSession: callStore('moveReservationToSession'),
+    updateTeacherAvailability: callStore('updateTeacherAvailability')
   };
 
   global.TMData = global.TMApi;

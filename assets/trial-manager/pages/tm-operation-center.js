@@ -207,6 +207,15 @@
           });
         }
       }
+      if (R && teacher && !R.isTeacherAvailable(s.teacherId, s.date, s.startTime, s.endTime)) {
+        var tName2 = U.fullName(teacher.firstName, teacher.lastName);
+        alerts.push({
+          msg: 'Müsaitlik dışı ders: ' + tName2 + ' · ' + U.formatDateKey(s.date) + ' ' + s.startTime,
+          type: 'warn',
+          sessionId: s.id,
+          teacherId: s.teacherId
+        });
+      }
     });
     Store.getReservations().forEach(function (r) {
       if (r.status === 'cancelled') return;

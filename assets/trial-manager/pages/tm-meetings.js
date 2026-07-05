@@ -114,6 +114,7 @@
     });
     if (loading) loading.hidden = true;
     if (wrap) wrap.hidden = false;
+    if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(tbody);
     } catch (err) {
       if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
       console.error(err);
@@ -139,6 +140,20 @@
       { key: 'meeting', label: 'Durum', value: function (r) { return r.meeting.status; } }
     ]);
   });
+
+  if (bulkLinksBtn) {
+    bulkLinksBtn.addEventListener('click', function () {
+      if (Perms && !Perms.guard('edit')) return;
+      if (!Store.markAllApprovedLinksSent) return;
+      var result = Store.markAllApprovedLinksSent();
+      if (!result.ok) U.notifyError(result.error || 'İşlem başarısız.');
+      else {
+        U.notifySuccess(result.count + ' rezervasyonda link gönderildi işaretlendi.');
+        if (window.TMOnSessionChange) window.TMOnSessionChange();
+        render();
+      }
+    });
+  }
 
   window.TMOnSessionChange = render;
   initFromUrl();

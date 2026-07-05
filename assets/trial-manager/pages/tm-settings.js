@@ -20,6 +20,7 @@
   var apiHealthEl = document.getElementById('tmApiHealthStatus');
   var apiHealthBtn = document.getElementById('tmApiHealthCheck');
   var apiMetricsBtn = document.getElementById('tmApiMetricsCheck');
+  var apiAllBtn = document.getElementById('tmApiAllCheck');
   var apiModeMockBtn = document.getElementById('tmApiModeMock');
   var apiModeApiBtn = document.getElementById('tmApiModeApi');
   var exportAuditBtn = document.getElementById('tmExportAudit');
@@ -77,6 +78,19 @@
       apiHealthEl.textContent = 'Metrik OK' + stub + ' · aksiyon: ' + (m.actionableCount != null ? m.actionableCount : '?') +
         ' · bugün ders: ' + (m.todaySessionCount != null ? m.todaySessionCount : '?');
       if (window.TMToast) window.TMToast.show('Metrik uç noktası yanıt verdi.', 'success');
+    });
+  }
+
+  function runApiAllCheck() {
+    if (!Api || !Api.probeAllEndpoints) return;
+    if (apiHealthEl) apiHealthEl.textContent = 'Tüm uç noktalar test ediliyor…';
+    Api.probeAllEndpoints().then(function (res) {
+      if (!apiHealthEl) return;
+      apiHealthEl.textContent = 'Uç nokta testi: ' + res.passed + '/' + res.total + ' başarılı' +
+        (res.ok ? ' · tümü yanıt verdi' : ' · bazı uçlar başarısız');
+      if (window.TMToast) {
+        window.TMToast.show(res.ok ? 'Tüm API uçları yanıt verdi.' : 'Bazı API uçları başarısız.', res.ok ? 'success' : 'error');
+      }
     });
   }
 
@@ -209,6 +223,7 @@
   if (switchUserBtn) switchUserBtn.addEventListener('click', switchUser);
   if (apiHealthBtn) apiHealthBtn.addEventListener('click', runApiHealthCheck);
   if (apiMetricsBtn) apiMetricsBtn.addEventListener('click', runApiMetricsCheck);
+  if (apiAllBtn) apiAllBtn.addEventListener('click', runApiAllCheck);
   if (apiModeMockBtn) apiModeMockBtn.addEventListener('click', function () { switchApiMode('mock'); });
   if (apiModeApiBtn) apiModeApiBtn.addEventListener('click', function () { switchApiMode('api'); });
   if (exportAuditBtn) exportAuditBtn.addEventListener('click', exportAuditLog);

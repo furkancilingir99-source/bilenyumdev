@@ -55,12 +55,35 @@
           <a class="tm-dg-action" href="deneme-dersi-yoneticisi-ders-planla.html">+ Planla</a>
           <span class="tm-dg-count" id="tmSessionsCount">—</span>
         </div>
+        <div class="tm-dg-toolbar-row tm-dg-toolbar-row--filters">
+          <input type="date" class="tm-dg-control" id="tmSessionsDateFrom" title="Başlangıç tarihi" aria-label="Başlangıç tarihi">
+          <input type="date" class="tm-dg-control" id="tmSessionsDateTo" title="Bitiş tarihi" aria-label="Bitiş tarihi">
+          <select class="tm-dg-control tm-dg-select" id="tmSessionsTeacher">
+            <option value="all">Tüm öğretmenler</option>
+          </select>
+          <select class="tm-dg-control tm-dg-select" id="tmSessionsLinkFilter">
+            <option value="all">Tüm link durumları</option>
+            <option value="link_pending">Link gönderilmeyen</option>
+            <option value="parent_pending">Veli onayı bekleyen</option>
+          </select>
+          <select class="tm-dg-control tm-dg-select" id="tmSessionsInformedFilter">
+            <option value="all">Öğretmen bilgisi</option>
+            <option value="yes">Bilgilendirildi</option>
+            <option value="no">Bilgilendirilmedi</option>
+          </select>
+          <select class="tm-dg-control tm-dg-select tm-dg-select--sort" id="tmSessionsSort">
+            <option value="date_asc">Tarih ↑</option>
+            <option value="date_desc">Tarih ↓</option>
+            <option value="updated_desc">Son güncelleme</option>
+            <option value="teacher_asc">Öğretmen A→Z</option>
+          </select>
+        </div>
       </header>
 
       <p id="tmSessionsFilterHint" class="tm-alert-row" style="margin:0 16px 12px" hidden></p>
 
       <div id="tmSessionsLoading" class="td-state">Yükleniyor…</div>
-      <div id="tmSessionsTableWrap" class="tm-res-table-wrap" hidden>
+      <div id="tmSessionsTableWrap" class="tm-res-table-wrap tm-sessions-table-wrap" hidden>
         <table class="tm-res-table tm-res-table--rich">
           <thead>
             <tr>
@@ -72,6 +95,7 @@
           <tbody id="tmSessionsBody"></tbody>
         </table>
       </div>
+      <div id="tmSessionsCards" class="tm-list-cards tm-sessions-cards" hidden></div>
       <div id="tmSessionsPagination" class="tm-pagination" hidden></div>
     </section>
   </main>

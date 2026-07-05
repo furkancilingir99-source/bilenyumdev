@@ -87,12 +87,23 @@
     if (!Drawer) return;
     var sessions = Store.getSessionsForTeacher(t.id);
     var upcoming = sessions.filter(function (s) { return s.date >= today && s.status !== 'cancelled'; });
+    function dayOfWeek(dateStr) {
+      var p = dateStr.split('-');
+      return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)).getDay();
+    }
     Drawer.open({
       title: U.fullName(t.firstName, t.lastName),
       subtitle: branchLabel(t),
       tabs: [{ label: 'Bilgi' }, { label: 'Yaklaşan dersler' }, { label: 'Müsaitlik' }],
       onTab: function (idx, body) {
         if (idx === 0) {
+          var todayDow = dayOfWeek(today);
+          var todaySlots = (t.availability || []).filter(function (a) {
+            return a.dayOfWeek === todayDow && a.isAvailable;
+          });
+          var previewText = todaySlots.length
+            ? todaySlots.map(function (a) { return a.startTime + '–' + a.endTime; }).join(', ')
+            : 'Bugün müsait değil';
           body.innerHTML =
             '<div class="tm-detail-actions" style="margin-bottom:12px">' +
               (QuickMsg ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-wa-teacher>WhatsApp</button> ' : '') +
@@ -101,7 +112,8 @@
             '<div class="tm-detail-grid">' +
             '<div><div class="tm-detail-cell-label">Telefon</div><div class="tm-detail-cell-value">' + U.escapeHtml(t.phone) + '</div></div>' +
             '<div><div class="tm-detail-cell-label">E-posta</div><div class="tm-detail-cell-value">' + U.escapeHtml(t.email) + '</div></div>' +
-            '<div><div class="tm-detail-cell-label">Dashboard</div><div class="tm-detail-cell-value">' + (t.dashboardEnabled ? 'Aktif' : 'Kapalı') + '</div></div></div>';
+            '<div><div class="tm-detail-cell-label">Dashboard</div><div class="tm-detail-cell-value">' + (t.dashboardEnabled ? 'Aktif' : 'Kapalı') + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Bugün müsaitlik</div><div class="tm-detail-cell-value">' + U.escapeHtml(previewText) + '</div></div></div>';
           var waBtn = body.querySelector('[data-wa-teacher]');
           if (waBtn && QuickMsg) {
             waBtn.addEventListener('click', function () {
@@ -132,13 +144,68 @@
             });
           });
         } else {
-          var days = ['Paz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct'];
-          body.innerHTML = '<table class="tm-inner-table"><tbody>' + (t.availability || []).map(function (a) {
-            return '<tr><td>' + days[a.dayOfWeek] + '</td><td>' + a.startTime + '–' + a.endTime + '</td><td>' + (a.isAvailable ? 'Müsait' : 'Değil') + '</td></tr>';
-          }).join('') + '</tbody></table>';
+          renderAvailabilityTab(body, Store.getTeacherById(t.id) || t);
         }
       }
     });
+  }
+
+  function availabilitySlots(teacher) {
+    var map = {};
+    (teacher.availability || []).forEach(function (a) { map[a.dayOfWeek] = a; });
+    var slots = [];
+    for (var d = 0; d <= 6; d++) {
+      slots.push(map[d] || {
+        id: teacher.id + '-av-' + d,
+        teacherId: teacher.id,
+        dayOfWeek: d,
+        startTime: '11:00',
+        endTime: '15:00',
+        isAvailable: false
+      });
+    }
+    return slots;
+  }
+
+  function renderAvailabilityTab(body, teacher) {
+    var shortDays = ['Paz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct'];
+    var canEdit = !window.TMPermissions || window.TMPermissions.can('edit');
+    var slots = availabilitySlots(teacher);
+    body.innerHTML =
+      (canEdit ? '<div class="tm-detail-actions" style="margin-bottom:12px"><button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-save-avail data-tm-require="edit">Kaydet</button></div>' : '') +
+      '<table class="tm-inner-table tm-avail-table"><thead><tr><th>Gün</th><th>Başlangıç</th><th>Bitiş</th><th>Müsait</th></tr></thead><tbody>' +
+      slots.map(function (a) {
+        return '<tr data-dow="' + a.dayOfWeek + '">' +
+          '<td>' + shortDays[a.dayOfWeek] + '</td>' +
+          '<td><input type="time" class="tm-dg-control" data-avail-start value="' + U.escapeHtml(a.startTime) + '"' + (canEdit ? '' : ' disabled') + '></td>' +
+          '<td><input type="time" class="tm-dg-control" data-avail-end value="' + U.escapeHtml(a.endTime) + '"' + (canEdit ? '' : ' disabled') + '></td>' +
+          '<td><input type="checkbox" data-avail-on' + (a.isAvailable ? ' checked' : '') + (canEdit ? '' : ' disabled') + '></td></tr>';
+      }).join('') +
+      '</tbody></table>';
+    var saveBtn = body.querySelector('[data-save-avail]');
+    if (saveBtn) {
+      saveBtn.addEventListener('click', function () {
+        if (window.TMPermissions && !window.TMPermissions.guard('edit')) return;
+        var next = [];
+        body.querySelectorAll('tr[data-dow]').forEach(function (row) {
+          var dow = parseInt(row.getAttribute('data-dow'), 10);
+          next.push({
+            dayOfWeek: dow,
+            startTime: row.querySelector('[data-avail-start]').value || '11:00',
+            endTime: row.querySelector('[data-avail-end]').value || '15:00',
+            isAvailable: row.querySelector('[data-avail-on]').checked
+          });
+        });
+        var res = Store.updateTeacherAvailability(teacher.id, next);
+        if (!res.ok) {
+          if (U.notifyError) U.notifyError(res.error);
+          return;
+        }
+        if (window.TMToast) window.TMToast.show('Müsaitlik kaydedildi.', 'success');
+        renderAvailabilityTab(body, res.teacher);
+        render();
+      });
+    }
   }
 
   function filtered() {
