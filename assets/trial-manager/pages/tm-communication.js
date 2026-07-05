@@ -14,6 +14,7 @@
   if (!Store) return;
 
   var tbody = document.getElementById('tmCommBody');
+  var cardsEl = document.getElementById('tmCommCards');
   var tabsEl = document.getElementById('tmCommTabs');
   var exportBtn = document.getElementById('tmCommExport');
   var bulkLinksBtn = document.getElementById('tmCommBulkLinks');
@@ -97,11 +98,21 @@
     return Store.getCommunicationLogs().map(function (l) {
       var pa = l.parentId ? Store.getParentById(l.parentId) : null;
       var t = l.teacherId ? Store.getTeacherById(l.teacherId) : null;
+      var st = l.studentId ? Store.getStudentById(l.studentId) : null;
+      var sess = l.sessionId ? Store.getSessionById(l.sessionId) : null;
       var creator = l.createdByUserId ? Store.getUsers().find(function (u) { return u.id === l.createdByUserId; }) : null;
+      var role = '—';
+      if (pa) role = 'Veli';
+      else if (t) {
+        role = (t.teacherType === 'pdr_teacher' || t.teacherType === 'pdr') ? 'PDR öğretmeni' : 'Branş öğretmeni';
+      }
       return {
         log: l,
+        student: st,
+        session: sess,
+        teacher: t,
         person: pa ? U.fullName(pa.firstName, pa.lastName) : (t ? U.fullName(t.firstName, t.lastName) : '—'),
-        role: pa ? 'Veli' : 'Öğretmen',
+        role: role,
         phone: pa ? pa.phone : (t ? t.phone : '—'),
         reservation: null,
         responsible: creator ? U.fullName(creator.firstName, creator.lastName) : '—'
@@ -271,20 +282,94 @@
     return parts.join(' ');
   }
 
-  function bindRowActions() {
-    tbody.querySelectorAll('[data-log-idx]').forEach(function (btn) {
+  function sessionTeachers(x) {
+    var pdrName = '—';
+    var branchName = '—';
+    if (x.session) {
+      var pdrT = Store.getTeacherById(x.session.pdrTeacherId);
+      var branchT = Store.getTeacherById(x.session.branchTeacherId);
+      pdrName = pdrT ? U.fullName(pdrT.firstName, pdrT.lastName) : '—';
+      branchName = branchT ? U.fullName(branchT.firstName, branchT.lastName) : '—';
+    }
+    return { pdrName: pdrName, branchName: branchName };
+  }
+
+  function rowHtml(x, i) {
+    var teachers = sessionTeachers(x);
+    if (activeTab === 'all') {
+      var l = x.log;
+      var stName = x.student ? U.fullName(x.student.firstName, x.student.lastName) : '—';
+      var sessLabel = x.session ? U.formatDateKey(x.session.date) + ' ' + x.session.startTime : '—';
+      return '<tr><td>' + U.escapeHtml(x.person) + '</td><td>' + x.role + '</td>' +
+        '<td>' + U.escapeHtml(stName) + '</td><td>' + U.escapeHtml(sessLabel) + '</td>' +
+        '<td>' + U.escapeHtml(teachers.pdrName) + '</td><td>' + U.escapeHtml(teachers.branchName) + '</td>' +
+        '<td>' + U.escapeHtml(x.phone) + '</td>' +
+        '<td>' + U.escapeHtml(SL.COMM_CHANNEL[l.channel] || l.channel) + '</td>' +
+        '<td>' + U.escapeHtml(SL.COMM_RESULT[l.result] || l.result) + '</td>' +
+        '<td>' + U.formatDateTime(l.createdAt) + '</td><td>' + U.escapeHtml(l.nextAction || '—') + '</td>' +
+        '<td>' + U.escapeHtml(x.responsible || '—') + '</td>' +
+        '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '" data-tm-require="edit">Kayıt ekle</button></td></tr>';
+    }
+    var stName = x.student ? U.fullName(x.student.firstName, x.student.lastName) : '—';
+    var sessLabel = x.session ? U.formatDateKey(x.session.date) + ' ' + x.session.startTime : '—';
+    var result = x.reservation ? SL.parentApprovalLabel(x.reservation.parentApprovalStatus) : (x.teacherRole === 'pdr' ? 'PDR bilgilendirilmedi' : (x.teacherRole === 'branch' ? 'Branş bilgilendirilmedi' : 'Bilgilendirilmedi'));
+    var actions = rowActions(x, i);
+    var resp = responsibleLabel();
+    return '<tr><td>' + U.escapeHtml(x.person) + '</td><td>' + x.role + '</td><td>' + U.escapeHtml(stName) + '</td><td>' + U.escapeHtml(sessLabel) + '</td>' +
+      '<td>' + U.escapeHtml(teachers.pdrName) + '</td><td>' + U.escapeHtml(teachers.branchName) + '</td>' +
+      '<td>' + U.escapeHtml(x.phone) + '</td><td>—</td><td>' + U.escapeHtml(result) + '</td><td>—</td><td>—</td><td>' + U.escapeHtml(resp) + '</td>' +
+      '<td style="white-space:nowrap">' + actions + '</td></tr>';
+  }
+
+  function cardHtml(x, i) {
+    var teachers = sessionTeachers(x);
+    var actions = rowActions(x, i);
+    if (activeTab === 'all') {
+      var l = x.log;
+      var stName = x.student ? U.fullName(x.student.firstName, x.student.lastName) : '—';
+      var sessLabel = x.session ? U.formatDateKey(x.session.date) + ' ' + x.session.startTime : '—';
+      return '<article class="tm-list-card">' +
+        '<div class="tm-list-card-head"><div><strong>' + U.escapeHtml(x.person) + '</strong></div><span class="tm-list-card-label">' + x.role + '</span></div>' +
+        '<div class="tm-list-card-body">' +
+          '<div><span class="tm-list-card-label">Öğrenci</span> ' + U.escapeHtml(stName) + '</div>' +
+          '<div><span class="tm-list-card-label">Ders</span> ' + U.escapeHtml(sessLabel) + '</div>' +
+          '<div><span class="tm-list-card-label">Kanal</span> ' + U.escapeHtml(SL.COMM_CHANNEL[l.channel] || l.channel) + '</div>' +
+          '<div><span class="tm-list-card-label">Sonuç</span> ' + U.escapeHtml(SL.COMM_RESULT[l.result] || l.result) + '</div>' +
+          '<div><span class="tm-list-card-label">Tarih</span> ' + U.formatDateTime(l.createdAt) + '</div>' +
+        '</div>' +
+        '<div class="tm-list-card-foot">' + actions + '</div></article>';
+    }
+    var stName = x.student ? U.fullName(x.student.firstName, x.student.lastName) : '—';
+    var sessLabel = x.session ? U.formatDateKey(x.session.date) + ' ' + x.session.startTime : '—';
+    var result = x.reservation ? SL.parentApprovalLabel(x.reservation.parentApprovalStatus) : (x.teacherRole === 'pdr' ? 'PDR bilgilendirilmedi' : (x.teacherRole === 'branch' ? 'Branş bilgilendirilmedi' : 'Bilgilendirilmedi'));
+    return '<article class="tm-list-card">' +
+      '<div class="tm-list-card-head"><div><strong>' + U.escapeHtml(x.person) + '</strong></div><span class="tm-list-card-label">' + x.role + '</span></div>' +
+      '<div class="tm-list-card-body">' +
+        '<div><span class="tm-list-card-label">Öğrenci</span> ' + U.escapeHtml(stName) + '</div>' +
+        '<div><span class="tm-list-card-label">Ders</span> ' + U.escapeHtml(sessLabel) + '</div>' +
+        (teachers.pdrName !== '—' ? '<div><span class="tm-list-card-label">PDR</span> ' + U.escapeHtml(teachers.pdrName) + '</div>' : '') +
+        (teachers.branchName !== '—' ? '<div><span class="tm-list-card-label">Branş</span> ' + U.escapeHtml(teachers.branchName) + '</div>' : '') +
+        '<div><span class="tm-list-card-label">Telefon</span> ' + U.escapeHtml(x.phone) + '</div>' +
+        '<div><span class="tm-list-card-label">Durum</span> ' + U.escapeHtml(result) + '</div>' +
+      '</div>' +
+      '<div class="tm-list-card-foot">' + actions + '</div></article>';
+  }
+
+  function bindRowActions(root) {
+    if (!root) return;
+    root.querySelectorAll('[data-log-idx]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var idx = parseInt(btn.getAttribute('data-log-idx'), 10);
         if (lastItems[idx]) openLogForm(lastItems[idx]);
       });
     });
-    tbody.querySelectorAll('[data-wa-idx]').forEach(function (btn) {
+    root.querySelectorAll('[data-wa-idx]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var idx = parseInt(btn.getAttribute('data-wa-idx'), 10);
         if (lastItems[idx]) openWhatsApp(lastItems[idx]);
       });
     });
-    tbody.querySelectorAll('[data-act-approve]').forEach(function (btn) {
+    root.querySelectorAll('[data-act-approve]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (Perms && !Perms.guard('edit')) return;
         var row = lastItems[parseInt(btn.getAttribute('data-act-approve'), 10)];
@@ -294,7 +379,7 @@
         else { U.notifySuccess('Veli onayı kaydedildi.'); if (window.TMOnSessionChange) window.TMOnSessionChange(); render(); }
       });
     });
-    tbody.querySelectorAll('[data-act-unreach]').forEach(function (btn) {
+    root.querySelectorAll('[data-act-unreach]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (Perms && !Perms.guard('edit')) return;
         var row = lastItems[parseInt(btn.getAttribute('data-act-unreach'), 10)];
@@ -305,7 +390,7 @@
         render();
       });
     });
-    tbody.querySelectorAll('[data-act-call]').forEach(function (btn) {
+    root.querySelectorAll('[data-act-call]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (Perms && !Perms.guard('edit')) return;
         var row = lastItems[parseInt(btn.getAttribute('data-act-call'), 10)];
@@ -316,7 +401,7 @@
         render();
       });
     });
-    tbody.querySelectorAll('[data-act-link]').forEach(function (btn) {
+    root.querySelectorAll('[data-act-link]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (Perms && !Perms.guard('edit')) return;
         var row = lastItems[parseInt(btn.getAttribute('data-act-link'), 10)];
@@ -326,7 +411,7 @@
         else { U.notifySuccess('Link gönderildi işaretlendi.'); if (window.TMOnSessionChange) window.TMOnSessionChange(); render(); }
       });
     });
-    tbody.querySelectorAll('[data-act-inform]').forEach(function (btn) {
+    root.querySelectorAll('[data-act-inform]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (Perms && !Perms.guard('edit')) return;
         var row = lastItems[parseInt(btn.getAttribute('data-act-inform'), 10)];
@@ -339,12 +424,12 @@
         render();
       });
     });
-    tbody.querySelectorAll('[data-act-session]').forEach(function (btn) {
+    root.querySelectorAll('[data-act-session]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (window.TMSessionDetail) window.TMSessionDetail.open(btn.getAttribute('data-act-session'));
       });
     });
-    tbody.querySelectorAll('[data-act-request]').forEach(function (btn) {
+    root.querySelectorAll('[data-act-request]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (window.TMRequestDrawer) window.TMRequestDrawer.open(btn.getAttribute('data-act-request'));
         else window.location.href = 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(btn.getAttribute('data-act-request'));
@@ -385,41 +470,15 @@
     var items = filterTab(taskRows());
     var p = U.paginate(items, page, pageSize);
     lastItems = p.items;
-    var resp = responsibleLabel();
-    if (activeTab === 'all') {
-      tbody.innerHTML = p.items.map(function (x, i) {
-        var l = x.log;
-        return '<tr><td>' + U.escapeHtml(x.person) + '</td><td>' + x.role + '</td><td>—</td><td>—</td><td>' + U.escapeHtml(x.phone) + '</td>' +
-          '<td>' + U.escapeHtml(SL.COMM_CHANNEL[l.channel] || l.channel) + '</td>' +
-          '<td>' + U.escapeHtml(SL.COMM_RESULT[l.result] || l.result) + '</td>' +
-          '<td>' + U.formatDateTime(l.createdAt) + '</td><td>' + U.escapeHtml(l.nextAction || '—') + '</td>' +
-          '<td>' + U.escapeHtml(x.responsible || '—') + '</td>' +
-          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-log-idx="' + i + '" data-tm-require="edit">Kayıt ekle</button></td></tr>';
-      }).join('');
-    } else {
-      tbody.innerHTML = p.items.map(function (x, i) {
-        var stName = x.student ? U.fullName(x.student.firstName, x.student.lastName) : '—';
-        var sessLabel = x.session ? U.formatDateKey(x.session.date) + ' ' + x.session.startTime : '—';
-        var pdrName = '—';
-        var branchName = '—';
-        if (x.session) {
-          var pdrT = Store.getTeacherById(x.session.pdrTeacherId);
-          var branchT = Store.getTeacherById(x.session.branchTeacherId);
-          pdrName = pdrT ? U.fullName(pdrT.firstName, pdrT.lastName) : '—';
-          branchName = branchT ? U.fullName(branchT.firstName, branchT.lastName) : '—';
-        }
-        var result = x.reservation ? SL.parentApprovalLabel(x.reservation.parentApprovalStatus) : (x.teacherRole === 'pdr' ? 'PDR bilgilendirilmedi' : (x.teacherRole === 'branch' ? 'Branş bilgilendirilmedi' : 'Bilgilendirilmedi'));
-        var actions = rowActions(x, i);
-        return '<tr><td>' + U.escapeHtml(x.person) + '</td><td>' + x.role + '</td><td>' + U.escapeHtml(stName) + '</td><td>' + U.escapeHtml(sessLabel) + '</td>' +
-          '<td>' + U.escapeHtml(pdrName) + '</td><td>' + U.escapeHtml(branchName) + '</td>' +
-          '<td>' + U.escapeHtml(x.phone) + '</td><td>—</td><td>' + U.escapeHtml(result) + '</td><td>—</td><td>' + U.escapeHtml(resp) + '</td>' +
-          '<td style="white-space:nowrap">' + actions + '</td></tr>';
-      }).join('');
-    }
+    tbody.innerHTML = p.items.map(rowHtml).join('');
+    if (cardsEl) cardsEl.innerHTML = p.items.map(cardHtml).join('');
     U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
-    bindRowActions();
+    bindRowActions(tbody);
+    if (cardsEl) bindRowActions(cardsEl);
     if (loading) loading.hidden = true;
     if (wrap) wrap.hidden = false;
+    if (cardsEl) cardsEl.hidden = false;
+    if (paginationEl) paginationEl.hidden = p.pages <= 1;
     if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(tbody);
     if (bulkLinksBtn) {
       bulkLinksBtn.hidden = activeTab !== 'link';

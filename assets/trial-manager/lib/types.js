@@ -28,7 +28,7 @@
    */
 
   /**
-   * @typedef {'branch'|'pdr'} TeacherType
+   * @typedef {'branch_teacher'|'pdr_teacher'} TeacherType
    */
 
   /**

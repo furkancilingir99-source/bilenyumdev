@@ -14,6 +14,7 @@
   if (!Store) return;
 
   var tbody = document.getElementById('tmStudentsBody');
+  var cardsEl = document.getElementById('tmStudentsCards');
   var searchInput = document.getElementById('tmStudentsSearch');
   var countEl = document.getElementById('tmStudentsCount');
   var paginationEl = document.getElementById('tmStudentsPagination');
@@ -151,6 +152,59 @@
     });
   }
 
+  function rowHtml(st) {
+    var lt = Store.getLessonTypeById(st.requestedLessonTypeId);
+    var pa = st.parentIds[0] ? Store.getParentById(st.parentIds[0]) : null;
+    var cur = currentReservation(st.id);
+    var sess = cur ? Store.getSessionById(cur.sessionId) : null;
+    return '<tr data-id="' + st.id + '" style="cursor:pointer">' +
+      '<td>' + U.escapeHtml(U.fullName(st.firstName, st.lastName)) + '</td>' +
+      '<td>' + st.age + '</td><td>' + U.escapeHtml(st.grade) + '</td><td>' + U.escapeHtml(st.level) + '</td>' +
+      '<td>' + (lt ? lt.name : '—') + '</td>' +
+      '<td>' + (pa ? U.escapeHtml(U.fullName(pa.firstName, pa.lastName)) : '—') + '</td>' +
+      '<td>' + (pa ? U.escapeHtml(pa.phone) : '—') + '</td>' +
+      '<td>' + (sess ? U.formatDateKey(sess.date) + ' ' + sess.startTime : '—') + '</td>' +
+      '<td>' + SL.studentBadge(st.status) + '</td>' +
+      '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + st.id + '">Detay</button></td></tr>';
+  }
+
+  function cardHtml(st) {
+    var lt = Store.getLessonTypeById(st.requestedLessonTypeId);
+    var pa = st.parentIds[0] ? Store.getParentById(st.parentIds[0]) : null;
+    var cur = currentReservation(st.id);
+    var sess = cur ? Store.getSessionById(cur.sessionId) : null;
+    return '<article class="tm-list-card" data-id="' + st.id + '">' +
+      '<div class="tm-list-card-head"><div><strong>' + U.escapeHtml(U.fullName(st.firstName, st.lastName)) + '</strong></div>' +
+      SL.studentBadge(st.status) + '</div>' +
+      '<div class="tm-list-card-body">' +
+        '<div><span class="tm-list-card-label">Sınıf</span> ' + U.escapeHtml(st.grade) + ' · ' + U.escapeHtml(st.level) + '</div>' +
+        '<div><span class="tm-list-card-label">Ders</span> ' + U.escapeHtml(lt ? lt.name : '—') + '</div>' +
+        '<div><span class="tm-list-card-label">Veli</span> ' + (pa ? U.escapeHtml(U.fullName(pa.firstName, pa.lastName)) : '—') + '</div>' +
+        '<div><span class="tm-list-card-label">Rezervasyon</span> ' + (sess ? U.formatDateKey(sess.date) + ' ' + sess.startTime : '—') + '</div>' +
+      '</div>' +
+      '<div class="tm-list-card-foot"><button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-detail="' + st.id + '">Detay</button></div>' +
+    '</article>';
+  }
+
+  function bindRowActions() {
+    function openStudent(id) { openDetail(Store.getStudentById(id)); }
+    [tbody, cardsEl].forEach(function (root) {
+      if (!root) return;
+      root.querySelectorAll('[data-detail]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          openStudent(btn.getAttribute('data-detail'));
+        });
+      });
+      root.querySelectorAll('tr[data-id], .tm-list-card[data-id]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          if (e.target.closest('button')) return;
+          openStudent(el.getAttribute('data-id'));
+        });
+      });
+    });
+  }
+
   function render() {
     if (!tbody) return;
     var loading = document.getElementById('tmStudentsLoading');
@@ -159,36 +213,14 @@
       var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
       var p = U.paginate(filtered(), page, pageSize);
       if (countEl) countEl.textContent = p.total + ' öğrenci';
-      tbody.innerHTML = p.items.map(function (st) {
-        var lt = Store.getLessonTypeById(st.requestedLessonTypeId);
-        var pa = st.parentIds[0] ? Store.getParentById(st.parentIds[0]) : null;
-        var cur = currentReservation(st.id);
-        var sess = cur ? Store.getSessionById(cur.sessionId) : null;
-        return '<tr data-id="' + st.id + '" style="cursor:pointer">' +
-          '<td>' + U.escapeHtml(U.fullName(st.firstName, st.lastName)) + '</td>' +
-          '<td>' + st.age + '</td><td>' + U.escapeHtml(st.grade) + '</td><td>' + U.escapeHtml(st.level) + '</td>' +
-          '<td>' + (lt ? lt.name : '—') + '</td>' +
-          '<td>' + (pa ? U.escapeHtml(U.fullName(pa.firstName, pa.lastName)) : '—') + '</td>' +
-          '<td>' + (pa ? U.escapeHtml(pa.phone) : '—') + '</td>' +
-          '<td>' + (sess ? U.formatDateKey(sess.date) + ' ' + sess.startTime : '—') + '</td>' +
-          '<td>' + SL.studentBadge(st.status) + '</td>' +
-          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + st.id + '">Detay</button></td></tr>';
-      }).join('');
+      tbody.innerHTML = p.items.map(rowHtml).join('');
+      if (cardsEl) cardsEl.innerHTML = p.items.map(cardHtml).join('');
       U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
-      tbody.querySelectorAll('[data-detail]').forEach(function (btn) {
-        btn.addEventListener('click', function (e) {
-          e.stopPropagation();
-          openDetail(Store.getStudentById(btn.getAttribute('data-detail')));
-        });
-      });
-      tbody.querySelectorAll('tr[data-id]').forEach(function (tr) {
-        tr.addEventListener('click', function (e) {
-          if (e.target.closest('button')) return;
-          openDetail(Store.getStudentById(tr.getAttribute('data-id')));
-        });
-      });
+      bindRowActions();
       if (loading) loading.hidden = true;
       if (wrap) wrap.hidden = false;
+      if (cardsEl) cardsEl.hidden = false;
+      if (paginationEl) paginationEl.hidden = p.pages <= 1;
     } catch (err) {
       if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
       console.error(err);

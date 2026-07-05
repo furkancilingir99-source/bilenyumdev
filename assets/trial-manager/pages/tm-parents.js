@@ -15,6 +15,7 @@
   if (!Store) return;
 
   var tbody = document.getElementById('tmParentsBody');
+  var cardsEl = document.getElementById('tmParentsCards');
   var searchInput = document.getElementById('tmParentsSearch');
   var countEl = document.getElementById('tmParentsCount');
   var paginationEl = document.getElementById('tmParentsPagination');
@@ -184,6 +185,58 @@
     });
   }
 
+  function rowHtml(pa) {
+    var res = Store.getReservationsForParent(pa.id);
+    var active = res.filter(function (r) { return r.status === 'confirmed' || r.status === 'pending'; });
+    var lastComm = Store.getCommunicationLogs().find(function (l) { return l.parentId === pa.id; });
+    var linkSent = res.some(function (r) { return r.linkSent; });
+    var callAgain = res.some(function (r) { return r.parentApprovalStatus === 'call_again'; });
+    var approval = active.length ? SL.parentApprovalBadge(active[0].parentApprovalStatus) : '—';
+    return '<tr data-id="' + pa.id + '" style="cursor:pointer"><td>' + U.escapeHtml(U.fullName(pa.firstName, pa.lastName)) + '</td>' +
+      '<td>' + U.escapeHtml(pa.phone) + '</td><td>' + U.escapeHtml(pa.email) + '</td>' +
+      '<td>' + pa.studentIds.length + '</td>' +
+      '<td>' + (lastComm ? U.formatDateTime(lastComm.createdAt) : '—') + '</td>' +
+      '<td>' + approval + '</td>' +
+      '<td>' + (callAgain ? 'Evet' : 'Hayır') + '</td>' +
+      '<td>' + (linkSent ? 'Evet' : 'Hayır') + '</td>' +
+      '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + pa.id + '">Detay</button></td></tr>';
+  }
+
+  function cardHtml(pa) {
+    var res = Store.getReservationsForParent(pa.id);
+    var active = res.filter(function (r) { return r.status === 'confirmed' || r.status === 'pending'; });
+    var approval = active.length ? SL.parentApprovalLabel(active[0].parentApprovalStatus) : '—';
+    return '<article class="tm-list-card" data-id="' + pa.id + '">' +
+      '<div class="tm-list-card-head"><div><strong>' + U.escapeHtml(U.fullName(pa.firstName, pa.lastName)) + '</strong></div></div>' +
+      '<div class="tm-list-card-body">' +
+        '<div><span class="tm-list-card-label">Telefon</span> ' + U.escapeHtml(pa.phone) + '</div>' +
+        '<div><span class="tm-list-card-label">E-posta</span> ' + U.escapeHtml(pa.email) + '</div>' +
+        '<div><span class="tm-list-card-label">Öğrenci</span> ' + pa.studentIds.length + '</div>' +
+        '<div><span class="tm-list-card-label">Onay</span> ' + U.escapeHtml(approval) + '</div>' +
+      '</div>' +
+      '<div class="tm-list-card-foot"><button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-detail="' + pa.id + '">Detay</button></div>' +
+    '</article>';
+  }
+
+  function bindRowActions() {
+    function openParent(id) { openDetail(Store.getParentById(id)); }
+    [tbody, cardsEl].forEach(function (root) {
+      if (!root) return;
+      root.querySelectorAll('[data-detail]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          openParent(btn.getAttribute('data-detail'));
+        });
+      });
+      root.querySelectorAll('tr[data-id], .tm-list-card[data-id]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          if (e.target.closest('button')) return;
+          openParent(el.getAttribute('data-id'));
+        });
+      });
+    });
+  }
+
   function render() {
     if (!tbody) return;
     var loading = document.getElementById('tmParentsLoading');
@@ -192,37 +245,14 @@
       var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
       var p = U.paginate(filtered(), page, pageSize);
       if (countEl) countEl.textContent = p.total + ' veli';
-      tbody.innerHTML = p.items.map(function (pa) {
-        var res = Store.getReservationsForParent(pa.id);
-        var active = res.filter(function (r) { return r.status === 'confirmed' || r.status === 'pending'; });
-        var lastComm = Store.getCommunicationLogs().find(function (l) { return l.parentId === pa.id; });
-        var linkSent = res.some(function (r) { return r.linkSent; });
-        var callAgain = res.some(function (r) { return r.parentApprovalStatus === 'call_again'; });
-        var approval = active.length ? SL.parentApprovalBadge(active[0].parentApprovalStatus) : '—';
-        return '<tr data-id="' + pa.id + '" style="cursor:pointer"><td>' + U.escapeHtml(U.fullName(pa.firstName, pa.lastName)) + '</td>' +
-          '<td>' + U.escapeHtml(pa.phone) + '</td><td>' + U.escapeHtml(pa.email) + '</td>' +
-          '<td>' + pa.studentIds.length + '</td>' +
-          '<td>' + (lastComm ? U.formatDateTime(lastComm.createdAt) : '—') + '</td>' +
-          '<td>' + approval + '</td>' +
-          '<td>' + (callAgain ? 'Evet' : 'Hayır') + '</td>' +
-          '<td>' + (linkSent ? 'Evet' : 'Hayır') + '</td>' +
-          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + pa.id + '">Detay</button></td></tr>';
-      }).join('');
+      tbody.innerHTML = p.items.map(rowHtml).join('');
+      if (cardsEl) cardsEl.innerHTML = p.items.map(cardHtml).join('');
       U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
-      tbody.querySelectorAll('[data-detail]').forEach(function (btn) {
-        btn.addEventListener('click', function (e) {
-          e.stopPropagation();
-          openDetail(Store.getParentById(btn.getAttribute('data-detail')));
-        });
-      });
-      tbody.querySelectorAll('tr[data-id]').forEach(function (tr) {
-        tr.addEventListener('click', function (e) {
-          if (e.target.closest('button')) return;
-          openDetail(Store.getParentById(tr.getAttribute('data-id')));
-        });
-      });
+      bindRowActions();
       if (loading) loading.hidden = true;
       if (wrap) wrap.hidden = false;
+      if (cardsEl) cardsEl.hidden = false;
+      if (paginationEl) paginationEl.hidden = p.pages <= 1;
     } catch (err) {
       if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
       console.error(err);

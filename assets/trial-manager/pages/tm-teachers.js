@@ -15,6 +15,7 @@
   if (!Store) return;
 
   var tbody = document.getElementById('tmTeachersBody');
+  var cardsEl = document.getElementById('tmTeachersCards');
   var searchInput = document.getElementById('tmTeachersSearch');
   var countEl = document.getElementById('tmTeachersCount');
   var paginationEl = document.getElementById('tmTeachersPagination');
@@ -216,6 +217,49 @@
     }).length;
   }
 
+  function rowHtml(t) {
+    var todayCount = Store.getSessionsForTeacher(t.id).filter(function (s) { return s.date === today && s.status !== 'cancelled'; }).length;
+    return '<tr data-id="' + t.id + '" style="cursor:pointer"><td>' + U.escapeHtml(U.fullName(t.firstName, t.lastName)) + '</td>' +
+      '<td>' + SL.teacherTypeBadge(t.teacherType || 'branch') + '</td>' +
+      '<td>' + U.escapeHtml(branchLabel(t)) + '</td>' +
+      '<td>' + U.escapeHtml(t.phone) + '</td>' +
+      '<td>' + todayCount + '</td><td>' + weekCount(t.id) + '</td>' +
+      '<td>' + (t.dashboardEnabled ? 'Evet' : 'Hayır') + '</td>' +
+      '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + t.id + '">Detay</button></td></tr>';
+  }
+
+  function cardHtml(t) {
+    var todayCount = Store.getSessionsForTeacher(t.id).filter(function (s) { return s.date === today && s.status !== 'cancelled'; }).length;
+    return '<article class="tm-list-card" data-id="' + t.id + '">' +
+      '<div class="tm-list-card-head"><div><strong>' + U.escapeHtml(U.fullName(t.firstName, t.lastName)) + '</strong></div>' +
+      SL.teacherTypeBadge(t.teacherType || 'branch') + '</div>' +
+      '<div class="tm-list-card-body">' +
+        '<div><span class="tm-list-card-label">Branş</span> ' + U.escapeHtml(branchLabel(t)) + '</div>' +
+        '<div><span class="tm-list-card-label">Bugün / hafta</span> ' + todayCount + ' / ' + weekCount(t.id) + ' ders</div>' +
+        '<div><span class="tm-list-card-label">Dashboard</span> ' + (t.dashboardEnabled ? 'Aktif' : 'Kapalı') + '</div>' +
+      '</div>' +
+      '<div class="tm-list-card-foot"><button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-detail="' + t.id + '">Detay</button></div>' +
+    '</article>';
+  }
+
+  function bindRowActions() {
+    [tbody, cardsEl].forEach(function (root) {
+      if (!root) return;
+      root.querySelectorAll('[data-detail]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          openDetail(Store.getTeacherById(btn.getAttribute('data-detail')));
+        });
+      });
+      root.querySelectorAll('tr[data-id], .tm-list-card[data-id]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          if (e.target.closest('button')) return;
+          openDetail(Store.getTeacherById(el.getAttribute('data-id')));
+        });
+      });
+    });
+  }
+
   function render() {
     if (!tbody) return;
     var loading = document.getElementById('tmTeachersLoading');
@@ -224,22 +268,14 @@
       var pageSize = parseInt(pageSizeSelect ? pageSizeSelect.value : '10', 10);
       var p = U.paginate(filtered(), page, pageSize);
       if (countEl) countEl.textContent = p.total + ' öğretmen';
-      tbody.innerHTML = p.items.map(function (t) {
-        var todayCount = Store.getSessionsForTeacher(t.id).filter(function (s) { return s.date === today && s.status !== 'cancelled'; }).length;
-        return '<tr><td>' + U.escapeHtml(U.fullName(t.firstName, t.lastName)) + '</td>' +
-          '<td>' + SL.teacherTypeBadge(t.teacherType || 'branch') + '</td>' +
-          '<td>' + U.escapeHtml(branchLabel(t)) + '</td>' +
-          '<td>' + U.escapeHtml(t.phone) + '</td>' +
-          '<td>' + todayCount + '</td><td>' + weekCount(t.id) + '</td>' +
-          '<td>' + (t.dashboardEnabled ? 'Evet' : 'Hayır') + '</td>' +
-          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + t.id + '">Detay</button></td></tr>';
-      }).join('');
+      tbody.innerHTML = p.items.map(rowHtml).join('');
+      if (cardsEl) cardsEl.innerHTML = p.items.map(cardHtml).join('');
       U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
-      tbody.querySelectorAll('[data-detail]').forEach(function (btn) {
-        btn.addEventListener('click', function () { openDetail(Store.getTeacherById(btn.getAttribute('data-detail'))); });
-      });
+      bindRowActions();
       if (loading) loading.hidden = true;
       if (wrap) wrap.hidden = false;
+      if (cardsEl) cardsEl.hidden = false;
+      if (paginationEl) paginationEl.hidden = p.pages <= 1;
     } catch (err) {
       if (loading) { loading.hidden = false; loading.textContent = 'Liste yüklenemedi: ' + err.message; }
       console.error(err);
