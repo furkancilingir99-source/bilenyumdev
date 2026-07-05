@@ -3,126 +3,84 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Planlanmış Dersler · Deneme Dersi Yöneticisi · Bilenyum</title>
-<meta name="description" content="Planlanmış deneme dersleri listesi — branş, öğretmen, öğrenci ve ders detayları." />
+<title>Deneme Dersleri · Deneme Dersi Yöneticisi · Bilenyum</title>
 <link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="assets/tokens.css">
 <link rel="stylesheet" href="assets/shell.css">
-<link rel="stylesheet" href="assets/dashboard-d3-mega.css">
-<link rel="stylesheet" href="assets/dashboard-light.css">
-<link rel="stylesheet" href="assets/dashboard-polish.css">
-<link rel="stylesheet" href="assets/teacher-dashboard.css">
 <link rel="stylesheet" href="assets/trial-lesson-manager.css">
+<link rel="stylesheet" href="assets/trial-manager/styles/trial-manager-admin.css">
 <script src="assets/auth-tab-session.js"></script>
-<script src="assets/dashboard-switcher.js" defer></script>
-<script src="assets/trial-lesson-manager-shell.js" defer></script>
-<script src="assets/shell.js" defer></script>
 </head>
-<body data-trial-manager-active="planlanmis-dersler">
-
-<div class="scene" aria-hidden="true">
-  <div class="scene-grid"></div>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-</div>
+<body data-tm-page="deneme-dersleri" class="tm-admin-body">
 
 <header class="hud" data-trial-manager-hud></header>
 
-<main class="stage thw-stage tm-stage">
-  <div class="stage-nav" data-trial-manager-nav></div>
-
+<main class="stage tm-stage">
   <div class="tm-main-col">
-    <div class="thw-context-panel">
-      <div class="thw-page-head">
-        <h1 class="thw-page-title">Planlanmış Dersler</h1>
-        <p class="thw-page-subtitle">Planlı dersler — filtreleyin, düzenleyin, detaya gidin.</p>
-      </div>
-    </div>
-
-    <div id="tmPlannedLoading" class="td-state">
-      <div class="td-skeleton"><div class="td-skeleton-bar"></div><div class="td-skeleton-bar"></div></div>
-      Planlanmış dersler yükleniyor...
+    <div class="tm-page-head">
+      <h1 class="tm-page-title">Deneme Dersleri</h1>
+      <p class="tm-page-sub">Online deneme dersi oturumları — kapasite, link, öğretmen ve katılımcı yönetimi.</p>
     </div>
 
     <section class="tm-panel tm-panel--datagrid">
-      <header class="tm-dg-toolbar" aria-label="Liste araç çubuğu">
+      <header class="tm-dg-toolbar">
         <div class="tm-dg-toolbar-row">
-          <input type="search" class="tm-dg-control tm-dg-search" id="tmPlannedSearch" placeholder="Ara: ID, branş, öğretmen, öğrenci…" aria-label="Planlanmış ders ara">
-          <select class="tm-dg-control tm-dg-select" id="tmPlannedGradeFilter" aria-label="Sınıf filtresi" title="Sınıf">
-            <option value="all">Tüm sınıflar</option>
+          <input type="search" class="tm-dg-control tm-dg-search" id="tmSessionsSearch" placeholder="Ara: ders, öğretmen, ID…">
+          <select class="tm-dg-control tm-dg-select" id="tmSessionsType">
+            <option value="all">Tüm ders türleri</option>
+            <option value="lt-mat">Matematik</option>
+            <option value="lt-fen">Fen</option>
           </select>
-          <select class="tm-dg-control tm-dg-select" id="tmPlannedSubjectFilter" aria-label="Branş filtresi" title="Branş">
-            <option value="all">Tüm branşlar</option>
+          <select class="tm-dg-control tm-dg-select" id="tmSessionsStatus">
+            <option value="all">Tüm durumlar</option>
+            <option value="scheduled">Planlandı</option>
+            <option value="confirmed">Onaylandı</option>
+            <option value="completed">Tamamlandı</option>
+            <option value="cancelled">İptal</option>
+            <option value="rescheduled">Yeniden planlandı</option>
           </select>
-          <select class="tm-dg-control tm-dg-select" id="tmPlannedTeacherFilter" aria-label="Öğretmen filtresi" title="Öğretmen">
-            <option value="all">Tüm öğretmenler</option>
-          </select>
-          <div class="tm-dg-dates" aria-label="Ders tarihi aralığı">
-            <div class="tm-date-field-wrap">
-              <button type="button" class="tm-dg-control tm-dg-date" id="tmPlannedDateStartBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="tmPlannedDateStartPop" aria-label="Ders başlangıç tarihi">
-                <span class="tm-date-btn-text is-placeholder">Başlangıç</span>
-              </button>
-              <div class="tm-date-popover" id="tmPlannedDateStartPop" hidden role="dialog" aria-label="Başlangıç tarihi"></div>
-            </div>
-            <span class="tm-dg-date-sep" aria-hidden="true">–</span>
-            <div class="tm-date-field-wrap">
-              <button type="button" class="tm-dg-control tm-dg-date" id="tmPlannedDateEndBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="tmPlannedDateEndPop" aria-label="Ders bitiş tarihi">
-                <span class="tm-date-btn-text is-placeholder">Bitiş</span>
-              </button>
-              <div class="tm-date-popover" id="tmPlannedDateEndPop" hidden role="dialog" aria-label="Bitiş tarihi"></div>
-            </div>
-            <button type="button" class="tm-dg-link" id="tmPlannedDateClear" hidden>Temizle</button>
-          </div>
-          <span class="tm-dg-spacer" aria-hidden="true"></span>
-          <select class="tm-dg-control tm-dg-select tm-dg-select--sort" id="tmPlannedSort" aria-label="Sıralama" title="Sıralama">
-            <option value="slot-desc">Tarih ↓</option>
-            <option value="slot-asc">Tarih ↑</option>
-            <option value="updated-desc">Güncelleme ↓</option>
-            <option value="subject-asc">Branş A→Z</option>
-            <option value="teacher-asc">Öğretmen A→Z</option>
-          </select>
-          <select class="tm-dg-control tm-dg-select tm-dg-select--narrow" id="tmPlannedPageSize" aria-label="Sayfa başına kayıt" title="Sayfa boyutu">
-            <option value="5">5</option>
-            <option value="8" selected>8</option>
-            <option value="10">10</option>
+          <span class="tm-dg-spacer"></span>
+          <select class="tm-dg-control tm-dg-select tm-dg-select--narrow" id="tmSessionsPageSize">
+            <option value="10" selected>10</option>
             <option value="20">20</option>
+            <option value="50">50</option>
           </select>
+          <button type="button" class="tm-dg-action" id="tmSessionsExport" style="border:none;cursor:pointer">CSV</button>
           <a class="tm-dg-action" href="deneme-dersi-yoneticisi-ders-planla.html">+ Planla</a>
-          <span class="tm-dg-count" id="tmPlannedCount" aria-live="polite">—</span>
+          <span class="tm-dg-count" id="tmSessionsCount">—</span>
         </div>
       </header>
 
-      <p id="tmPlannedEmpty" class="td-state" hidden>Eşleşen planlanmış ders bulunamadı.</p>
-
-      <div id="tmPlannedTableWrap" class="tm-res-table-wrap" hidden>
+      <div id="tmSessionsLoading" class="td-state">Yükleniyor…</div>
+      <div id="tmSessionsTableWrap" class="tm-res-table-wrap" hidden>
         <table class="tm-res-table tm-res-table--rich">
           <thead>
             <tr>
-              <th>Ders ID</th>
-              <th>Branş</th>
-              <th>Sınıf</th>
-              <th>Öğretmen</th>
-              <th>Ders Tarihi / Saat</th>
-              <th>Öğrenciler</th>
-              <th>Öğrenci sayısı</th>
-              <th>Son Güncelleme</th>
-              <th>Durum</th>
-              <th>İşlemler</th>
+              <th>Tarih</th><th>Saat</th><th>Ders türü</th><th>Öğretmen</th>
+              <th>Öğrenci</th><th>Kapasite</th><th>Boş</th><th>Link</th><th>Meeting ID</th>
+              <th>Veli onay bekleyen</th><th>Link gönderilmeyen</th><th>Öğrt.bilgi</th><th>Durum</th><th>Güncelleme</th><th>İşlem</th>
             </tr>
           </thead>
-          <tbody id="tmPlannedTableBody"></tbody>
+          <tbody id="tmSessionsBody"></tbody>
         </table>
       </div>
-
-      <div id="tmPlannedPagination" class="tm-pagination" hidden></div>
+      <div id="tmSessionsPagination" class="tm-pagination" hidden></div>
     </section>
   </div>
 </main>
 
-<script src="assets/trial-lesson-manager-mock.js"></script>
-<script src="assets/trial-lesson-planner-mock.js"></script>
-<script src="assets/trial-lesson-planned.js"></script>
+<script src="assets/trial-manager/lib/types.js"></script>
+<script src="assets/trial-manager/lib/status-labels.js"></script>
+<script src="assets/trial-manager/lib/audit-utils.js"></script>
+<script src="assets/trial-manager/lib/mock-data.js"></script>
+<script src="assets/trial-manager/lib/scheduling-rules.js"></script>
+<script src="assets/trial-manager/lib/message-templates.js"></script>
+<script src="assets/trial-manager/lib/export-utils.js"></script>
+<script src="assets/trial-manager/components/tm-utils.js"></script>
+<script src="assets/trial-manager/components/tm-confirm-dialog.js"></script>
+<script src="assets/trial-manager/components/tm-detail-drawer.js"></script>
+<script src="assets/trial-manager/components/tm-app-shell.js"></script>
+<script src="assets/trial-manager/pages/tm-session-detail.js"></script>
+<script src="assets/trial-manager/pages/tm-sessions.js"></script>
 </body>
 </html>

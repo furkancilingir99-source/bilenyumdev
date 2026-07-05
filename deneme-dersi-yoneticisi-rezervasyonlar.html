@@ -3,131 +3,71 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Rezervasyonlar · Deneme Dersi Yöneticisi · Bilenyum</title>
-<meta name="description" content="Bilenyum — Deneme dersi rezervasyon listesi: veli, öğrenci ve iletişim bilgileri." />
+<title>Rezervasyon Talepleri · Deneme Dersi Yöneticisi · Bilenyum</title>
 <link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="assets/tokens.css">
 <link rel="stylesheet" href="assets/shell.css">
-<link rel="stylesheet" href="assets/dashboard-d3-mega.css">
-<link rel="stylesheet" href="assets/dashboard-light.css">
-<link rel="stylesheet" href="assets/dashboard-polish.css">
-<link rel="stylesheet" href="assets/teacher-dashboard.css">
 <link rel="stylesheet" href="assets/trial-lesson-manager.css">
+<link rel="stylesheet" href="assets/trial-manager/styles/trial-manager-admin.css">
 <script src="assets/auth-tab-session.js"></script>
-<script src="assets/dashboard-switcher.js" defer></script>
-<script src="assets/trial-lesson-manager-shell.js" defer></script>
-<script src="assets/shell.js" defer></script>
 </head>
-<body data-trial-manager-active="rezervasyonlar">
-
-<div class="scene" aria-hidden="true">
-  <div class="scene-grid"></div>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-</div>
+<body data-tm-page="rezervasyon-talepleri" class="tm-admin-body">
 
 <header class="hud" data-trial-manager-hud></header>
 
-<main class="stage thw-stage tm-stage">
-  <div class="stage-nav" data-trial-manager-nav></div>
-
+<main class="stage tm-stage">
   <div class="tm-main-col">
-    <div class="thw-context-panel">
-      <div class="thw-page-head">
-        <h1 class="thw-page-title">Rezervasyonlar</h1>
-        <p class="thw-page-subtitle">100+ başvuru — filtreleyin, sıralayın, detaya gidin.</p>
-      </div>
-    </div>
-
-    <div id="tmResLoading" class="td-state">
-      <div class="td-skeleton"><div class="td-skeleton-bar"></div><div class="td-skeleton-bar"></div></div>
-      Rezervasyonlar yükleniyor...
+    <div class="tm-page-head">
+      <h1 class="tm-page-title">Rezervasyon Talepleri</h1>
+      <p class="tm-page-sub">Web sitesinden gelen ücretsiz online deneme dersi form talepleri.</p>
     </div>
 
     <section class="tm-panel tm-panel--datagrid">
-      <header class="tm-dg-toolbar" aria-label="Liste araç çubuğu">
+      <header class="tm-dg-toolbar">
         <div class="tm-dg-toolbar-row">
-          <input type="search" class="tm-dg-control tm-dg-search" id="tmResSearch" placeholder="Ara: ID, öğrenci, veli, telefon…" aria-label="Rezervasyon ara">
-          <select class="tm-dg-control tm-dg-select" id="tmResStatusFilter" aria-label="Durum filtresi" title="Durum">
+          <input type="search" class="tm-dg-control tm-dg-search" id="tmRequestsSearch" placeholder="Ara: öğrenci, veli, telefon…">
+          <select class="tm-dg-control tm-dg-select" id="tmRequestsStatus">
             <option value="all">Tüm durumlar</option>
-            <option value="pending">Onay bekliyor</option>
-            <option value="confirmed">Onaylandı</option>
-            <option value="completed">Tamamlandı</option>
+            <option value="new">Yeni</option>
+            <option value="reviewing">İnceleniyor</option>
+            <option value="assigned">Atandı</option>
+            <option value="rejected">Reddedildi</option>
             <option value="cancelled">İptal</option>
           </select>
-          <select class="tm-dg-control tm-dg-select" id="tmResGradeFilter" aria-label="Sınıf filtresi" title="Sınıf">
-            <option value="all">Tüm sınıflar</option>
+          <span class="tm-dg-spacer"></span>
+          <select class="tm-dg-control tm-dg-select tm-dg-select--narrow" id="tmRequestsPageSize">
+            <option value="10" selected>10</option><option value="20">20</option>
           </select>
-          <select class="tm-dg-control tm-dg-select" id="tmResSubjectFilter" aria-label="Ders filtresi" title="Ders">
-            <option value="all">Tüm dersler</option>
-          </select>
-          <div class="tm-dg-dates" aria-label="Kayıt tarihi aralığı">
-            <div class="tm-date-field-wrap">
-              <button type="button" class="tm-dg-control tm-dg-date" id="tmResDateStartBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="tmResDateStartPop" aria-label="Kayıt başlangıç tarihi">
-                <span class="tm-date-btn-text is-placeholder">Başlangıç</span>
-              </button>
-              <div class="tm-date-popover" id="tmResDateStartPop" hidden role="dialog" aria-label="Başlangıç tarihi"></div>
-            </div>
-            <span class="tm-dg-date-sep" aria-hidden="true">–</span>
-            <div class="tm-date-field-wrap">
-              <button type="button" class="tm-dg-control tm-dg-date" id="tmResDateEndBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="tmResDateEndPop" aria-label="Kayıt bitiş tarihi">
-                <span class="tm-date-btn-text is-placeholder">Bitiş</span>
-              </button>
-              <div class="tm-date-popover" id="tmResDateEndPop" hidden role="dialog" aria-label="Bitiş tarihi"></div>
-            </div>
-            <button type="button" class="tm-dg-link" id="tmResDateClear" hidden>Temizle</button>
-          </div>
-          <span class="tm-dg-spacer" aria-hidden="true"></span>
-          <select class="tm-dg-control tm-dg-select tm-dg-select--sort" id="tmResSort" aria-label="Sıralama" title="Sıralama">
-            <option value="createdAt-desc">Kayıt ↓</option>
-            <option value="createdAt-asc">Kayıt ↑</option>
-            <option value="student-asc">Öğrenci A→Z</option>
-            <option value="student-desc">Öğrenci Z→A</option>
-            <option value="subject-asc">Ders A→Z</option>
-          </select>
-          <select class="tm-dg-control tm-dg-select tm-dg-select--narrow" id="tmResPageSize" aria-label="Sayfa başına kayıt" title="Sayfa boyutu">
-            <option value="5">5</option>
-            <option value="8" selected>8</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-          </select>
-          <span class="tm-dg-count" id="tmResCount" aria-live="polite">—</span>
+          <button type="button" class="tm-dg-action" id="tmRequestsExport" style="border:none;cursor:pointer">CSV</button>
+          <span class="tm-dg-count" id="tmRequestsCount">—</span>
         </div>
       </header>
-
-      <p id="tmResEmpty" class="td-state" hidden>Eşleşen rezervasyon bulunamadı.</p>
-
-      <div id="tmResTableWrap" class="tm-res-table-wrap" hidden>
+      <div id="tmRequestsLoading" class="td-state">Yükleniyor…</div>
+      <div id="tmRequestsTableWrap" class="tm-res-table-wrap" hidden>
         <table class="tm-res-table tm-res-table--rich">
           <thead>
             <tr>
-              <th>Rezervasyon ID</th>
-              <th>Öğrenci</th>
-              <th>Sınıf</th>
-              <th>Ders</th>
-              <th>Veli</th>
-              <th>Telefon</th>
-              <th>E-posta</th>
-              <th>Kayıt Tarihi</th>
-              <th>Ders Tarihi / Saat</th>
-              <th>Planlı ders</th>
-              <th>Durum</th>
-              <th>İşlemler</th>
+              <th>Talep tarihi</th><th>Öğrenci</th><th>Yaş</th><th>Sınıf</th><th>Seviye</th><th>Ders türü</th>
+              <th>Veli</th><th>Telefon</th><th>E-posta</th><th>Seçilen ders</th><th>Veli onay</th><th>Durum</th><th>Link</th><th>İşlem</th>
             </tr>
           </thead>
-          <tbody id="tmResTableBody"></tbody>
+          <tbody id="tmRequestsBody"></tbody>
         </table>
       </div>
-
-      <div id="tmResPagination" class="tm-pagination" hidden></div>
+      <div id="tmRequestsPagination" class="tm-pagination" hidden></div>
     </section>
   </div>
 </main>
 
-<script src="assets/trial-lesson-manager-mock.js"></script>
-<script src="assets/trial-lesson-planner-mock.js"></script>
-<script src="assets/trial-lesson-manager-reservations.js"></script>
+<script src="assets/trial-manager/lib/types.js"></script>
+<script src="assets/trial-manager/lib/status-labels.js"></script>
+<script src="assets/trial-manager/lib/audit-utils.js"></script>
+<script src="assets/trial-manager/lib/mock-data.js"></script>
+<script src="assets/trial-manager/lib/scheduling-rules.js"></script>
+<script src="assets/trial-manager/lib/message-templates.js"></script>
+<script src="assets/trial-manager/lib/export-utils.js"></script>
+<script src="assets/trial-manager/components/tm-utils.js"></script>
+<script src="assets/trial-manager/components/tm-app-shell.js"></script>
+<script src="assets/trial-manager/pages/tm-requests.js"></script>
 </body>
 </html>

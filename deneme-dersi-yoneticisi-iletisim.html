@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>İletişim Takibi · Deneme Dersi Yöneticisi · Bilenyum</title>
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/trial-lesson-manager.css">
+<link rel="stylesheet" href="assets/trial-manager/styles/trial-manager-admin.css">
+<script src="assets/auth-tab-session.js"></script>
+</head>
+<body data-tm-page="iletisim" class="tm-admin-body">
+<header class="hud" data-trial-manager-hud></header>
+<main class="stage tm-stage">
+  <div class="tm-main-col">
+    <div class="tm-page-head"><h1 class="tm-page-title">İletişim Takibi</h1><p class="tm-page-sub">Aranacak veliler, onay bekleyenler, link gönderilecekler ve iletişim geçmişi.</p></div>
+    <section class="tm-panel tm-panel--datagrid">
+      <div class="tm-comm-tabs" id="tmCommTabs"></div>
+      <div id="tmCommLoading" class="td-state">Yükleniyor…</div>
+      <div id="tmCommTableWrap" class="tm-res-table-wrap" hidden>
+        <table class="tm-res-table"><thead><tr>
+          <th>Kişi</th><th>Rol</th><th>Öğrenci</th><th>Ders</th><th>Telefon</th><th>Kanal</th><th>Sonuç</th><th>Son iletişim</th><th>Sonraki aksiyon</th><th>Sorumlu</th><th></th>
+        </tr></thead><tbody id="tmCommBody"></tbody></table>
+      </div>
+      <div id="tmCommPagination" class="tm-pagination" hidden></div>
+    </section>
+  </div>
+</main>
+<script src="assets/trial-manager/lib/status-labels.js"></script>
+<script src="assets/trial-manager/lib/mock-data.js"></script>
+<script src="assets/trial-manager/components/tm-utils.js"></script>
+<script src="assets/trial-manager/components/tm-app-shell.js"></script>
+<script src="assets/trial-manager/pages/tm-communication.js"></script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Kullanıcılar ve Yetkiler · Deneme Dersi Yöneticisi · Bilenyum</title>
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/trial-lesson-manager.css">
+<link rel="stylesheet" href="assets/trial-manager/styles/trial-manager-admin.css">
+<script src="assets/auth-tab-session.js"></script>
+</head>
+<body data-tm-page="kullanicilar" class="tm-admin-body">
+<header class="hud" data-trial-manager-hud></header>
+<main class="stage tm-stage">
+  <div class="tm-main-col">
+    <div class="tm-page-head"><h1 class="tm-page-title">Kullanıcılar ve Yetkiler</h1><p class="tm-page-sub">Yönetici görüntüleme, düzenleme, iptal ve dışa aktarma izinleri.</p></div>
+    <section class="tm-panel tm-panel--datagrid">
+      <div id="tmUsersLoading" class="td-state">Yükleniyor…</div>
+      <div id="tmUsersTableWrap" class="tm-res-table-wrap" hidden>
+        <table class="tm-res-table"><thead><tr>
+          <th>Ad</th><th>E-posta</th><th>Rol</th><th>Görüntüle</th><th>Oluştur</th><th>Düzenle</th><th>İptal</th><th>Dışa aktar</th><th>Durum</th>
+        </tr></thead><tbody id="tmUsersBody"></tbody></table>
+      </div>
+    </section>
+  </div>
+</main>
+<script src="assets/trial-manager/lib/mock-data.js"></script>
+<script src="assets/trial-manager/components/tm-utils.js"></script>
+<script src="assets/trial-manager/components/tm-app-shell.js"></script>
+<script src="assets/trial-manager/pages/tm-users.js"></script>
+</body>
+</html>

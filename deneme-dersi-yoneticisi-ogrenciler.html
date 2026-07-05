@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Öğrenciler · Deneme Dersi Yöneticisi · Bilenyum</title>
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/trial-lesson-manager.css">
+<link rel="stylesheet" href="assets/trial-manager/styles/trial-manager-admin.css">
+<script src="assets/auth-tab-session.js"></script>
+</head>
+<body data-tm-page="ogrenciler" class="tm-admin-body">
+<header class="hud" data-trial-manager-hud></header>
+<main class="stage tm-stage">
+  <div class="tm-main-col">
+    <div class="tm-page-head">
+      <h1 class="tm-page-title">Öğrenciler</h1>
+      <p class="tm-page-sub">Deneme dersi öğrenci kayıtları, rezervasyon ve kayıt dönüşüm durumları.</p>
+    </div>
+    <section class="tm-panel tm-panel--datagrid">
+      <header class="tm-dg-toolbar"><div class="tm-dg-toolbar-row">
+        <input type="search" class="tm-dg-control tm-dg-search" id="tmStudentsSearch" placeholder="Ara…">
+        <span class="tm-dg-spacer"></span>
+        <select class="tm-dg-control tm-dg-select tm-dg-select--narrow" id="tmStudentsPageSize"><option value="10">10</option><option value="20">20</option></select>
+        <button type="button" class="tm-dg-action" id="tmStudentsExport" style="border:none;cursor:pointer">CSV</button>
+        <span class="tm-dg-count" id="tmStudentsCount">—</span>
+      </div></header>
+      <div id="tmStudentsLoading" class="td-state">Yükleniyor…</div>
+      <div id="tmStudentsTableWrap" class="tm-res-table-wrap" hidden>
+        <table class="tm-res-table"><thead><tr>
+          <th>Öğrenci</th><th>Yaş</th><th>Sınıf</th><th>Seviye</th><th>Ders türü</th><th>Veli</th><th>Telefon</th><th>Rezervasyon</th><th>Durum</th><th></th>
+        </tr></thead><tbody id="tmStudentsBody"></tbody></table>
+      </div>
+      <div id="tmStudentsPagination" class="tm-pagination" hidden></div>
+    </section>
+  </div>
+</main>
+<script src="assets/trial-manager/lib/status-labels.js"></script>
+<script src="assets/trial-manager/lib/audit-utils.js"></script>
+<script src="assets/trial-manager/lib/mock-data.js"></script>
+<script src="assets/trial-manager/components/tm-utils.js"></script>
+<script src="assets/trial-manager/components/tm-detail-drawer.js"></script>
+<script src="assets/trial-manager/components/tm-app-shell.js"></script>
+<script src="assets/trial-manager/pages/tm-students.js"></script>
+</body>
+</html>

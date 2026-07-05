@@ -1,0 +1,65 @@
+/**
+ * Tam sayfa ders detayı (drawer genişlet hedefi)
+ */
+(function () {
+  'use strict';
+
+  var Store = window.TMStore;
+  var U = window.TMUtils;
+  var SL = window.TMStatusLabels;
+  var id = U.qs('id');
+  if (!Store || !id) return;
+
+  var root = document.getElementById('tmFullDetail');
+  var d = Store.getSessionWithDetails(id);
+  if (!d || !root) return;
+
+  var tabs = ['Özet', 'Katılımcılar', 'Online Link', 'İletişim', 'Katılım', 'Geçmiş'];
+  var active = 0;
+
+  function render() {
+    root.innerHTML =
+      '<div class="tm-admin-header">' +
+        '<div class="tm-admin-header-main">' +
+          '<h1 class="tm-admin-header-title">' + U.escapeHtml(d.lessonType.name) + ' · ' + U.formatDateKey(d.session.date) + '</h1>' +
+          '<p class="tm-admin-header-meta">' + d.session.startTime + '–' + d.session.endTime + ' · ' + SL.sessionLabel(d.session.status) + '</p>' +
+        '</div>' +
+        '<div class="tm-admin-header-actions">' +
+          '<button type="button" class="tm-btn tm-btn--ghost" id="tmOpenDrawer">Drawer\'da aç</button>' +
+          '<a class="tm-btn tm-btn--ghost" href="deneme-dersi-yoneticisi-planlanmis-dersler.html">← Listeye dön</a>' +
+        '</div>' +
+      '</div>' +
+      '<nav class="tm-drawer-tabs" id="tmFullTabs">' + tabs.map(function (t, i) {
+        return '<button type="button" class="tm-drawer-tab' + (i === active ? ' is-active' : '') + '" data-i="' + i + '">' + t + '</button>';
+      }).join('') + '</nav>' +
+      '<div id="tmFullBody" class="tm-panel" style="padding:20px;margin-top:12px"></div>';
+
+    document.getElementById('tmOpenDrawer').addEventListener('click', function () {
+      if (window.TMSessionDetail) {
+        window.TMSessionDetail.open(id, active);
+        window.history.back();
+      }
+    });
+    document.getElementById('tmFullTabs').querySelectorAll('[data-i]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        active = parseInt(btn.getAttribute('data-i'), 10);
+        render();
+      });
+    });
+    var body = document.getElementById('tmFullBody');
+    if (window.TMSessionDetail) {
+      /* Reuse tab render via temporary hook */
+      var detailModule = window.TMSessionDetail;
+      detailModule.open(id, active);
+      setTimeout(function () {
+        var drBody = document.querySelector('[data-dr-body]');
+        if (drBody) body.innerHTML = drBody.innerHTML;
+        if (window.TMDetailDrawer) window.TMDetailDrawer.close();
+      }, 50);
+    } else {
+      body.innerHTML = '<p>Detay modülü yüklenemedi.</p>';
+    }
+  }
+
+  render();
+})();

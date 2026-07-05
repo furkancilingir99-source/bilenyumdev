@@ -1,0 +1,152 @@
+/**
+ * Deneme Dersi Yöneticisi — 11 maddelik sidebar + admin layout
+ */
+(function (global) {
+  'use strict';
+
+  var MANAGER_NAME = 'Elif Yıldırım';
+  var MANAGER_ROLE = 'Deneme Dersi Yöneticisi';
+
+  var ICON = {
+    home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+    inbox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>',
+    users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    teacher: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+    link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
+    phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+    chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+    shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+    notif: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+    chevron: '<svg class="hud-player-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="6 9 12 15 18 9"/></svg>'
+  };
+
+  var NAV_ITEMS = [
+    { key: 'operasyon', href: 'deneme-dersi-yoneticisi-dashboard.html', label: 'Operasyon Merkezi', icon: ICON.home },
+    { key: 'deneme-dersleri', href: 'deneme-dersi-yoneticisi-planlanmis-dersler.html', label: 'Deneme Dersleri', icon: ICON.calendar },
+    { key: 'rezervasyon-talepleri', href: 'deneme-dersi-yoneticisi-rezervasyonlar.html', label: 'Rezervasyon Talepleri', icon: ICON.inbox },
+    { key: 'ogrenciler', href: 'deneme-dersi-yoneticisi-ogrenciler.html', label: 'Öğrenciler', icon: ICON.user },
+    { key: 'veliler', href: 'deneme-dersi-yoneticisi-veliler.html', label: 'Veliler', icon: ICON.users },
+    { key: 'ogretmenler', href: 'deneme-dersi-yoneticisi-ogretmenler.html', label: 'Öğretmenler', icon: ICON.teacher },
+    { key: 'online-linkler', href: 'deneme-dersi-yoneticisi-online-linkler.html', label: 'Online Ders Linkleri', icon: ICON.link },
+    { key: 'iletisim', href: 'deneme-dersi-yoneticisi-iletisim.html', label: 'İletişim Takibi', icon: ICON.phone },
+    { key: 'raporlar', href: 'deneme-dersi-yoneticisi-raporlar.html', label: 'Raporlar', icon: ICON.chart },
+    { key: 'kullanicilar', href: 'deneme-dersi-yoneticisi-kullanicilar.html', label: 'Kullanıcılar ve Yetkiler', icon: ICON.shield },
+    { key: 'ayarlar', href: 'deneme-dersi-yoneticisi-ayarlar.html', label: 'Ayarlar', icon: ICON.settings }
+  ];
+
+  var LEGACY_KEY_MAP = {
+    dashboard: 'operasyon',
+    rezervasyonlar: 'rezervasyon-talepleri',
+    'ders-planla': 'deneme-dersleri',
+    planlanmis-dersler: 'deneme-dersleri'
+  };
+
+  function getActiveKey() {
+    var body = document.body;
+    var key = body && body.getAttribute('data-tm-page');
+    if (key) return key;
+    var legacy = body && body.getAttribute('data-trial-manager-active');
+    if (legacy && LEGACY_KEY_MAP[legacy]) return LEGACY_KEY_MAP[legacy];
+    return 'operasyon';
+  }
+
+  function renderHud() {
+    return (
+      '<header class="hud">' +
+        '<a class="hud-brand" href="index.html" aria-label="Bilenyum anasayfa">' +
+          '<img src="assets/bilenyum-logo.svg" alt="Bilenyum" />' +
+        '</a>' +
+        '<div class="hud-stats">' +
+          '<button type="button" class="stat-icon-btn is-notif" id="tmNotifBtn" aria-label="Bildirimler">' +
+            ICON.notif + '<span class="notif-dot"></span>' +
+          '</button>' +
+          '<div class="hud-profile">' +
+            '<button type="button" class="hud-player" id="profileBtn" aria-haspopup="true" aria-expanded="false">' +
+              '<span class="player-avatar-wrap"><span class="player-avatar"><span aria-hidden="true">DD</span></span></span>' +
+              '<span class="player-text">' +
+                '<span class="player-name">' + MANAGER_NAME + '</span>' +
+                '<span class="player-clan">' + MANAGER_ROLE + '</span>' +
+              '</span>' + ICON.chevron +
+            '</button>' +
+            '<div class="hud-menu" id="profileMenu" role="menu">' +
+              '<button type="button" class="hud-menu-item is-danger" role="menuitem">Çıkış Yap</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</header>'
+    );
+  }
+
+  function renderSidebar(activeKey) {
+    var links = NAV_ITEMS.map(function (item) {
+      var active = item.key === activeKey;
+      return (
+        '<a class="tm-sidebar-link' + (active ? ' is-active' : '') + '" href="' + item.href + '"' +
+          (active ? ' aria-current="page"' : '') + '>' +
+          item.icon + '<span>' + item.label + '</span>' +
+        '</a>'
+      );
+    }).join('');
+    return (
+      '<aside class="tm-sidebar" aria-label="Deneme dersi yönetim menüsü">' +
+        '<div class="tm-sidebar-brand">Deneme Dersi Yönetimi</div>' +
+        '<nav class="tm-sidebar-nav">' + links + '</nav>' +
+      '</aside>'
+    );
+  }
+
+  function wrapMainContent() {
+    var mainCol = document.querySelector('.tm-main-col, .tm-admin-main');
+    if (!mainCol) return;
+    var stage = mainCol.closest('.stage, main');
+    if (!stage || stage.dataset.tmLayoutWrapped) return;
+    stage.dataset.tmLayoutWrapped = '1';
+    var activeKey = getActiveKey();
+    var sidebar = document.createElement('div');
+    sidebar.innerHTML = renderSidebar(activeKey);
+    var layout = document.createElement('div');
+    layout.className = 'tm-admin-layout';
+    layout.appendChild(sidebar.firstElementChild);
+    mainCol.classList.add('tm-admin-main');
+    stage.insertBefore(layout, mainCol);
+    layout.appendChild(mainCol);
+    var oldNav = stage.querySelector('.stage-nav, [data-trial-manager-nav]');
+    if (oldNav) oldNav.remove();
+  }
+
+  function initProfileMenu() {
+    var btn = document.getElementById('profileBtn');
+    var menu = document.getElementById('profileMenu');
+    if (!btn || !menu || btn.dataset.inited) return;
+    btn.dataset.inited = '1';
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('is-open');
+    });
+    document.addEventListener('click', function () { menu.classList.remove('is-open'); });
+  }
+
+  function init() {
+    document.body.classList.add('tm-admin-body');
+    var hudMount = document.querySelector('[data-trial-manager-hud]');
+    if (hudMount) hudMount.outerHTML = renderHud();
+    wrapMainContent();
+    initProfileMenu();
+  }
+
+  global.TMAppShell = {
+    NAV_ITEMS: NAV_ITEMS,
+    getActiveKey: getActiveKey,
+    renderSidebar: renderSidebar,
+    init: init
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})(typeof window !== 'undefined' ? window : this);

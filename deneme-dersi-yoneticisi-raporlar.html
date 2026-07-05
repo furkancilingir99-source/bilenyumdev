@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Raporlar · Deneme Dersi Yöneticisi · Bilenyum</title>
+<link rel="icon" type="image/svg+xml" href="assets/bilenyum-app-icon.svg">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/shell.css">
+<link rel="stylesheet" href="assets/trial-lesson-manager.css">
+<link rel="stylesheet" href="assets/trial-manager/styles/trial-manager-admin.css">
+<script src="assets/auth-tab-session.js"></script>
+</head>
+<body data-tm-page="raporlar" class="tm-admin-body">
+<header class="hud" data-trial-manager-hud></header>
+<main class="stage tm-stage">
+  <div class="tm-main-col">
+    <div class="tm-page-head"><h1 class="tm-page-title">Raporlar</h1><p class="tm-page-sub">Katılım, dönüşüm, talep dağılımı ve iletişim metrikleri.</p></div>
+    <section class="tm-panel" style="padding:16px">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-bottom:16px">
+        <label>Başlangıç <input type="date" class="tm-dg-control" id="tmReportStart"></label>
+        <label>Bitiş <input type="date" class="tm-dg-control" id="tmReportEnd"></label>
+        <button type="button" class="tm-btn tm-btn--ghost" id="tmReportExport">CSV dışa aktar</button>
+      </div>
+      <div id="tmReportGrid" class="tm-report-grid"></div>
+    </section>
+  </div>
+</main>
+<script src="assets/trial-manager/lib/mock-data.js"></script>
+<script src="assets/trial-manager/lib/export-utils.js"></script>
+<script src="assets/trial-manager/components/tm-utils.js"></script>
+<script src="assets/trial-manager/components/tm-app-shell.js"></script>
+<script src="assets/trial-manager/pages/tm-reports.js"></script>
+</body>
+</html>
