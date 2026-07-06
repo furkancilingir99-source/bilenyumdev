@@ -9,7 +9,7 @@ import {
   clearSessionCookieHeaders,
   createSupabaseClient
 } from '../lib/supabase-session.mjs';
-import { handleTrialManagerRoute } from './lib/trial-manager-routes.mjs';
+import { handleTrialManagerRoute } from '../lib/trial-manager-routes.mjs';
 
 function readBody(req) {
   return new Promise(function (resolve, reject) {
@@ -28,10 +28,18 @@ function readBody(req) {
 }
 
 function routeSegments(req) {
-  var path = req.query.path;
-  if (Array.isArray(path)) return path;
-  if (typeof path === 'string' && path) return [path];
-  return [];
+  var path = req.query && req.query.path;
+  if (Array.isArray(path) && path.length) return path;
+  if (typeof path === 'string' && path) return path.split('/').filter(Boolean);
+
+  var raw = req.url || '';
+  try {
+    var pathname = new URL(raw, 'http://localhost').pathname || '';
+    return pathname.replace(/^\/api\/?/, '').split('/').filter(Boolean);
+  } catch {
+    var match = raw.match(/\/api\/?([^?]*)/);
+    return match && match[1] ? match[1].split('/').filter(Boolean) : [];
+  }
 }
 
 async function handleLogin(req, res) {
