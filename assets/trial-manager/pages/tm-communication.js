@@ -111,6 +111,8 @@
         student: st,
         session: sess,
         teacher: t,
+        parent: pa,
+        teacherRole: t ? ((t.teacherType === 'pdr_teacher' || t.teacherType === 'pdr') ? 'pdr' : 'branch') : null,
         person: pa ? U.fullName(pa.firstName, pa.lastName) : (t ? U.fullName(t.firstName, t.lastName) : '—'),
         role: role,
         phone: pa ? pa.phone : (t ? t.phone : '—'),

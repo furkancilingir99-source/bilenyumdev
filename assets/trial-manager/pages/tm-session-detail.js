@@ -126,7 +126,7 @@
         '<div style="margin-top:8px">' + SL.meetingBadge(m.status) + '</div>' +
         '<div style="margin-top:8px"><strong>PDR öğretmeni erişimi:</strong> ' + (d.pdrTeacher ? U.escapeHtml(U.fullName(d.pdrTeacher.firstName, d.pdrTeacher.lastName)) : '—') + '</div>' +
         '<div><strong>Branş öğretmeni erişimi:</strong> ' + (d.branchTeacher ? U.escapeHtml(U.fullName(d.branchTeacher.firstName, d.branchTeacher.lastName)) : '—') + '</div>' +
-        '<div style="margin-top:8px;font-size:12px;color:#64748b">Oluşturulma: ' + U.formatDateTime(m.generatedAt) +
+        '<div style="margin-top:8px;font-size:12px;color:#7a769e">Oluşturulma: ' + U.formatDateTime(m.generatedAt) +
           (m.lastPasscodeChangedAt ? ' · Şifre değişimi: ' + U.formatDateTime(m.lastPasscodeChangedAt) : '') + '</div>' +
         '<div style="margin-top:8px">Link gönderilen: ' + sentCount + ' · Gönderilmeyen (onaylı): ' + notSent + '</div>' +
         '<div style="margin-top:8px;font-size:12px">PDR ve branş öğretmeni aynı linke katılır.</div>' +

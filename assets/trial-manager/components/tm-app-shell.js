@@ -40,6 +40,27 @@
     { key: 'ayarlar', href: 'deneme-dersi-yoneticisi-ayarlar.html', label: 'Ayarlar', icon: ICON.settings }
   ];
 
+  var ICON_GLOBE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+
+  var SWITCH_ITEMS = [
+    { key: 'website', href: 'index.html', short: 'Website', label: 'Website', icon: ICON_GLOBE },
+    { key: 'veli', href: 'veli-dashboard.html', short: 'Veli', label: 'Veli Dashboard', icon: ICON.users },
+    { key: 'student', href: 'ogrenci-dashboard.html', short: 'Öğrenci', label: 'Öğrenci Dashboard', icon: ICON.user },
+    { key: 'teacher', href: 'ogretmen-dashboard.html', short: 'Öğretmen', label: 'Öğretmen Dashboard', icon: ICON.teacher },
+    { key: 'trial-manager', href: 'deneme-dersi-yoneticisi-dashboard.html', short: 'Deneme', label: 'Deneme Dersi Yöneticisi', icon: ICON.calendar }
+  ];
+
+  function renderSwitcher() {
+    return '<nav class="tm-switcher" aria-label="Bölüm geçişi">' +
+      SWITCH_ITEMS.map(function (it) {
+        var active = it.key === 'trial-manager';
+        return '<a class="tm-switcher-btn' + (active ? ' is-active' : '') + '" href="' + it.href + '"' +
+          (active ? ' aria-current="page"' : '') + ' title="' + it.label + '">' +
+          it.icon + '<span>' + it.short + '</span></a>';
+      }).join('') +
+    '</nav>';
+  }
+
   function getActiveKey() {
     var body = document.body;
     var key = body && body.getAttribute('data-tm-page');
@@ -54,7 +75,22 @@
         '<a class="hud-brand" href="index.html" aria-label="Bilenyum anasayfa">' +
           '<img src="assets/bilenyum-logo.svg" alt="Bilenyum" />' +
         '</a>' +
+        renderSwitcher() +
         '<div class="hud-stats">' +
+          '<div class="tm-notif">' +
+            '<button type="button" class="tm-notif-btn" id="tmNotifBtn" aria-haspopup="true" aria-expanded="false" aria-label="Bildirimler" title="Bildirimler">' +
+              ICON.notif +
+              '<span class="tm-notif-badge" id="tmNotifBadge" hidden></span>' +
+            '</button>' +
+            '<div class="tm-notif-panel" id="tmNotifPanel" role="dialog" aria-label="Bildirimler">' +
+              '<div class="tm-notif-head">' +
+                '<span class="tm-notif-head-title">Bildirimler</span>' +
+                '<button type="button" class="tm-notif-markall" id="tmNotifMarkAll">Tümünü okundu işaretle</button>' +
+              '</div>' +
+              '<div class="tm-notif-body" id="tmNotifBody"></div>' +
+              '<a class="tm-notif-foot" href="deneme-dersi-yoneticisi-dashboard.html#tmDashActions">Operasyon merkezinde tümünü gör →</a>' +
+            '</div>' +
+          '</div>' +
           '<div class="hud-profile">' +
             '<button type="button" class="hud-player" id="profileBtn" aria-haspopup="true" aria-expanded="false">' +
               '<span class="player-avatar-wrap"><span class="player-avatar"><span aria-hidden="true">DD</span></span></span>' +
@@ -300,6 +336,18 @@
     loadScript('assets/trial-manager/components/tm-toast.js', 'toast');
   }
 
+  function mountNotifications() {
+    if (global.TMNotifications && global.TMNotifications.init) { global.TMNotifications.init(); return; }
+    loadScript('assets/trial-manager/components/tm-notifications.js', 'notif', function () {
+      if (global.TMNotifications && global.TMNotifications.init) global.TMNotifications.init();
+    });
+  }
+
+  function mountTeacherCalendar() {
+    if (global.TMTeacherCalendar) return;
+    loadScript('assets/trial-manager/components/tm-teacher-calendar.js', 'teachercal');
+  }
+
   function cleanupForeignChrome() {
     document.querySelectorAll('.db-switch, .site-persona-rail').forEach(function (el) {
       el.remove();
@@ -322,6 +370,8 @@
     mountSidebar();
     refreshSidebarBadges();
     mountToast();
+    mountNotifications();
+    mountTeacherCalendar();
     initProfileMenu();
     initMobileMenu();
     var oldNav = document.querySelector('.stage-nav, [data-trial-manager-nav], .nav-rail');

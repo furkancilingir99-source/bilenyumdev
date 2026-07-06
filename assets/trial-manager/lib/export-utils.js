@@ -4,9 +4,13 @@
 (function (global) {
   'use strict';
 
+  // Türkçe Excel (tr-TR) varsayılan liste ayracı ';' olduğundan CSV'yi ';' ile
+  // üretiyoruz; virgüllü CSV Excel'de tek sütuna sıkışıyordu.
+  var CSV_SEP = ';';
+
   function escapeCell(val) {
     var s = val == null ? '' : String(val);
-    if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    if (/[";\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
     return s;
   }
 
@@ -18,12 +22,12 @@
 
   function toCsv(rows, columns) {
     var lines = [];
-    lines.push(columns.map(function (c) { return escapeCell(c.label); }).join(','));
+    lines.push(columns.map(function (c) { return escapeCell(c.label); }).join(CSV_SEP));
     rows.forEach(function (row) {
       lines.push(columns.map(function (c) {
         var v = typeof c.value === 'function' ? c.value(row) : row[c.key];
         return escapeCell(v);
-      }).join(','));
+      }).join(CSV_SEP));
     });
     return '\uFEFF' + lines.join('\r\n');
   }

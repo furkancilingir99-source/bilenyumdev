@@ -48,7 +48,7 @@
         return '<option value="' + String(val).replace(/"/g, '&quot;') + '"' + sel + '>' + lab + '</option>';
       }).join('');
       return '<label class="tm-form-field" for="' + id + '">' + f.label +
-        '<select class="tm-dg-control" id="' + id + '" name="' + f.name + '" required>' + opts + '</select></label>';
+        '<select class="tm-dg-control" id="' + id + '" name="' + f.name + '"' + (f.required !== false ? ' required' : '') + '>' + opts + '</select></label>';
     }
     if (f.type === 'textarea') {
       return '<label class="tm-form-field" for="' + id + '">' + f.label +

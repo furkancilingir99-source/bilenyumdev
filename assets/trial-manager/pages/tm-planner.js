@@ -53,6 +53,30 @@
     }
   }
 
+  function dateHasAvailableTeachers(dateKey) {
+    var teachers = Store.getTeachers();
+    return Rules.HOURLY_SLOTS.some(function (slot) {
+      var end = Rules.addMinutes(slot, 50);
+      var pdrOk = teachers.some(function (t) {
+        return t.isActive && Rules.isTeacherPdr(t.id) && Rules.isPdrTeacherAvailable(t.id, dateKey, slot, end);
+      });
+      var branchOk = teachers.some(function (t) {
+        return t.isActive && t.teacherType === 'branch_teacher' && Rules.isBranchTeacherAvailable(t.id, dateKey, slot, end);
+      });
+      return pdrOk && branchOk;
+    });
+  }
+
+  function firstPlannableDate(fromKey) {
+    var base = new Date(fromKey + 'T00:00:00');
+    if (isNaN(base.getTime())) return fromKey;
+    for (var i = 0; i < 14; i++) {
+      var key = new Date(base.getTime() + i * 86400000).toISOString().slice(0, 10);
+      if (dateHasAvailableTeachers(key)) return key;
+    }
+    return fromKey;
+  }
+
   function initSelects() {
     if (typeSelect) {
       typeSelect.innerHTML = Store.getLessonTypes().map(function (lt) {
@@ -65,7 +89,7 @@
       }).join('');
     }
     if (dateInput && !dateInput.value) {
-      dateInput.value = Store.todayKey();
+      dateInput.value = editId ? Store.todayKey() : firstPlannableDate(Store.todayKey());
     }
     if (titleEl) {
       titleEl.textContent = editId ? 'Dersi Düzenle' : 'Yeni Online Deneme Dersi Planla';
@@ -97,13 +121,15 @@
     var prevPdr = pdrTeacherSelect ? pdrTeacherSelect.value : '';
     var prevBranch = branchTeacherSelect ? branchTeacherSelect.value : '';
     if (pdrTeacherSelect) {
-      pdrTeacherSelect.innerHTML = '<option value="">PDR öğretmeni seçin</option>' + pdrTeachers.map(function (t) {
+      var pdrPlaceholder = pdrTeachers.length ? 'PDR öğretmeni seçin' : 'Bu tarih/saatte uygun PDR öğretmeni yok';
+      pdrTeacherSelect.innerHTML = '<option value="">' + pdrPlaceholder + '</option>' + pdrTeachers.map(function (t) {
         return '<option value="' + t.id + '">' + U.fullName(t.firstName, t.lastName) + '</option>';
       }).join('');
       if (prevPdr && pdrTeachers.some(function (t) { return t.id === prevPdr; })) pdrTeacherSelect.value = prevPdr;
     }
     if (branchTeacherSelect) {
-      branchTeacherSelect.innerHTML = '<option value="">Branş öğretmeni seçin</option>' + branchTeachers.map(function (t) {
+      var branchPlaceholder = branchTeachers.length ? 'Branş öğretmeni seçin' : 'Bu tarih/saatte uygun branş öğretmeni yok';
+      branchTeacherSelect.innerHTML = '<option value="">' + branchPlaceholder + '</option>' + branchTeachers.map(function (t) {
         return '<option value="' + t.id + '">' + U.fullName(t.firstName, t.lastName) + '</option>';
       }).join('');
       if (prevBranch && branchTeachers.some(function (t) { return t.id === prevBranch; })) branchTeacherSelect.value = prevBranch;

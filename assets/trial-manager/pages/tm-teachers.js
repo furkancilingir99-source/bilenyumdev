@@ -189,11 +189,16 @@
     var slots = (teacher.availability || []).slice().sort(function (a, b) { return a.dayOfWeek - b.dayOfWeek; });
     body.innerHTML =
       '<p class="tm-form-desc">Müsaitlik bilgileri Ana Admin Panel\'den gelir; bu ekranda düzenlenemez.</p>' +
+      '<div class="tm-detail-actions" style="margin-bottom:12px"><button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-open-calendar="' + teacher.id + '">Haftalık takvimi aç</button></div>' +
       '<table class="tm-inner-table"><thead><tr><th>Gün</th><th>Saat</th><th>Durum</th></tr></thead><tbody>' +
       slots.map(function (a) {
         return '<tr><td>' + shortDays[a.dayOfWeek] + '</td><td>' + a.startTime + '–' + a.endTime + '</td><td>' + (a.isAvailable ? 'Müsait' : 'Değil') + '</td></tr>';
       }).join('') +
       '</tbody></table>';
+    var calBtn = body.querySelector('[data-open-calendar]');
+    if (calBtn) calBtn.addEventListener('click', function () {
+      if (window.TMTeacherCalendar) window.TMTeacherCalendar.open(teacher.id);
+    });
   }
 
   function filtered() {
@@ -225,7 +230,8 @@
       '<td>' + U.escapeHtml(t.phone) + '</td>' +
       '<td>' + todayCount + '</td><td>' + weekCount(t.id) + '</td>' +
       '<td>' + (t.dashboardEnabled ? 'Evet' : 'Hayır') + '</td>' +
-      '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + t.id + '">Detay</button></td></tr>';
+      '<td style="white-space:nowrap"><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-cal="' + t.id + '">Program</button> ' +
+      '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + t.id + '">Detay</button></td></tr>';
   }
 
   function cardHtml(t) {
@@ -238,7 +244,8 @@
         '<div><span class="tm-list-card-label">Bugün / hafta</span> ' + todayCount + ' / ' + weekCount(t.id) + ' ders</div>' +
         '<div><span class="tm-list-card-label">Dashboard</span> ' + (t.dashboardEnabled ? 'Aktif' : 'Kapalı') + '</div>' +
       '</div>' +
-      '<div class="tm-list-card-foot"><button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-detail="' + t.id + '">Detay</button></div>' +
+      '<div class="tm-list-card-foot"><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-cal="' + t.id + '">Program</button>' +
+      '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-detail="' + t.id + '">Detay</button></div>' +
     '</article>';
   }
 
@@ -249,6 +256,12 @@
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
           openDetail(Store.getTeacherById(btn.getAttribute('data-detail')));
+        });
+      });
+      root.querySelectorAll('[data-cal]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (window.TMTeacherCalendar) window.TMTeacherCalendar.open(btn.getAttribute('data-cal'));
         });
       });
       root.querySelectorAll('tr[data-id], .tm-list-card[data-id]').forEach(function (el) {

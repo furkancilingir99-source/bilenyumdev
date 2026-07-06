@@ -2,8 +2,15 @@
   "name": "bilenyum",
   "private": true,
   "type": "module",
+  "scripts": {
+    "start": "serve -l 3456 .",
+    "dev": "serve -l 3456 ."
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
     "@vercel/functions": "^2.0.0"
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
   }
 }

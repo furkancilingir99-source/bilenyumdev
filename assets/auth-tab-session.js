@@ -27,7 +27,12 @@
 
   function isLoginPage() {
     var p = location.pathname || '';
-    return p === '/giris' || p === '/giris.html' || p === '/login' || p === '/login.html';
+    return p === '/giris' || p === '/giris.html' || p === '/login' || p === '/login.html' ||
+      /(?:^|\/)(?:giris|login)(?:\.html)?$/i.test(p);
+  }
+
+  function isLocalFile() {
+    return location.protocol === 'file:';
   }
 
   function readTabs() {
@@ -120,7 +125,7 @@
       })
       .finally(function () {
         clearBrowserSession();
-        if (!isLoginPage()) {
+        if (!isLoginPage() && !isLocalFile()) {
           location.replace('/giris?expired=1');
         }
       });
@@ -176,7 +181,7 @@
     clear: clearBrowserSession
   };
 
-  if (!isLoginPage()) {
+  if (!isLoginPage() && !isLocalFile()) {
     enforceBrowserSessionOnLoad();
   }
 

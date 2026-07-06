@@ -112,82 +112,68 @@
     });
   }
 
+  function openAction(a) {
+    if (!a) return;
+    if (a.kind === 'request') {
+      if (window.TMRequestDrawer && window.TMRequestDrawer.open) window.TMRequestDrawer.open(a.id);
+      else window.location.href = 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(a.id);
+    } else if (a.kind === 'session') {
+      if (window.TMSessionDetail && window.TMSessionDetail.open) window.TMSessionDetail.open(a.id);
+      else window.location.href = 'deneme-dersi-yoneticisi-planlanmis-ders-detay.html?id=' + encodeURIComponent(a.id) + (a.tab != null ? '&tab=' + a.tab : '');
+    }
+  }
+
   function renderActions(m) {
     var list = document.getElementById('tmDashActionsList');
     var panel = document.getElementById('tmDashActions');
     if (!list) return;
     var items = [];
-    m.pendingApproval.slice(0, 5).forEach(function (r) {
-      var st = Store.getStudentById(r.studentId);
-      items.push({
-        text: 'Veli onayı: ' + (st ? U.fullName(st.firstName, st.lastName) : r.id),
-        requestId: r.requestId
-      });
-    });
-    m.linkNotSent.slice(0, 3).forEach(function (r) {
-      var st = Store.getStudentById(r.studentId);
-      items.push({
-        text: 'Link gönderilmedi: ' + (st ? U.fullName(st.firstName, st.lastName) : r.id),
-        requestId: r.requestId
-      });
-    });
-    m.pdrNotInformed && m.pdrNotInformed.slice(0, 2).forEach(function (s) {
-      items.push({ text: 'PDR bilgilendir: ' + s.title, href: '#', sessionId: s.id });
-    });
-    m.branchNotInformed && m.branchNotInformed.slice(0, 2).forEach(function (s) {
-      items.push({ text: 'Branş bilgilendir: ' + s.title, href: '#', sessionId: s.id });
-    });
-    if (!m.pdrNotInformed && !m.branchNotInformed) {
-      m.teacherNotInformed.slice(0, 3).forEach(function (s) {
-        items.push({ text: 'Öğretmen bilgilendir: ' + s.title, href: '#', sessionId: s.id });
-      });
-    }
-    m.orphanRequests.slice(0, 3).forEach(function (r) {
-      items.push({
-        text: 'Rezervasyonsuz: ' + r.studentFirstName + ' ' + r.studentLastName,
-        requestId: r.id
-      });
+    function push(cat, tone, text, action) { items.push({ cat: cat, tone: tone, text: text, action: action }); }
+
+    m.orphanRequests.slice(0, 4).forEach(function (r) {
+      push('Talep', 'danger', 'Rezervasyonsuz talep · ' + r.studentFirstName + ' ' + r.studentLastName, { kind: 'request', id: r.id });
     });
     m.newRequests.slice(0, 3).forEach(function (r) {
       if (m.orphanRequests.some(function (o) { return o.id === r.id; })) return;
-      items.push({
-        text: 'Yeni talep: ' + r.studentFirstName + ' ' + r.studentLastName,
-        requestId: r.id
-      });
+      push('Talep', 'info', 'Yeni talep · ' + r.studentFirstName + ' ' + r.studentLastName, { kind: 'request', id: r.id });
     });
+    m.pendingApproval.slice(0, 5).forEach(function (r) {
+      var st = Store.getStudentById(r.studentId);
+      push('Veli onayı', 'warn', 'Onay bekliyor · ' + (st ? U.fullName(st.firstName, st.lastName) : r.id), { kind: 'request', id: r.requestId });
+    });
+    m.linkNotSent.slice(0, 3).forEach(function (r) {
+      var st = Store.getStudentById(r.studentId);
+      push('Link', 'warn', 'Link gönderilmedi · ' + (st ? U.fullName(st.firstName, st.lastName) : r.id), { kind: 'request', id: r.requestId });
+    });
+    var pdrList = (m.pdrNotInformed && m.pdrNotInformed.slice(0, 2)) || [];
+    var brList = (m.branchNotInformed && m.branchNotInformed.slice(0, 2)) || [];
+    if (!pdrList.length && !brList.length) pdrList = (m.teacherNotInformed || []).slice(0, 3);
+    pdrList.forEach(function (s) { push('Öğretmen', 'warn', 'PDR bilgilendir · ' + s.title, { kind: 'session', id: s.id }); });
+    brList.forEach(function (s) { push('Öğretmen', 'warn', 'Branş bilgilendir · ' + s.title, { kind: 'session', id: s.id }); });
     m.needsAttendance.slice(0, 3).forEach(function (s) {
-      items.push({
-        text: 'Katılım gir: ' + s.title,
-        href: 'deneme-dersi-yoneticisi-planlanmis-ders-detay.html?id=' + encodeURIComponent(s.id) + '&tab=4'
-      });
+      push('Katılım', 'info', 'Katılım gir · ' + s.title, { kind: 'session', id: s.id, tab: 4 });
     });
+
     if (!items.length) {
       if (panel) panel.hidden = true;
       return;
     }
     if (panel) panel.hidden = false;
-    list.innerHTML = items.map(function (it) {
-      if (it.sessionId) {
-        return '<li class="tm-action-item"><span>' + U.escapeHtml(it.text) + '</span><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-session="' + it.sessionId + '">Aç</button></li>';
-      }
-      if (it.requestId) {
-        return '<li class="tm-action-item"><span>' + U.escapeHtml(it.text) + '</span>' +
-          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-open-request="' + it.requestId + '">Aç</button>' +
-          '<a href="deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(it.requestId) + '" class="tm-panel-link" style="margin-left:8px">Tam sayfa</a></li>';
-      }
-      return '<li class="tm-action-item"><span>' + U.escapeHtml(it.text) + '</span><a href="' + it.href + '" class="tm-panel-link">Git →</a></li>';
+    var toneCls = { danger: 'is-danger', warn: 'is-warn', info: 'is-info' };
+    list.innerHTML = items.map(function (it, i) {
+      return '<li class="tm-action-item" data-act-idx="' + i + '" role="button" tabindex="0">' +
+        '<span class="tm-action-chip ' + (toneCls[it.tone] || '') + '">' + U.escapeHtml(it.cat) + '</span>' +
+        '<span class="tm-action-text">' + U.escapeHtml(it.text) + '</span>' +
+        '<span class="tm-action-open">Aç →</span>' +
+      '</li>';
     }).join('');
-    list.querySelectorAll('[data-open-request]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var rid = btn.getAttribute('data-open-request');
-        if (global.TMRequestDrawer) global.TMRequestDrawer.open(rid);
-        else window.location.href = 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(rid);
-      });
-    });
-    list.querySelectorAll('[data-session]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        if (window.TMSessionDetail) window.TMSessionDetail.open(btn.getAttribute('data-session'));
-      });
+    list.querySelectorAll('[data-act-idx]').forEach(function (row) {
+      var handler = function () {
+        var it = items[parseInt(row.getAttribute('data-act-idx'), 10)];
+        if (it) openAction(it.action);
+      };
+      row.addEventListener('click', handler);
+      row.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); } });
     });
   }
 

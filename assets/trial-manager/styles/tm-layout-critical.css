@@ -24,7 +24,7 @@ body.tm-admin-body .tm-admin-hud {
   min-height: 60px !important;
   padding: 10px 16px !important;
   background: #fff !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  border-bottom: 1px solid #e7e3f3 !important;
 }
 
 body.tm-admin-body .hud-stats {
@@ -43,8 +43,8 @@ body.tm-admin-body .tm-sidebar {
   flex-direction: column !important;
   width: 240px !important;
   flex-shrink: 0 !important;
-  background: #1e293b !important;
-  color: #e2e8f0 !important;
+  background: #28265a !important;
+  color: #e7e3f3 !important;
   overflow-y: auto !important;
 }
 
@@ -53,7 +53,7 @@ body.tm-admin-body .tm-admin-main {
   min-width: 0 !important;
   display: block !important;
   padding: 16px 20px 32px !important;
-  background: #f1f5f9 !important;
+  background: #f1eff9 !important;
 }
 
 body.tm-admin-body .tm-sidebar-link {
@@ -61,7 +61,7 @@ body.tm-admin-body .tm-sidebar-link {
   align-items: center !important;
   gap: 10px !important;
   padding: 9px 16px !important;
-  color: #cbd5e1 !important;
+  color: #cbc5e6 !important;
   text-decoration: none !important;
   font-size: 13px !important;
 }

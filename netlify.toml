@@ -21,6 +21,26 @@
   to = "/ogrenci-dashboard"
   status = 301
 
+[[redirects]]
+  from = "/sinav-sonuclari"
+  to = "/sinav-sonuclari.html"
+  status = 200
+
+[[redirects]]
+  from = "/seviye-belirleme"
+  to = "/seviye-belirleme.html"
+  status = 200
+
+[[redirects]]
+  from = "/ogrenci-dashboard"
+  to = "/ogrenci-dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/giris"
+  to = "/giris.html"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]

@@ -6,6 +6,19 @@
 
   var Audit = global.TMAuditUtils;
   var Rules = global.TMSchedulingRules;
+  // scheduling-rules.js bu dosyadan SONRA yüklenebilir; o yüzden Rules başta
+  // undefined kalır ve tüm kural doğrulamaları (kapasite, ücretsiz deneme,
+  // öğretmen uygunluğu) sessizce atlanırdı. Senkron script grubu bittikten
+  // sonra closure referansını yeniden bağla, böylece tüm metotlar gerçek
+  // kural motorunu görür.
+  function resolveRules() {
+    if (!Rules) { Rules = global.TMSchedulingRules; }
+    if (!Audit) { Audit = global.TMAuditUtils; }
+  }
+  if (!Rules && global.setTimeout) { global.setTimeout(resolveRules, 0); }
+  if (global.document && global.document.addEventListener) {
+    global.document.addEventListener('DOMContentLoaded', resolveRules);
+  }
 
   var CURRENT_USER_ID = 'user-manager-1';
   var STORAGE_KEY = 'bilenyum_tmstore_v1';
@@ -951,6 +964,7 @@
       studentId: entry.studentId,
       parentId: entry.parentId,
       teacherId: entry.teacherId,
+      requestId: entry.requestId,
       reservationId: entry.reservationId,
       sessionId: entry.sessionId,
       channel: entry.channel,

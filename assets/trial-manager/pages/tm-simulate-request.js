@@ -80,6 +80,7 @@
           name: 'selectedSessionId',
           label: 'Tercih edilen ders slotu',
           value: '',
+          required: false,
           options: allSessionOptions()
         }
       ],
