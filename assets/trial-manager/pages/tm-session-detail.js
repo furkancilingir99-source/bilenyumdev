@@ -52,8 +52,8 @@
         cell('Branş Öğretmeni', U.escapeHtml(branchName)) +
         cell('Kapasite', assignedCount + ' / ' + capacity + ' (boş: ' + remaining + ')') +
         cell('Durum', SL.sessionBadge(s.status)) +
-        cell('PDR bilgilendirme', s.pdrTeacherInformed ? '<span class="tm-badge tm-badge--green">Bilgilendirildi</span>' : '<span class="tm-badge tm-badge--orange">Bilgilendirilmedi</span>') +
-        cell('Branş bilgilendirme', s.branchTeacherInformed ? '<span class="tm-badge tm-badge--green">Bilgilendirildi</span>' : '<span class="tm-badge tm-badge--orange">Bilgilendirilmedi</span>') +
+        cell('PDR bilgilendirme', (s.pdrTeacherInformed || s.status === 'completed') ? '<span class="tm-badge tm-badge--green">Bilgilendirildi</span>' : '<span class="tm-badge tm-badge--orange">Bilgilendirilmedi</span>') +
+        cell('Branş bilgilendirme', (s.branchTeacherInformed || s.status === 'completed') ? '<span class="tm-badge tm-badge--green">Bilgilendirildi</span>' : '<span class="tm-badge tm-badge--orange">Bilgilendirilmedi</span>') +
         cell('Son güncelleme', U.formatDateTime(s.updatedAt)) +
       '</div>' +
       (s.notes ? '<p><strong>Not:</strong> ' + U.escapeHtml(s.notes) + '</p>' : '') +
@@ -87,6 +87,7 @@
   }
 
   var EYE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+  var COPY_ICON = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
   var X_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>';
 
   // Görünen kimlik kodu: trialstudent-0001 / trialparent-0001
@@ -121,7 +122,6 @@
     var st = p.student, pa = p.parent;
     var studentCode = personCode('trialstudent', st && st.id);
     var parentCode = personCode('trialparent', pa && pa.id);
-    var lessonCode = Store.getLessonCode ? Store.getLessonCode(d.session) : d.session.id;
     var ders = (d.lessonType ? d.lessonType.name : 'Ders') + ' · ' + (d.session.gradeLevel || '—');
     var dersTarihi = U.formatDateKey(d.session.date) + ' ' + d.session.startTime + '–' + d.session.endTime;
     var rezTarihi = (p.reservation && p.reservation.createdAt) ? U.formatDateTime(p.reservation.createdAt) : '—';
@@ -131,7 +131,6 @@
       cell('Ders', U.escapeHtml(ders)) +
       cell('Ders Tarihi', U.escapeHtml(dersTarihi)) +
       cell('Deneme Dersi Rezervasyon Tarihi', U.escapeHtml(rezTarihi)) +
-      cell('Ders ID', '<code class="tm-res-code-cell">' + U.escapeHtml(lessonCode) + '</code>') +
       cell('Öğrenci ID', '<code class="tm-res-code-cell">' + U.escapeHtml(studentCode) + '</code>') +
       cell('Veli', U.escapeHtml(pa ? U.fullName(pa.firstName, pa.lastName) : '—')) +
       cell('Veli E-posta', U.escapeHtml(pa ? pa.email : '—')) +
@@ -216,38 +215,37 @@
     var m = d.meeting;
     var s = d.session;
     if (!m) return '<p class="tm-empty">Toplantı bilgisi yok.</p>';
-    var inactive = m.status === 'cancelled' || s.status === 'cancelled';
+    var cancelled = m.status === 'cancelled' || s.status === 'cancelled';
     var editable = s.status !== 'cancelled' && s.status !== 'completed';
-    var sentCount = d.reservations.filter(function (r) { return r.linkSent; }).length;
-    var notSent = d.reservations.filter(function (r) { return !r.linkSent && r.parentApprovalStatus === 'approved'; }).length;
     var lessonCode = Store.getLessonCode ? Store.getLessonCode(s) : s.id;
     var topInfo = '<div class="tm-detail-grid tm-detail-grid--modal" style="margin-bottom:12px">' +
       cell('Ders Adı', U.escapeHtml(d.lessonType ? d.lessonType.name : 'Ders')) +
       cell('Ders ID', '<code class="tm-res-code-cell">' + U.escapeHtml(lessonCode) + '</code>') +
       cell('Ders Tarihi', U.escapeHtml(U.formatDateKey(s.date))) +
       cell('Ders Saati', U.escapeHtml(s.startTime + '–' + s.endTime)) +
+      cell('PDR/Rehberlik Öğretmeni', U.escapeHtml(d.pdrTeacher ? U.fullName(d.pdrTeacher.firstName, d.pdrTeacher.lastName) : '—')) +
+      cell('Branş Öğretmeni', U.escapeHtml(d.branchTeacher ? U.fullName(d.branchTeacher.firstName, d.branchTeacher.lastName) : '—')) +
     '</div>';
+    // İptal edilen derste link gösterilmez; yerine bilgilendirici bir placeholder gösterilir.
+    if (cancelled) {
+      return topInfo +
+        '<div class="tm-link-box is-inactive tm-link-box--empty">' +
+          '<p class="tm-empty" style="margin:0">Ders iptal edildiği için ders linki bulunmuyor.</p>' +
+        '</div>';
+    }
     return (
       topInfo +
-      (inactive ? '<p class="tm-alert-row is-danger">Bu ders iptal edildiği için link aktif değildir.</p>' : '') +
-      '<div class="tm-link-box' + (inactive ? ' is-inactive' : '') + '">' +
+      '<div class="tm-link-box">' +
         copyRow('Davet linki', m.meetingUrl) +
         copyRow('Toplantı ID', m.meetingId) +
         copyRow('Şifre', m.passcode) +
-        '<div class="tm-teacher-access">' +
-          '<div class="tm-teacher-access-col"><span class="tm-teacher-access-label">PDR/Rehberlik Öğretmeni</span>' +
-            '<span class="tm-teacher-access-name">' + (d.pdrTeacher ? U.escapeHtml(U.fullName(d.pdrTeacher.firstName, d.pdrTeacher.lastName)) : '—') + '</span></div>' +
-          '<div class="tm-teacher-access-col"><span class="tm-teacher-access-label">Branş Öğretmeni</span>' +
-            '<span class="tm-teacher-access-name">' + (d.branchTeacher ? U.escapeHtml(U.fullName(d.branchTeacher.firstName, d.branchTeacher.lastName)) : '—') + '</span></div>' +
-        '</div>' +
         '<div style="margin-top:8px;font-size:12px;color:#7a769e">Oluşturulma: ' + U.formatDateTime(m.generatedAt) +
           (m.lastPasscodeChangedAt ? ' · Şifre değişimi: ' + U.formatDateTime(m.lastPasscodeChangedAt) : '') + '</div>' +
-        '<div style="margin-top:8px">Link gönderilen: ' + sentCount + ' · Gönderilmeyen (onaylı): ' + notSent + '</div>' +
-        '<div style="margin-top:8px;font-size:12px">PDR ve branş öğretmeni aynı linke katılır.</div>' +
       '</div>' +
       (editable
         ? '<div class="tm-detail-actions tm-detail-actions--wrap">' +
             '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-refresh-passcode data-tm-require="edit">Şifre yenile</button>' +
+            '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-send-all-links data-tm-require="edit">Davet linkini herkese gönder</button>' +
           '</div>'
         : '')
     );
@@ -255,7 +253,7 @@
 
   function copyRow(label, val) {
     var safe = String(val || '').replace(/"/g, '&quot;');
-    return '<div class="tm-copy-row"><span class="tm-detail-cell-label">' + label + '</span><code>' + U.escapeHtml(val) + '</code><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-copy="' + safe + '">Kopyala</button></div>';
+    return '<div class="tm-copy-row"><span class="tm-detail-cell-label">' + label + '</span><code>' + U.escapeHtml(val) + '</code><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-copy="' + safe + '" title="Kopyala" aria-label="Kopyala">' + COPY_ICON + '</button></div>';
   }
 
   // İşlemi yapan kullanıcı — ad + rol.
@@ -492,6 +490,26 @@
           warning: 'Yeni şifre oluşturulacak. Velilere tekrar göndermeniz gerekebilir.',
           onConfirm: function (reason) {
             Store.refreshMeetingPasscode(d.meeting.id, reason);
+            if (global.TMOnSessionChange) global.TMOnSessionChange();
+            renderTab(2, bodyEl);
+          }
+        });
+      });
+      bodyEl.querySelector('[data-send-all-links]') && bodyEl.querySelector('[data-send-all-links]').addEventListener('click', function () {
+        if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
+        Confirm.open({
+          title: 'Davet linkini herkese gönder',
+          current: (d.lessonType ? d.lessonType.name : 'Ders') + ' · ' + (d.session.gradeLevel || '—') +
+            ' · ' + U.formatDateKey(d.session.date) + ' ' + d.session.startTime + '–' + d.session.endTime,
+          warning: 'Derse atanan tüm velilere davet linki (tarih, saat, şifre) gönderilecek. Devam edilsin mi?',
+          requireReason: false,
+          danger: false,
+          confirmLabel: 'Evet',
+          cancelLabel: 'Hayır',
+          onConfirm: function () {
+            var res = Store.notifyAllParentsForSession(d.session.id);
+            if (!res || res.ok === false) { U.notifyError((res && res.error) || 'İşlem başarısız.'); return; }
+            U.notifySuccess('Davet linki tüm velilere gönderildi (' + res.count + ' veli).');
             if (global.TMOnSessionChange) global.TMOnSessionChange();
             renderTab(2, bodyEl);
           }

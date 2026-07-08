@@ -3421,6 +3421,37 @@
     goToStep(2);
   });
 
+  // "Devam Et" butonu formun dışında (sidebar) olduğundan, eksik zorunlu alanlarda native
+  // uyarı fark edilmeyebiliyor. Eksikse: ilk boş alana kaydır + odakla + net uyarı göster.
+  (function setupStep1ContinueFeedback() {
+    const form = document.getElementById('step1Form');
+    const btn = document.querySelector('#ctaStep1 button[type="submit"]');
+    if (!form || !btn) return;
+    btn.addEventListener('click', (e) => {
+      if (form.checkValidity()) return; // geçerliyse native submit → goToStep(2)
+      e.preventDefault();
+      let first = null;
+      const missing = [];
+      form.querySelectorAll('input, select, textarea').forEach((el) => {
+        if (!el.willValidate || el.checkValidity()) return;
+        if (!first) first = el;
+        let lbl = '';
+        if (el.labels && el.labels[0]) lbl = el.labels[0].textContent.replace('*', '').trim();
+        if (!lbl) { const wrap = el.closest('label'); if (wrap) lbl = wrap.textContent.replace('*', '').trim(); }
+        if (!lbl) lbl = el.getAttribute('placeholder') || el.name || el.id;
+        if (lbl && missing.indexOf(lbl) < 0) missing.push(lbl);
+      });
+      if (first) {
+        first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        try { first.focus({ preventScroll: true }); } catch (_) { first.focus(); }
+        try { form.reportValidity(); } catch (_) {}
+      }
+      if (typeof showToast === 'function') {
+        showToast('Devam etmek için eksik alanları doldurun: ' + missing.slice(0, 4).join(', ') + (missing.length > 4 ? '…' : ''), 'error');
+      }
+    });
+  })();
+
   // ---------- "Öğrencinin velisiyim" checkbox + inline veli formu ----------
   (function setupParentInlineToggle() {
     const cb = document.getElementById('cf-is-parent');

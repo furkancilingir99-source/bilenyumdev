@@ -29,6 +29,15 @@
     return t.teacherType === 'pdr_teacher' || t.teacherType === 'pdr';
   }
 
+  var CAL_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
+  var EYE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+  // Öğretmen görünen ID'si — tipe göre benzersiz (pdr/branş) kod.
+  function teacherCode(t) {
+    var m = String(t.id || '').match(/(\d+)\s*$/);
+    var num = m ? m[1].padStart(4, '0') : '0000';
+    return 'trialteacher-' + (isPdrTeacher(t) ? 'pdr' : 'brans') + '-' + num;
+  }
+
   function sessionInformedForTeacher(s, teacherId) {
     if (s.pdrTeacherId === teacherId) return !!s.pdrTeacherInformed;
     if (s.branchTeacherId === teacherId) return !!s.branchTeacherInformed;
@@ -222,30 +231,33 @@
     }).length;
   }
 
+  function actionIcons(t) {
+    return '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-cal="' + t.id + '" title="Program" aria-label="Program">' + CAL_ICON + '</button> ' +
+      '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-detail="' + t.id + '" title="Detay" aria-label="Detay">' + EYE_ICON + '</button>';
+  }
+
   function rowHtml(t) {
     var todayCount = Store.getSessionsForTeacher(t.id).filter(function (s) { return s.date === today && s.status !== 'cancelled'; }).length;
-    return '<tr data-id="' + t.id + '" style="cursor:pointer"><td>' + U.escapeHtml(U.fullName(t.firstName, t.lastName)) + '</td>' +
+    return '<tr data-id="' + t.id + '" style="cursor:pointer">' +
+      '<td><code class="tm-res-code-cell">' + U.escapeHtml(teacherCode(t)) + '</code></td>' +
+      '<td>' + U.escapeHtml(U.fullName(t.firstName, t.lastName)) + '</td>' +
       '<td>' + SL.teacherTypeBadge(t.teacherType || 'branch') + '</td>' +
       '<td>' + U.escapeHtml(branchLabel(t)) + '</td>' +
       '<td>' + U.escapeHtml(t.phone) + '</td>' +
       '<td>' + todayCount + '</td><td>' + weekCount(t.id) + '</td>' +
-      '<td>' + (t.dashboardEnabled ? 'Evet' : 'Hayır') + '</td>' +
-      '<td style="white-space:nowrap"><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-cal="' + t.id + '">Program</button> ' +
-      '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + t.id + '">Detay</button></td></tr>';
+      '<td style="white-space:nowrap">' + actionIcons(t) + '</td></tr>';
   }
 
   function cardHtml(t) {
     var todayCount = Store.getSessionsForTeacher(t.id).filter(function (s) { return s.date === today && s.status !== 'cancelled'; }).length;
     return '<article class="tm-list-card" data-id="' + t.id + '">' +
-      '<div class="tm-list-card-head"><div><strong>' + U.escapeHtml(U.fullName(t.firstName, t.lastName)) + '</strong></div>' +
+      '<div class="tm-list-card-head"><div><strong>' + U.escapeHtml(U.fullName(t.firstName, t.lastName)) + '</strong><code class="tm-res-code-cell">' + U.escapeHtml(teacherCode(t)) + '</code></div>' +
       SL.teacherTypeBadge(t.teacherType || 'branch') + '</div>' +
       '<div class="tm-list-card-body">' +
         '<div><span class="tm-list-card-label">Branş</span> ' + U.escapeHtml(branchLabel(t)) + '</div>' +
         '<div><span class="tm-list-card-label">Bugün / hafta</span> ' + todayCount + ' / ' + weekCount(t.id) + ' ders</div>' +
-        '<div><span class="tm-list-card-label">Dashboard</span> ' + (t.dashboardEnabled ? 'Aktif' : 'Kapalı') + '</div>' +
       '</div>' +
-      '<div class="tm-list-card-foot"><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-cal="' + t.id + '">Program</button>' +
-      '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-detail="' + t.id + '">Detay</button></div>' +
+      '<div class="tm-list-card-foot">' + actionIcons(t) + '</div>' +
     '</article>';
   }
 

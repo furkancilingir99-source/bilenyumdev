@@ -27,11 +27,11 @@
 
   var NAV_ITEMS = [
     { key: 'operasyon', href: 'deneme-dersi-yoneticisi-dashboard.html', label: 'Operasyon Merkezi', icon: ICON.home, badgeMetric: 'actionableCount' },
-    { key: 'deneme-dersleri', href: 'deneme-dersi-yoneticisi-planlanmis-dersler.html', label: 'Deneme Dersleri', icon: ICON.calendar, badgeMetric: 'needsAttendanceCount' },
+    { key: 'deneme-dersleri', href: 'deneme-dersi-yoneticisi-planlanmis-dersler.html', label: 'Deneme Dersleri', icon: ICON.calendar },
     { key: 'rezervasyon-talepleri', href: 'deneme-dersi-yoneticisi-rezervasyonlar.html', label: 'Rezervasyon Talepleri', icon: ICON.inbox, badgeMetric: 'orphanRequestCount' },
     { key: 'ogrenciler', href: 'deneme-dersi-yoneticisi-ogrenciler.html', label: 'Öğrenciler', icon: ICON.user },
     { key: 'veliler', href: 'deneme-dersi-yoneticisi-veliler.html', label: 'Veliler', icon: ICON.users },
-    { key: 'ogretmenler', href: 'deneme-dersi-yoneticisi-ogretmenler.html', label: 'Öğretmen Uygunluğu', icon: ICON.teacher },
+    { key: 'ogretmenler', href: 'deneme-dersi-yoneticisi-ogretmenler.html', label: 'Öğretmenler', icon: ICON.teacher },
     { key: 'online-linkler', href: 'deneme-dersi-yoneticisi-online-linkler.html', label: 'Online Ders Linkleri', icon: ICON.link, badgeMetric: 'linkNotSentCount' },
     { key: 'iletisim', href: 'deneme-dersi-yoneticisi-iletisim.html', label: 'İletişim Takibi', icon: ICON.phone, badgeMetric: 'pendingApprovalCount' },
     { key: 'raporlar', href: 'deneme-dersi-yoneticisi-raporlar.html', label: 'Raporlar', icon: ICON.chart },
@@ -390,6 +390,20 @@
     refreshHudProfile: refreshHudProfile,
     init: init
   };
+
+  // Metin seçme/kopyalama koruması: tıklanabilir satır/kartlarda kullanıcı metin seçtiyse
+  // (örn. Rezervasyon ID'yi kopyalamak için basılı tutup sürükleme) bunu "tıklama" sayma.
+  // Yakalama (capture) fazında çalışır; satırın kendi tıklama işleyicisine ulaşmadan durdurur.
+  var SELECTABLE_ROW_SEL = 'tr[data-id], tr[data-req], tr[data-res-open], tr[data-res-detail], .tm-list-card[data-id], .tm-list-card[data-detail]';
+  document.addEventListener('click', function (e) {
+    var sel = global.getSelection ? global.getSelection() : null;
+    if (!sel || sel.isCollapsed || !String(sel).trim()) return;
+    // Buton/link/girdi gibi gerçek etkileşim öğelerine tıklamayı engelleme.
+    if (e.target.closest('button, a, input, select, textarea, [data-modal-close]')) return;
+    if (e.target.closest(SELECTABLE_ROW_SEL)) {
+      e.stopPropagation();
+    }
+  }, true);
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

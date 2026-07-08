@@ -45,7 +45,11 @@
     var assignment = assignmentFilter ? assignmentFilter.value : 'all';
     var items = Store.getRequests();
     items = U.filterSearch(items, q, function (r) {
-      return r.studentFirstName + ' ' + r.studentLastName + ' ' + r.parentPhone + ' ' + r.id;
+      // Ada, telefona, talep id'sine ek olarak Rezervasyon ID (REZTRIAL-…) ve Ders ID
+      // (trialLesson-…) ile de aranabilsin; diğer ekranlardan kopyalanan kodlar bulunsun.
+      var lessonCode = (r.selectedSessionId && Store.getLessonCode) ? Store.getLessonCode(r.selectedSessionId) : '';
+      return r.studentFirstName + ' ' + r.studentLastName + ' ' + r.parentPhone + ' ' + r.id +
+        ' ' + resCode(r) + ' ' + lessonCode;
     });
     if (status === 'orphan') items = items.filter(isOrphan);
     else if (status !== 'all') items = items.filter(function (r) { return r.status === status; });

@@ -17,6 +17,7 @@
       '<aside class="tm-drawer" role="dialog" aria-modal="true">' +
         '<header class="tm-drawer-head">' +
           '<div class="tm-drawer-head-main">' +
+            '<button type="button" class="tm-drawer-back" data-dr-back hidden>&larr; Geri Dön</button>' +
             '<h2 class="tm-drawer-title" data-dr-title></h2>' +
             '<p class="tm-drawer-sub" data-dr-sub hidden></p>' +
           '</div>' +
@@ -54,6 +55,16 @@
       sub.textContent = opts.subtitle;
       sub.hidden = false;
     } else sub.hidden = true;
+    // İsteğe bağlı "Geri Dön" — yalnızca çağıran onBack verirse görünür (mevcut kullanımları etkilemez).
+    var backBtn = overlay.querySelector('[data-dr-back]');
+    if (opts.onBack) {
+      backBtn.hidden = false;
+      backBtn.innerHTML = opts.backLabel || '&larr; Geri Dön';
+      backBtn.onclick = function () { opts.onBack(); };
+    } else {
+      backBtn.hidden = true;
+      backBtn.onclick = null;
+    }
     var tabsEl = overlay.querySelector('[data-dr-tabs]');
     if (opts.tabs && opts.tabs.length) {
       tabsEl.hidden = false;

@@ -254,7 +254,6 @@
         detail('E-posta', r.parentEmail) +
         detail('İletişim durumu', contactStatusBadge(r.contactStatus)) +
         detail('Atanan ders', assignedText) +
-        detail('Veli onay', res ? SL.parentApprovalBadge(res.parentApprovalStatus) : '—') +
       '</div>' +
       (meeting && res ? '<div class="tm-link-box" style="margin-top:12px"><strong>Online link</strong><br>' + U.escapeHtml(meeting.meetingUrl) + '</div>' : '') +
       panel
@@ -269,11 +268,30 @@
     });
     if (!logs.length) return '<p class="tm-empty">İletişim kaydı yok.</p>';
     var rows = logs.map(function (l) {
+      var hasTransition = l.contactTo !== undefined && l.contactTo !== null;
+      var eski, yeni;
+      if (hasTransition) {
+        eski = contactStatusBadge(l.contactFrom === 'none' ? null : l.contactFrom);
+        yeni = contactStatusBadge(l.contactTo);
+      } else {
+        var derived = resultToContact(l.result);
+        eski = '<span class="tm-audit-none">—</span>';
+        yeni = derived ? contactStatusBadge(derived) : '<span class="tm-audit-none">—</span>';
+      }
       return '<tr><td>' + U.formatDateTime(l.createdAt) + '</td><td>' + U.escapeHtml(SL.COMM_CHANNEL[l.channel] || l.channel) +
         '</td><td>' + contactByCell(l.createdByUserId) +
+        '</td><td>' + eski + '</td><td>' + yeni +
         '</td><td>' + U.escapeHtml(l.summary) + '</td></tr>';
     }).join('');
-    return '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Kanal</th><th>İletişim Kuran</th><th>Özet</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    return '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Kanal</th><th>İletişim Kuran</th><th>Eski Durum</th><th>Yeni Durum</th><th>Özet</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  // İletişim kaydının sonucundan (result) iletişim durumunu türet (eski seed kayıtları için).
+  function resultToContact(result) {
+    if (result === 'reached' || result === 'approved') return 'positive';
+    if (result === 'declined' || result === 'rejected') return 'negative';
+    if (result === 'unreachable' || result === 'call_again') return 'unreachable';
+    return null;
   }
 
   function auditUserName(userId) {
@@ -582,8 +600,9 @@
     if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(body);
   }
 
-  function open(id, tab) {
+  function open(id, tab, opts) {
     if (!Store || !Drawer || !id) return;
+    opts = opts || {};
     currentId = id;
     activeTab = tab || 0;
     viewStep = null;
@@ -597,6 +616,8 @@
       subtitle: code,
       tabs: [{ label: 'Talep bilgisi' }, { label: 'İletişim' }, { label: 'Geçmiş' }],
       activeTab: activeTab,
+      onBack: opts.onBack || null,
+      backLabel: opts.backLabel || null,
       onTab: function (idx, body) {
         activeTab = idx;
         renderTab(body, id, idx);

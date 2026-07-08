@@ -9,7 +9,55 @@
   var SL = window.TMStatusLabels;
   var Export = window.TMExportUtils;
   var Rules = window.TMSchedulingRules;
+  var Form = window.TMFormDialog;
+  var Perms = window.TMPermissions;
   if (!Store) return;
+
+  // Yeni ders oluşturma modalı — gerekli bilgileri gir, öğretmen çakışması varsa uyarı ver, ekle.
+  function openCreateSessionModal(prefill) {
+    if (!Form) { window.location.href = 'deneme-dersi-yoneticisi-ders-planla.html'; return; }
+    if (Perms && !Perms.guard('create')) return;
+    prefill = prefill || {};
+    var lessonTypes = Store.getLessonTypes();
+    var grades = Store.getGrades ? Store.getGrades() : ['5. Sınıf', '6. Sınıf', '7. Sınıf', '8. Sınıf'];
+    var slots = (Rules && Rules.HOURLY_SLOTS) || ['11:00', '12:00', '13:00', '14:00'];
+    var pdrTeachers = Store.getTeachers().filter(function (t) { return t.isActive && (!Rules || Rules.isTeacherPdr(t.id)); });
+    var branchTeachers = Store.getTeachers().filter(function (t) { return t.isActive && (!Rules || Rules.isTeacherBranchTeacher(t.id)); });
+    function teacherOpts(list) { return list.map(function (t) { return { value: t.id, label: U.fullName(t.firstName, t.lastName) }; }); }
+    Form.open({
+      title: 'Yeni ders oluştur',
+      description: 'Deneme dersi 50 dakikadır. Seçilen öğretmenin programı çakışırsa uyarı verilir. Yeni ders öğrencisiz oluşturulur.',
+      fields: [
+        { type: 'select', name: 'lessonTypeId', label: 'Ders türü', value: prefill.lessonTypeId, options: lessonTypes.map(function (lt) { return { value: lt.id, label: lt.name }; }) },
+        { type: 'select', name: 'gradeLevel', label: 'Sınıf', value: prefill.gradeLevel, options: grades.map(function (g) { return { value: g, label: g }; }) },
+        { type: 'date', name: 'date', label: 'Tarih', value: prefill.date || Store.todayKey() },
+        { type: 'select', name: 'startTime', label: 'Başlangıç saati', value: prefill.startTime, options: slots.map(function (s) { return { value: s, label: s + '–' + (Rules ? Rules.addMinutes(s, 50) : s) }; }) },
+        { type: 'select', name: 'pdrTeacherId', label: 'PDR/Rehberlik öğretmeni', value: prefill.pdrTeacherId, options: teacherOpts(pdrTeachers) },
+        { type: 'select', name: 'branchTeacherId', label: 'Branş öğretmeni', value: prefill.branchTeacherId, options: teacherOpts(branchTeachers) }
+      ],
+      submitLabel: 'Ekle',
+      onSubmit: function (data) {
+        var draft = {
+          lessonTypeId: data.lessonTypeId,
+          gradeLevel: data.gradeLevel,
+          date: data.date,
+          startTime: data.startTime,
+          endTime: Rules ? Rules.addMinutes(data.startTime, 50) : data.startTime,
+          pdrTeacherId: data.pdrTeacherId,
+          branchTeacherId: data.branchTeacherId
+        };
+        var res = Store.createSession(draft);
+        if (!res.ok) {
+          U.notifyError(res.error || 'Öğretmen uygun değil, ders eklenemedi.');
+          openCreateSessionModal(data); // değerleri koruyarak yeniden aç
+          return;
+        }
+        U.notifySuccess('Yeni ders oluşturuldu (öğrencisiz).');
+        if (window.TMOnSessionChange) window.TMOnSessionChange();
+        render();
+      }
+    });
+  }
 
   var tbody = document.getElementById('tmSessionsBody');
   var cardsEl = document.getElementById('tmSessionsCards');
@@ -317,6 +365,14 @@
         { key: 'startTime', label: 'Başlangıç' },
         { key: 'status', label: 'Durum', value: function (s) { return SL.sessionLabel(s.status); } }
       ]);
+    });
+  }
+
+  var createBtn = document.getElementById('tmSessionsCreate');
+  if (createBtn) {
+    createBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      openCreateSessionModal();
     });
   }
 

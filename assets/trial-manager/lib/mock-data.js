@@ -21,8 +21,8 @@
   }
 
   var CURRENT_USER_ID = 'user-manager-1';
-  // v6: ders ataması ↔ olumlu iletişim tutarlılığı (atama ancak olumlu görüşmede). Eski veriler atılır.
-  var STORAGE_KEY = 'bilenyum_tmstore_v6';
+  // v10: iletişim durumu değişim kayıtları (eski/yeni durum) İletişim sekmesinde. Eski veriler atılır.
+  var STORAGE_KEY = 'bilenyum_tmstore_v18';
 
   function touch() {
     try {
@@ -204,10 +204,12 @@
   function buildParentsAndStudents() {
     var parents = [];
     var students = [];
-    var total = 55;
+    var total = 96;
     for (var i = 0; i < total; i++) {
       var pid = 'parent-' + (i + 1);
-      var pFirst = ['Ayşe', 'Mehmet', 'Zeynep', 'Fatma', 'Burak', 'Deniz', 'Gül', 'Hakan', 'Seda', 'Emre'][i % 10];
+      var PARENT_FIRST = ['Ayşe', 'Mehmet', 'Zeynep', 'Fatma', 'Burak', 'Deniz', 'Gül', 'Hakan', 'Seda', 'Emre', 'Ahmet', 'Elif', 'Murat', 'Sibel', 'Kemal', 'Nurten', 'Serkan', 'Merve', 'Volkan', 'Aylin', 'Tolga', 'Pınar', 'Cenk', 'Derya'];
+      var pFirst = PARENT_FIRST[i % PARENT_FIRST.length];
+      // Veli soyadı = öğrenci soyadı (aynı aile). Öğrenci soyadı da aynı indeksten gelir.
       var pLast = STUDENT_LAST[i % STUDENT_LAST.length];
       var sid = 'student-' + (i + 1);
       var lessonTypeId = i % 2 === 0 ? 'lt-mat' : 'lt-fen';
@@ -228,7 +230,8 @@
         updatedAt: isoAt(-1, 14, 0)
       });
 
-      var usedTrial = i % 17 === 0 ? [lessonTypeId] : [];
+      // Ücretsiz deneme kullanımı, rezervasyon oluşturulunca işaretlenir (aşağıda). Başta boş.
+      var usedTrial = [];
       students.push({
         id: sid,
         source: 'trial_lesson_application',
@@ -246,13 +249,14 @@
         updatedAt: isoAt(-2, 11, 0)
       });
     }
-    /* Bir velinin iki öğrencisi */
-    parents[0].studentIds.push('student-56');
+    /* Bir velinin iki öğrencisi (parent-1'in ikinci çocuğu). Soyadı parent-1 ile aynı olmalı. */
+    var extraSid = 'student-' + (total + 1);
+    parents[0].studentIds.push(extraSid);
     students.push({
-      id: 'student-56',
+      id: extraSid,
       source: 'trial_lesson_application',
       firstName: 'Deniz',
-      lastName: 'Yılmaz',
+      lastName: parents[0].lastName,
       age: 12,
       grade: '6. Sınıf',
       level: 'Orta',
@@ -293,8 +297,9 @@
           var sid = 'session-' + String(seq).padStart(4, '0');
           var mid = 'meeting-' + String(seq).padStart(4, '0');
           var ltName = ltId === 'lt-mat' ? 'Matematik' : 'Fen';
-          // Her ders 5/6/7/8. sınıftan biri; öğrenciler her sınıf+türde bulunduğundan tüm kombinasyonlar dolar.
-          var gradeLevel = GRADES[seq % GRADES.length];
+          // Sınıf seviyesi (gün, saat) çiftinden gelir; ders türünden BAĞIMSIZ. Böylece hem Matematik
+          // hem Fen için 5/6/7/8. sınıfın tamamı üretilir ve her (tür, sınıf) kombinasyonu ders bulur.
+          var gradeLevel = GRADES[((day + 2) * slots.length + slotIdx) % GRADES.length];
           // İlk 20 ders için üç durumu da (Tamamlandı / Onaylandı / İptal Edildi) karışık üret — iyi bir demo için.
           var status;
           if (seq <= 20) {
@@ -304,6 +309,11 @@
             if (!isPast && day === 1 && slotIdx === 2 && ltId === 'lt-fen') status = 'cancelled';
           }
           var meetingStatus = status === 'cancelled' ? 'cancelled' : (status === 'completed' ? 'expired' : 'active');
+          // Kural: tamamlanan derste PDR ve branş öğretmeni mutlaka atanmış ve bilgilendirilmiştir.
+          var isCompleted = status === 'completed';
+          var pdrId = (seq % 17 === 0 && !isCompleted) ? null : pdrTeacher.id;
+          var pdrInformed = isCompleted || (seq % 5 !== 0);
+          var branchInformed = isCompleted || (seq % 4 !== 0);
 
           meetings.push({
             id: mid,
@@ -321,7 +331,7 @@
             id: sid,
             title: ltName + ' · ' + date + ' · ' + startTime,
             lessonTypeId: ltId,
-            pdrTeacherId: seq % 17 === 0 ? null : pdrTeacher.id,
+            pdrTeacherId: pdrId,
             branchTeacherId: branchTeacher.id,
             date: date,
             startTime: startTime,
@@ -334,12 +344,12 @@
             status: status,
             parentPresentationMinutes: 20,
             studentTrialMinutes: 30,
-            pdrTeacherInformed: seq % 5 !== 0,
-            pdrTeacherInformedAt: seq % 5 !== 0 ? isoAt(-2, 10, 0) : undefined,
-            pdrTeacherInformedByUserId: seq % 5 !== 0 ? CURRENT_USER_ID : undefined,
-            branchTeacherInformed: seq % 4 !== 0,
-            branchTeacherInformedAt: seq % 4 !== 0 ? isoAt(-2, 10, 0) : undefined,
-            branchTeacherInformedByUserId: seq % 4 !== 0 ? CURRENT_USER_ID : undefined,
+            pdrTeacherInformed: pdrInformed,
+            pdrTeacherInformedAt: pdrInformed ? isoAt(-2, 10, 0) : undefined,
+            pdrTeacherInformedByUserId: pdrInformed ? CURRENT_USER_ID : undefined,
+            branchTeacherInformed: branchInformed,
+            branchTeacherInformedAt: branchInformed ? isoAt(-2, 10, 0) : undefined,
+            branchTeacherInformedByUserId: branchInformed ? CURRENT_USER_ID : undefined,
             createdByUserId: CURRENT_USER_ID,
             createdAt: isoAt(-14, 8, 0),
             updatedAt: isoAt(-day, 8, 30)
@@ -350,136 +360,113 @@
     return { sessions: sessions, meetings: meetings };
   }
 
-  function buildRequests(students, sessions) {
+  function contactNoteFor(status) {
+    if (status === 'positive') return 'Veli ile olumlu görüşüldü, deneme dersi hakkında bilgi verildi.';
+    if (status === 'negative') return 'Veli şu an ilgilenmediğini belirtti.';
+    if (status === 'unreachable') return 'Veliye ulaşılamadı, tekrar aranacak.';
+    return 'Veli ile görüşüldü.';
+  }
+
+  // Talepler ve rezervasyonlar TEK bir tutarlı zincirden üretilir:
+  //   gerçek öğrenci + gerçek veli → talep (studentGrade/tür öğrenciden) →
+  //   atanmışsa öğrencinin (tür+sınıf) ile EŞLEŞEN bir derse rezervasyon.
+  // Böylece Öğrenciler / Veliler / Rezervasyon Talepleri / Deneme Dersleri aynı veriyi gösterir.
+  // Her rezervasyonun gerçek bir talebi (requestId) vardır; uydurma isim/orphan yoktur.
+  function buildRequestsAndReservations(students, sessions) {
     var requests = [];
-    var activeSessions = sessions.filter(function (s) { return s.status !== 'cancelled' && s.status !== 'completed'; });
-    for (var i = 0; i < 35; i++) {
-      var st = students[i % students.length];
-      var parentId = st.parentIds[0];
-      var parent = state.parents.find(function (p) { return p.id === parentId; });
-      var session = activeSessions[i % activeSessions.length];
-      var statuses = ['new', 'reviewing', 'assigned', 'rejected', 'cancelled'];
-      var status = i < 10 ? 'new' : statuses[i % statuses.length];
-      // Ders ataması (reviewing/assigned) ancak veli ile olumlu görüşme sonrası olur.
-      var contactStatus = (status === 'reviewing' || status === 'assigned') ? 'positive' : undefined;
+    var reservations = [];
+    var reqSeq = 0;
+    var rSeq = 0;
+    var channels = ['phone', 'whatsapp', 'sms', 'email'];
+    function matchingSessions(ltId, grade) {
+      return sessions.filter(function (s) {
+        return s.status !== 'cancelled' && s.lessonTypeId === ltId && s.gradeLevel === grade;
+      });
+    }
+    // Öğrenciyi (tür+sınıf) uyan derslere yerleştir: her dersi ~3 öğrenciye kadar doldur, sonra
+    // sıradaki derse geç (küçük gruplu deneme dersleri; ne tek derse yığılma ne de aşırı boşluk).
+    var CAP = 3;
+    function pickSessionToFill(ltId, grade) {
+      var pool = matchingSessions(ltId, grade);
+      if (!pool.length) return null;
+      var underCap = pool.filter(function (s) { return s.reservationIds.length < CAP; });
+      var candidates = underCap.length ? underCap : pool;
+      return candidates.slice().sort(function (a, b) { return b.reservationIds.length - a.reservationIds.length; })[0];
+    }
+
+    students.forEach(function (st, i) {
+      var parent = state.parents.find(function (p) { return p.id === st.parentIds[0]; });
+      if (!parent) return;
+      var ltId = st.requestedLessonTypeId;
+
+      // Talep sonucu dağılımı — çeşitlilik + tutarlılık (her satır gerçek bir hayat döngüsü):
+      var mod = i % 10;
+      var status, contactStatus, reserve = false;
+      if (mod === 0) { status = 'new'; contactStatus = undefined; }            // yeni, henüz görüşülmedi
+      else if (mod === 1) { status = 'new'; contactStatus = 'negative'; }      // görüşüldü, olumsuz
+      else if (mod === 2) { status = 'new'; contactStatus = 'unreachable'; }   // ulaşılamadı
+      else if (mod === 3) { status = 'rejected'; contactStatus = 'negative'; } // reddedildi
+      else if (mod === 4) { status = 'cancelled'; contactStatus = undefined; } // veli iptal etti
+      else if (mod === 5) { status = 'reviewing'; contactStatus = 'positive'; }// olumlu, atama bekliyor (orphan)
+      else { status = 'assigned'; contactStatus = 'positive'; reserve = true; } // derse atandı → rezervasyon
+
+      var session = reserve ? pickSessionToFill(ltId, st.grade) : null;
+      if (reserve && !session) { reserve = false; status = 'reviewing'; } // uygun ders yoksa atama bekliyor
+
+      reqSeq++;
+      var reqId = 'request-' + String(reqSeq).padStart(4, '0');
       requests.push({
-        id: 'request-' + String(i + 1).padStart(4, '0'),
+        id: reqId,
         studentFirstName: st.firstName,
         studentLastName: st.lastName,
         studentAge: st.age,
         studentGrade: st.grade,
         studentLevel: st.level,
-        requestedLessonTypeId: st.requestedLessonTypeId,
-        parentFirstName: parent ? parent.firstName : 'Veli',
-        parentLastName: parent ? parent.lastName : '—',
-        parentPhone: parent ? parent.phone : '',
-        parentEmail: parent ? parent.email : '',
+        requestedLessonTypeId: ltId,
+        parentFirstName: parent.firstName,
+        parentLastName: parent.lastName,
+        parentPhone: parent.phone,
+        parentEmail: parent.email,
         selectedSessionId: session ? session.id : undefined,
         status: status,
         contactStatus: contactStatus,
-        contactChannel: contactStatus ? 'phone' : undefined,
-        contactNote: contactStatus ? 'Veli ile olumlu görüşüldü.' : undefined,
+        contactChannel: contactStatus ? channels[i % 3] : undefined,
+        contactNote: contactStatus ? contactNoteFor(contactStatus) : undefined,
         source: 'website_form',
-        createdAt: isoAt(-7 + (i % 5), 8 + (i % 10), 0),
+        createdAt: isoAt(-9 + (i % 8), 8 + (i % 9), 0),
         updatedAt: isoAt(-1, 12, 0)
       });
-    }
-    return requests;
-  }
 
-  function buildOrphanRequests(sessions) {
-    var activeSessions = sessions.filter(function (s) { return s.status !== 'cancelled' && s.status !== 'completed'; });
-    var demos = [
-      { studentFirstName: 'Ece', studentLastName: 'Vural', studentAge: 11, studentGrade: '5. Sınıf', studentLevel: 'Orta', requestedLessonTypeId: 'lt-mat', parentFirstName: 'Serkan', parentLastName: 'Vural', parentPhone: '0532 441 2218', parentEmail: 'serkan.vural@mail.com' },
-      { studentFirstName: 'Baran', studentLastName: 'Güneş', studentAge: 12, studentGrade: '6. Sınıf', studentLevel: 'Başlangıç', requestedLessonTypeId: 'lt-fen', parentFirstName: 'Merve', parentLastName: 'Güneş', parentPhone: '0533 552 9031', parentEmail: 'merve.gunes@mail.com' },
-      { studentFirstName: 'Lina', studentLastName: 'Koç', studentAge: 10, studentGrade: '4. Sınıf', studentLevel: 'Başlangıç', requestedLessonTypeId: 'lt-mat', parentFirstName: 'Hakan', parentLastName: 'Koç', parentPhone: '0542 118 7744', parentEmail: 'hakan.koc@mail.com' },
-      { studentFirstName: 'Arda', studentLastName: 'Tekin', studentAge: 13, studentGrade: '7. Sınıf', studentLevel: 'İleri', requestedLessonTypeId: 'lt-fen', parentFirstName: 'Seda', parentLastName: 'Tekin', parentPhone: '0555 902 3311', parentEmail: 'seda.tekin@mail.com' },
-      { studentFirstName: 'Nil', studentLastName: 'Akar', studentAge: 11, studentGrade: '5. Sınıf', studentLevel: 'Orta', requestedLessonTypeId: 'lt-mat', parentFirstName: 'Volkan', parentLastName: 'Akar', parentPhone: '0506 771 2409', parentEmail: 'volkan.akar@mail.com' }
-    ];
-    // İlk sayfada tür tür veri görünsün — ama tutarlı: ders ataması yalnızca olumlu iletişimde.
-    var demoStatuses = ['assigned', 'new', 'new', 'rejected', 'reviewing'];
-    var demoContact = ['positive', 'unreachable', 'negative', undefined, 'positive'];
-    var demoChannel = ['phone', 'whatsapp', 'phone', undefined, 'sms'];
-    return demos.map(function (d, i) {
-      var session = activeSessions[i % activeSessions.length];
-      return {
-        id: 'request-orphan-' + String(i + 1).padStart(2, '0'),
-        studentFirstName: d.studentFirstName,
-        studentLastName: d.studentLastName,
-        studentAge: d.studentAge,
-        studentGrade: d.studentGrade,
-        studentLevel: d.studentLevel,
-        requestedLessonTypeId: d.requestedLessonTypeId,
-        parentFirstName: d.parentFirstName,
-        parentLastName: d.parentLastName,
-        parentPhone: d.parentPhone,
-        parentEmail: d.parentEmail,
-        selectedSessionId: session ? session.id : undefined,
-        status: demoStatuses[i] || 'new',
-        contactStatus: demoContact[i],
-        contactChannel: demoChannel[i],
-        contactNote: demoContact[i] ? 'Veli ile görüşme yapıldı.' : undefined,
-        source: 'website_form',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-    });
-  }
-
-  function buildReservations(students, sessions, requests) {
-    var reservations = [];
-    var rSeq = 0;
-    var approvalStatuses = ['not_called', 'unreachable', 'approved', 'rejected', 'call_again'];
-    var resStatuses = ['pending', 'confirmed', 'cancelled', 'rescheduled', 'attended', 'no_show'];
-
-    sessions.forEach(function (session, si) {
-      if (session.status === 'cancelled') return;
-      var count = si % 5 === 0 ? 18 : (si % 3 === 0 ? 12 : (si % 2 === 0 ? 6 : 3));
-      if (session.status === 'completed') count = 15;
-      var matchingStudents = students.filter(function (st) {
-        return st.requestedLessonTypeId === session.lessonTypeId &&
-          (!session.gradeLevel || st.grade === session.gradeLevel) &&
-          st.hasUsedFreeTrialForLessonTypeIds.indexOf(session.lessonTypeId) < 0;
-      });
-      for (var j = 0; j < count && j < matchingStudents.length; j++) {
+      if (reserve && session) {
         rSeq++;
-        var st = matchingStudents[(si * 7 + j) % matchingStudents.length];
-        var parentId = st.parentIds[0];
-        var req = requests.find(function (rq) {
-          return rq.studentFirstName === st.firstName && rq.studentLastName === st.lastName && rq.status !== 'new';
-        });
-        var status = resStatuses[(si + j) % resStatuses.length];
-        if (session.status === 'completed') status = j % 4 === 0 ? 'no_show' : 'attended';
-        if (session.status === 'cancelled') status = 'cancelled';
-        // Derse yalnızca onaylanmış öğrenciler alınır: aktif (iptal/taşınmamış) tüm rezervasyonlar onaylı.
-        var parentApproval = (status !== 'cancelled' && status !== 'rescheduled')
-          ? 'approved'
-          : approvalStatuses[(si + j) % approvalStatuses.length];
-        var linkSent = parentApproval === 'approved' && j % 3 !== 0;
-
         var rid = 'res-' + String(rSeq).padStart(4, '0');
+        var resStatus = session.status === 'completed'
+          ? (i % 5 === 0 ? 'no_show' : 'attended')
+          : 'confirmed';
+        var linkSent = resStatus !== 'no_show' && (i % 3 !== 0);
         reservations.push({
           id: rid,
-          requestId: req ? req.id : undefined,
+          requestId: reqId,
           studentId: st.id,
-          parentId: parentId,
+          parentId: parent.id,
           sessionId: session.id,
-          lessonTypeId: session.lessonTypeId,
-          status: status,
-          parentApprovalStatus: parentApproval,
+          lessonTypeId: ltId,
+          status: resStatus,
+          parentApprovalStatus: 'approved',
           linkSent: linkSent,
           linkSentAt: linkSent ? isoAt(-1, 15, 0) : undefined,
           linkSentByUserId: linkSent ? CURRENT_USER_ID : undefined,
           communicationLogIds: [],
-          enrolled: status === 'attended' && j % 5 === 0,
+          enrolled: resStatus === 'attended' && (i % 4 === 0),
           createdAt: isoAt(-5, 10, 0),
           updatedAt: isoAt(-1, 16, 0)
         });
         session.enrolledStudentIds.push(st.id);
         session.reservationIds.push(rid);
+        st.hasUsedFreeTrialForLessonTypeIds = [ltId];
       }
     });
-    return reservations;
+    return { requests: requests, reservations: reservations };
   }
 
   function buildCommunicationLogs(reservations) {
@@ -502,6 +489,30 @@
         createdAt: isoAt(-3 + (i % 3), 10 + (i % 8), 0)
       });
       r.communicationLogIds.push('comm-' + String(i + 1).padStart(4, '0'));
+    });
+    return logs;
+  }
+
+  // İletişim durumu olan talepler için "Görüşülmedi → durum" iletişim kaydı üret (İletişim sekmesinde eski/yeni durum gösterilsin).
+  function buildContactChangeLogs(requests) {
+    var CR = { positive: 'reached', negative: 'declined', unreachable: 'unreachable' };
+    var logs = [];
+    var n = 0;
+    requests.forEach(function (req) {
+      if (!req.contactStatus) return;
+      n++;
+      logs.push({
+        id: 'commc-' + String(n).padStart(4, '0'),
+        requestId: req.id,
+        parentId: undefined,
+        channel: req.contactChannel || 'phone',
+        result: CR[req.contactStatus] || 'reached',
+        contactFrom: 'none',
+        contactTo: req.contactStatus,
+        summary: req.contactNote || 'Veli ile görüşüldü.',
+        createdByUserId: CURRENT_USER_ID,
+        createdAt: req.updatedAt || isoAt(-1, 12, 0)
+      });
     });
     return logs;
   }
@@ -626,9 +637,10 @@
     var sm = buildSessionsAndMeetings(state.teachers);
     state.sessions = sm.sessions;
     state.meetings = sm.meetings;
-    state.requests = buildRequests(state.students, state.sessions).concat(buildOrphanRequests(state.sessions));
-    state.reservations = buildReservations(state.students, state.sessions, state.requests);
-    state.communicationLogs = buildCommunicationLogs(state.reservations);
+    var rr = buildRequestsAndReservations(state.students, state.sessions);
+    state.requests = rr.requests;
+    state.reservations = rr.reservations;
+    state.communicationLogs = buildContactChangeLogs(state.requests).concat(buildCommunicationLogs(state.reservations));
     state.auditLogs = buildAuditLogs(state.sessions, state.reservations);
     ensureDataSourceMetadata();
   }
@@ -1052,10 +1064,12 @@
       channel: entry.channel,
       result: entry.result,
       summary: entry.summary || '',
+      contactFrom: entry.contactFrom,
+      contactTo: entry.contactTo,
       nextAction: entry.nextAction,
       nextActionDate: entry.nextActionDate,
-      createdByUserId: state.currentUserId,
-      createdAt: new Date().toISOString()
+      createdByUserId: entry.createdByUserId || state.currentUserId,
+      createdAt: entry.createdAt || new Date().toISOString()
     };
     state.communicationLogs.unshift(log);
     if (entry.reservationId) {
@@ -1075,6 +1089,7 @@
     if (!data || !data.status || !CONTACT_RESULT[data.status]) return { ok: false, error: 'Durum seçilmelidir.' };
     if (!data.channel) return { ok: false, error: 'İletişim kanalı seçilmelidir.' };
     if (!data.note || !String(data.note).trim()) return { ok: false, error: 'Açıklama girilmelidir.' };
+    var prevStatus = req.contactStatus || 'none';
     var prevLabel = req.contactStatus ? (CONTACT_LABEL[req.contactStatus] || req.contactStatus) : 'Görüşülmedi';
     req.contactStatus = data.status;
     req.contactChannel = data.channel;
@@ -1084,6 +1099,8 @@
       requestId: requestId,
       channel: data.channel,
       result: CONTACT_RESULT[data.status],
+      contactFrom: prevStatus,
+      contactTo: data.status,
       summary: req.contactNote
     });
     if (Audit) {
