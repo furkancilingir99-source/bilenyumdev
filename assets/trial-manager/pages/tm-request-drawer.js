@@ -15,6 +15,8 @@
 
   var currentId = null;
   var activeTab = 0;
+  var viewStep = null;       // stepper'da görüntülenen adım (gezinme)
+  var contactEditing = null; // İletişim kartı düzenleme modunda mı
 
   function guard(action) {
     return !Perms || Perms.guard(action);
@@ -45,24 +47,164 @@
       (String(v).indexOf('<') >= 0 ? v : U.escapeHtml(String(v))) + '</div></div>';
   }
 
-  var STEPS = ['Yeni', 'Atandı', 'Rezervasyon', 'Onay', 'Link'];
-
-  function requestStep(r, res) {
-    if (res && res.linkSent) return 5;
-    if (res && res.parentApprovalStatus === 'approved') return 4;
-    if (res) return 3;
-    if (r.status !== 'new') return 2;
-    return 1;
+  var APPROVAL_KEYS = { unreachable: 1, approved: 1, call_again: 1, rejected: 1, not_called: 1 };
+  function commBadge(result) {
+    if (result === 'reached') return '<span class="tm-badge tm-badge--green">Ulaşıldı</span>';
+    if (APPROVAL_KEYS[result] && SL.parentApprovalBadge) return SL.parentApprovalBadge(result);
+    return '<span class="tm-badge tm-badge--muted">' + U.escapeHtml((SL.COMM_RESULT && SL.COMM_RESULT[result]) || result) + '</span>';
   }
 
-  function renderStepper(r, res, rejected) {
+  function lastContact(r, res) {
+    var logs = Store.getCommunicationLogs().filter(function (l) {
+      return l.requestId === r.id || (res && l.reservationId === res.id);
+    }).slice().sort(function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); });
+    return logs[0] || null;
+  }
+
+  var STEPS = ['İletişim', 'Ders<br>Ataması', 'Rezerve', 'Onay', 'Link'];
+
+  function isContacted(r, res) {
+    return Store.getCommunicationLogs().some(function (l) {
+      return (l.requestId === r.id || (res && l.reservationId === res.id)) &&
+        (l.result === 'reached' || l.result === 'approved');
+    });
+  }
+
+  function renderStepper(currentStep, viewStep, rejected) {
     if (rejected) return '<div class="tm-req-status-banner is-rejected">Bu talep reddedildi / iptal edildi.</div>';
-    var step = requestStep(r, res);
     return '<div class="tm-req-steps">' + STEPS.map(function (s, i) {
       var n = i + 1;
-      var cls = n < step ? ' is-done' : (n === step ? ' is-current' : '');
-      return '<span class="tm-req-step' + cls + '"><span class="tm-req-step-dot">' + n + '</span><span class="tm-req-step-label">' + s + '</span></span>';
+      var reachable = n <= currentStep;
+      var cls = (n === viewStep ? ' is-current' : (n < currentStep ? ' is-done' : '')) + (reachable ? ' is-clickable' : '');
+      var inner = '<span class="tm-req-step-dot">' + n + '</span><span class="tm-req-step-label">' + s + '</span>';
+      return reachable
+        ? '<button type="button" class="tm-req-step' + cls + '" data-goto-step="' + n + '">' + inner + '</button>'
+        : '<span class="tm-req-step' + cls + '">' + inner + '</span>';
     }).join('') + '</div>';
+  }
+
+  function contactStatusBadge(status) {
+    if (status === 'positive') return '<span class="tm-badge tm-badge--green">Olumlu</span>';
+    if (status === 'negative') return '<span class="tm-badge tm-badge--red">Olumsuz</span>';
+    if (status === 'unreachable') return '<span class="tm-badge tm-badge--orange">Ulaşılamadı</span>';
+    return '<span class="tm-badge tm-badge--muted">Görüşülmedi</span>';
+  }
+
+  function channelSelect(current) {
+    var opts = '<option value="">Kanal seçin</option>' + Object.keys(SL.COMM_CHANNEL).map(function (k) {
+      return '<option value="' + k + '"' + (current === k ? ' selected' : '') + '>' + SL.COMM_CHANNEL[k] + '</option>';
+    }).join('');
+    return '<select class="tm-dg-control" id="tmContactChannel">' + opts + '</select>';
+  }
+
+  function contactForm(r) {
+    var cs = r.contactStatus;
+    function pill(val, label) {
+      return '<button type="button" class="tm-contact-pill' + (cs === val ? ' is-selected' : '') + '" data-contact-opt="' + val + '">' + label + '</button>';
+    }
+    return '<p class="tm-contact-desc">Görüşme durumunu seçin, kanalı ve açıklamayı girin (hepsi zorunlu). <strong>Olumlu</strong> seçilince ders atama adımına geçilir.</p>' +
+      '<div class="tm-contact-field"><span class="tm-contact-label">Durum <span class="tm-req">*</span></span>' +
+        '<div class="tm-contact-pills">' + pill('positive', 'Olumlu') + pill('negative', 'Olumsuz') + pill('unreachable', 'Ulaşılamadı') + '</div>' +
+      '</div>' +
+      '<div class="tm-contact-field"><label class="tm-contact-label" for="tmContactChannel">İletişim kanalı <span class="tm-req">*</span></label>' + channelSelect(r.contactChannel) + '</div>' +
+      '<div class="tm-contact-field"><label class="tm-contact-label" for="tmContactNote">Açıklama <span class="tm-req">*</span></label>' +
+        '<textarea class="tm-dg-control tm-contact-note" id="tmContactNote" rows="3" placeholder="Görüşme detaylarını giriniz.">' + U.escapeHtml(r.contactNote || '') + '</textarea>' +
+      '</div>' +
+      '<div class="tm-contact-actions">' +
+        '<button type="button" class="tm-btn tm-btn--primary tm-contact-save" id="tmContactSave" data-tm-require="edit">Güncelle</button>' +
+        (cs ? '<button type="button" class="tm-btn tm-btn--ghost" id="tmContactCancel">Vazgeç</button>' : '') +
+      '</div>';
+  }
+
+  function contactResult(r) {
+    var status = r.contactStatus;
+    var msg, cls;
+    if (status === 'positive') { cls = 'is-positive'; msg = 'Veli ile olumlu görüşüldü. Ders atama adımına geçebilirsiniz.'; }
+    else if (status === 'negative') { cls = 'is-negative'; msg = 'Veli görüşmesi olumsuz oldu — ücretsiz deneme dersi almayacak. Veli geri dönüş yaparsa durumu güncelleyebilirsiniz.'; }
+    else { cls = 'is-unreachable'; msg = 'Veli arandı ancak ulaşılamadı. Yeniden arayıp durumu Olumlu ya da Olumsuz olarak güncelleyebilirsiniz.'; }
+    return '<div class="tm-contact-result ' + cls + '">' +
+        '<div class="tm-contact-result-top">' + contactStatusBadge(status) + '</div>' +
+        '<p class="tm-contact-result-msg">' + U.escapeHtml(msg) + '</p>' +
+        (r.contactNote ? '<p class="tm-contact-result-note">Not: ' + U.escapeHtml(r.contactNote) + '</p>' : '') +
+      '</div>' +
+      '<button type="button" class="tm-btn tm-btn--primary tm-contact-save" id="tmContactEdit" data-tm-require="edit">İletişim durumunu güncelle</button>';
+  }
+
+  function contactPanel(r) {
+    var editing = contactEditing == null ? !r.contactStatus : contactEditing;
+    return '<div class="tm-contact-card">' +
+      '<div class="tm-contact-head"><span class="tm-wizard-num">1</span> Veli ile iletişim</div>' +
+      (editing ? contactForm(r) : contactResult(r)) +
+    '</div>';
+  }
+
+  function lessonDayName(dateKey) {
+    if (!dateKey) return '';
+    var p = String(dateKey).split('-');
+    if (p.length !== 3) return '';
+    var d = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+    return isNaN(d.getTime()) ? '' : (U.WEEKDAYS[d.getDay()] || '');
+  }
+
+  function subjectMeta(lt) {
+    var id = lt ? lt.id : '';
+    if (id === 'lt-mat') return { name: 'Matematik', cls: 'is-mat', icon: '∑' };
+    if (id === 'lt-fen') return { name: 'Fen', cls: 'is-fen', icon: '⚛' };
+    return { name: lt ? lt.name : 'Ders', cls: 'is-other', icon: '•' };
+  }
+
+  // Derse ait bilgi kartı: ID, konu (Matematik/Fen), gün/tarih/saat, TRIAL etiketi.
+  function lessonCard(sess, lt, isPref) {
+    var subj = subjectMeta(lt);
+    var day = lessonDayName(sess.date);
+    return '<div class="tm-lesson-card ' + subj.cls + (isPref ? ' is-pref' : '') + '">' +
+      '<div class="tm-lesson-card-top">' +
+        '<span class="tm-lesson-subject"><span class="tm-lesson-icon">' + subj.icon + '</span>' + U.escapeHtml(subj.name) + '</span>' +
+        '<span class="tm-lesson-trial">TRIAL</span>' +
+      '</div>' +
+      '<div class="tm-lesson-when">' + U.escapeHtml(U.formatDateKey(sess.date)) + (day ? ' · ' + U.escapeHtml(day) : '') + ' · ' + U.escapeHtml(sess.startTime || '') + (sess.endTime ? '–' + U.escapeHtml(sess.endTime) : '') + '</div>' +
+      '<div class="tm-lesson-id">Ders ID <code>' + U.escapeHtml(Store.getLessonCode ? Store.getLessonCode(sess) : sess.id) + '</code>' +
+        (isPref ? '<span class="tm-lesson-flag">Velinin form tercihi · henüz atanmadı</span>' : '<span class="tm-lesson-flag is-ok">Atandı ✓</span>') +
+      '</div>' +
+    '</div>';
+  }
+
+  function wizardPanel(step, ctx, assigned) {
+    var sess = ctx.sess, lt = ctx.lt;
+    var wa = QuickMsg ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" id="tmDrawerWa">WhatsApp</button>' : '';
+    var lessonBox = sess ? lessonCard(sess, lt, !assigned) : '';
+    function panel(n, title, d, inner, extra) {
+      return '<div class="tm-wizard-head"><span class="tm-wizard-num">' + n + '</span>' + title + '</div>' +
+        '<p class="tm-wizard-desc">' + d + '</p>' +
+        (extra || '') +
+        '<div class="tm-wizard-actions">' + inner + '</div>';
+    }
+    if (step === 2) {
+      return panel(2, 'Öğrenciyi derse ata',
+        'Öğrenciyi sınıf seviyesine uygun bir Matematik/Fen dersine yerleştirin.',
+        '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmAssignSession" data-tm-require="edit">' + (assigned ? 'Dersi değiştir' : 'Derse ata') + '</button>',
+        lessonBox);
+    }
+    if (step === 3) {
+      return panel(3, 'Rezervasyon oluştur',
+        'Atanan derste öğrenciye yer ayırın. Yanlışsa dersi değiştirebilirsiniz.',
+        '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" id="tmAssignSession" data-tm-require="edit">Dersi değiştir</button>' +
+        '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmCreateRes" data-tm-require="create">Rezervasyon oluştur</button>',
+        lessonBox);
+    }
+    if (step === 4) {
+      return panel(4, 'Veli onayını al',
+        'Veli deneme dersini onayladığında işaretleyin.',
+        wa + '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmApproveParent" data-tm-require="edit">Veli onayladı</button>',
+        lessonBox);
+    }
+    if (step === 5) {
+      return panel(5, 'Online linki gönder',
+        'Meeting linkini veliye ilettikten sonra işaretleyin.',
+        wa + '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmMarkLink" data-tm-require="edit">Link gönder</button>',
+        lessonBox);
+    }
+    return '<div class="tm-wizard-done">Tüm adımlar tamamlandı ✓</div>';
   }
 
   function renderInfo(ctx) {
@@ -72,72 +214,50 @@
     var sess = ctx.sess;
     var meeting = ctx.meeting;
     var rejected = ctx.rejected;
-    // Yönetici "Derse ata"ya bastıysa (status 'new' değil) ve oturum varsa atanmış say.
-    var assigned = r.status !== 'new' && !!sess;
+    // Olumlu iletişim (ya da zaten bir rezervasyonun varlığı) olmadan ders ataması yapılamaz.
+    var contacted = r.contactStatus === 'positive' || !!res;
+    var positive = contacted;
+    var assigned = contacted && r.status !== 'new' && r.status !== 'rejected' && r.status !== 'cancelled' && !!sess;
+    var currentStep = !positive ? 1 : (!assigned ? 2 : (!res ? 3 : (res.parentApprovalStatus !== 'approved' ? 4 : (!res.linkSent ? 5 : 6))));
+    // viewStep: hangi adımı görüntülüyoruz (stepper ile gezinme). Ulaşılabilir aralığa kıstır.
+    var vs = viewStep == null ? currentStep : viewStep;
+    if (vs > currentStep) vs = currentStep;
+    if (vs < 1) vs = 1;
 
-    var assignedBox = assigned
-      ? '<div class="tm-assigned-box"><span class="tm-assigned-title">Atanan ders</span>' +
-          '<span class="tm-assigned-val">' + U.escapeHtml(U.formatDateKey(sess.date) + ' ' + sess.startTime + ' · ' + (lt ? lt.name : '')) + '</span></div>'
-      : '<div class="tm-assigned-box is-empty"><span class="tm-assigned-title">Atanan ders</span>' +
-          '<span class="tm-assigned-val">Henüz ders atanmadı — “Derse ata” ile öğrenciyi uygun bir derse yerleştirin.' +
-          (r.selectedSessionId && sess ? '<br><span class="tm-assigned-pref">Velinin form tercihi: ' + U.escapeHtml(U.formatDateKey(sess.date) + ' ' + sess.startTime) + '</span>' : '') +
-          '</span></div>';
+    var panel;
+    if (rejected) {
+      panel = '';
+    } else if (vs === 1) {
+      panel = contactPanel(r);
+    } else if (currentStep === 6 && vs === 6) {
+      panel = '<div class="tm-wizard"><div class="tm-wizard-done">Tüm adımlar tamamlandı ✓</div></div>';
+    } else {
+      panel = '<div class="tm-wizard">' + wizardPanel(vs, ctx, assigned) + '</div>';
+    }
 
-    var communicationGroup =
-      '<div class="tm-action-group">' +
-        '<span class="tm-action-group-label">Veli iletişimi</span>' +
-        '<div class="tm-action-group-btns">' +
-          (QuickMsg ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmDrawerWa">WhatsApp</button>' : '') +
-          (!rejected
-            ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" id="tmMarkUnreachable" data-tm-require="edit">Ulaşılamadı</button>' +
-              '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" id="tmMarkCallAgain" data-tm-require="edit">Tekrar aranacak</button>'
-            : '') +
-          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" id="tmAddComm" data-tm-require="edit">İletişim kaydı ekle</button>' +
-          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" id="tmCopyContact" title="Kişi bilgilerini kopyala">Kişi kartı kopyala</button>' +
-        '</div>' +
-      '</div>';
+    // Atanan ders: yalnızca gerçekten atanmışsa dolu, atanan derse göre güncellenir. Bitiş saati de gösterilir.
+    var assignedText = (assigned && sess)
+      ? (U.formatDateKey(sess.date) + ' ' + (sess.startTime || '') + (sess.endTime ? '–' + sess.endTime : '') + ' · ' + (lt ? lt.name : '') + ' (' + (Store.getLessonCode ? Store.getLessonCode(sess) : sess.id) + ')')
+      : '—';
 
-    var planningGroup = rejected ? '' :
-      '<div class="tm-action-group">' +
-        '<span class="tm-action-group-label">Planlama</span>' +
-        '<div class="tm-action-group-btns">' +
-          (!assigned
-            ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmAssignSession" data-tm-require="edit">Derse ata</button>'
-            : (!res
-                ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" id="tmAssignSession" data-tm-require="edit">Dersi değiştir</button>' +
-                  '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmCreateRes" data-tm-require="create">Rezervasyon oluştur</button>'
-                : (res.parentApprovalStatus !== 'approved' ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmApproveParent" data-tm-require="edit">Veli onayladı</button>' : '') +
-                  (!res.linkSent ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" id="tmMarkLink" data-tm-require="edit">Link gönderildi</button>' : '') +
-                  (res.parentApprovalStatus === 'approved' && res.linkSent ? '<span class="tm-form-desc" style="margin:0">Bu talep tamamlandı ✓</span>' : '')
-              )
-          ) +
-        '</div>' +
-        (!assigned ? '<p class="tm-form-desc" style="margin:8px 0 0">Rezervasyon oluşturmak için önce öğrenciyi bir derse atayın.</p>' : '') +
-      '</div>';
-
-    var negativeGroup = rejected ? '' :
-      '<div class="tm-action-group">' +
-        '<span class="tm-action-group-label">Olumsuz</span>' +
-        '<div class="tm-action-group-btns">' +
-          '<button type="button" class="tm-btn tm-btn--sm tm-btn--danger" id="tmRejectReq" data-tm-require="cancel">Reddet</button>' +
-        '</div>' +
-      '</div>';
+    var code = Store.getReservationCode ? Store.getReservationCode(r.id) : r.id;
 
     return (
-      renderStepper(r, res, rejected) +
+      '<div class="tm-res-code"><span class="tm-res-code-label">Rezervasyon ID</span><code class="tm-res-code-val">' + U.escapeHtml(code) + '</code></div>' +
+      renderStepper(currentStep, vs, rejected) +
       '<div class="tm-detail-grid">' +
         detail('Öğrenci', r.studentFirstName + ' ' + r.studentLastName) +
-        detail('Yaş / Sınıf', r.studentAge + ' · ' + r.studentGrade) +
+        detail('Sınıf', r.studentGrade) +
         detail('Ders türü', lt ? lt.name : '—') +
         detail('Veli', r.parentFirstName + ' ' + r.parentLastName) +
         detail('Telefon', r.parentPhone) +
         detail('E-posta', r.parentEmail) +
+        detail('İletişim durumu', contactStatusBadge(r.contactStatus)) +
+        detail('Atanan ders', assignedText) +
         detail('Veli onay', res ? SL.parentApprovalBadge(res.parentApprovalStatus) : '—') +
-        detail('Rezervasyon', res ? SL.reservationBadge(res.status) : '—') +
       '</div>' +
-      assignedBox +
       (meeting && res ? '<div class="tm-link-box" style="margin-top:12px"><strong>Online link</strong><br>' + U.escapeHtml(meeting.meetingUrl) + '</div>' : '') +
-      '<div class="tm-action-groups">' + communicationGroup + planningGroup + negativeGroup + '</div>'
+      panel
     );
   }
 
@@ -147,18 +267,37 @@
     var logs = Store.getCommunicationLogs().filter(function (l) {
       return l.requestId === ctx.r.id || (res && l.reservationId === res.id) || (sess && l.sessionId === sess.id);
     });
-    var addBtn = '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmAddCommTab" data-tm-require="edit" style="margin-bottom:12px">Kayıt ekle</button>';
-    if (!logs.length) return addBtn + '<p class="tm-empty">İletişim kaydı yok.</p>';
+    if (!logs.length) return '<p class="tm-empty">İletişim kaydı yok.</p>';
     var rows = logs.map(function (l) {
       return '<tr><td>' + U.formatDateTime(l.createdAt) + '</td><td>' + U.escapeHtml(SL.COMM_CHANNEL[l.channel] || l.channel) +
+        '</td><td>' + contactByCell(l.createdByUserId) +
         '</td><td>' + U.escapeHtml(l.summary) + '</td></tr>';
     }).join('');
-    return addBtn + '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Kanal</th><th>Özet</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    return '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Kanal</th><th>İletişim Kuran</th><th>Özet</th></tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
   function auditUserName(userId) {
     var u = (Store.getUsers ? Store.getUsers() : []).find(function (x) { return x.id === userId; });
     return u ? U.fullName(u.firstName, u.lastName) : 'Sistem';
+  }
+
+  // İletişimi kuran kullanıcı (Trial Class Manager) — ad + rol.
+  function contactByCell(userId) {
+    var u = (Store.getUsers ? Store.getUsers() : []).find(function (x) { return x.id === userId; });
+    if (!u) return '<span class="tm-comm-by-name">Sistem</span>';
+    var role = (SL.USER_ROLE && SL.USER_ROLE[u.role]) || '';
+    return '<span class="tm-comm-by-name">' + U.escapeHtml(U.fullName(u.firstName, u.lastName)) + '</span>' +
+      (role ? '<span class="tm-comm-by-role">' + U.escapeHtml(role) + '</span>' : '');
+  }
+
+  function formatAuditValue(v) {
+    if (v == null || v === '') return '—';
+    if (typeof v === 'object') {
+      if (v.sessionId) return (Store.getLessonCode ? Store.getLessonCode(v.sessionId) : v.sessionId);
+      if (v.date || v.startTime) return U.formatDateKey(v.date || '') + (v.startTime ? ' ' + v.startTime : '');
+      return Object.keys(v).map(function (k) { return k + ': ' + v[k]; }).join(', ');
+    }
+    return String(v);
   }
 
   function renderAudit(id) {
@@ -167,12 +306,18 @@
     }).slice().sort(function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); });
     if (!logs.length) return '<p class="tm-empty">Değişiklik geçmişi yok.</p>';
     var rows = logs.map(function (l) {
+      var hasOld = l.previousValue !== undefined && l.previousValue !== null && l.previousValue !== '';
+      var hasNew = l.newValue !== undefined && l.newValue !== null && l.newValue !== '';
+      var oldCell = hasOld ? '<span class="tm-audit-old">' + U.escapeHtml(formatAuditValue(l.previousValue)) + '</span>' : '<span class="tm-audit-none">—</span>';
+      var newCell = hasNew ? '<span class="tm-audit-new">' + U.escapeHtml(formatAuditValue(l.newValue)) + '</span>' : '<span class="tm-audit-none">—</span>';
       return '<tr><td>' + U.formatDateTime(l.createdAt) + '</td>' +
-        '<td><span class="tm-audit-who">' + U.escapeHtml(auditUserName(l.createdByUserId)) + '</span></td>' +
-        '<td>' + U.escapeHtml(SL.AUDIT_ACTION[l.action] || l.action) + '</td>' +
+        '<td>' + contactByCell(l.createdByUserId) + '</td>' +
+        '<td><span class="tm-audit-action">' + U.escapeHtml(SL.AUDIT_ACTION[l.action] || l.action) + '</span></td>' +
+        '<td>' + oldCell + '</td>' +
+        '<td>' + newCell + '</td>' +
         '<td>' + U.escapeHtml(l.description) + (l.reason ? '<span class="tm-audit-reason">Neden: ' + U.escapeHtml(l.reason) + '</span>' : '') + '</td></tr>';
     }).join('');
-    return '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Kişi</th><th>İşlem</th><th>Açıklama</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    return '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Kişi</th><th>İşlem</th><th>Eski Durum</th><th>Yeni Durum</th><th>Açıklama</th></tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
   function openCommForm(ctx) {
@@ -230,7 +375,7 @@
           parentId: res ? res.parentId : undefined,
           studentId: res ? res.studentId : undefined
         });
-        if (res && Store.updateParentApproval) Store.updateParentApproval(res.id, result);
+        if (res && Store.updateParentApproval && (result === 'unreachable' || result === 'call_again')) Store.updateParentApproval(res.id, result);
         U.notifySuccess(label + ' kaydedildi.');
         notifyChange();
         open(currentId, activeTab);
@@ -283,9 +428,8 @@
         label: 'Ders oturumu',
         value: r.selectedSessionId || '',
         options: sessions.map(function (s) {
-          var lt = Store.getLessonTypeById(s.lessonTypeId);
-          var rem = global.TMSchedulingRules ? global.TMSchedulingRules.getSessionRemainingCapacity(s.id) : 0;
-          return { value: s.id, label: U.formatDateKey(s.date) + ' ' + s.startTime + ' · ' + (lt ? lt.name : '') + ' (boş: ' + rem + ')' };
+          var code = Store.getLessonCode ? Store.getLessonCode(s) : s.id;
+          return { value: s.id, label: code + ' · ' + U.formatDateKey(s.date) + ' ' + s.startTime + (s.endTime ? '–' + s.endTime : '') };
         })
       }],
       onSubmit: function (data) {
@@ -341,11 +485,50 @@
     var approveBtn = body.querySelector('#tmApproveParent');
     if (approveBtn) approveBtn.onclick = function () { recordApproval(ctx); };
 
-    var unreach = body.querySelector('#tmMarkUnreachable');
-    if (unreach) unreach.onclick = function () { recordContact(ctx, 'unreachable', 'Ulaşılamadı'); };
+    // Stepper ile adımlar arasında gezinme
+    body.querySelectorAll('[data-goto-step]').forEach(function (stepBtn) {
+      stepBtn.onclick = function () {
+        viewStep = parseInt(stepBtn.getAttribute('data-goto-step'), 10) || 1;
+        contactEditing = null;
+        renderTab(body, currentId, activeTab);
+      };
+    });
 
-    var callAgain = body.querySelector('#tmMarkCallAgain');
-    if (callAgain) callAgain.onclick = function () { recordContact(ctx, 'call_again', 'Tekrar aranacak'); };
+    // İletişim durumu seçenekleri (pill)
+    body.querySelectorAll('[data-contact-opt]').forEach(function (pillBtn) {
+      pillBtn.onclick = function () {
+        body.querySelectorAll('[data-contact-opt]').forEach(function (p) { p.classList.remove('is-selected'); });
+        pillBtn.classList.add('is-selected');
+      };
+    });
+
+    // Sonuç ekranından düzenlemeye geç / vazgeç
+    var contactEditBtn = body.querySelector('#tmContactEdit');
+    if (contactEditBtn) contactEditBtn.onclick = function () { contactEditing = true; viewStep = 1; renderTab(body, currentId, activeTab); };
+    var contactCancelBtn = body.querySelector('#tmContactCancel');
+    if (contactCancelBtn) contactCancelBtn.onclick = function () { contactEditing = false; renderTab(body, currentId, activeTab); };
+
+    var contactSaveBtn = body.querySelector('#tmContactSave');
+    if (contactSaveBtn) {
+      contactSaveBtn.onclick = function () {
+        if (!guard('edit')) return;
+        var selected = body.querySelector('.tm-contact-pill.is-selected');
+        var channelEl = body.querySelector('#tmContactChannel');
+        var noteEl = body.querySelector('#tmContactNote');
+        var status = selected ? selected.getAttribute('data-contact-opt') : '';
+        if (!status) { U.notifyError('Lütfen bir durum seçin: Olumlu, Olumsuz veya Ulaşılamadı.'); return; }
+        if (!channelEl || !channelEl.value) { U.notifyError('Lütfen iletişim kanalını seçin.'); return; }
+        if (!noteEl || !noteEl.value.trim()) { U.notifyError('Lütfen açıklama girin.'); return; }
+        var result = Store.setRequestContactStatus(currentId, { status: status, channel: channelEl.value, note: noteEl.value });
+        if (!result.ok) { U.notifyError(result.error); return; }
+        U.notifySuccess('İletişim durumu kaydedildi.');
+        notifyChange();
+        contactEditing = false;
+        // Olumlu ise ders atama adımına ilerle; değilse sonuç ekranını göster.
+        viewStep = status === 'positive' ? 2 : 1;
+        renderTab(body, currentId, activeTab);
+      };
+    }
 
     var linkBtn = body.querySelector('#tmMarkLink');
     if (linkBtn && res) {
@@ -357,45 +540,9 @@
       };
     }
 
-    var rejectBtn = body.querySelector('#tmRejectReq');
-    if (rejectBtn && Confirm) {
-      rejectBtn.onclick = function () {
-        if (!guard('cancel')) return;
-        Confirm.open({
-          title: 'Talebi reddet',
-          warning: 'Bağlı rezervasyon varsa iptal edilecektir.',
-          onConfirm: function (reason) {
-            var result = Store.rejectRequest(currentId, reason);
-            if (!result.ok) U.notifyError(result.error);
-            else { U.notifySuccess('Talep reddedildi.'); notifyChange(); open(currentId, 0); }
-          }
-        });
-      };
-    }
-
-    var commBtn = body.querySelector('#tmAddComm') || body.querySelector('#tmAddCommTab');
+    // İletişim sekmesindeki "Kayıt ekle" butonu
+    var commBtn = body.querySelector('#tmAddCommTab');
     if (commBtn) commBtn.onclick = function () { openCommForm(ctx); };
-
-    var copyBtn = body.querySelector('#tmCopyContact');
-    if (copyBtn) {
-      copyBtn.onclick = function () {
-        var approvalLabel = res
-          ? (SL.parentApprovalLabel ? SL.parentApprovalLabel(res.parentApprovalStatus) : res.parentApprovalStatus)
-          : 'Rezervasyon yok';
-        var text = [
-          'DENEME DERSİ · İLETİŞİM KARTI',
-          'Öğrenci: ' + r.studentFirstName + ' ' + r.studentLastName + ' (' + r.studentGrade + ')',
-          'Veli: ' + r.parentFirstName + ' ' + r.parentLastName,
-          'Telefon: ' + r.parentPhone,
-          'E-posta: ' + r.parentEmail,
-          'Ders türü: ' + (ctx.lt ? ctx.lt.name : '—'),
-          'Seçilen ders: ' + (sess ? U.formatDateKey(sess.date) + ' ' + sess.startTime : 'Atanmadı'),
-          'Durum: ' + approvalLabel,
-          'Talep no: ' + r.id
-        ].join('\n');
-        copyText(text);
-      };
-    }
   }
 
   function copyText(text) {
@@ -439,13 +586,15 @@
     if (!Store || !Drawer || !id) return;
     currentId = id;
     activeTab = tab || 0;
+    viewStep = null;
+    contactEditing = null;
     var ctx = context(id);
     if (!ctx) return;
     var r = ctx.r;
+    var code = Store.getReservationCode ? Store.getReservationCode(id) : r.id;
     Drawer.open({
       title: r.studentFirstName + ' ' + r.studentLastName,
-      subtitle: r.id + ' · ' + SL.requestLabel(r.status),
-      expandHref: fullHref(id),
+      subtitle: code,
       tabs: [{ label: 'Talep bilgisi' }, { label: 'İletişim' }, { label: 'Geçmiş' }],
       activeTab: activeTab,
       onTab: function (idx, body) {

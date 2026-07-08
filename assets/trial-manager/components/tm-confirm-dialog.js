@@ -59,6 +59,8 @@
         '<textarea class="tm-crit-input" data-crit-reason rows="3" placeholder="Zorunlu"></textarea></label>';
     }
     el.querySelector('[data-crit-body]').innerHTML = body;
+    var cancelBtn = el.querySelector('[data-crit-cancel]');
+    if (cancelBtn) cancelBtn.textContent = opts.cancelLabel || 'İptal';
     var confirmBtn = el.querySelector('[data-crit-confirm]');
     confirmBtn.textContent = opts.confirmLabel || 'Onayla';
     confirmBtn.className = 'tm-btn ' + (opts.danger !== false ? 'tm-btn--danger' : 'tm-btn--primary');

@@ -701,13 +701,10 @@ a.is-perm-disabled {
   flex-shrink: 0;
 }
 
-.tm-drawer-expand {
-  font-size: 12px;
-  color: #3e3a8e;
-  text-decoration: none;
-}
-
 .tm-drawer-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 32px;
   height: 32px;
   border: none;
@@ -716,7 +713,16 @@ a.is-perm-disabled {
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
-  color: #7a769e;
+  color: #3e3a8e;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+.tm-drawer-close:hover {
+  background: linear-gradient(135deg, #e6087b, #c0066a);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(230, 8, 123, 0.35), 0 0 0 3px rgba(230, 8, 123, 0.18);
+}
+.tm-drawer-close:active {
+  transform: scale(0.94);
 }
 
 .tm-drawer-tabs {
@@ -864,6 +870,7 @@ body.tm-drawer-open { overflow: hidden; }
   color: #28265a;
   font-weight: 500;
 }
+.tm-detail-cell-sub { display: inline-block; font-size: 11px; color: #7a769e; font-weight: 400; margin-left: 4px; }
 
 .tm-detail-actions {
   display: flex;
@@ -898,19 +905,63 @@ body.tm-drawer-open { overflow: hidden; }
   flex-wrap: wrap;
   gap: 8px;
 }
+.tm-action-group-help {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #7a769e;
+}
+.tm-action-group-help strong { color: #4a4778; font-weight: 600; }
 
 .tm-audit-who { font-weight: 600; color: #3e3a8e; white-space: nowrap; }
 .tm-audit-reason { display: block; font-size: 11px; color: #7a769e; margin-top: 2px; font-style: italic; }
+.tm-audit-action { display: inline-block; font-weight: 700; color: #3e3a8e; }
+.tm-audit-old { display: inline-block; color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; padding: 2px 8px; border-radius: 5px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.tm-audit-new { display: inline-block; color: #15803d; background: #dcfce7; border: 1px solid #86efac; padding: 2px 8px; border-radius: 5px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.tm-audit-none { color: #b3afce; }
 
-/* Talep durum adımları (stepper) */
-.tm-req-steps { display: flex; align-items: center; gap: 2px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
-.tm-req-step { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: #9b97c4; white-space: nowrap; flex-shrink: 0; }
-.tm-req-step:not(:last-child)::after { content: ''; width: 14px; height: 2px; background: #e7e3f3; margin: 0 4px; border-radius: 2px; }
-.tm-req-step-dot { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #f1eff9; color: #9b97c4; font-size: 11px; font-weight: 700; border: 1px solid #e7e3f3; }
-.tm-req-step.is-done { color: #3e3a8e; }
-.tm-req-step.is-done .tm-req-step-dot { background: #ece9fa; color: #3e3a8e; border-color: #cbc5e6; }
-.tm-req-step.is-current { color: #e6087b; }
-.tm-req-step.is-current .tm-req-step-dot { background: #e6087b; color: #fff; border-color: #e6087b; box-shadow: 0 0 0 3px rgba(230, 8, 123, 0.15); }
+/* Talep durum adımları (stepper) — belirgin dolu pill izi */
+.tm-req-steps { display: flex; gap: 5px; margin: 0 0 16px; overflow-x: auto; padding-bottom: 2px; }
+.tm-req-step {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 8px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #f1eff9;
+  color: #9b97c4;
+  border: 1px solid #e7e3f3;
+  white-space: nowrap;
+  font-family: inherit;
+  margin: 0;
+}
+button.tm-req-step { cursor: default; }
+.tm-req-step.is-clickable { cursor: pointer; transition: filter 0.12s, box-shadow 0.12s; }
+.tm-req-step.is-clickable:hover { filter: brightness(0.97); }
+.tm-req-step-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #fff;
+  color: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  border: 1.5px solid currentColor;
+  flex-shrink: 0;
+}
+.tm-req-step-label { overflow: hidden; text-overflow: ellipsis; text-align: center; line-height: 1.12; }
+.tm-req-step.is-done { background: #ece9fa; color: #3e3a8e; border-color: #cbc5e6; }
+.tm-req-step.is-done .tm-req-step-dot { background: #6b67b8; color: #fff; border-color: #6b67b8; }
+.tm-req-step.is-current { background: linear-gradient(135deg, #e6087b, #c0066a); color: #fff; border-color: #e6087b; box-shadow: 0 3px 10px rgba(230, 8, 123, 0.3); }
+.tm-req-step.is-current .tm-req-step-dot { background: #fff; color: #e6087b; border-color: #fff; }
 .tm-req-status-banner { padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-bottom: 14px; }
 .tm-req-status-banner.is-rejected { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 
@@ -921,6 +972,100 @@ body.tm-drawer-open { overflow: hidden; }
 .tm-assigned-val { font-size: 14px; font-weight: 600; color: #28265a; }
 .tm-assigned-box.is-empty .tm-assigned-val { font-size: 13px; font-weight: 500; color: #92400e; }
 .tm-assigned-pref { font-size: 12px; font-weight: 500; color: #7a769e; }
+
+/* Talep sihirbazı (mevcut adım paneli) */
+.tm-wizard { margin: 4px 0 14px; padding: 14px 16px; border: 1.5px solid #cbc5e6; border-radius: 12px; background: linear-gradient(180deg, #faf9fd, #f4f2fb); }
+.tm-wizard-head { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; color: #28265a; margin-bottom: 6px; }
+.tm-wizard-num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #e6087b; color: #fff; font-size: 12px; font-weight: 800; flex-shrink: 0; box-shadow: 0 2px 6px rgba(230, 8, 123, 0.3); }
+.tm-wizard-desc { margin: 0 0 12px; font-size: 12.5px; line-height: 1.5; color: #7a769e; }
+.tm-wizard-desc strong { color: #4a4778; font-weight: 600; }
+.tm-wizard-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.tm-wizard-done { padding: 14px; text-align: center; font-size: 14px; font-weight: 700; color: #15803d; background: #dcfce7; border: 1px solid #86efac; border-radius: 8px; }
+
+/* Ders bilgi kartı (sihirbaz kutusunun içinde) */
+.tm-lesson-card { margin: 0 0 12px; padding: 12px 14px; border-radius: 11px; border: 1.5px solid #cbc5e6; background: #fff; box-shadow: 0 1px 3px rgba(40, 38, 90, 0.06); }
+.tm-lesson-card.is-mat { border-left: 4px solid #3e3a8e; }
+.tm-lesson-card.is-fen { border-left: 4px solid #0d9488; }
+.tm-lesson-card.is-pref { background: #fffdf6; border-color: #fcd34d; }
+.tm-lesson-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 7px; }
+.tm-lesson-subject { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 800; color: #28265a; }
+.tm-lesson-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 6px; background: #ece9fa; color: #3e3a8e; font-size: 13px; font-weight: 800; }
+.tm-lesson-card.is-fen .tm-lesson-icon { background: #ccfbf1; color: #0d9488; }
+.tm-lesson-trial { font-size: 10px; font-weight: 800; letter-spacing: 0.08em; color: #b45309; background: #fef3c7; border: 1px solid #fcd34d; padding: 3px 8px; border-radius: 999px; }
+.tm-lesson-when { font-size: 13px; font-weight: 600; color: #4a4778; margin-bottom: 6px; }
+.tm-lesson-id { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 11px; font-weight: 600; color: #7a769e; }
+.tm-lesson-id code { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 11px; font-weight: 700; color: #3e3a8e; background: #f1eff9; padding: 2px 7px; border-radius: 5px; }
+.tm-lesson-flag { font-size: 11px; font-weight: 700; color: #92400e; background: #fef3c7; padding: 2px 8px; border-radius: 999px; }
+.tm-lesson-flag.is-ok { color: #15803d; background: #dcfce7; }
+
+/* Düzenle (kalem) ikon butonu */
+.tm-btn--icon { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.tm-btn--icon svg { display: block; flex-shrink: 0; }
+td .tm-btn--icon { padding: 6px 8px; }
+
+/* İletişim tablosunda "İletişim Kuran" hücresi */
+.tm-comm-by-name { display: block; font-weight: 600; color: #28265a; }
+.tm-comm-by-role { display: block; font-size: 11px; color: #7a769e; }
+
+/* Otomatik rezervasyon kodu (REZTRIAL-...) */
+.tm-res-code { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 10px 14px; border-radius: 10px; background: linear-gradient(135deg, #ece9fa, #f4f2fb); border: 1px solid #cbc5e6; }
+.tm-res-code-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #7a769e; }
+.tm-res-code-val { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 14px; font-weight: 800; color: #3e3a8e; letter-spacing: 0.02em; }
+.tm-res-code-cell { display: inline-block; font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 11px; font-weight: 700; color: #3e3a8e; background: #f1eff9; padding: 2px 7px; border-radius: 5px; white-space: nowrap; }
+.tm-list-card-head .tm-res-code-cell { margin-top: 3px; }
+
+/* Veli iletişim kartı (büyük, adım 1) */
+.tm-contact-card { margin: 6px 0 12px; padding: 13px 14px; border: 1.5px solid #cbc5e6; border-radius: 12px; background: linear-gradient(180deg, #faf9fd, #f1eff9); }
+.tm-contact-head { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #28265a; margin-bottom: 4px; }
+.tm-contact-desc { margin: 0 0 11px; font-size: 11.5px; line-height: 1.45; color: #7a769e; }
+.tm-contact-desc strong { color: #4a4778; font-weight: 600; }
+.tm-contact-field { margin-bottom: 10px; }
+.tm-contact-label { display: block; font-size: 11px; font-weight: 600; color: #4a4778; margin-bottom: 5px; }
+.tm-contact-pills { display: flex; gap: 7px; flex-wrap: wrap; }
+.tm-contact-pill {
+  flex: 1 1 0;
+  min-width: 84px;
+  padding: 9px 8px;
+  border-radius: 9px;
+  border: 1.5px solid #cbc5e6;
+  background: #fff;
+  color: #4a4778;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s, box-shadow 0.12s;
+}
+.tm-contact-pill:hover { border-color: #9b97c4; }
+.tm-contact-pill.is-selected { color: #fff; }
+.tm-contact-pill[data-contact-opt="positive"].is-selected { background: #16a34a; border-color: #16a34a; box-shadow: 0 3px 10px rgba(21, 128, 61, 0.25); }
+.tm-contact-pill[data-contact-opt="negative"].is-selected { background: #dc2626; border-color: #dc2626; box-shadow: 0 3px 10px rgba(220, 38, 38, 0.25); }
+.tm-contact-pill[data-contact-opt="unreachable"].is-selected { background: #d97706; border-color: #d97706; box-shadow: 0 3px 10px rgba(217, 119, 6, 0.25); }
+body.tm-admin-body #tmContactChannel { width: 100%; }
+/* Not: .tm-contact-note aynı zamanda .tm-dg-control — kayma olmaması için element seçiciyle daha yüksek özgüllük */
+body.tm-admin-body textarea.tm-contact-note {
+  width: 100%;
+  resize: vertical;
+  min-height: 76px;
+  line-height: 1.5;
+  padding: 9px 11px;
+  display: block;
+}
+.tm-contact-actions { display: flex; gap: 8px; margin-top: 4px; }
+.tm-contact-save { flex: 1 1 auto; }
+.tm-contact-actions .tm-btn--ghost { flex: 0 0 auto; }
+
+/* İletişim sonucu ekranı (kaydedilmiş durum) */
+.tm-contact-result { padding: 14px 16px; border-radius: 12px; border: 1.5px solid; margin-bottom: 14px; }
+.tm-contact-result-top { margin-bottom: 8px; }
+.tm-contact-result-msg { margin: 0; font-size: 13.5px; line-height: 1.55; font-weight: 600; }
+.tm-contact-result-note { margin: 8px 0 0; font-size: 12.5px; line-height: 1.5; color: #4a4778; }
+.tm-contact-result.is-positive { background: #f0fdf4; border-color: #86efac; }
+.tm-contact-result.is-positive .tm-contact-result-msg { color: #15803d; }
+.tm-contact-result.is-negative { background: #fef2f2; border-color: #fecaca; }
+.tm-contact-result.is-negative .tm-contact-result-msg { color: #b91c1c; }
+.tm-contact-result.is-unreachable { background: #fffbeb; border-color: #fcd34d; }
+.tm-contact-result.is-unreachable .tm-contact-result-msg { color: #b45309; }
 
 .tm-link-box {
   background: #faf9fd;
@@ -1290,10 +1435,13 @@ body.tm-admin-body .tm-dg-control:focus {
 
 .tm-dg-select {
   flex: 0 1 auto;
-  min-width: 0;
-  max-width: 180px;
-  padding-right: 28px;
+  min-width: 172px;
+  max-width: 240px;
+  padding-right: 30px;
   cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tm-dg-select--sort {
@@ -1301,8 +1449,10 @@ body.tm-admin-body .tm-dg-control:focus {
 }
 
 .tm-dg-select--narrow {
+  min-width: 64px;
   max-width: 72px;
   text-align: center;
+  padding-right: 10px;
 }
 
 .tm-dg-count {
@@ -1338,6 +1488,181 @@ body.tm-admin-body .tm-dg-control:focus {
   background: #e9e5f7;
   border-color: #b9b1de;
 }
+
+/* Yeni ders oluştur — yeşil hover, tema uyumlu */
+.tm-dg-action--create {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #15803d;
+}
+.tm-dg-action--create:hover {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  border-color: #15803d;
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(22, 163, 74, 0.28);
+}
+
+/* CSV indir — belirgin, çerçeveli buton */
+.tm-dg-action--csv {
+  background: #fff;
+  border-color: #b9b1de;
+  color: #3e3a8e;
+  font-weight: 700;
+}
+.tm-dg-action--csv:hover {
+  background: linear-gradient(135deg, #3e3a8e, #322e78);
+  border-color: #322e78;
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(62, 58, 142, 0.25);
+}
+
+/* Kare ikon butonu (yalnız ikon) — tüm bölümlerde tek tip */
+.tm-dg-action--iconbtn {
+  width: 36px;
+  min-width: 36px;
+  padding: 0;
+  gap: 0;
+}
+.tm-dg-action--iconbtn svg { display: block; }
+
+/* Planlanmış dersler tablosunda satırlar tıklanabilir — hover ile belli olsun */
+.tm-sessions-table-wrap tbody tr { transition: background 0.12s; }
+.tm-sessions-table-wrap tbody tr:hover { background: #f6f4fc; }
+
+/* Ders detay drawer'ında açıklamalı aksiyon kartları — 3 sütun × 2 satır. */
+.tm-action-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+.tm-action-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  padding: 11px 12px;
+  border: 1.5px solid #cbc5e6;
+  border-radius: 11px;
+  background: #fff;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.12s, box-shadow 0.12s, background 0.12s, transform 0.1s;
+}
+.tm-action-card:hover {
+  border-color: #e6087b;
+  background: #fdf5fa;
+  box-shadow: 0 3px 10px rgba(230, 8, 123, 0.14);
+}
+.tm-action-card:active { transform: scale(0.98); }
+.tm-action-card-title { font-size: 12.5px; font-weight: 700; color: #28265a; line-height: 1.25; }
+.tm-action-card-desc { font-size: 11px; line-height: 1.4; color: #7a769e; }
+.tm-action-card:disabled, .tm-action-card[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+.tm-action-cancel-row { display: flex; justify-content: center; margin-top: 12px; }
+.tm-action-cancel-row .tm-action-card { width: 100%; max-width: 340px; align-items: center; text-align: center; }
+.tm-action-card--danger { border-color: #fecaca; background: #fef2f2; }
+.tm-action-card--danger .tm-action-card-title { color: #b91c1c; }
+.tm-action-card--danger .tm-action-card-desc { color: #c15b5b; }
+.tm-action-card--danger:hover { border-color: #dc2626; background: #fee2e2; box-shadow: 0 3px 10px rgba(220, 38, 38, 0.2); }
+
+@media (max-width: 640px) {
+  .tm-action-cards { grid-template-columns: 1fr 1fr; }
+  .tm-cap-stats { grid-template-columns: 1fr; }
+}
+
+/* Tamamlanmış / iptal edilmiş ders — düzenlenemez notu */
+.tm-locked-note {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f1eff9;
+  border: 1px solid #cbc5e6;
+  color: #4a4778;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Katılımcılar sekmesi — kapasite özet kutuları (3 yan yana) */
+.tm-cap-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.tm-cap-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 12px 10px;
+  border-radius: 11px;
+  border: 1.5px solid #cbc5e6;
+  background: #faf9fd;
+}
+.tm-cap-num { font-size: 24px; font-weight: 800; line-height: 1; color: #28265a; }
+.tm-cap-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: #7a769e; text-align: center; }
+.tm-cap-box.is-total { background: #ece9fa; border-color: #cbc5e6; }
+.tm-cap-box.is-total .tm-cap-num { color: #3e3a8e; }
+.tm-cap-box.is-enrolled { background: #f0fdf4; border-color: #86efac; }
+.tm-cap-box.is-enrolled .tm-cap-num { color: #15803d; }
+.tm-cap-box.is-free { background: #fffbeb; border-color: #fcd34d; }
+.tm-cap-box.is-free .tm-cap-num { color: #b45309; }
+
+/* Sağ drawer içeriği — kompakt, okunur stil (abartısız) */
+.tm-drawer-body .tm-detail-grid { gap: 6px; }
+.tm-drawer-body .tm-detail-grid > div {
+  padding: 6px 9px;
+  background: #faf9fd;
+  border: 1px solid #ece9f6;
+  border-radius: 8px;
+}
+.tm-drawer-body .tm-detail-cell-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.03em; }
+.tm-drawer-body .tm-detail-cell-value { font-size: 12px; font-weight: 600; margin-top: 1px; line-height: 1.35; }
+.tm-drawer-body .tm-inner-table { font-size: 12.5px; }
+.tm-drawer-body .tm-inner-table th {
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 10.5px;
+  color: #6b6797;
+  background: #f1eff9;
+  border-bottom: 1px solid #e0dbf2;
+}
+.tm-drawer-body .tm-inner-table td { color: #34315f; }
+.tm-drawer-body .tm-inner-table tbody tr:hover { background: #faf9fd; }
+.tm-drawer-body .tm-inner-table tbody tr:last-child td { border-bottom: none; }
+.tm-drawer-body .tm-inner-table .tm-row-index { width: 28px; text-align: center; font-weight: 700; color: #7a769e; }
+.tm-row-actions { display: inline-flex; gap: 6px; align-items: center; }
+
+/* Öğrenci detay modalı içerik ızgarası */
+.tm-detail-grid--modal { gap: 8px; margin-bottom: 0; }
+.tm-detail-grid--modal > div {
+  padding: 8px 10px;
+  background: #faf9fd;
+  border: 1px solid #ece9f6;
+  border-radius: 8px;
+}
+.tm-detail-grid--modal .tm-detail-cell-label { font-size: 10px; font-weight: 700; letter-spacing: 0.03em; }
+.tm-detail-grid--modal .tm-detail-cell-value { font-size: 13px; font-weight: 600; margin-top: 2px; }
+
+/* Ders Linki — öğretmen erişimi 2 sütun */
+.tm-teacher-access {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+.tm-teacher-access-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #e0dbf2;
+}
+.tm-teacher-access-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: #7a769e; }
+.tm-teacher-access-name { font-size: 13.5px; font-weight: 700; color: #28265a; }
 
 body.tm-admin-body .tm-panel--datagrid .tm-res-table th {
   position: sticky;
@@ -1404,6 +1729,12 @@ body.tm-admin-body .tm-res-table td {
   vertical-align: middle;
 }
 
+/* Sütunlar arası dikey ayırıcı çizgiler */
+body.tm-admin-body .tm-res-table th:not(:last-child),
+body.tm-admin-body .tm-res-table td:not(:last-child) {
+  border-right: 1px solid #ece9f6;
+}
+
 body.tm-admin-body .tm-res-table th {
   font-size: 11px;
   font-weight: 600;
@@ -1443,6 +1774,29 @@ body.tm-admin-body .tm-pagination-btn.is-active {
   background: #3e3a8e;
   border-color: #3e3a8e;
   color: #fff;
+}
+
+body.tm-admin-body .tm-pagination-btn:hover:not(.is-active):not([disabled]) {
+  background: #f1eff9;
+  border-color: #cbc5e6;
+}
+
+body.tm-admin-body .tm-pagination-nav {
+  font-weight: 700;
+  color: #3e3a8e;
+}
+
+body.tm-admin-body .tm-pagination-btn[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+body.tm-admin-body .tm-pagination-gap {
+  display: inline-flex;
+  align-items: flex-end;
+  padding: 0 2px;
+  color: #9b97c4;
+  font-size: 13px;
 }
 
 body.tm-admin-body .tm-panel--datagrid {

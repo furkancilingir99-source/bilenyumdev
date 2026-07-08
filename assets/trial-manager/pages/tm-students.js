@@ -88,52 +88,49 @@
     Drawer.open({
       title: U.fullName(student.firstName, student.lastName),
       subtitle: student.grade + ' · ' + (lt ? lt.name : ''),
-      tabs: [{ label: 'Başvuru' }, { label: 'Rezervasyonlar' }, { label: 'İletişim' }],
+      tabs: [{ label: 'Başvuru' }, { label: 'Rezervasyonlar' }],
       onTab: function (idx, body) {
         if (idx === 0) {
+          var pa0 = parents[0];
           body.innerHTML =
-            '<p class="tm-source-notice">' + SL.dataSourceBadge(student.source || 'trial_lesson_application') + '</p>' +
-            '<div class="tm-detail-actions tm-detail-actions--wrap" style="margin-bottom:12px">' +
-              (reqId ? '<a class="tm-btn tm-btn--sm tm-btn--ghost" href="deneme-dersi-yoneticisi-rezervasyonlar.html?id=' + encodeURIComponent(reqId) + '">Başvuru detayı</a> ' : '') +
-              '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-correct-student data-tm-require="edit-application-student">Başvuru bilgisini düzelt</button> ' +
-              (student.status === 'attended' || student.status === 'confirmed' ?
-                '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-enroll="' + student.id + '" data-tm-require="edit">Kayıt oldu</button>' : '') +
-            '</div>' +
             '<div class="tm-detail-grid">' +
-            '<div><div class="tm-detail-cell-label">Ad soyad</div><div class="tm-detail-cell-value">' + U.escapeHtml(U.fullName(student.firstName, student.lastName)) + '</div></div>' +
-            '<div><div class="tm-detail-cell-label">Yaş</div><div class="tm-detail-cell-value">' + student.age + '</div></div>' +
-            '<div><div class="tm-detail-cell-label">Sınıf / Seviye</div><div class="tm-detail-cell-value">' + U.escapeHtml(student.grade) + ' · ' + U.escapeHtml(student.level) + '</div></div>' +
-            '<div><div class="tm-detail-cell-label">İstenen ders</div><div class="tm-detail-cell-value">' + (lt ? lt.name : '—') + '</div></div>' +
-            '<div><div class="tm-detail-cell-label">Durum</div><div class="tm-detail-cell-value">' + SL.studentBadge(student.status) + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Öğrenci Adı</div><div class="tm-detail-cell-value">' + U.escapeHtml(U.fullName(student.firstName, student.lastName)) + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Öğrenci ID</div><div class="tm-detail-cell-value"><code class="tm-res-code-cell">' + U.escapeHtml(studentCode(student)) + '</code></div></div>' +
+            '<div><div class="tm-detail-cell-label">Sınıf</div><div class="tm-detail-cell-value">' + U.escapeHtml(student.grade) + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Ders</div><div class="tm-detail-cell-value">' + U.escapeHtml(lt ? lt.name : '—') + '</div></div>' +
             '<div><div class="tm-detail-cell-label">Veli</div><div class="tm-detail-cell-value">' + parents.map(function (p) {
               return '<a class="tm-panel-link" href="deneme-dersi-yoneticisi-veliler.html?id=' + encodeURIComponent(p.id) + '">' + U.escapeHtml(U.fullName(p.firstName, p.lastName)) + '</a>';
             }).join(', ') + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Veli Telefon</div><div class="tm-detail-cell-value">' + (pa0 ? U.escapeHtml(pa0.phone) : '—') + '</div></div>' +
+            '<div><div class="tm-detail-cell-label">Veli E-posta</div><div class="tm-detail-cell-value">' + (pa0 ? U.escapeHtml(pa0.email) : '—') + '</div></div>' +
             (student.notes ? '<div><div class="tm-detail-cell-label">Operasyon notu</div><div class="tm-detail-cell-value">' + U.escapeHtml(student.notes) + '</div></div>' : '') +
+            '</div>' +
+            '<div style="display:flex;justify-content:center;margin-top:14px">' +
+              '<a class="tm-btn tm-btn--primary" href="deneme-dersi-yoneticisi-rezervasyonlar.html' + (reqId ? '?id=' + encodeURIComponent(reqId) : '') + '">Detaylı İncele</a>' +
             '</div>';
-          body.querySelector('[data-correct-student]') && body.querySelector('[data-correct-student]').addEventListener('click', function () {
-            openCorrectStudent(Store.getStudentById(student.id) || student);
-          });
-          body.querySelector('[data-enroll]') && body.querySelector('[data-enroll]').addEventListener('click', function () {
-            if (!Perms.guard('edit')) return;
-            var result = Store.convertStudentToEnrollment(student.id);
-            if (!result.ok) U.notifyError(result.error);
-            else {
-              U.notifySuccess('Öğrenci kayda dönüştürüldü.');
-              if (window.TMOnSessionChange) window.TMOnSessionChange();
-              render();
-            }
-          });
           if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(body);
         } else if (idx === 1) {
-          body.innerHTML = resHistory.length ? '<table class="tm-inner-table"><thead><tr><th>Rezervasyon</th><th>Durum</th><th>Link</th><th></th></tr></thead><tbody>' +
+          body.innerHTML = resHistory.length ? '<table class="tm-inner-table"><thead><tr><th>Atandığı Ders</th><th>Ders ID</th><th>Rezervasyon ID</th><th>Ders Tarihi</th><th>Ders Saati</th><th>İşlem</th></tr></thead><tbody>' +
             resHistory.map(function (r) {
               var s = Store.getSessionById(r.sessionId);
-              return '<tr><td>' + (s ? U.formatDateKey(s.date) + ' ' + s.startTime : r.sessionId) + '</td><td>' + SL.reservationBadge(r.status) + '</td><td>' + (r.linkSent ? 'Evet' : 'Hayır') + '</td><td>' +
-                (s ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-open-session="' + s.id + '">Ders</button>' : '') + '</td></tr>';
+              var lt2 = s ? Store.getLessonTypeById(s.lessonTypeId) : null;
+              var code = (s && Store.getLessonCode) ? Store.getLessonCode(s) : (s ? s.id : '—');
+              return '<tr data-res-detail="' + r.id + '" style="cursor:pointer">' +
+                '<td>' + U.escapeHtml(lt2 ? lt2.name : '—') + '</td>' +
+                '<td><code class="tm-res-code-cell">' + U.escapeHtml(code) + '</code></td>' +
+                '<td><code class="tm-res-code-cell">' + U.escapeHtml(reservationCode(r)) + '</code></td>' +
+                '<td>' + (s ? U.escapeHtml(U.formatDateKey(s.date)) : '—') + '</td>' +
+                '<td>' + (s ? U.escapeHtml(s.startTime + '–' + s.endTime) : '—') + '</td>' +
+                '<td style="white-space:nowrap"><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-res-detail="' + r.id + '">İncele</button></td>' +
+              '</tr>';
             }).join('') + '</tbody></table>' : '<p class="tm-empty">Rezervasyon yok.</p>';
-          body.querySelectorAll('[data-open-session]').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-              if (window.TMSessionDetail) window.TMSessionDetail.open(btn.getAttribute('data-open-session'));
+          body.querySelectorAll('button[data-res-detail]').forEach(function (btn) {
+            btn.addEventListener('click', function (e) { e.stopPropagation(); showReservationDetail(btn.getAttribute('data-res-detail')); });
+          });
+          body.querySelectorAll('tr[data-res-detail]').forEach(function (tr) {
+            tr.addEventListener('click', function (e) {
+              if (e.target.closest('button')) return;
+              showReservationDetail(tr.getAttribute('data-res-detail'));
             });
           });
         } else {
@@ -147,42 +144,117 @@
   }
 
   function filtered() {
-    return U.filterSearch(Store.getStudents(), searchInput ? searchInput.value : '', function (st) {
+    var items = U.filterSearch(Store.getStudents(), searchInput ? searchInput.value : '', function (st) {
       return st.firstName + ' ' + st.lastName + ' ' + st.grade;
     });
+    // Alfabetik (ad soyad) sıralama
+    return U.sortBy(items, function (st) {
+      return U.fullName(st.firstName, st.lastName).toLocaleLowerCase('tr');
+    }, 'asc');
+  }
+
+  var EDIT_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>';
+  function studentCode(st) {
+    var m = String(st.id || '').match(/(\d+)\s*$/);
+    return 'trialstudent-' + (m ? m[1].padStart(4, '0') : '0000');
+  }
+  function editBtn(id) {
+    return '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-detail="' + id + '" title="Düzenle" aria-label="Düzenle">' + EDIT_ICON + '</button>';
+  }
+
+  function contactBadge(status) {
+    if (status === 'positive') return '<span class="tm-badge tm-badge--green">Olumlu</span>';
+    if (status === 'negative') return '<span class="tm-badge tm-badge--red">Olumsuz</span>';
+    if (status === 'unreachable') return '<span class="tm-badge tm-badge--orange">Ulaşılamadı</span>';
+    return '<span class="tm-badge tm-badge--muted">Görüşülmedi</span>';
+  }
+  function assignmentBadge(done) {
+    return done
+      ? '<span class="tm-badge tm-badge--green">Yapıldı</span>'
+      : '<span class="tm-badge tm-badge--orange">Yapılmadı</span>';
+  }
+  // Rezervasyon görünen kodu — mümkünse talebin REZTRIAL kodu, değilse rezervasyondan türetilir.
+  function reservationCode(r) {
+    if (r.requestId && Store.getReservationCode) {
+      var c = Store.getReservationCode(r.requestId);
+      if (c) return c;
+    }
+    var s = r.sessionId ? Store.getSessionById(r.sessionId) : null;
+    var dateKey = (s && s.date) ? s.date : (r.createdAt ? String(r.createdAt).slice(0, 10) : '');
+    var compact = dateKey ? dateKey.replace(/-/g, '') : '00000000';
+    var m = String(r.id).match(/(\d+)\s*$/);
+    return 'REZTRIAL-' + compact + '-' + (m ? m[1].padStart(4, '0') : '0000');
+  }
+
+  function infoCell(label, value) {
+    return '<div><div class="tm-detail-cell-label">' + label + '</div><div class="tm-detail-cell-value">' + value + '</div></div>';
+  }
+  function openInfoModal(title, bodyHtml) {
+    var existing = document.getElementById('tmInfoModal');
+    if (existing) existing.parentNode.removeChild(existing);
+    var overlay = document.createElement('div');
+    overlay.className = 'tm-crit-overlay is-open';
+    overlay.id = 'tmInfoModal';
+    overlay.innerHTML =
+      '<div class="tm-crit-dialog" role="dialog" aria-modal="true">' +
+        '<header class="tm-crit-head"><h2 class="tm-crit-title">' + title + '</h2></header>' +
+        '<div class="tm-crit-body">' + bodyHtml + '</div>' +
+        '<footer class="tm-crit-foot"><button type="button" class="tm-btn tm-btn--primary" data-modal-close>Kapat</button></footer>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    function close() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); document.removeEventListener('keydown', onKey); }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    overlay.addEventListener('click', function (e) { if (e.target === overlay || e.target.closest('[data-modal-close]')) close(); });
+    document.addEventListener('keydown', onKey);
+  }
+
+  function showReservationDetail(reservationId) {
+    var r = Store.getReservationById(reservationId);
+    if (!r) return;
+    var s = r.sessionId ? Store.getSessionById(r.sessionId) : null;
+    var lt = s ? Store.getLessonTypeById(s.lessonTypeId) : (r.lessonTypeId ? Store.getLessonTypeById(r.lessonTypeId) : null);
+    var req = r.requestId ? Store.getRequestById(r.requestId) : null;
+    var lessonCode = (s && Store.getLessonCode) ? Store.getLessonCode(s) : (s ? s.id : '—');
+    var talepTarihi = req && req.createdAt ? U.formatDateTime(req.createdAt) : (r.createdAt ? U.formatDateTime(r.createdAt) : '—');
+    var contactStatus = req ? req.contactStatus : undefined;
+    var assigned = !!s; // rezervasyon bir derse bağlıysa atama yapılmıştır
+    var body = '<div class="tm-detail-grid tm-detail-grid--modal">' +
+      infoCell('Talep tarihi', U.escapeHtml(talepTarihi)) +
+      infoCell('Rezervasyon Adı', '<code class="tm-res-code-cell">' + U.escapeHtml(reservationCode(r)) + '</code>') +
+      infoCell('İstenen Ders', U.escapeHtml(lt ? lt.name : '—')) +
+      infoCell('Ders Tarihi', U.escapeHtml(s ? U.formatDateKey(s.date) : '—')) +
+      infoCell('Ders Saati', U.escapeHtml(s ? (s.startTime + '–' + s.endTime) : '—')) +
+      infoCell('Ders ID', '<code class="tm-res-code-cell">' + U.escapeHtml(lessonCode) + '</code>') +
+      infoCell('İletişim Durumu', contactBadge(contactStatus)) +
+      infoCell('Ders Ataması', assignmentBadge(assigned)) +
+      infoCell('Sınıf', U.escapeHtml(s ? (s.gradeLevel || '—') : '—')) +
+    '</div>';
+    openInfoModal('Rezervasyon Detayı', body);
   }
 
   function rowHtml(st) {
-    var lt = Store.getLessonTypeById(st.requestedLessonTypeId);
     var pa = st.parentIds[0] ? Store.getParentById(st.parentIds[0]) : null;
-    var cur = currentReservation(st.id);
-    var sess = cur ? Store.getSessionById(cur.sessionId) : null;
     return '<tr data-id="' + st.id + '" style="cursor:pointer">' +
+      '<td><code class="tm-res-code-cell">' + U.escapeHtml(studentCode(st)) + '</code></td>' +
       '<td>' + U.escapeHtml(U.fullName(st.firstName, st.lastName)) + '</td>' +
-      '<td>' + st.age + '</td><td>' + U.escapeHtml(st.grade) + '</td><td>' + U.escapeHtml(st.level) + '</td>' +
-      '<td>' + (lt ? lt.name : '—') + '</td>' +
+      '<td>' + U.escapeHtml(st.grade) + '</td>' +
       '<td>' + (pa ? U.escapeHtml(U.fullName(pa.firstName, pa.lastName)) : '—') + '</td>' +
       '<td>' + (pa ? U.escapeHtml(pa.phone) : '—') + '</td>' +
-      '<td>' + (sess ? U.formatDateKey(sess.date) + ' ' + sess.startTime : '—') + '</td>' +
-      '<td>' + SL.studentBadge(st.status) + '</td>' +
-      '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + st.id + '">Detay</button></td></tr>';
+      '<td>' + (pa ? U.escapeHtml(pa.email) : '—') + '</td>' +
+      '<td style="white-space:nowrap">' + editBtn(st.id) + '</td></tr>';
   }
 
   function cardHtml(st) {
-    var lt = Store.getLessonTypeById(st.requestedLessonTypeId);
     var pa = st.parentIds[0] ? Store.getParentById(st.parentIds[0]) : null;
-    var cur = currentReservation(st.id);
-    var sess = cur ? Store.getSessionById(cur.sessionId) : null;
     return '<article class="tm-list-card" data-id="' + st.id + '">' +
-      '<div class="tm-list-card-head"><div><strong>' + U.escapeHtml(U.fullName(st.firstName, st.lastName)) + '</strong></div>' +
-      SL.studentBadge(st.status) + '</div>' +
+      '<div class="tm-list-card-head"><div><strong>' + U.escapeHtml(U.fullName(st.firstName, st.lastName)) + '</strong><code class="tm-res-code-cell">' + U.escapeHtml(studentCode(st)) + '</code></div>' +
+      editBtn(st.id) + '</div>' +
       '<div class="tm-list-card-body">' +
-        '<div><span class="tm-list-card-label">Sınıf</span> ' + U.escapeHtml(st.grade) + ' · ' + U.escapeHtml(st.level) + '</div>' +
-        '<div><span class="tm-list-card-label">Ders</span> ' + U.escapeHtml(lt ? lt.name : '—') + '</div>' +
+        '<div><span class="tm-list-card-label">Sınıf</span> ' + U.escapeHtml(st.grade) + '</div>' +
         '<div><span class="tm-list-card-label">Veli</span> ' + (pa ? U.escapeHtml(U.fullName(pa.firstName, pa.lastName)) : '—') + '</div>' +
-        '<div><span class="tm-list-card-label">Rezervasyon</span> ' + (sess ? U.formatDateKey(sess.date) + ' ' + sess.startTime : '—') + '</div>' +
+        '<div><span class="tm-list-card-label">Telefon</span> ' + (pa ? U.escapeHtml(pa.phone) : '—') + '</div>' +
+        '<div><span class="tm-list-card-label">Veli E-posta</span> ' + (pa ? U.escapeHtml(pa.email) : '—') + '</div>' +
       '</div>' +
-      '<div class="tm-list-card-foot"><button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-detail="' + st.id + '">Detay</button></div>' +
     '</article>';
   }
 

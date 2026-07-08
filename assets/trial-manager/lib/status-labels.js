@@ -9,7 +9,7 @@
     scheduled: { label: 'Planlandı', badge: 'tm-badge--blue' },
     confirmed: { label: 'Onaylandı', badge: 'tm-badge--green' },
     completed: { label: 'Tamamlandı', badge: 'tm-badge--purple' },
-    cancelled: { label: 'İptal', badge: 'tm-badge--red' },
+    cancelled: { label: 'İptal Edildi', badge: 'tm-badge--red' },
     rescheduled: { label: 'Yeniden Planlandı', badge: 'tm-badge--orange' }
   };
 
@@ -81,6 +81,8 @@
 
   var COMM_RESULT = {
     not_called: 'Aranmadı',
+    reached: 'Ulaşıldı',
+    declined: 'Olumsuz',
     unreachable: 'Ulaşılamadı',
     approved: 'Onayladı',
     rejected: 'Reddetti',
@@ -110,7 +112,9 @@
 
   var AUDIT_ACTION = {
     created: 'Oluşturuldu',
+    create: 'Oluşturuldu',
     updated: 'Güncellendi',
+    update: 'Güncellendi',
     application_contact_corrected: 'Başvuru iletişimi düzeltildi',
     application_student_corrected: 'Başvuru öğrenci bilgisi düzeltildi',
     operational_note_updated: 'Operasyon notu güncellendi',

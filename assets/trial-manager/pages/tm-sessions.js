@@ -95,24 +95,37 @@
     }
   }
 
+  // Derse gerçekten atanmış (aktif) rezervasyonlar — iptal/taşınanlar hariç.
+  function activeReservations(d) {
+    return d.reservations.filter(function (r) {
+      return r.status !== 'cancelled' && r.status !== 'rescheduled';
+    });
+  }
+
   function rowData(s) {
     var d = Store.getSessionWithDetails(s.id);
     var meeting = d.meeting;
-    var pendingParent = d.reservations.filter(function (r) {
+    var active = activeReservations(d);
+    var pendingParent = active.filter(function (r) {
       return r.parentApprovalStatus !== 'approved';
     }).length;
-    var linkNotSent = d.reservations.filter(function (r) {
+    var linkNotSent = active.filter(function (r) {
       return r.parentApprovalStatus === 'approved' && !r.linkSent;
     }).length;
+    var capacity = s.capacity || (d.lessonType && d.lessonType.defaultCapacity) || 20;
+    var enrolled = active.length;
     return {
       session: s,
       detail: d,
       lessonName: d.lessonType ? d.lessonType.name : '—',
+      gradeLevel: s.gradeLevel || '—',
+      lessonCode: Store.getLessonCode ? Store.getLessonCode(s) : s.id,
       pdrTeacherName: d.pdrTeacher ? U.fullName(d.pdrTeacher.firstName, d.pdrTeacher.lastName) : '—',
       branchTeacherName: d.branchTeacher ? U.fullName(d.branchTeacher.firstName, d.branchTeacher.lastName) : '—',
       missingTeachers: Rules && Rules.sessionMissingTeachers ? Rules.sessionMissingTeachers(s) : (!s.pdrTeacherId || !s.branchTeacherId),
-      enrolled: s.enrolledStudentIds.length,
-      remaining: window.TMSchedulingRules.getSessionRemainingCapacity(s.id),
+      enrolled: enrolled,
+      capacity: capacity,
+      remaining: Math.max(0, capacity - enrolled),
       meetingStatus: meeting ? meeting.status : '—',
       meetingId: meeting ? meeting.meetingId : '—',
       pendingParent: pendingParent,
@@ -203,43 +216,43 @@
     hintEl.textContent = '';
   }
 
+  var EDIT_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>';
+  function editBtn(id) {
+    return '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-detail="' + id + '" title="Düzenle" aria-label="Düzenle">' + EDIT_ICON + '</button>';
+  }
+
   function rowHtml(r) {
     var s = r.session;
-    return '<tr data-id="' + s.id + '">' +
+    return '<tr data-id="' + s.id + '" style="cursor:pointer">' +
+      '<td><code class="tm-res-code-cell">' + U.escapeHtml(r.lessonCode) + '</code></td>' +
+      '<td><code class="tm-res-code-cell">' + U.escapeHtml(String(r.meetingId)) + '</code></td>' +
       '<td>' + U.formatDateKey(s.date) + '</td>' +
       '<td>' + s.startTime + '–' + s.endTime + '</td>' +
       '<td>' + U.escapeHtml(r.lessonName) + '</td>' +
+      '<td>' + U.escapeHtml(r.gradeLevel) + '</td>' +
       '<td>' + U.escapeHtml(r.pdrTeacherName) + (r.missingTeachers && !s.pdrTeacherId ? ' <span class="tm-badge tm-badge--warn">Eksik</span>' : '') + '</td>' +
       '<td>' + U.escapeHtml(r.branchTeacherName) + (r.missingTeachers && !s.branchTeacherId ? ' <span class="tm-badge tm-badge--warn">Eksik</span>' : '') + '</td>' +
-      '<td>' + r.enrolled + '</td><td>20</td><td>' + r.remaining + '</td>' +
-      '<td>' + SL.meetingBadge(r.meetingStatus) + '</td>' +
-      '<td><code style="font-size:11px">' + U.escapeHtml(String(r.meetingId).slice(0, 8)) + '…</code></td>' +
-      '<td>' + r.pendingParent + '</td><td>' + r.linkNotSent + '</td>' +
-      '<td>' + (s.pdrTeacherInformed ? '✓' : '—') + '</td>' +
-      '<td>' + (s.branchTeacherInformed ? '✓' : '—') + '</td>' +
+      '<td>' + r.capacity + '</td><td>' + r.enrolled + '</td><td>' + r.remaining + '</td>' +
       '<td>' + SL.sessionBadge(s.status) + '</td>' +
-      '<td>' + U.formatDateTime(s.updatedAt) + '</td>' +
-      '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-detail="' + s.id + '">Detay</button> ' +
-      '<a class="tm-btn tm-btn--sm tm-btn--ghost" href="deneme-dersi-yoneticisi-ders-planla.html?edit=' + encodeURIComponent(s.id) + '" data-tm-require="edit">Düzenle</a></td></tr>';
+      '<td style="white-space:nowrap">' + editBtn(s.id) + '</td></tr>';
   }
 
   function cardHtml(r) {
     var s = r.session;
     return '<article class="tm-list-card" data-id="' + s.id + '">' +
       '<div class="tm-list-card-head">' +
-        '<div><strong>' + U.formatDateKey(s.date) + ' · ' + s.startTime + '–' + s.endTime + '</strong></div>' +
+        '<div><strong>' + U.formatDateKey(s.date) + ' · ' + s.startTime + '–' + s.endTime + '</strong><code class="tm-res-code-cell">' + U.escapeHtml(r.lessonCode) + '</code></div>' +
         SL.sessionBadge(s.status) +
       '</div>' +
       '<div class="tm-list-card-body">' +
-        '<div><span class="tm-list-card-label">Ders</span> ' + U.escapeHtml(r.lessonName) + '</div>' +
+        '<div><span class="tm-list-card-label">Ders</span> ' + U.escapeHtml(r.lessonName) + ' · ' + U.escapeHtml(r.gradeLevel) + '</div>' +
         '<div><span class="tm-list-card-label">PDR</span> ' + U.escapeHtml(r.pdrTeacherName) + '</div>' +
         '<div><span class="tm-list-card-label">Branş</span> ' + U.escapeHtml(r.branchTeacherName) + '</div>' +
-        '<div><span class="tm-list-card-label">Kapasite</span> ' + r.enrolled + '/20 · boş ' + r.remaining + '</div>' +
-        '<div><span class="tm-list-card-label">Link</span> ' + SL.meetingBadge(r.meetingStatus) +
-          (r.linkNotSent ? ' · <span class="tm-badge tm-badge--warn">' + r.linkNotSent + ' bekliyor</span>' : '') + '</div>' +
+        '<div><span class="tm-list-card-label">Kapasite</span> ' + r.enrolled + '/' + r.capacity + ' · boş ' + r.remaining + '</div>' +
+        '<div><span class="tm-list-card-label">Meeting ID</span> <code class="tm-res-code-cell">' + U.escapeHtml(String(r.meetingId)) + '</code></div>' +
       '</div>' +
       '<div class="tm-list-card-foot">' +
-        '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-detail="' + s.id + '">Detay</button>' +
+        '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-detail="' + s.id + '" title="Düzenle" aria-label="Düzenle">' + EDIT_ICON + ' Düzenle</button>' +
       '</div>' +
     '</article>';
   }

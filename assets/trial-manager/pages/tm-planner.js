@@ -16,6 +16,7 @@
   var editId = U.qs('edit');
   var form = document.getElementById('tmPlanForm');
   var typeSelect = document.getElementById('tmPlanType');
+  var gradeSelect = document.getElementById('tmPlanGrade');
   var dateInput = document.getElementById('tmPlanDate');
   var timeSelect = document.getElementById('tmPlanTime');
   var pdrTeacherSelect = document.getElementById('tmPlanPdrTeacher');
@@ -81,6 +82,11 @@
     if (typeSelect) {
       typeSelect.innerHTML = Store.getLessonTypes().map(function (lt) {
         return '<option value="' + lt.id + '">' + lt.name + '</option>';
+      }).join('');
+    }
+    if (gradeSelect && Store.getGrades) {
+      gradeSelect.innerHTML = Store.getGrades().map(function (g) {
+        return '<option value="' + g + '">' + g + '</option>';
       }).join('');
     }
     if (timeSelect) {
@@ -202,6 +208,7 @@
     return {
       id: editId || undefined,
       lessonTypeId: typeSelect ? typeSelect.value : '',
+      gradeLevel: gradeSelect ? gradeSelect.value : '',
       pdrTeacherId: pdrTeacherSelect ? pdrTeacherSelect.value : '',
       branchTeacherId: branchTeacherSelect ? branchTeacherSelect.value : '',
       date: dateInput ? dateInput.value : '',
@@ -233,6 +240,7 @@
     if (typeSelect) {
       typeSelect.value = s.lessonTypeId;
     }
+    if (gradeSelect && s.gradeLevel) gradeSelect.value = s.gradeLevel;
     if (dateInput) dateInput.value = s.date;
     if (timeSelect) timeSelect.value = s.startTime;
     refreshTeachers();
@@ -368,6 +376,10 @@
       if (s && s.branchTeacherId !== draft.branchTeacherId) {
         var res2 = Store.changeSessionBranchTeacher(editId, draft.branchTeacherId, 'Planlama formundan güncellendi');
         if (!res2.ok) { U.notifyError(res2.error); return; }
+      }
+      if (s && draft.gradeLevel && s.gradeLevel !== draft.gradeLevel && Store.changeSessionGradeLevel) {
+        var resGrade = Store.changeSessionGradeLevel(editId, draft.gradeLevel, 'Planlama formundan güncellendi');
+        if (!resGrade.ok) { U.notifyError(resGrade.error); return; }
       }
       if (s && (s.notes || '') !== (draft.notes || '')) {
         Store.updateSessionNotes(editId, draft.notes);

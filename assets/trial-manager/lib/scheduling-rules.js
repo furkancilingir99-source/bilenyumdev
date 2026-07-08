@@ -212,6 +212,9 @@
     if (student.requestedLessonTypeId && student.requestedLessonTypeId !== session.lessonTypeId) {
       return { allowed: false, reason: 'Öğrencinin istediği ders türü ile uyuşmuyor.' };
     }
+    if (session.gradeLevel && student.grade && session.gradeLevel !== student.grade) {
+      return { allowed: false, reason: 'Öğrencinin sınıf seviyesi (' + student.grade + ') ders seviyesi (' + session.gradeLevel + ') ile uyuşmuyor.' };
+    }
     if ((session.enrolledStudentIds || []).indexOf(studentId) >= 0) {
       return { allowed: false, reason: 'Öğrenci zaten bu derste.' };
     }

@@ -171,6 +171,10 @@
   }
 
   function installSessionChangeHook() {
+    // Sayfa scriptleri (tm-sessions.js vb.) DOMContentLoaded'dan önce parse anında
+    // TMOnSessionChange'i düz atama ile set eder. defineProperty bunu ezmesin diye
+    // önce var olan handler'ı yakalayıp sarmalayarak geri veriyoruz.
+    var existing = (typeof global.TMOnSessionChange === 'function') ? global.TMOnSessionChange : null;
     var wrapped = null;
     Object.defineProperty(global, 'TMOnSessionChange', {
       configurable: true,
@@ -183,6 +187,7 @@
         };
       }
     });
+    if (existing) global.TMOnSessionChange = existing;
   }
 
   function ensureLayout() {

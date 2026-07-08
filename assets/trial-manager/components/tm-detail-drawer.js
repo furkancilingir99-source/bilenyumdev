@@ -21,7 +21,6 @@
             '<p class="tm-drawer-sub" data-dr-sub hidden></p>' +
           '</div>' +
           '<div class="tm-drawer-head-actions">' +
-            '<a class="tm-drawer-expand" data-dr-expand href="#" hidden>Tam ekranda aç</a>' +
             '<button type="button" class="tm-drawer-close" data-dr-close aria-label="Kapat">&times;</button>' +
           '</div>' +
         '</header>' +
@@ -55,11 +54,6 @@
       sub.textContent = opts.subtitle;
       sub.hidden = false;
     } else sub.hidden = true;
-    var expand = overlay.querySelector('[data-dr-expand]');
-    if (opts.expandHref) {
-      expand.href = opts.expandHref;
-      expand.hidden = false;
-    } else expand.hidden = true;
     var tabsEl = overlay.querySelector('[data-dr-tabs]');
     if (opts.tabs && opts.tabs.length) {
       tabsEl.hidden = false;

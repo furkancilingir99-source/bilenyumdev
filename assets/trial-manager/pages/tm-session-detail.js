@@ -32,81 +32,184 @@
 
   function renderSummary(d) {
     var s = d.session;
-    var cap = s.enrolledStudentIds.length;
-    var remaining = Rules.getSessionRemainingCapacity(s.id);
+    var assignedCount = d.reservations.filter(function (r) {
+      return r.status !== 'cancelled' && r.status !== 'rescheduled';
+    }).length;
+    var capacity = s.capacity || (d.lessonType && d.lessonType.defaultCapacity) || 20;
+    var remaining = Math.max(0, capacity - assignedCount);
     var pdrName = d.pdrTeacher ? U.fullName(d.pdrTeacher.firstName, d.pdrTeacher.lastName) : '—';
     var branchName = d.branchTeacher ? U.fullName(d.branchTeacher.firstName, d.branchTeacher.lastName) : '—';
+    var lessonCode = Store.getLessonCode ? Store.getLessonCode(s) : s.id;
     return (
       '<div class="tm-detail-grid">' +
+        cell('Deneme Dersi ID', '<code class="tm-res-code-cell">' + U.escapeHtml(lessonCode) + '</code>') +
         cell('Ders türü', d.lessonType ? d.lessonType.name : '—') +
+        cell('Sınıf', U.escapeHtml(s.gradeLevel || '—')) +
         cell('Tarih', U.formatDateKey(s.date)) +
         cell('Saat', U.formatTimeRange(s.startTime, s.endTime)) +
         cell('Süre', '50 dk (PDR veli sunumu 20 + öğrenci denemesi 30)') +
         cell('PDR/Rehberlik Öğretmeni', U.escapeHtml(pdrName)) +
         cell('Branş Öğretmeni', U.escapeHtml(branchName)) +
-        cell('Kapasite', cap + ' / 20 (boş: ' + remaining + ')') +
+        cell('Kapasite', assignedCount + ' / ' + capacity + ' (boş: ' + remaining + ')') +
         cell('Durum', SL.sessionBadge(s.status)) +
         cell('PDR bilgilendirme', s.pdrTeacherInformed ? '<span class="tm-badge tm-badge--green">Bilgilendirildi</span>' : '<span class="tm-badge tm-badge--orange">Bilgilendirilmedi</span>') +
         cell('Branş bilgilendirme', s.branchTeacherInformed ? '<span class="tm-badge tm-badge--green">Bilgilendirildi</span>' : '<span class="tm-badge tm-badge--orange">Bilgilendirilmedi</span>') +
         cell('Son güncelleme', U.formatDateTime(s.updatedAt)) +
       '</div>' +
       (s.notes ? '<p><strong>Not:</strong> ' + U.escapeHtml(s.notes) + '</p>' : '') +
-      '<div class="tm-detail-actions tm-detail-actions--wrap">' +
-        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm" data-act="change-pdr-teacher" data-tm-require="edit">PDR öğretmenini değiştir</button>' +
-        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm" data-act="change-branch-teacher" data-tm-require="edit">Branş öğretmenini değiştir</button>' +
-        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm" data-act="reschedule" data-tm-require="edit">Saat değiştir</button>' +
-        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm" data-act="inform-pdr" data-tm-require="edit">PDR bilgilendir</button>' +
-        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm" data-act="inform-branch" data-tm-require="edit">Branş bilgilendir</button>' +
-        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm" data-act="attendance" data-tm-require="edit">Katılım gir</button>' +
-        '<button type="button" class="tm-btn tm-btn--danger tm-btn--sm" data-act="cancel" data-tm-require="cancel">Dersi iptal et</button>' +
-      '</div>'
+      (s.status === 'completed'
+        ? '<p class="tm-locked-note">Bu ders tamamlanmıştır ve artık düzenlenemez.</p>'
+        : s.status === 'cancelled'
+        ? '<p class="tm-locked-note">Bu ders iptal edilmiştir ve tekrar aktif hale getirilemez.</p>'
+        : '<div class="tm-action-cards">' +
+            actionCard('change-pdr-teacher', 'edit', 'PDR Değiş', 'Derse atanan PDR/rehberlik öğretmenini değiştirin.') +
+            actionCard('change-branch-teacher', 'edit', 'Branş Değiş', 'Derse atanan branş öğretmenini değiştirin.') +
+            actionCard('reschedule', 'edit', 'Tarih Değiştir', 'Dersin tarih ve saatini yeniden planlayın.') +
+            actionCard('inform-pdr', 'edit', 'PDR Bilgilendir', 'PDR öğretmenini ders hakkında bilgilendirin.') +
+            actionCard('inform-branch', 'edit', 'Branş Bilgilendir', 'Branş öğretmenini ders hakkında bilgilendirin.') +
+            actionCard('notify-all-parents', 'edit', 'Velilerin tümünü bilgilendir', 'Derse atanan tüm velilere ders bilgilerini gönderin.') +
+          '</div>' +
+          '<div class="tm-action-cancel-row">' +
+            actionCard('cancel', 'cancel', 'Dersi iptal et', 'Dersi iptal edin; bağlı rezervasyonlar iptal olur, link çalışmaz. Bu işlem geri alınamaz.', true) +
+          '</div>')
     );
+  }
+
+  function actionCard(act, perm, title, desc, danger) {
+    return '<button type="button" class="tm-action-card' + (danger ? ' tm-action-card--danger' : '') + '" data-act="' + act + '" data-tm-require="' + perm + '">' +
+      '<span class="tm-action-card-title">' + U.escapeHtml(title) + '</span>' +
+      '<span class="tm-action-card-desc">' + U.escapeHtml(desc) + '</span>' +
+    '</button>';
   }
 
   function cell(label, value) {
     return '<div><div class="tm-detail-cell-label">' + label + '</div><div class="tm-detail-cell-value">' + value + '</div></div>';
   }
 
+  var EYE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+  var X_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>';
+
+  // Görünen kimlik kodu: trialstudent-0001 / trialparent-0001
+  function personCode(prefix, id) {
+    var m = String(id || '').match(/(\d+)\s*$/);
+    var seq = m ? m[1].padStart(4, '0') : '0000';
+    return prefix + '-' + seq;
+  }
+
+  function openInfoModal(title, bodyHtml) {
+    var existing = document.getElementById('tmInfoModal');
+    if (existing) existing.parentNode.removeChild(existing);
+    var overlay = document.createElement('div');
+    overlay.className = 'tm-crit-overlay is-open';
+    overlay.id = 'tmInfoModal';
+    overlay.innerHTML =
+      '<div class="tm-crit-dialog" role="dialog" aria-modal="true">' +
+        '<header class="tm-crit-head"><h2 class="tm-crit-title">' + title + '</h2></header>' +
+        '<div class="tm-crit-body">' + bodyHtml + '</div>' +
+        '<footer class="tm-crit-foot"><button type="button" class="tm-btn tm-btn--primary" data-modal-close>Kapat</button></footer>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    function close() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); document.removeEventListener('keydown', onKey); }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    overlay.addEventListener('click', function (e) { if (e.target === overlay || e.target.closest('[data-modal-close]')) close(); });
+    document.addEventListener('keydown', onKey);
+  }
+
+  function showStudentDetail(d, reservationId) {
+    var p = d.participants.find(function (x) { return x.reservation.id === reservationId; });
+    if (!p) return;
+    var st = p.student, pa = p.parent;
+    var studentCode = personCode('trialstudent', st && st.id);
+    var parentCode = personCode('trialparent', pa && pa.id);
+    var lessonCode = Store.getLessonCode ? Store.getLessonCode(d.session) : d.session.id;
+    var ders = (d.lessonType ? d.lessonType.name : 'Ders') + ' · ' + (d.session.gradeLevel || '—');
+    var dersTarihi = U.formatDateKey(d.session.date) + ' ' + d.session.startTime + '–' + d.session.endTime;
+    var rezTarihi = (p.reservation && p.reservation.createdAt) ? U.formatDateTime(p.reservation.createdAt) : '—';
+    var body = '<div class="tm-detail-grid tm-detail-grid--modal">' +
+      cell('Öğrenci', U.escapeHtml(st ? U.fullName(st.firstName, st.lastName) : '—')) +
+      cell('Sınıf', U.escapeHtml(st ? st.grade : '—')) +
+      cell('Ders', U.escapeHtml(ders)) +
+      cell('Ders Tarihi', U.escapeHtml(dersTarihi)) +
+      cell('Deneme Dersi Rezervasyon Tarihi', U.escapeHtml(rezTarihi)) +
+      cell('Ders ID', '<code class="tm-res-code-cell">' + U.escapeHtml(lessonCode) + '</code>') +
+      cell('Öğrenci ID', '<code class="tm-res-code-cell">' + U.escapeHtml(studentCode) + '</code>') +
+      cell('Veli', U.escapeHtml(pa ? U.fullName(pa.firstName, pa.lastName) : '—')) +
+      cell('Veli E-posta', U.escapeHtml(pa ? pa.email : '—')) +
+      cell('Veli Telefon', U.escapeHtml(pa ? pa.phone : '—')) +
+      cell('Veli ID', '<code class="tm-res-code-cell">' + U.escapeHtml(parentCode) + '</code>') +
+    '</div>';
+    openInfoModal('Öğrenci Detayı', body);
+  }
+
+  // Öğretmen bilgilendirme onayı — ilk kez / tekrar durumuna göre soru sorar, sonra işaretler + bildirir.
+  function confirmInform(d, bodyEl, role) {
+    if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
+    var isPdr = role === 'pdr';
+    var teacher = isPdr ? d.pdrTeacher : d.branchTeacher;
+    var roleLabel = isPdr ? 'PDR/rehberlik öğretmeni' : 'branş öğretmeni';
+    if (!teacher) { U.notifyError('Önce ' + roleLabel + ' atanmalı.'); return; }
+    var teacherName = U.fullName(teacher.firstName, teacher.lastName);
+    var already = isPdr ? d.session.pdrTeacherInformed : d.session.branchTeacherInformed;
+    var warning = already
+      ? teacherName + ' zaten bilgilendirildi. Yine de tekrar bilgilendirmek istiyor musunuz?'
+      : 'Bu ders ile ilgili ' + roleLabel + ' (' + teacherName + ') bilgilendirilecek. Bu işlemi yapmak istiyor musunuz?';
+    Confirm.open({
+      title: isPdr ? 'PDR bilgilendir' : 'Branş bilgilendir',
+      current: (d.lessonType ? d.lessonType.name : 'Ders') + ' · ' + (d.session.gradeLevel || '—') +
+        ' · ' + U.formatDateKey(d.session.date) + ' ' + d.session.startTime + '–' + d.session.endTime,
+      warning: warning,
+      requireReason: false,
+      danger: false,
+      confirmLabel: 'Evet',
+      cancelLabel: 'Hayır',
+      onConfirm: function () {
+        var res = isPdr ? Store.markPdrTeacherInformed(d.session.id) : Store.markBranchTeacherInformed(d.session.id);
+        if (res && res.ok === false) { U.notifyError(res.error || 'İşlem başarısız.'); return; }
+        U.notifySuccess(teacherName + ' bilgilendirildi.');
+        if (global.TMOnSessionChange) global.TMOnSessionChange();
+        renderTab(0, bodyEl);
+      }
+    });
+  }
+
   function renderParticipants(d) {
     var sessionActive = d.session.status !== 'cancelled' && d.session.status !== 'completed';
-    var remaining = Rules.getSessionRemainingCapacity(d.session.id);
-    if (!d.participants.length) {
-      return (sessionActive ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-add-participant data-tm-require="edit" style="margin-bottom:12px">Öğrenci ekle</button>' : '') +
-        '<p class="tm-empty">Katılımcı yok.</p>';
+    // Derse yalnızca onaylanmış, aktif öğrenciler alınır (iptal/taşınan/onaysız gösterilmez).
+    var assigned = d.participants.filter(function (p) {
+      return p.reservation.status !== 'cancelled' && p.reservation.status !== 'rescheduled' &&
+        p.reservation.parentApprovalStatus === 'approved';
+    });
+    var capacity = d.session.capacity || (d.lessonType && d.lessonType.defaultCapacity) || 20;
+    var enrolled = assigned.length;
+    var remaining = Math.max(0, capacity - enrolled);
+    var stats = '<div class="tm-cap-stats">' +
+        '<div class="tm-cap-box is-total"><span class="tm-cap-num">' + capacity + '</span><span class="tm-cap-label">Toplam Kapasite</span></div>' +
+        '<div class="tm-cap-box is-enrolled"><span class="tm-cap-num">' + enrolled + '</span><span class="tm-cap-label">Katılan Öğrenci</span></div>' +
+        '<div class="tm-cap-box is-free"><span class="tm-cap-num">' + remaining + '</span><span class="tm-cap-label">Boş Kontenjan</span></div>' +
+      '</div>';
+    var addBtn = sessionActive ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-add-participant data-tm-require="edit" style="margin-bottom:12px">Öğrenci ekle</button>' : '';
+    if (!assigned.length) {
+      return stats + addBtn + '<p class="tm-empty">Derse atanmış onaylı öğrenci yok.</p>';
     }
-    var notSent = d.reservations.filter(function (r) { return r.parentApprovalStatus === 'approved' && !r.linkSent; }).length;
-    var rows = d.participants.map(function (p) {
+    var rows = assigned.map(function (p, i) {
       var st = p.student;
       var pa = p.parent;
       var r = p.reservation;
-      var removeBtn = sessionActive && r.status !== 'cancelled'
-        ? ' <button type="button" class="tm-btn tm-btn--sm tm-btn--danger" data-remove-res="' + r.id + '" data-tm-require="cancel">Çıkar</button>'
+      var detailBtn = '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-student-detail="' + r.id + '" title="Detaylı görüntüle" aria-label="Detaylı görüntüle">' + EYE_ICON + '</button>';
+      var removeBtn = sessionActive
+        ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--danger tm-btn--icon" data-remove-res="' + r.id + '" data-tm-require="cancel" title="Öğrenciyi sil" aria-label="Öğrenciyi sil">' + X_ICON + '</button>'
         : '';
-      var moveBtn = sessionActive && r.status !== 'cancelled' && r.status !== 'rescheduled'
-        ? ' <button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-move-res="' + r.id + '" data-tm-require="edit">Dersi değiştir</button>'
-        : '';
-      return '<tr>' +
+      return '<tr data-student-detail="' + r.id + '" style="cursor:pointer">' +
+        '<td class="tm-row-index">' + (i + 1) + '</td>' +
         '<td>' + U.escapeHtml(st ? U.fullName(st.firstName, st.lastName) : '—') + '</td>' +
         '<td>' + U.escapeHtml(st ? st.grade : '—') + '</td>' +
         '<td>' + U.escapeHtml(pa ? U.fullName(pa.firstName, pa.lastName) : '—') + '</td>' +
         '<td>' + U.escapeHtml(pa ? pa.phone : '—') + '</td>' +
-        '<td>' + SL.parentApprovalBadge(r.parentApprovalStatus) + '</td>' +
-        '<td>' + (r.linkSent ? '<span class="tm-badge tm-badge--green">Gönderildi</span>' : '<span class="tm-badge tm-badge--orange">Hayır</span>') + '</td>' +
-        '<td>' + SL.reservationBadge(r.status) + '</td>' +
-        '<td style="white-space:nowrap">' +
-          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-wa-parent="' + r.id + '">WhatsApp</button> ' +
-          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-link-sent="' + r.id + '" data-tm-require="edit">Link gönderildi</button>' +
-          moveBtn +
-          removeBtn +
-        '</td>' +
+        '<td style="white-space:nowrap"><span class="tm-row-actions">' + detailBtn + removeBtn + '</span></td>' +
       '</tr>';
     }).join('');
-    return (sessionActive ? '<p class="tm-detail-cell-label" style="margin-bottom:8px">Boş kapasite: ' + remaining + ' / 20</p>' : '') +
-      '<p class="tm-form-desc">Bu online deneme dersinde veliler ve öğrenciler aynı bilgisayardan katılır. İlk 20 dakika PDR/Rehberlik Öğretmeni veli sunumu yapar; son 30 dakika Branş Öğretmeni öğrencilere deneme dersi yapar.</p>' +
-      (sessionActive ? '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-add-participant data-tm-require="edit" style="margin-bottom:12px">Öğrenci ekle</button>' : '') +
-      (notSent ? '<p class="tm-alert-row" style="margin-bottom:8px">Onaylı ancak link gönderilmemiş: ' + notSent + ' veli</p>' +
-      '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-bulk-link data-tm-require="edit" style="margin-bottom:12px">Tüm onaylılara link gönderildi işaretle</button>' : '') +
-      '<table class="tm-inner-table"><thead><tr><th>Öğrenci</th><th>Sınıf</th><th>Veli</th><th>Telefon</th><th>Veli onay</th><th>Link</th><th>Durum</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+    return stats + addBtn +
+      '<table class="tm-inner-table"><thead><tr><th>#</th><th>Öğrenci</th><th>Sınıf</th><th>Veli</th><th>Telefon</th><th>İşlem</th></tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
   function renderOnlineLink(d) {
@@ -114,28 +217,39 @@
     var s = d.session;
     if (!m) return '<p class="tm-empty">Toplantı bilgisi yok.</p>';
     var inactive = m.status === 'cancelled' || s.status === 'cancelled';
+    var editable = s.status !== 'cancelled' && s.status !== 'completed';
     var sentCount = d.reservations.filter(function (r) { return r.linkSent; }).length;
     var notSent = d.reservations.filter(function (r) { return !r.linkSent && r.parentApprovalStatus === 'approved'; }).length;
+    var lessonCode = Store.getLessonCode ? Store.getLessonCode(s) : s.id;
+    var topInfo = '<div class="tm-detail-grid tm-detail-grid--modal" style="margin-bottom:12px">' +
+      cell('Ders Adı', U.escapeHtml(d.lessonType ? d.lessonType.name : 'Ders')) +
+      cell('Ders ID', '<code class="tm-res-code-cell">' + U.escapeHtml(lessonCode) + '</code>') +
+      cell('Ders Tarihi', U.escapeHtml(U.formatDateKey(s.date))) +
+      cell('Ders Saati', U.escapeHtml(s.startTime + '–' + s.endTime)) +
+    '</div>';
     return (
+      topInfo +
       (inactive ? '<p class="tm-alert-row is-danger">Bu ders iptal edildiği için link aktif değildir.</p>' : '') +
       '<div class="tm-link-box' + (inactive ? ' is-inactive' : '') + '">' +
-        '<div><strong>Platform:</strong> Kurum içi uygulama</div>' +
         copyRow('Davet linki', m.meetingUrl) +
         copyRow('Toplantı ID', m.meetingId) +
         copyRow('Şifre', m.passcode) +
-        '<div style="margin-top:8px">' + SL.meetingBadge(m.status) + '</div>' +
-        '<div style="margin-top:8px"><strong>PDR öğretmeni erişimi:</strong> ' + (d.pdrTeacher ? U.escapeHtml(U.fullName(d.pdrTeacher.firstName, d.pdrTeacher.lastName)) : '—') + '</div>' +
-        '<div><strong>Branş öğretmeni erişimi:</strong> ' + (d.branchTeacher ? U.escapeHtml(U.fullName(d.branchTeacher.firstName, d.branchTeacher.lastName)) : '—') + '</div>' +
+        '<div class="tm-teacher-access">' +
+          '<div class="tm-teacher-access-col"><span class="tm-teacher-access-label">PDR/Rehberlik Öğretmeni</span>' +
+            '<span class="tm-teacher-access-name">' + (d.pdrTeacher ? U.escapeHtml(U.fullName(d.pdrTeacher.firstName, d.pdrTeacher.lastName)) : '—') + '</span></div>' +
+          '<div class="tm-teacher-access-col"><span class="tm-teacher-access-label">Branş Öğretmeni</span>' +
+            '<span class="tm-teacher-access-name">' + (d.branchTeacher ? U.escapeHtml(U.fullName(d.branchTeacher.firstName, d.branchTeacher.lastName)) : '—') + '</span></div>' +
+        '</div>' +
         '<div style="margin-top:8px;font-size:12px;color:#7a769e">Oluşturulma: ' + U.formatDateTime(m.generatedAt) +
           (m.lastPasscodeChangedAt ? ' · Şifre değişimi: ' + U.formatDateTime(m.lastPasscodeChangedAt) : '') + '</div>' +
         '<div style="margin-top:8px">Link gönderilen: ' + sentCount + ' · Gönderilmeyen (onaylı): ' + notSent + '</div>' +
         '<div style="margin-top:8px;font-size:12px">PDR ve branş öğretmeni aynı linke katılır.</div>' +
       '</div>' +
-      '<div class="tm-detail-actions tm-detail-actions--wrap">' +
-        '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-wa-pdr-teacher>PDR WhatsApp</button>' +
-        '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-wa-branch-teacher>Branş WhatsApp</button>' +
-        '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-refresh-passcode data-tm-require="edit">Şifre yenile</button>' +
-      '</div>'
+      (editable
+        ? '<div class="tm-detail-actions tm-detail-actions--wrap">' +
+            '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-refresh-passcode data-tm-require="edit">Şifre yenile</button>' +
+          '</div>'
+        : '')
     );
   }
 
@@ -144,14 +258,37 @@
     return '<div class="tm-copy-row"><span class="tm-detail-cell-label">' + label + '</span><code>' + U.escapeHtml(val) + '</code><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-copy="' + safe + '">Kopyala</button></div>';
   }
 
+  // İşlemi yapan kullanıcı — ad + rol.
+  function userCell(userId) {
+    var u = (Store.getUsers ? Store.getUsers() : []).find(function (x) { return x.id === userId; });
+    if (!u) return '<span class="tm-comm-by-name">Sistem</span>';
+    var role = (SL.USER_ROLE && SL.USER_ROLE[u.role]) || '';
+    return '<span class="tm-comm-by-name">' + U.escapeHtml(U.fullName(u.firstName, u.lastName)) + '</span>' +
+      (role ? '<span class="tm-comm-by-role">' + U.escapeHtml(role) + '</span>' : '');
+  }
+
+  function formatAuditValue(v) {
+    if (v == null || v === '') return '—';
+    if (typeof v === 'object') {
+      if (v.sessionId) return (Store.getLessonCode ? Store.getLessonCode(v.sessionId) : v.sessionId);
+      if (v.date || v.startTime) return U.formatDateKey(v.date || '') + (v.startTime ? ' ' + v.startTime : '');
+      return Object.keys(v).map(function (k) { return k + ': ' + v[k]; }).join(', ');
+    }
+    // Öğretmen id'sini isme çevir
+    var t = Store.getTeacherById ? Store.getTeacherById(v) : null;
+    if (t) return U.fullName(t.firstName, t.lastName);
+    return SL.sessionLabel ? (SL.SESSION_STATUS && SL.SESSION_STATUS[v] ? SL.sessionLabel(v) : String(v)) : String(v);
+  }
+
   function renderCommunication(d) {
     var logs = Store.getCommunicationLogs().filter(function (l) { return l.sessionId === d.session.id; });
     if (!logs.length) return '<p class="tm-empty">İletişim kaydı yok.</p><button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-add-comm data-tm-require="edit">İletişim kaydı ekle</button>';
     var rows = logs.map(function (l) {
       return '<tr><td>' + U.formatDateTime(l.createdAt) + '</td><td>' + U.escapeHtml(SL.COMM_CHANNEL[l.channel] || l.channel) +
+        '</td><td>' + userCell(l.createdByUserId) +
         '</td><td>' + U.escapeHtml(SL.COMM_RESULT[l.result] || l.result) + '</td><td>' + U.escapeHtml(l.summary) + '</td></tr>';
     }).join('');
-    return '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Kanal</th><th>Sonuç</th><th>Özet</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+    return '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Kanal</th><th>İşlemi Yapan</th><th>Sonuç</th><th>Özet</th></tr></thead><tbody>' + rows + '</tbody></table>' +
       '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-add-comm data-tm-require="edit" style="margin-top:12px">İletişim kaydı ekle</button>';
   }
 
@@ -197,10 +334,18 @@
     });
     if (!logs.length) return '<p class="tm-empty">Değişiklik geçmişi yok.</p>';
     var rows = logs.map(function (l) {
-      return '<tr><td>' + U.formatDateTime(l.createdAt) + '</td><td>' + U.escapeHtml(SL.AUDIT_ACTION[l.action] || l.action) +
-        '</td><td>' + U.escapeHtml(l.description) + '</td><td>' + U.escapeHtml(l.reason || '—') + '</td></tr>';
+      var hasOld = l.previousValue !== undefined && l.previousValue !== null && l.previousValue !== '';
+      var hasNew = l.newValue !== undefined && l.newValue !== null && l.newValue !== '';
+      var oldCell = hasOld ? '<span class="tm-audit-old">' + U.escapeHtml(formatAuditValue(l.previousValue)) + '</span>' : '<span class="tm-audit-none">—</span>';
+      var newCell = hasNew ? '<span class="tm-audit-new">' + U.escapeHtml(formatAuditValue(l.newValue)) + '</span>' : '<span class="tm-audit-none">—</span>';
+      return '<tr><td>' + U.formatDateTime(l.createdAt) + '</td>' +
+        '<td>' + userCell(l.createdByUserId) + '</td>' +
+        '<td><span class="tm-audit-action">' + U.escapeHtml(SL.AUDIT_ACTION[l.action] || l.action) + '</span></td>' +
+        '<td>' + oldCell + '</td>' +
+        '<td>' + newCell + '</td>' +
+        '<td>' + U.escapeHtml(l.description) + (l.reason ? '<span class="tm-audit-reason">Neden: ' + U.escapeHtml(l.reason) + '</span>' : '') + '</td></tr>';
     }).join('');
-    return '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>İşlem</th><th>Açıklama</th><th>Neden</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    return '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Yapan Kişi</th><th>İşlem</th><th>Eski Durum</th><th>Yeni Durum</th><th>Açıklama</th></tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
   function renderTab(idx, bodyEl) {
@@ -210,8 +355,6 @@
     if (idx === 0) html = renderSummary(d);
     else if (idx === 1) html = renderParticipants(d);
     else if (idx === 2) html = renderOnlineLink(d);
-    else if (idx === 3) html = renderCommunication(d);
-    else if (idx === 4) html = renderAttendance(d);
     else html = renderAudit(d);
     bodyEl.innerHTML = html;
     bindTabActions(bodyEl, d, idx);
@@ -235,29 +378,49 @@
           var st = Store.getStudentById(sid);
           if (st) names.push('Öğrenci: ' + U.fullName(st.firstName, st.lastName));
         });
+        var lessonCode = Store.getLessonCode ? Store.getLessonCode(d.session) : d.session.id;
         Confirm.open({
           title: 'Dersi iptal et',
-          current: d.lessonType.name + ' · ' + U.formatDateKey(d.session.date) + ' ' + d.session.startTime,
-          warning: 'Bağlı rezervasyonlar iptal edilecek. Link görünür kalacak ancak çalışmayacak.',
+          current: (d.lessonType ? d.lessonType.name : 'Ders') + ' · ' + (d.session.gradeLevel || '—') +
+            ' · ' + lessonCode +
+            ' · ' + U.formatDateKey(d.session.date) + ' ' + d.session.startTime + '–' + d.session.endTime,
+          warning: 'Bağlı rezervasyonlar iptal edilecek, link çalışmayacak. Ders iptal edildikten sonra tekrar aktif hale getirilemez.',
           affected: names,
+          confirmLabel: 'Dersi iptal et',
           onConfirm: function (reason) {
-            Store.cancelSession(d.session.id, reason);
+            var res = Store.cancelSession(d.session.id, reason);
+            if (res && res.ok === false) { U.notifyError(res.error); return; }
+            U.notifySuccess('Ders iptal edildi.');
             open(currentSessionId);
             if (global.TMOnSessionChange) global.TMOnSessionChange();
           }
         });
       });
       bodyEl.querySelector('[data-act="inform-pdr"]') && bodyEl.querySelector('[data-act="inform-pdr"]').addEventListener('click', function () {
-        if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
-        Store.markPdrTeacherInformed(d.session.id);
-        if (global.TMOnSessionChange) global.TMOnSessionChange();
-        renderTab(0, bodyEl);
+        confirmInform(d, bodyEl, 'pdr');
       });
       bodyEl.querySelector('[data-act="inform-branch"]') && bodyEl.querySelector('[data-act="inform-branch"]').addEventListener('click', function () {
+        confirmInform(d, bodyEl, 'branch');
+      });
+      bodyEl.querySelector('[data-act="notify-all-parents"]') && bodyEl.querySelector('[data-act="notify-all-parents"]').addEventListener('click', function () {
         if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
-        Store.markBranchTeacherInformed(d.session.id);
-        if (global.TMOnSessionChange) global.TMOnSessionChange();
-        renderTab(0, bodyEl);
+        Confirm.open({
+          title: 'Velilerin tümünü bilgilendir',
+          current: (d.lessonType ? d.lessonType.name : 'Ders') + ' · ' + (d.session.gradeLevel || '—') +
+            ' · ' + U.formatDateKey(d.session.date) + ' ' + d.session.startTime + '–' + d.session.endTime,
+          warning: 'Derse atanan tüm velilere ders bilgileri (tarih, saat, link) gönderilecek. Bu işlemi yapmak istiyor musunuz?',
+          requireReason: false,
+          danger: false,
+          confirmLabel: 'Evet',
+          cancelLabel: 'Hayır',
+          onConfirm: function () {
+            var res = Store.notifyAllParentsForSession(d.session.id);
+            if (!res || res.ok === false) { U.notifyError((res && res.error) || 'İşlem başarısız.'); return; }
+            U.notifySuccess('İlgili tüm velilere bildirim gönderildi (' + res.count + ' veli).');
+            if (global.TMOnSessionChange) global.TMOnSessionChange();
+            renderTab(0, bodyEl);
+          }
+        });
       });
       bodyEl.querySelector('[data-act="change-pdr-teacher"]') && bodyEl.querySelector('[data-act="change-pdr-teacher"]').addEventListener('click', function () {
         showTeacherPicker(d, 'pdr');
@@ -277,71 +440,42 @@
       bodyEl.querySelector('[data-add-participant]') && bodyEl.querySelector('[data-add-participant]').addEventListener('click', function () {
         showAddStudentPicker(d);
       });
-      bodyEl.querySelectorAll('[data-move-res]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          showMoveReservation(d, btn.getAttribute('data-move-res'));
+      // Öğrenci detay modalı — satıra veya göz ikonuna tıklayınca
+      bodyEl.querySelectorAll('button[data-student-detail]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          showStudentDetail(d, btn.getAttribute('data-student-detail'));
+        });
+      });
+      bodyEl.querySelectorAll('tr[data-student-detail]').forEach(function (tr) {
+        tr.addEventListener('click', function (e) {
+          if (e.target.closest('button')) return;
+          showStudentDetail(d, tr.getAttribute('data-student-detail'));
         });
       });
       bodyEl.querySelectorAll('[data-remove-res]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function (e) {
+          if (e) e.stopPropagation();
           if (global.TMPermissions && !global.TMPermissions.guard('cancel')) return;
           var resId = btn.getAttribute('data-remove-res');
+          var p = d.participants.find(function (x) { return x.reservation.id === resId; });
+          var stName = p && p.student ? U.fullName(p.student.firstName, p.student.lastName) : 'Öğrenci';
           Confirm.open({
-            title: 'Öğrenciyi dersten çıkar',
-            warning: 'Rezervasyon iptal edilecek ve kapasite açılacak.',
-            requireReason: true,
+            title: 'Öğrenciyi dersten sil',
+            warning: stName + ' adlı öğrenciyi bu dersten silmek istediğinize emin misiniz? Kapasite yeniden açılacak.',
+            requireReason: false,
             danger: true,
-            confirmLabel: 'Çıkar',
+            confirmLabel: 'Sil',
             onConfirm: function (reason) {
-              var result = Store.removeStudentFromSession(d.session.id, resId, reason);
+              var result = Store.removeStudentFromSession(d.session.id, resId, reason || 'Yönetici tarafından dersten silindi.');
               if (!result.ok) U.notifyError(result.error);
               else {
-                U.notifySuccess('Öğrenci dersten çıkarıldı.');
+                U.notifySuccess('Öğrenci dersten silindi.');
                 if (global.TMOnSessionChange) global.TMOnSessionChange();
                 renderTab(1, bodyEl);
               }
             }
           });
-        });
-      });
-      bodyEl.querySelector('[data-bulk-link]') && bodyEl.querySelector('[data-bulk-link]').addEventListener('click', function () {
-        if (window.TMPermissions && !window.TMPermissions.guard('edit')) return;
-        var result = Store.markBulkLinksSentForSession(d.session.id);
-        if (!result.ok) U.notifyError(result.error || 'İşlem başarısız.');
-        else {
-          U.notifySuccess(result.count + ' veli için link gönderildi işaretlendi.');
-          if (global.TMOnSessionChange) global.TMOnSessionChange();
-          renderTab(1, bodyEl);
-        }
-      });
-      bodyEl.querySelectorAll('[data-wa-parent]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          var rid = btn.getAttribute('data-wa-parent');
-          var p = d.participants.find(function (x) { return x.reservation.id === rid; });
-          if (!p || !p.parent || !QuickMsg) return;
-          QuickMsg.openForParent({
-            parentName: U.fullName(p.parent.firstName, p.parent.lastName),
-            studentName: U.fullName(p.student.firstName, p.student.lastName),
-            lessonType: d.lessonType.name,
-            date: U.formatDateKey(d.session.date),
-            time: d.session.startTime,
-            meetingUrl: d.meeting ? d.meeting.meetingUrl : '',
-            meetingId: d.meeting ? d.meeting.meetingId : '',
-            passcode: d.meeting ? d.meeting.passcode : '',
-            phone: p.parent.phone,
-            email: p.parent.email
-          });
-        });
-      });
-      bodyEl.querySelectorAll('[data-link-sent]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
-          var res = Store.markLinkSent(btn.getAttribute('data-link-sent'));
-          if (!res.ok) U.notifyError(res.error);
-          else {
-            if (global.TMOnSessionChange) global.TMOnSessionChange();
-            renderTab(1, bodyEl);
-          }
         });
       });
     }
@@ -418,12 +552,12 @@
     if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
     var eligible = Store.getEligibleStudentsForSession(d.session.id);
     if (!eligible.length) {
-      U.notifyError('Eklenebilecek uygun öğrenci yok (kapasite, branş veya daha önce deneme almış olabilir).');
+      U.notifyError('Eklenebilecek uygun öğrenci yok (sınıf seviyesi, kapasite, branş veya daha önce deneme almış olabilir).');
       return;
     }
     Form.open({
       title: 'Derse öğrenci ekle',
-      description: 'Kapasite ve ücretsiz deneme kurallarına uygun öğrenciler listelenir.',
+      description: 'Yalnızca dersin sınıf seviyesindeki (' + (d.session.gradeLevel || '—') + '), kapasite ve ücretsiz deneme kurallarına uygun öğrenciler listelenir.',
       fields: [{
         type: 'select',
         name: 'studentId',
@@ -605,29 +739,42 @@
     if (global.TMPermissions && !global.TMPermissions.guard('edit')) return;
     var slots = Rules.HOURLY_SLOTS || ['11:00', '12:00', '13:00', '14:00'];
     Form.open({
-      title: 'Saat değiştir',
+      title: 'Tarih ve saat ayarla',
+      description: 'Deneme dersi 50 dakikadır; bitiş saati başlangıca göre otomatik belirlenir.',
       fields: [
         { type: 'date', name: 'date', label: 'Yeni tarih', value: d.session.date },
         {
           type: 'select',
-          name: 'time',
-          label: 'Yeni saat',
+          name: 'startTime',
+          label: 'Başlangıç saati',
           value: d.session.startTime,
           options: slots.map(function (s) { return { value: s, label: s }; })
+        },
+        {
+          type: 'select',
+          name: 'endTime',
+          label: 'Bitiş saati',
+          value: d.session.endTime,
+          options: slots.map(function (s) { var e = Rules.addMinutes(s, 50); return { value: e, label: e }; })
         }
       ],
       submitLabel: 'Devam',
       onSubmit: function (data) {
-        if (!data.date || !data.time) return;
+        if (!data.date || !data.startTime) return;
+        var expectedEnd = Rules.addMinutes(data.startTime, 50);
+        if (data.endTime && data.endTime !== expectedEnd) {
+          U.notifyError('Bitiş saati başlangıçtan 50 dk sonra olmalı (' + expectedEnd + ').');
+          return;
+        }
         Confirm.open({
-          title: 'Saat değiştir',
-          current: U.formatDateKey(d.session.date) + ' ' + d.session.startTime,
-          next: U.formatDateKey(data.date) + ' ' + data.time,
+          title: 'Tarih ve saat ayarla',
+          current: U.formatDateKey(d.session.date) + ' ' + d.session.startTime + '–' + d.session.endTime,
+          next: U.formatDateKey(data.date) + ' ' + data.startTime + '–' + expectedEnd,
           warning: 'Dersteki tüm veliler bilgilendirilmelidir.',
           onConfirm: function (reason) {
-            var res = Store.rescheduleSession(d.session.id, data.date, data.time, reason);
+            var res = Store.rescheduleSession(d.session.id, data.date, data.startTime, reason);
             if (!res.ok) U.notifyError(res.error);
-            else open(currentSessionId);
+            else { U.notifySuccess('Ders tarihi güncellendi.'); open(currentSessionId); }
             if (global.TMOnSessionChange) global.TMOnSessionChange();
           }
         });
@@ -672,8 +819,7 @@
       subtitle: d.session.startTime + ' – ' + d.session.endTime + ' · ' + SL.sessionLabel(d.session.status),
       expandHref: 'deneme-dersi-yoneticisi-planlanmis-ders-detay.html?id=' + encodeURIComponent(sessionId),
       tabs: [
-        { label: 'Özet' }, { label: 'Katılımcılar' }, { label: 'Online Link' },
-        { label: 'İletişim' }, { label: 'Katılım' }, { label: 'Geçmiş' }
+        { label: 'Özet' }, { label: 'Katılımcılar' }, { label: 'Ders Linki' }, { label: 'Geçmiş' }
       ],
       activeTab: tab || 0,
       onTab: function (idx, bodyEl) { activeTab = idx; renderTab(idx, bodyEl); }
@@ -694,7 +840,7 @@
     renderTab(activeTab, bodyEl);
   }
 
-  var TAB_LABELS = ['Özet', 'Katılımcılar', 'Online Link', 'İletişim', 'Katılım', 'Geçmiş'];
+  var TAB_LABELS = ['Özet', 'Katılımcılar', 'Ders Linki', 'Geçmiş'];
 
   global.TMSessionDetail = { open: open, renderTabAt: renderTabAt, tabLabels: TAB_LABELS };
 })(typeof window !== 'undefined' ? window : this);

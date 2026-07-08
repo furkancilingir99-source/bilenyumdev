@@ -49,13 +49,13 @@
 
     /* Tamamlanan sınav ilerlemesini koru (kısmi veya tam) */
     if (placementDone || attentionDone) {
-      if (!lsGet(KEYS.studentName)) lsSet(KEYS.studentName, 'Mira Yılmaz');
+      if (!lsGet(KEYS.studentName)) lsSet(KEYS.studentName, 'Furkan Çilingir');
       if (!lsGet(KEYS.studentGrade)) lsSet(KEYS.studentGrade, '8');
       if (!lsGet(KEYS.isNew)) lsSet(KEYS.isNew, '1');
       return;
     }
 
-    if (!lsGet(KEYS.studentName)) lsSet(KEYS.studentName, 'Mira Yılmaz');
+    if (!lsGet(KEYS.studentName)) lsSet(KEYS.studentName, 'Furkan Çilingir');
     if (!lsGet(KEYS.studentGrade)) lsSet(KEYS.studentGrade, '8');
     if (!lsGet(KEYS.isNew)) initNewStudent();
     lsRemove(KEYS.placement);
@@ -132,7 +132,7 @@
       return;
     }
 
-    var name = lsGet(KEYS.studentName) || 'Mira Yılmaz';
+    var name = lsGet(KEYS.studentName) || 'Furkan Çilingir';
     var grade = lsGet(KEYS.studentGrade) || '8';
     var now = new Date().toISOString();
     lsSet('assignedClan', 'Alfa Klanı');
@@ -182,7 +182,7 @@
   function resetToExistingStudent(options) {
     options = options || {};
     IN_PROGRESS_KEYS.forEach(lsRemove);
-    if (!lsGet(KEYS.studentName)) lsSet(KEYS.studentName, 'Mira Yılmaz');
+    if (!lsGet(KEYS.studentName)) lsSet(KEYS.studentName, 'Furkan Çilingir');
     if (!lsGet(KEYS.studentGrade)) lsSet(KEYS.studentGrade, '8');
     if (options.name) lsSet(KEYS.studentName, options.name);
     if (options.grade) lsSet(KEYS.studentGrade, String(options.grade));
@@ -203,7 +203,7 @@
     PROGRESS_KEYS.forEach(lsRemove);
     lsRemove('assessmentGraduated');
     lsRemove('placementPassedBlank');
-    if (!lsGet(KEYS.studentName)) lsSet(KEYS.studentName, 'Mira Yılmaz');
+    if (!lsGet(KEYS.studentName)) lsSet(KEYS.studentName, 'Furkan Çilingir');
     if (!lsGet(KEYS.studentGrade)) lsSet(KEYS.studentGrade, '8');
     if (options.name) lsSet(KEYS.studentName, options.name);
     if (options.grade) lsSet(KEYS.studentGrade, String(options.grade));

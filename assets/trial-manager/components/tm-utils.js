@@ -72,13 +72,29 @@
     if (!el) return;
     if (pages <= 1) { el.hidden = true; el.innerHTML = ''; return; }
     el.hidden = false;
+    function navBtn(label, target, disabled, aria) {
+      return '<button type="button" class="tm-pagination-btn tm-pagination-nav"' + (disabled ? ' disabled' : '') +
+        ' data-page="' + target + '" aria-label="' + aria + '" title="' + aria + '">' + label + '</button>';
+    }
     var html = '';
-    for (var i = 1; i <= pages; i++) {
+    html += navBtn('«', 1, page <= 1, 'İlk sayfa');
+    html += navBtn('‹', Math.max(1, page - 1), page <= 1, 'Önceki sayfa');
+    // Aktif sayfa etrafında pencereli sayı listesi
+    var start = Math.max(1, page - 2);
+    var end = Math.min(pages, page + 2);
+    if (page <= 3) end = Math.min(pages, 5);
+    if (page >= pages - 2) start = Math.max(1, pages - 4);
+    if (start > 1) html += '<span class="tm-pagination-gap">…</span>';
+    for (var i = start; i <= end; i++) {
       html += '<button type="button" class="tm-pagination-btn' + (i === page ? ' is-active' : '') + '" data-page="' + i + '">' + i + '</button>';
     }
+    if (end < pages) html += '<span class="tm-pagination-gap">…</span>';
+    html += navBtn('›', Math.min(pages, page + 1), page >= pages, 'Sonraki sayfa');
+    html += navBtn('»', pages, page >= pages, 'Son sayfa');
     el.innerHTML = html;
     el.querySelectorAll('[data-page]').forEach(function (btn) {
       btn.addEventListener('click', function () {
+        if (btn.disabled) return;
         onPage(parseInt(btn.getAttribute('data-page'), 10));
       });
     });
