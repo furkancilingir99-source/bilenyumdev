@@ -22,7 +22,7 @@
 
   var CURRENT_USER_ID = 'user-manager-1';
   // v10: iletişim durumu değişim kayıtları (eski/yeni durum) İletişim sekmesinde. Eski veriler atılır.
-  var STORAGE_KEY = 'bilenyum_tmstore_v18';
+  var STORAGE_KEY = 'bilenyum_tmstore_v26';
 
   function touch() {
     try {
@@ -146,16 +146,19 @@
 
   var PDR_NAMES = [
     ['Ayşe', 'Yılmaz'], ['Zeynep', 'Demir'], ['Selin', 'Korkmaz'], ['Burak', 'Özkan'], ['Elif', 'Şahin'],
-    ['Sühendan', 'Tatlı']
+    ['Sühendan', 'Tatlı'], ['Merve', 'Aydın'], ['Serkan', 'Bulut'], ['Pınar', 'Yıldız'], ['Cem', 'Aslan'],
+    ['Derya', 'Koç'], ['Tolga', 'Erden']
   ];
 
   var BRANCH_NAMES = [
     ['Furkan', 'Çilingir', 'lt-mat'], ['Koray', 'Şen', 'lt-mat'], ['Ayşe', 'Özkan', 'lt-mat'],
     ['Can', 'Demir', 'lt-mat'], ['Melis', 'Aktaş', 'lt-mat'], ['Hakan', 'Gürbüz', 'lt-mat'],
-    ['Gürkan', 'Dayı', 'lt-mat'],
+    ['Gürkan', 'Dayı', 'lt-mat'], ['Sibel', 'Uçar', 'lt-mat'], ['Onur', 'Taş', 'lt-mat'],
+    ['Nalan', 'Toprak', 'lt-mat'], ['Kaya', 'Doğan', 'lt-mat'], ['Ece', 'Yavuz', 'lt-mat'],
     ['Emre', 'Yalçın', 'lt-fen'], ['Deniz', 'Kara', 'lt-fen'], ['Ebru', 'Çetin', 'lt-fen'],
     ['Arda', 'Polat', 'lt-fen'], ['Gül', 'Tekin', 'lt-fen'], ['Mert', 'Acar', 'lt-fen'],
-    ['Akif', 'Dayı', 'lt-fen']
+    ['Akif', 'Dayı', 'lt-fen'], ['Barış', 'Çakır', 'lt-fen'], ['Yasemin', 'Kılıç', 'lt-fen'],
+    ['Umut', 'Şimşek', 'lt-fen'], ['Aylin', 'Erdem', 'lt-fen'], ['Kerem', 'Balcı', 'lt-fen']
   ];
 
   function buildTeacherRecord(id, firstName, lastName, teacherType, branchLessonTypeIds, idx) {
@@ -198,40 +201,40 @@
     return teachers;
   }
 
-  var STUDENT_FIRST = ['Mira', 'Can', 'Elif', 'Arda', 'Selin', 'Emir', 'Lina', 'Kerem', 'Defne', 'Yiğit', 'Zeynep', 'Berk', 'Ece', 'Alp', 'Damla', 'Kaan', 'Asya', 'Deniz', 'Eren', 'Gizem', 'Baran', 'Ceren', 'Doruk', 'Fulya', 'Gökhan', 'Hazal', 'Ilgın', 'Jale', 'Kuzey', 'Lara', 'Mete', 'Nil', 'Ozan', 'Pelin', 'Rüya', 'Sarp', 'Tuana', 'Umut', 'Vildan', 'Yasin', 'Zara', 'Atlas', 'Belinay', 'Cemre', 'Dilan', 'Efe', 'Fırat', 'Gülce', 'Alper', 'Buse', 'Cem', 'Derya', 'Eda', 'Fahri', 'Gamze', 'Mehmet', 'Gürkan', 'Akif', 'Sühendan', 'Emel', 'Fatma'];
-  var STUDENT_LAST = ['Yılmaz', 'Kaya', 'Demir', 'Öztürk', 'Aksoy', 'Çelik', 'Şahin', 'Aydın', 'Koç', 'Polat', 'Arslan', 'Yıldız', 'Güneş', 'Kurt', 'Erdoğan', 'Tekin', 'Bulut', 'Acar', 'Taş', 'Uçar', 'Dayı', 'Tatlı', 'Yaşar', 'Güneş Savul'];
+  var STUDENT_FIRST = ['Mira', 'Can', 'Elif', 'Arda', 'Selin', 'Emir', 'Lina', 'Kerem', 'Defne', 'Yiğit', 'Zeynep', 'Berk', 'Ece', 'Alp', 'Damla', 'Kaan', 'Asya', 'Deniz', 'Eren', 'Gizem', 'Baran', 'Ceren', 'Doruk', 'Fulya', 'Gökhan', 'Hazal', 'Ilgın', 'Jale', 'Kuzey', 'Lara', 'Mete', 'Nil', 'Ozan', 'Pelin', 'Rüya', 'Sarp', 'Tuana', 'Umut', 'Vildan', 'Yasin', 'Zara', 'Atlas', 'Belinay', 'Cemre', 'Dilan', 'Efe', 'Fırat', 'Gülce', 'Alper', 'Buse', 'Cem', 'Derya', 'Eda', 'Fahri', 'Gamze', 'Mehmet', 'Gürkan', 'Akif', 'Sühendan', 'Emel', 'Fatma', 'Ada', 'Bora', 'Ceyda', 'Doğa', 'Ela', 'Ferhat', 'Gökçe', 'Hira', 'İpek', 'Leyla', 'Mavi', 'Naz', 'Oğuz', 'Poyraz', 'Rana', 'Toprak', 'Utku', 'Yağmur', 'Zehra', 'Ali', 'Beren', 'Çağla', 'Duru', 'Ege', 'Melis', 'Onat', 'Roya', 'Talha'];
+  var STUDENT_LAST = ['Yılmaz', 'Kaya', 'Demir', 'Öztürk', 'Aksoy', 'Çelik', 'Şahin', 'Aydın', 'Koç', 'Polat', 'Arslan', 'Yıldız', 'Güneş', 'Kurt', 'Erdoğan', 'Tekin', 'Bulut', 'Acar', 'Taş', 'Uçar', 'Dayı', 'Tatlı', 'Yaşar', 'Güneş Savul', 'Doğan', 'Aslan', 'Çakır', 'Kılıç', 'Şimşek', 'Erdem', 'Yavuz', 'Özkan', 'Korkmaz', 'Aktaş', 'Gürbüz', 'Çetin', 'Kara', 'Yalçın', 'Bozkurt', 'Ateş', 'Sarı', 'Duman', 'Ekinci', 'Karaca', 'Toprak', 'Balcı', 'Çınar', 'Keskin'];
+
+  var PARENT_FIRST = ['Ayşe', 'Mehmet', 'Zeynep', 'Fatma', 'Burak', 'Deniz', 'Gül', 'Hakan', 'Seda', 'Emre', 'Ahmet', 'Elif', 'Murat', 'Sibel', 'Kemal', 'Nurten', 'Serkan', 'Merve', 'Volkan', 'Aylin', 'Tolga', 'Pınar', 'Cenk', 'Derya', 'Hüseyin', 'Ayla', 'Kadir', 'Nesrin', 'Levent', 'Şule', 'Barış', 'Filiz', 'Okan', 'Meltem', 'Erhan', 'Gülşen', 'Tarık', 'Hande', 'Sinan', 'Yeliz', 'Ufuk'];
+  var STUDENT_STATUSES = ['new_request', 'awaiting_assignment', 'scheduled', 'confirmed', 'attended', 'no_show', 'enrolled', 'cancelled', 'lost'];
 
   function buildParentsAndStudents() {
     var parents = [];
     var students = [];
-    var total = 96;
+    var total = 320;
     for (var i = 0; i < total; i++) {
       var pid = 'parent-' + (i + 1);
-      var PARENT_FIRST = ['Ayşe', 'Mehmet', 'Zeynep', 'Fatma', 'Burak', 'Deniz', 'Gül', 'Hakan', 'Seda', 'Emre', 'Ahmet', 'Elif', 'Murat', 'Sibel', 'Kemal', 'Nurten', 'Serkan', 'Merve', 'Volkan', 'Aylin', 'Tolga', 'Pınar', 'Cenk', 'Derya'];
       var pFirst = PARENT_FIRST[i % PARENT_FIRST.length];
       // Veli soyadı = öğrenci soyadı (aynı aile). Öğrenci soyadı da aynı indeksten gelir.
       var pLast = STUDENT_LAST[i % STUDENT_LAST.length];
       var sid = 'student-' + (i + 1);
       var lessonTypeId = i % 2 === 0 ? 'lt-mat' : 'lt-fen';
       var age = 10 + (i % 5);
-      var statuses = ['new_request', 'awaiting_assignment', 'scheduled', 'confirmed', 'attended', 'no_show', 'enrolled', 'cancelled', 'lost'];
-      var status = statuses[i % statuses.length];
+      var status = STUDENT_STATUSES[i % STUDENT_STATUSES.length];
 
       parents.push({
         id: pid,
         source: 'trial_lesson_application',
         firstName: pFirst,
         lastName: pLast,
-        phone: '05' + String(30 + (i % 50)).padStart(2, '0') + ' ' + String(100 + i * 3) + ' ' + String(10 + (i % 89)).padStart(2, '0'),
-        email: pFirst.toLowerCase() + '.' + pLast.toLowerCase() + i + '@mail.com',
+        phone: '05' + String(30 + (i % 50)).padStart(2, '0') + ' ' + String(100 + i * 3).slice(-3) + ' ' + String(10 + (i % 89)).padStart(2, '0'),
+        email: pFirst.toLowerCase() + '.' + pLast.toLowerCase().replace(/\s+/g, '') + (i + 1) + '@mail.com',
         studentIds: [sid],
-        preferredChannels: i % 3 === 0 ? ['whatsapp', 'phone'] : ['phone', 'email'],
+        preferredChannels: i % 3 === 0 ? ['whatsapp', 'phone'] : (i % 3 === 1 ? ['phone', 'email'] : ['phone']),
         createdAt: isoAt(-30 + (i % 20), 10, 0),
         updatedAt: isoAt(-1, 14, 0)
       });
 
       // Ücretsiz deneme kullanımı, rezervasyon oluşturulunca işaretlenir (aşağıda). Başta boş.
-      var usedTrial = [];
       students.push({
         id: sid,
         source: 'trial_lesson_application',
@@ -244,28 +247,38 @@
         requestedLessonTypeId: lessonTypeId,
         parentIds: [pid],
         status: status,
-        hasUsedFreeTrialForLessonTypeIds: usedTrial,
+        hasUsedFreeTrialForLessonTypeIds: [],
         createdAt: isoAt(-25 + (i % 15), 9, 0),
         updatedAt: isoAt(-2, 11, 0)
       });
     }
-    /* Bir velinin iki öğrencisi (parent-1'in ikinci çocuğu). Soyadı parent-1 ile aynı olmalı. */
-    var extraSid = 'student-' + (total + 1);
-    parents[0].studentIds.push(extraSid);
-    students.push({
-      id: extraSid,
-      source: 'trial_lesson_application',
-      firstName: 'Deniz',
-      lastName: parents[0].lastName,
-      age: 12,
-      grade: '6. Sınıf',
-      level: 'Orta',
-      requestedLessonTypeId: 'lt-mat',
-      parentIds: ['parent-1'],
-      status: 'awaiting_assignment',
-      hasUsedFreeTrialForLessonTypeIds: [],
-      createdAt: isoAt(-5, 10, 0),
-      updatedAt: isoAt(-1, 9, 0)
+    // Çok çocuklu aileler — soyad veliyle aynı, kardeşlerin sınıf/türü farklı olabilir.
+    var extraSeq = total;
+    var multiParents = [0, 3, 7, 12, 20, 33, 48, 60, 77, 90, 110, 130, 150, 175, 200, 230, 260, 290, 305, 315];
+    multiParents.forEach(function (pi, k) {
+      if (pi >= parents.length) return;
+      var pa = parents[pi];
+      var childCount = (k % 6 === 0) ? 2 : 1; // birkaç ailede 3 çocuk (mevcut 1 + bu 2)
+      for (var c = 0; c < childCount; c++) {
+        extraSeq++;
+        var esid = 'student-' + extraSeq;
+        pa.studentIds.push(esid);
+        students.push({
+          id: esid,
+          source: 'trial_lesson_application',
+          firstName: STUDENT_FIRST[(extraSeq * 3 + c) % STUDENT_FIRST.length],
+          lastName: pa.lastName,
+          age: 10 + ((k + c) % 5),
+          grade: GRADES[(pi + k + c) % GRADES.length],
+          level: LEVELS[(k + c) % LEVELS.length],
+          requestedLessonTypeId: ((k + c) % 2 === 0) ? 'lt-mat' : 'lt-fen',
+          parentIds: [pa.id],
+          status: STUDENT_STATUSES[(k + c) % STUDENT_STATUSES.length],
+          hasUsedFreeTrialForLessonTypeIds: [],
+          createdAt: isoAt(-6 - (k % 10), 10, 0),
+          updatedAt: isoAt(-1, 9, 0)
+        });
+      }
     });
     return { parents: parents, students: students };
   }
@@ -284,7 +297,8 @@
     var pdrTeachers = teachers.filter(function (t) { return t.teacherType === 'pdr_teacher'; });
 
     // Geçmiş günler (day < 0) tamamlanmış ders olarak, gelecek günler onaylı olarak üretilir.
-    for (var day = -2; day < 4; day++) {
+    // Geniş tarih aralığı: her öğretmene çok sayıda tutarlı ders atanır (Verdiği Dersler zenginleşir).
+    for (var day = -16; day < 16; day++) {
       var date = dateKeyOffset(day);
       var isPast = day < 0;
       slots.forEach(function (startTime, slotIdx) {
@@ -292,14 +306,19 @@
           seq++;
           var teacherPool = ltId === 'lt-mat' ? matTeachers : fenTeachers;
           var branchTeacher = teacherPool[(seq + slotIdx) % teacherPool.length];
-          var pdrTeacher = pdrTeachers[(seq + ltIdx) % pdrTeachers.length];
+          // seq tüm PDR öğretmenlerine eşit dağılsın (eski (seq+ltIdx) formülü hep tek indekse düşüp
+          // PDR öğretmenlerinin yarısını boşta bırakıyordu).
+          var pdrTeacher = pdrTeachers[seq % pdrTeachers.length];
           var endTime = Rules ? Rules.addMinutes(startTime, 50) : startTime.replace(':00', ':50');
           var sid = 'session-' + String(seq).padStart(4, '0');
           var mid = 'meeting-' + String(seq).padStart(4, '0');
           var ltName = ltId === 'lt-mat' ? 'Matematik' : 'Fen';
           // Sınıf seviyesi (gün, saat) çiftinden gelir; ders türünden BAĞIMSIZ. Böylece hem Matematik
           // hem Fen için 5/6/7/8. sınıfın tamamı üretilir ve her (tür, sınıf) kombinasyonu ders bulur.
-          var gradeLevel = GRADES[((day + 2) * slots.length + slotIdx) % GRADES.length];
+          // NOT: negatif günlerde JS modulo negatif dönebildiğinden non-negatif indekse zorlanır
+          // (aksi halde GRADES[negatif] = undefined → sınıfsız ders olurdu).
+          var gradeRaw = (day + 2) * slots.length + slotIdx;
+          var gradeLevel = GRADES[((gradeRaw % GRADES.length) + GRADES.length) % GRADES.length];
           // İlk 20 ders için üç durumu da (Tamamlandı / Onaylandı / İptal Edildi) karışık üret — iyi bir demo için.
           var status;
           if (seq <= 20) {
@@ -320,7 +339,7 @@
             sessionId: sid,
             platform: 'internal_app',
             meetingUrl: 'https://app.bilenyum.com/ders/' + sid,
-            meetingId: 'TRIALMEETING-' + String(seq).padStart(4, '0'),
+            meetingId: 'tM-' + String(seq).padStart(4, '0'),
             passcode: randPass(),
             status: meetingStatus,
             generatedAt: isoAt(-10, 8, 0),
@@ -383,15 +402,12 @@
         return s.status !== 'cancelled' && s.lessonTypeId === ltId && s.gradeLevel === grade;
       });
     }
-    // Öğrenciyi (tür+sınıf) uyan derslere yerleştir: her dersi ~3 öğrenciye kadar doldur, sonra
-    // sıradaki derse geç (küçük gruplu deneme dersleri; ne tek derse yığılma ne de aşırı boşluk).
-    var CAP = 3;
+    // Öğrenciyi (tür+sınıf) uyan dersler arasında EN AZ dolu olana yerleştir: rezervasyonlar
+    // dengeli dağılsın, çoğu ders katılımcı göstersin, tek derse yığılma olmasın.
     function pickSessionToFill(ltId, grade) {
       var pool = matchingSessions(ltId, grade);
       if (!pool.length) return null;
-      var underCap = pool.filter(function (s) { return s.reservationIds.length < CAP; });
-      var candidates = underCap.length ? underCap : pool;
-      return candidates.slice().sort(function (a, b) { return b.reservationIds.length - a.reservationIds.length; })[0];
+      return pool.slice().sort(function (a, b) { return a.reservationIds.length - b.reservationIds.length; })[0];
     }
 
     students.forEach(function (st, i) {
@@ -413,8 +429,18 @@
       var session = reserve ? pickSessionToFill(ltId, st.grade) : null;
       if (reserve && !session) { reserve = false; status = 'reviewing'; } // uygun ders yoksa atama bekliyor
 
+      // Velinin ücretsiz deneme formunda seçtiği ders saati — başvuruda ZORUNLU olduğundan
+      // her talepte doludur. Atanmışsa atanan ders, değilse (tür+sınıf) uyan gerçek bir ders.
+      var preferSession = session;
+      if (!preferSession) {
+        var preferPool = matchingSessions(ltId, st.grade);
+        if (!preferPool.length) preferPool = sessions.filter(function (s) { return s.status !== 'cancelled' && s.lessonTypeId === ltId; });
+        preferSession = preferPool.length ? preferPool[i % preferPool.length] : null;
+      }
+
       reqSeq++;
       var reqId = 'request-' + String(reqSeq).padStart(4, '0');
+      var reqDay = -12 + (i % 8); // talebin geldiği gün (-12..-5); tüm döngü buna göre sıralanır
       requests.push({
         id: reqId,
         studentFirstName: st.firstName,
@@ -427,14 +453,17 @@
         parentLastName: parent.lastName,
         parentPhone: parent.phone,
         parentEmail: parent.email,
+        preferredSessionId: preferSession ? preferSession.id : undefined,
         selectedSessionId: session ? session.id : undefined,
         status: status,
         contactStatus: contactStatus,
         contactChannel: contactStatus ? channels[i % 3] : undefined,
         contactNote: contactStatus ? contactNoteFor(contactStatus) : undefined,
         source: 'website_form',
-        createdAt: isoAt(-9 + (i % 8), 8 + (i % 9), 0),
-        updatedAt: isoAt(-1, 12, 0)
+        // Yaşam döngüsü zaman damgaları KRONOLOJİK olmalı (Geçmiş sekmesi bunu gösterir):
+        // talep(reqDay) < iletişim(reqDay+1) < rezervasyon(reqDay+2) < veli onayı/link(reqDay+3).
+        createdAt: isoAt(reqDay, 8 + (i % 9), 0),
+        updatedAt: isoAt(reqDay + 1, 12, 0)
       });
 
       if (reserve && session) {
@@ -454,12 +483,12 @@
           status: resStatus,
           parentApprovalStatus: 'approved',
           linkSent: linkSent,
-          linkSentAt: linkSent ? isoAt(-1, 15, 0) : undefined,
+          linkSentAt: linkSent ? isoAt(reqDay + 3, 17, 0) : undefined,
           linkSentByUserId: linkSent ? CURRENT_USER_ID : undefined,
           communicationLogIds: [],
           enrolled: resStatus === 'attended' && (i % 4 === 0),
-          createdAt: isoAt(-5, 10, 0),
-          updatedAt: isoAt(-1, 16, 0)
+          createdAt: isoAt(reqDay + 2, 10, 0),
+          updatedAt: isoAt(reqDay + 3, 16, 0)
         });
         session.enrolledStudentIds.push(st.id);
         session.reservationIds.push(rid);
@@ -517,30 +546,105 @@
     return logs;
   }
 
-  function buildAuditLogs(sessions, reservations) {
+  // Gerçekçi, eski/yeni değerli değişiklik geçmişi — tüm varlık türleri için (talep, ders,
+  // öğrenci, veli, öğretmen). Her kayıt gerçek verinin GÜNCEL halini "yeni durum" kabul eder;
+  // "eski durum" ise değişiklikten önceki (kurgusal ama tutarlı) değerdir.
+  function buildAuditLogs(sessions, reservations, requests, students, parents, teachers) {
     var logs = [];
-    sessions.slice(0, 15).forEach(function (s, i) {
-      logs.push({
-        id: 'AUD-' + String(i + 1).padStart(5, '0'),
-        entityType: 'trial_lesson_session',
-        entityId: s.id,
-        action: i % 2 === 0 ? 'created' : 'updated',
-        description: 'Ders oturumu oluşturuldu / güncellendi.',
-        createdByUserId: CURRENT_USER_ID,
-        createdAt: s.createdAt
+    var seq = 0;
+    var USERS = [CURRENT_USER_ID, 'user-admin-1'];
+    var GR = ['5. Sınıf', '6. Sınıf', '7. Sınıf', '8. Sınıf'];
+    function tName(id) { var t = find(teachers, id); return t ? t.firstName + ' ' + t.lastName : (id || '—'); }
+    function altTeacher(sameTypeId, notId) {
+      var pool = teachers.filter(function (t) {
+        var samePdr = (t.teacherType === 'pdr_teacher') === (find(teachers, notId) && find(teachers, notId).teacherType === 'pdr_teacher');
+        return t.id !== notId && samePdr;
       });
-    });
-    reservations.slice(0, 10).forEach(function (r, i) {
+      return pool.length ? pool[(seq) % pool.length] : null;
+    }
+    function push(o) {
+      seq++;
       logs.push({
-        id: 'AUD-' + String(20 + i).padStart(5, '0'),
-        entityType: 'reservation',
-        entityId: r.id,
-        action: 'student_assigned',
-        description: 'Öğrenci derse atandı.',
-        createdByUserId: CURRENT_USER_ID,
-        createdAt: r.createdAt
+        id: 'AUD-' + String(seq).padStart(5, '0'),
+        entityType: o.entityType, entityId: o.entityId,
+        action: o.action, description: o.description || '',
+        previousValue: o.previousValue, newValue: o.newValue,
+        reason: o.reason,
+        relatedTeacherIds: o.relatedTeacherIds,
+        createdByUserId: o.by || USERS[seq % 2],
+        createdAt: o.at
       });
+    }
+    var lc = function (s) { return getLessonCode(s); };
+    var ltName = function (id) { return id === 'lt-mat' ? 'Matematik' : (id === 'lt-fen' ? 'Fen' : id); };
+
+    // 1) DENEME DERSLERİ — öğretmen değişimi, sınıf değişimi, tarih değişimi, iptal, öğrenci ekle/çıkar
+    sessions.forEach(function (s, i) {
+      if (s.status === 'cancelled') {
+        push({ entityType: 'trial_lesson_session', entityId: s.id, action: 'cancelled', description: 'Ders iptal edildi (' + lc(s) + ').', previousValue: 'Onaylandı', newValue: 'İptal Edildi', reason: 'Öğretmen uygunluğu', at: isoAt(-2, 14, 0) });
+        return;
+      }
+      if (s.status === 'completed') return; // tamamlananları sade tutalım
+      var m = i % 9;
+      if (m === 0 && s.pdrTeacherId) {
+        var altP = altTeacher(s.pdrTeacherId, s.pdrTeacherId);
+        if (altP) push({ entityType: 'trial_lesson_session', entityId: s.id, action: 'pdr_teacher_changed', description: 'PDR öğretmeni değiştirildi (' + lc(s) + ').', previousValue: tName(altP.id), newValue: tName(s.pdrTeacherId), relatedTeacherIds: [altP.id, s.pdrTeacherId], reason: 'Program çakışması', at: isoAt(-3 - (i % 5), 9 + (i % 6), 0) });
+      } else if (m === 1 && s.branchTeacherId) {
+        var altB = altTeacher(s.branchTeacherId, s.branchTeacherId);
+        if (altB) push({ entityType: 'trial_lesson_session', entityId: s.id, action: 'branch_teacher_changed', description: 'Branş öğretmeni değiştirildi (' + lc(s) + ').', previousValue: tName(altB.id), newValue: tName(s.branchTeacherId), relatedTeacherIds: [altB.id, s.branchTeacherId], reason: 'Öğretmen talebi', at: isoAt(-3 - (i % 5), 10 + (i % 5), 0) });
+      } else if (m === 2 && s.gradeLevel) {
+        var oldG = GR[(GR.indexOf(s.gradeLevel) + 1) % GR.length];
+        push({ entityType: 'trial_lesson_session', entityId: s.id, action: 'grade_changed', description: 'Ders sınıf seviyesi güncellendi (' + lc(s) + ').', previousValue: oldG, newValue: s.gradeLevel, reason: 'Sınıf düzeltmesi', at: isoAt(-4 - (i % 4), 11, 0) });
+      } else if (m === 3) {
+        push({ entityType: 'trial_lesson_session', entityId: s.id, action: 'time_changed', description: 'Ders tarih/saati değiştirildi (' + lc(s) + ').', previousValue: dateKeyOffset(-1) + ' ' + s.startTime, newValue: s.date + ' ' + s.startTime, reason: 'Veli talebi', at: isoAt(-5 - (i % 3), 13, 0) });
+      } else if (m === 4 && s.lessonTypeId) {
+        var oldLt = s.lessonTypeId === 'lt-mat' ? 'lt-fen' : 'lt-mat';
+        push({ entityType: 'trial_lesson_session', entityId: s.id, action: 'lesson_type_changed', description: 'Ders türü değiştirildi (' + lc(s) + ').', previousValue: ltName(oldLt), newValue: ltName(s.lessonTypeId), reason: 'Planlama düzeltmesi', at: isoAt(-6, 12, 0) });
+      } else if (m === 5 && (s.enrolledStudentIds || []).length) {
+        var st = find(students, s.enrolledStudentIds[0]);
+        if (st) push({ entityType: 'trial_lesson_session', entityId: s.id, action: 'student_assigned', description: 'Derse öğrenci eklendi (' + lc(s) + ').', previousValue: '—', newValue: st.firstName + ' ' + st.lastName, at: isoAt(-4, 15, 0) });
+      }
     });
+
+    // 2) REZERVASYON TALEPLERİ — iletişim durumu, derse atama, atanan ders değişimi
+    requests.forEach(function (r, i) {
+      if (r.deleted) return;
+      var res = reservations.find(function (x) { return x.requestId === r.id; });
+      var m = i % 7;
+      if (m === 0 && r.contactStatus) {
+        var trMap = { positive: 'Olumlu', negative: 'Olumsuz', unreachable: 'Ulaşılamadı' };
+        push({ entityType: 'trial_lesson_request', entityId: r.id, action: 'contact_updated', description: 'İletişim durumu güncellendi (' + r.studentFirstName + ' ' + r.studentLastName + ').', previousValue: 'Görüşülmedi', newValue: trMap[r.contactStatus] || 'Görüşülmedi', at: isoAt(-6 + (i % 5), 10, 0) });
+      } else if (m === 1 && res) {
+        var s2 = find(sessions, res.sessionId);
+        push({ entityType: 'trial_lesson_request', entityId: r.id, action: 'student_assigned', description: 'Öğrenci derse atandı (' + r.studentFirstName + ' ' + r.studentLastName + ').', previousValue: 'Atanmadı', newValue: s2 ? lc(s2) : 'Atandı', at: isoAt(-5 + (i % 4), 11, 0) });
+      } else if (m === 2 && res) {
+        var s3 = find(sessions, res.sessionId);
+        push({ entityType: 'trial_lesson_request', entityId: r.id, action: 'session_changed', description: 'Atanan ders değiştirildi (' + r.studentFirstName + ' ' + r.studentLastName + ').', previousValue: 'tL-' + String((i % 80) + 1).padStart(4, '0'), newValue: s3 ? lc(s3) : '—', reason: 'Uygun saat', at: isoAt(-4, 14, 0) });
+      }
+    });
+
+    // 3) ÖĞRENCİ — sınıf düzeltmesi, ad düzeltmesi
+    students.forEach(function (st, i) {
+      if (i % 11 !== 0) return;
+      if (i % 22 === 0) {
+        var oldG2 = GR[(GR.indexOf(st.grade) + 1) % GR.length];
+        push({ entityType: 'student', entityId: st.id, action: 'grade_changed', description: 'Öğrenci sınıfı güncellendi (' + st.firstName + ' ' + st.lastName + ').', previousValue: oldG2, newValue: st.grade, at: isoAt(-7 + (i % 6), 9, 0) });
+      } else {
+        push({ entityType: 'student', entityId: st.id, action: 'name_changed', description: 'Öğrenci adı düzeltildi.', previousValue: st.firstName + 'can ' + st.lastName, newValue: st.firstName + ' ' + st.lastName, at: isoAt(-8 + (i % 6), 10, 0) });
+      }
+    });
+
+    // 4) VELİ — telefon / e-posta / ad güncellemesi
+    parents.forEach(function (pa, i) {
+      if (i % 9 !== 0) return;
+      var pick = i % 3;
+      if (pick === 0) push({ entityType: 'parent', entityId: pa.id, action: 'phone_changed', description: 'Veli telefonu güncellendi (' + pa.firstName + ' ' + pa.lastName + ').', previousValue: '05' + String(300000000 + i).slice(0, 9), newValue: pa.phone, at: isoAt(-6 + (i % 5), 12, 0) });
+      else if (pick === 1) push({ entityType: 'parent', entityId: pa.id, action: 'email_changed', description: 'Veli e-postası güncellendi (' + pa.firstName + ' ' + pa.lastName + ').', previousValue: 'eski.' + (pa.email || 'mail@mail.com'), newValue: pa.email, at: isoAt(-5 + (i % 4), 13, 0) });
+      else push({ entityType: 'parent', entityId: pa.id, action: 'name_changed', description: 'Veli adı düzeltildi.', previousValue: pa.firstName + ' ' + pa.lastName + 'oğlu', newValue: pa.firstName + ' ' + pa.lastName, at: isoAt(-7, 11, 0) });
+    });
+
+    logs.sort(function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); });
+    // id'leri zaman sırasına göre yeniden numaralandır (en yeni en büyük değil; sabit kalsın)
     return logs;
   }
 
@@ -641,7 +745,7 @@
     state.requests = rr.requests;
     state.reservations = rr.reservations;
     state.communicationLogs = buildContactChangeLogs(state.requests).concat(buildCommunicationLogs(state.reservations));
-    state.auditLogs = buildAuditLogs(state.sessions, state.reservations);
+    state.auditLogs = buildAuditLogs(state.sessions, state.reservations, state.requests, state.students, state.parents, state.teachers);
     ensureDataSourceMetadata();
   }
 
@@ -662,7 +766,7 @@
       sessionId: sessionId,
       platform: 'internal_app',
       meetingUrl: 'https://app.bilenyum.com/ders/' + sessionId,
-      meetingId: 'TRIALMEETING-' + String(state.meetings.length + 1).padStart(4, '0'),
+      meetingId: 'tM-' + String(state.meetings.length + 1).padStart(4, '0'),
       passcode: randPass(),
       status: 'active',
       generatedAt: new Date().toISOString(),
@@ -1159,7 +1263,7 @@
     return state.reservations.find(function (r) { return r.requestId === requestId; }) || null;
   }
 
-  // Otomatik deneme rezervasyon kodu: REZTRIAL-<tarih>-<sıra>, atanan/seçilen ders tarihine göre.
+  // Otomatik deneme rezervasyon kodu: rT-<tarih>-<sıra>, atanan/seçilen ders tarihine göre.
   function getReservationCode(requestId) {
     var r = find(state.requests, requestId);
     if (!r) return '';
@@ -1172,22 +1276,77 @@
     var compact = dateKey ? dateKey.replace(/-/g, '') : '00000000';
     var m = String(r.id).match(/(\d+)\s*$/);
     var seq = m ? m[1].padStart(4, '0') : '0000';
-    return 'REZTRIAL-' + compact + '-' + seq;
+    return 'rT-' + compact + '-' + seq;
   }
 
-  // Deneme dersi görünen kimliği: trialLesson-<sıra>
+  // Deneme dersi görünen kimliği: tL-<sıra>
   function getLessonCode(sessionOrId) {
     var s = typeof sessionOrId === 'string' ? find(state.sessions, sessionOrId) : sessionOrId;
     if (!s) return '';
     var m = String(s.id).match(/(\d+)\s*$/);
     var seq = m ? m[1].padStart(4, '0') : '0000';
-    return 'trialLesson-' + seq;
+    return 'tL-' + seq;
   }
 
   function isOrphanRequest(requestId) {
     var req = find(state.requests, requestId);
-    if (!req || req.status === 'rejected' || req.status === 'cancelled') return false;
+    if (!req || req.deleted || req.status === 'rejected' || req.status === 'cancelled') return false;
     return !getReservationByRequestId(requestId);
+  }
+
+  // Rezervasyon talebini sil (soft-delete): talep listede "Silindi" olarak kalır. Bağlı aktif
+  // rezervasyon varsa iptal edilir ve öğrenci dersten çıkarılır (reddetme akışıyla aynı temizlik).
+  function deleteRequest(requestId) {
+    var req = find(state.requests, requestId);
+    if (!req) return { ok: false, error: 'Talep bulunamadı.' };
+    if (req.deleted) return { ok: false, error: 'Talep zaten silinmiş.' };
+    req.deleted = true;
+    req.deletedAt = new Date().toISOString();
+    req.updatedAt = new Date().toISOString();
+    var res = getReservationByRequestId(requestId);
+    if (res && res.status !== 'cancelled') {
+      res.status = 'cancelled';
+      res.cancellationReason = 'Talep silindi.';
+      res.updatedAt = new Date().toISOString();
+      var session = find(state.sessions, res.sessionId);
+      if (session) {
+        var idx = session.enrolledStudentIds.indexOf(res.studentId);
+        if (idx >= 0) session.enrolledStudentIds.splice(idx, 1);
+        var ridx = session.reservationIds.indexOf(res.id);
+        if (ridx >= 0) session.reservationIds.splice(ridx, 1);
+      }
+    }
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'trial_lesson_request',
+        entityId: requestId,
+        action: 'request_deleted',
+        description: 'Rezervasyon talebi silindi.'
+      });
+    }
+    touch();
+    return { ok: true, request: req };
+  }
+
+  // Silinmiş / reddedilmiş / iptal edilmiş bir talebi yeniden aktifleştir → durum "Bekliyor",
+  // süreç (İletişim → Ders Ataması → Rezerve → Onay → Link) baştan devam eder.
+  function reactivateRequest(requestId) {
+    var req = find(state.requests, requestId);
+    if (!req) return { ok: false, error: 'Talep bulunamadı.' };
+    req.deleted = false;
+    req.deletedAt = undefined;
+    if (req.status === 'rejected' || req.status === 'cancelled') req.status = 'new';
+    req.updatedAt = new Date().toISOString();
+    if (Audit) {
+      Audit.append(state, {
+        entityType: 'trial_lesson_request',
+        entityId: requestId,
+        action: 'request_reactivated',
+        description: 'Talep yeniden aktifleştirildi (Bekliyor).'
+      });
+    }
+    touch();
+    return { ok: true, request: req };
   }
 
   function approveParentForRequest(requestId) {
@@ -1420,6 +1579,9 @@
     if (session.lessonTypeId !== req.requestedLessonTypeId) {
       return { ok: false, error: 'Ders türü taleple uyuşmuyor.' };
     }
+    if (session.gradeLevel && req.studentGrade && session.gradeLevel !== req.studentGrade) {
+      return { ok: false, error: 'Dersin sınıf seviyesi (' + session.gradeLevel + ') öğrencinin sınıfı (' + req.studentGrade + ') ile uyuşmuyor.' };
+    }
     if (Rules && Rules.getSessionRemainingCapacity(sessionId) <= 0) {
       return { ok: false, error: 'Seçilen dersin kapasitesi dolu.' };
     }
@@ -1540,6 +1702,105 @@
     }
     touch();
     return { ok: true, parent: pa };
+  }
+
+  // Veli + öğrencilerini tek seferde günceller ve talep (requests) tablosundaki denormalize
+  // kopyaları (ad/telefon/e-posta/öğrenci adı) da eşitler. Böylece Öğrenciler, Rezervasyon
+  // Talepleri, Operasyon Merkezi ve tüm detaylar aynı veriyi gösterir. İşlev mantığı bozulmaz:
+  // talep↔öğrenci bağı ad ile, talep↔veli bağı telefon ile kurulduğundan eski değerlerle eşleşilir.
+  function updateParentFamily(parentId, patch) {
+    var pa = find(state.parents, parentId);
+    if (!pa) return { ok: false, error: 'Veli bulunamadı.' };
+    patch = patch || {};
+
+    // Eski kimlikleri mutasyondan ÖNCE yakala (denormalize eşleştirme için).
+    var oldParentDigits = String(pa.phone || '').replace(/\D/g, '');
+    var studentOld = {};
+    (pa.studentIds || []).forEach(function (sid) {
+      var st = find(state.students, sid);
+      if (st) studentOld[sid] = { first: st.firstName, last: st.lastName };
+    });
+
+    var now = new Date().toISOString();
+    function audit(entityType, entityId, action, desc, oldV, newV) {
+      if (Audit) Audit.append(state, { entityType: entityType, entityId: entityId, action: action, description: desc, previousValue: oldV, newValue: newV, createdAt: now });
+    }
+
+    // Veli alanları — her değişen alan için eski/yeni değerli denetim kaydı.
+    var p = patch.parent || {};
+    var paName = pa.firstName + ' ' + pa.lastName;
+    if (p.firstName != null && String(p.firstName).trim() && String(p.firstName).trim() !== pa.firstName) { var of = pa.firstName; pa.firstName = String(p.firstName).trim(); audit('parent', parentId, 'name_changed', 'Veli adı güncellendi.', of + ' ' + pa.lastName, pa.firstName + ' ' + pa.lastName); }
+    if (p.lastName != null && String(p.lastName).trim() && String(p.lastName).trim() !== pa.lastName) { var ol = pa.lastName; pa.lastName = String(p.lastName).trim(); audit('parent', parentId, 'name_changed', 'Veli soyadı güncellendi.', pa.firstName + ' ' + ol, pa.firstName + ' ' + pa.lastName); }
+    if (p.phone != null && String(p.phone).trim() && String(p.phone).trim() !== pa.phone) { var op = pa.phone; pa.phone = String(p.phone).trim(); audit('parent', parentId, 'phone_changed', 'Veli telefonu güncellendi (' + pa.firstName + ' ' + pa.lastName + ').', op, pa.phone); }
+    if (p.email != null && String(p.email).trim() && String(p.email).trim() !== pa.email) { var oe = pa.email; pa.email = String(p.email).trim(); audit('parent', parentId, 'email_changed', 'Veli e-postası güncellendi (' + pa.firstName + ' ' + pa.lastName + ').', oe || '—', pa.email); }
+    pa.updatedAt = now;
+
+    // Öğrenci bilgileri (sadece bu veliye bağlı öğrenciler) — eski/yeni değerli denetim.
+    (patch.students || []).forEach(function (sp) {
+      if (!sp || !sp.id || (pa.studentIds || []).indexOf(sp.id) < 0) return;
+      var st = find(state.students, sp.id);
+      if (!st) return;
+      var full = function () { return st.firstName + ' ' + st.lastName; };
+      if (sp.firstName != null && String(sp.firstName).trim() && String(sp.firstName).trim() !== st.firstName) { var sf = st.firstName; st.firstName = String(sp.firstName).trim(); audit('student', st.id, 'name_changed', 'Öğrenci adı güncellendi.', sf + ' ' + st.lastName, full()); }
+      if (sp.lastName != null && String(sp.lastName).trim() && String(sp.lastName).trim() !== st.lastName) { var sl = st.lastName; st.lastName = String(sp.lastName).trim(); audit('student', st.id, 'name_changed', 'Öğrenci soyadı güncellendi.', st.firstName + ' ' + sl, full()); }
+      if (sp.grade != null && String(sp.grade).trim() && String(sp.grade).trim() !== st.grade) { var sg = st.grade; st.grade = String(sp.grade).trim(); audit('student', st.id, 'grade_changed', 'Öğrenci sınıfı güncellendi (' + full() + ').', sg, st.grade); }
+      if (sp.requestedLessonTypeId != null && String(sp.requestedLessonTypeId).trim()) st.requestedLessonTypeId = String(sp.requestedLessonTypeId).trim();
+      st.updatedAt = now;
+    });
+
+    // Yeni öğrenci(ler) ekle ve veliye bağla (talep/rezervasyon oluşmaz; sadece kayıt).
+    var created = [];
+    (patch.newStudents || []).forEach(function (ns) {
+      if (!ns || !String(ns.firstName || '').trim() || !String(ns.lastName || '').trim()) return;
+      var sid = nextId('student', state.students);
+      var st = {
+        id: sid,
+        source: 'trial_lesson_application',
+        firstName: String(ns.firstName).trim(),
+        lastName: String(ns.lastName).trim(),
+        age: parseInt(ns.age, 10) || 11,
+        grade: ns.grade || GRADES[0],
+        level: ns.level || LEVELS[0],
+        requestedLessonTypeId: ns.requestedLessonTypeId || 'lt-mat',
+        parentIds: [parentId],
+        status: 'new_request',
+        hasUsedFreeTrialForLessonTypeIds: [],
+        notes: '',
+        createdAt: now,
+        updatedAt: now
+      };
+      state.students.push(st);
+      pa.studentIds.push(sid);
+      created.push(st);
+      audit('student', sid, 'created', 'Veliye yeni öğrenci eklendi (' + st.firstName + ' ' + st.lastName + ').', '—', st.firstName + ' ' + st.lastName);
+    });
+
+    // Talep tablosundaki denormalize kopyaları eşitle.
+    state.requests.forEach(function (req) {
+      var reqDigits = String(req.parentPhone || '').replace(/\D/g, '');
+      var belongs = (oldParentDigits && reqDigits === oldParentDigits) ||
+        state.reservations.some(function (r) { return r.requestId === req.id && r.parentId === parentId; });
+      if (!belongs) return;
+      req.parentFirstName = pa.firstName;
+      req.parentLastName = pa.lastName;
+      req.parentPhone = pa.phone;
+      req.parentEmail = pa.email;
+      (pa.studentIds || []).forEach(function (sid) {
+        var st = find(state.students, sid);
+        var old = studentOld[sid];
+        if (!st || !old) return;
+        var nameMatch = req.studentFirstName === old.first && req.studentLastName === old.last;
+        var resMatch = state.reservations.some(function (r) { return r.requestId === req.id && r.studentId === sid; });
+        if (nameMatch || resMatch) {
+          req.studentFirstName = st.firstName;
+          req.studentLastName = st.lastName;
+          if (st.grade) req.studentGrade = st.grade;
+        }
+      });
+    });
+
+    touch();
+    return { ok: true, parent: pa, createdStudents: created };
   }
 
   function guardTrialManagerEntityCreate() {
@@ -2102,6 +2363,9 @@
       selectedSessionId: draft.selectedSessionId !== undefined
         ? (draft.selectedSessionId || undefined)
         : (session ? session.id : undefined),
+      preferredSessionId: (draft.selectedSessionId && find(state.sessions, draft.selectedSessionId))
+        ? draft.selectedSessionId
+        : (session ? session.id : undefined),
       status: 'new',
       source: 'website_form',
       createdAt: new Date().toISOString(),
@@ -2197,7 +2461,7 @@
     var orphanRequests = state.requests.filter(function (r) {
       return isOrphanRequest(r.id);
     });
-    var newRequests = state.requests.filter(function (r) { return r.status === 'new'; });
+    var newRequests = state.requests.filter(function (r) { return r.status === 'new' && !r.deleted; });
     var studentCountToday = 0;
     todaySessions.forEach(function (s) { studentCountToday += s.enrolledStudentIds.length; });
     var actionableCount = pendingApproval.length + linkNotSent.length + orphanRequests.length +
@@ -2264,11 +2528,14 @@
     updateSessionNotes: updateSessionNotes,
     changeSessionGradeLevel: changeSessionGradeLevel,
     rejectRequest: rejectRequest,
+    deleteRequest: deleteRequest,
+    reactivateRequest: reactivateRequest,
     assignRequestToSession: assignRequestToSession,
     getAvailableSessionsForLessonType: getAvailableSessionsForLessonType,
     convertStudentToEnrollment: convertStudentToEnrollment,
     updateStudent: updateStudent,
     updateParent: updateParent,
+    updateParentFamily: updateParentFamily,
     updateTeacher: updateTeacher,
     updateTeacherAvailability: updateTeacherAvailability,
     updateTeacherOperationalNotes: updateTeacherOperationalNotes,

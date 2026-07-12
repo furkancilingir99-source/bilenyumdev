@@ -35,11 +35,15 @@
     if (!r) return null;
     var lt = Store.getLessonTypeById(r.requestedLessonTypeId);
     var res = Store.getReservationByRequestId(id);
+    // İptal edilmiş rezervasyon aktif sayılmaz (silme/yeniden aktifleştirme sonrası akış doğru başlar).
+    if (res && res.status === 'cancelled') res = null;
     var sess = r.selectedSessionId ? Store.getSessionById(r.selectedSessionId) : (res ? Store.getSessionById(res.sessionId) : null);
     var meeting = sess ? Store.getMeetingBySessionId(sess.id) : null;
     var rejected = r.status === 'rejected' || r.status === 'cancelled';
+    var deleted = !!r.deleted;
+    var locked = rejected || deleted;
     var orphan = Store.isOrphanRequest ? Store.isOrphanRequest(id) : !res;
-    return { r: r, lt: lt, res: res, sess: sess, meeting: meeting, rejected: rejected, orphan: orphan };
+    return { r: r, lt: lt, res: res, sess: sess, meeting: meeting, rejected: rejected, deleted: deleted, locked: locked, orphan: orphan };
   }
 
   function detail(l, v) {
@@ -70,8 +74,12 @@
     });
   }
 
-  function renderStepper(currentStep, viewStep, rejected) {
-    if (rejected) return '<div class="tm-req-status-banner is-rejected">Bu talep reddedildi / iptal edildi.</div>';
+  function renderStepper(currentStep, viewStep, locked, isDeleted) {
+    if (locked) {
+      var msg = isDeleted ? 'Bu talep iptal edildi.' : 'Bu talep reddedildi / iptal edildi.';
+      return '<div class="tm-req-status-banner is-rejected">' + msg +
+        ' <button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmReactivate" data-tm-require="edit">Aktif hale getir</button></div>';
+    }
     return '<div class="tm-req-steps">' + STEPS.map(function (s, i) {
       var n = i + 1;
       var reachable = n <= currentStep;
@@ -195,7 +203,7 @@
     if (step === 4) {
       return panel(4, 'Veli onayını al',
         'Veli deneme dersini onayladığında işaretleyin.',
-        wa + '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmApproveParent" data-tm-require="edit">Veli onayladı</button>',
+        '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" id="tmApproveParent" data-tm-require="edit">Veli onayladı</button>',
         lessonBox);
     }
     if (step === 5) {
@@ -213,7 +221,7 @@
     var res = ctx.res;
     var sess = ctx.sess;
     var meeting = ctx.meeting;
-    var rejected = ctx.rejected;
+    var locked = ctx.locked;
     // Olumlu iletişim (ya da zaten bir rezervasyonun varlığı) olmadan ders ataması yapılamaz.
     var contacted = r.contactStatus === 'positive' || !!res;
     var positive = contacted;
@@ -225,7 +233,7 @@
     if (vs < 1) vs = 1;
 
     var panel;
-    if (rejected) {
+    if (locked) {
       panel = '';
     } else if (vs === 1) {
       panel = contactPanel(r);
@@ -242,10 +250,19 @@
 
     var code = Store.getReservationCode ? Store.getReservationCode(r.id) : r.id;
 
+    // Talebin geldiği an + velinin formda seçtiği ders saati (preferredSessionId, boş olamaz).
+    var preferSid = r.preferredSessionId || r.selectedSessionId;
+    var preferSess = preferSid ? Store.getSessionById(preferSid) : null;
+    var istedigiText = preferSess
+      ? (U.formatDateKey(preferSess.date) + ' ' + (preferSess.startTime || '') + (preferSess.endTime ? '–' + preferSess.endTime : ''))
+      : '—';
+
     return (
       '<div class="tm-res-code"><span class="tm-res-code-label">Rezervasyon ID</span><code class="tm-res-code-val">' + U.escapeHtml(code) + '</code></div>' +
-      renderStepper(currentStep, vs, rejected) +
+      renderStepper(currentStep, vs, locked, ctx.deleted) +
       '<div class="tm-detail-grid">' +
+        detail('Talep tarihi', U.formatDateTime(r.createdAt)) +
+        detail('İstediği Ders Tarihi', istedigiText) +
         detail('Öğrenci', r.studentFirstName + ' ' + r.studentLastName) +
         detail('Sınıf', r.studentGrade) +
         detail('Ders türü', lt ? lt.name : '—') +
@@ -255,7 +272,8 @@
         detail('İletişim durumu', contactStatusBadge(r.contactStatus)) +
         detail('Atanan ders', assignedText) +
       '</div>' +
-      (meeting && res ? '<div class="tm-link-box" style="margin-top:12px"><strong>Online link</strong><br>' + U.escapeHtml(meeting.meetingUrl) + '</div>' : '') +
+      // Link bölümü yalnızca Link aşamasında (onay tamamlanıp link adımına gelince) görünür.
+      (meeting && res && currentStep >= 5 ? '<div class="tm-link-box" style="margin-top:12px"><strong>Online link</strong><br>' + U.escapeHtml(meeting.meetingUrl) + '</div>' : '') +
       panel
     );
   }
@@ -318,24 +336,59 @@
     return String(v);
   }
 
+  var CONTACT_TR = { positive: 'Olumlu', negative: 'Olumsuz', unreachable: 'Ulaşılamadı', call_again: 'Tekrar aranacak', none: 'Görüşülmedi' };
+  function contactTr(s) { return CONTACT_TR[s] || 'Görüşülmedi'; }
+  function byCell(by) {
+    if (by === 'website' || !by) return '<span class="tm-comm-by-name">Web formu / Sistem</span>';
+    return contactByCell(by);
+  }
+
+  // Talebin/rezervasyonun TÜM yaşam döngüsü: talep alındı → iletişim → derse atama/rezervasyon →
+  // veli onayı → link → sonraki değişiklikler. Gerçek zaman damgaları + değişikliği yapan kişi.
+  function requestHistory(id) {
+    var r = Store.getRequestById(id);
+    if (!r) return [];
+    var res = Store.getReservationByRequestId(id);
+    var sess = res && res.sessionId ? Store.getSessionById(res.sessionId) : (r.selectedSessionId ? Store.getSessionById(r.selectedSessionId) : null);
+    var lessonCode = sess && Store.getLessonCode ? Store.getLessonCode(sess) : '';
+    var ev = [];
+    ev.push({ at: r.createdAt, by: 'website', text: 'Web formundan ücretsiz deneme dersi talebi alındı.', oldV: '—', newV: 'Talep alındı' });
+    (Store.getCommunicationLogs ? Store.getCommunicationLogs() : []).filter(function (l) { return l.requestId === id; })
+      .forEach(function (l) {
+        var chan = SL.COMM_CHANNEL && SL.COMM_CHANNEL[l.channel] ? SL.COMM_CHANNEL[l.channel] : (l.channel || '');
+        var hasTrans = (l.contactTo !== undefined && l.contactTo !== null);
+        ev.push({ at: l.createdAt, by: l.createdByUserId, text: 'İletişim' + (chan ? ' (' + chan + ')' : '') + (l.summary ? ' — ' + l.summary : ''),
+          oldV: hasTrans ? contactTr(l.contactFrom === 'none' ? 'none' : l.contactFrom) : '—', newV: hasTrans ? contactTr(l.contactTo) : '—' });
+      });
+    if (res) {
+      ev.push({ at: res.createdAt, by: 'user-manager-1', text: 'Öğrenci derse atandı ve rezervasyon oluşturuldu.', oldV: 'Atanmadı', newV: lessonCode || 'Atandı' });
+      if (res.parentApprovalStatus === 'approved') ev.push({ at: res.updatedAt || res.createdAt, by: 'user-manager-1', text: 'Veli deneme dersini onayladı.', oldV: 'Onay bekliyor', newV: 'Onaylandı' });
+      if (res.linkSent && res.linkSentAt) ev.push({ at: res.linkSentAt, by: res.linkSentByUserId || 'user-manager-1', text: 'Online ders linki veliye gönderildi.', oldV: 'Gönderilmedi', newV: 'Gönderildi' });
+      if (res.status === 'cancelled') ev.push({ at: res.updatedAt || res.createdAt, by: 'user-manager-1', text: 'Rezervasyon iptal edildi.', oldV: 'Aktif', newV: 'İptal Edildi' });
+    }
+    (Store.getAuditLogs ? Store.getAuditLogs() : []).filter(function (l) {
+      return (l.entityType === 'trial_lesson_request' && l.entityId === id) ||
+        (res && l.entityType === 'trial_lesson_reservation' && l.entityId === res.id);
+    }).forEach(function (l) {
+      ev.push({ at: l.createdAt, by: l.createdByUserId, text: (l.description || (SL.AUDIT_ACTION[l.action] || l.action)) + (l.reason ? ' (Neden: ' + l.reason + ')' : ''), oldV: l.previousValue, newV: l.newValue });
+    });
+    ev.sort(function (a, b) { return String(b.at || '').localeCompare(String(a.at || '')); });
+    return ev;
+  }
+
+  function hval(v) { return (v === undefined || v === null || v === '') ? '—' : String(v); }
   function renderAudit(id) {
-    var logs = Store.getAuditLogs().filter(function (l) {
-      return l.entityType === 'trial_lesson_request' && l.entityId === id;
-    }).slice().sort(function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); });
-    if (!logs.length) return '<p class="tm-empty">Değişiklik geçmişi yok.</p>';
-    var rows = logs.map(function (l) {
-      var hasOld = l.previousValue !== undefined && l.previousValue !== null && l.previousValue !== '';
-      var hasNew = l.newValue !== undefined && l.newValue !== null && l.newValue !== '';
-      var oldCell = hasOld ? '<span class="tm-audit-old">' + U.escapeHtml(formatAuditValue(l.previousValue)) + '</span>' : '<span class="tm-audit-none">—</span>';
-      var newCell = hasNew ? '<span class="tm-audit-new">' + U.escapeHtml(formatAuditValue(l.newValue)) + '</span>' : '<span class="tm-audit-none">—</span>';
-      return '<tr><td>' + U.formatDateTime(l.createdAt) + '</td>' +
-        '<td>' + contactByCell(l.createdByUserId) + '</td>' +
-        '<td><span class="tm-audit-action">' + U.escapeHtml(SL.AUDIT_ACTION[l.action] || l.action) + '</span></td>' +
-        '<td>' + oldCell + '</td>' +
-        '<td>' + newCell + '</td>' +
-        '<td>' + U.escapeHtml(l.description) + (l.reason ? '<span class="tm-audit-reason">Neden: ' + U.escapeHtml(l.reason) + '</span>' : '') + '</td></tr>';
+    var ev = requestHistory(id);
+    if (!ev.length) return '<p class="tm-empty">Değişiklik geçmişi yok.</p>';
+    var rows = ev.map(function (e) {
+      return '<tr><td>' + U.escapeHtml(U.formatDateTime(e.at)) + '</td>' +
+        '<td>' + byCell(e.by) + '</td>' +
+        '<td>' + U.escapeHtml(e.text) + '</td>' +
+        '<td><span class="tm-audit-old">' + U.escapeHtml(hval(e.oldV)) + '</span></td>' +
+        '<td><span class="tm-audit-new">' + U.escapeHtml(hval(e.newV)) + '</span></td></tr>';
     }).join('');
-    return '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Kişi</th><th>İşlem</th><th>Eski Durum</th><th>Yeni Durum</th><th>Açıklama</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    return '<table class="tm-inner-table tm-upcoming-table tm-fixed-table"><colgroup><col style="width:16%"><col style="width:20%"><col style="width:32%"><col style="width:16%"><col style="width:16%"></colgroup>' +
+      '<thead><tr><th>Tarih &amp; Saat</th><th>Değişikliği yapan</th><th>Değişiklik / İşlem</th><th>Eski Durum</th><th>Yeni Durum</th></tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
   function openCommForm(ctx) {
@@ -433,21 +486,27 @@
   function openAssignSession(ctx) {
     if (!Form || !guard('edit')) return;
     var r = ctx.r;
-    var sessions = Store.getAvailableSessionsForLessonType(r.requestedLessonTypeId);
+    // Yalnızca öğrencinin istediği TÜR ve SINIF seviyesine (5/6/7/8) uygun, uygun (gelecek,
+    // dolu olmayan) dersler listelenir; böylece atama sırasında "ders uygun değil" oluşmaz.
+    var sessions = Store.getAvailableSessionsForLessonType(r.requestedLessonTypeId).filter(function (s) {
+      return !s.gradeLevel || s.gradeLevel === r.studentGrade;
+    });
     if (!sessions.length) {
-      U.notifyError('Uygun ders bulunamadı. Önce ders planlayın.');
+      U.notifyError('Bu öğrencinin sınıfına (' + (r.studentGrade || '—') + ') ve istediği derse uygun boş ders bulunamadı. Önce uygun bir ders planlayın.');
       return;
     }
     Form.open({
       title: 'Derse ata',
+      description: 'Öğrenci: ' + U.escapeHtml(r.studentFirstName + ' ' + r.studentLastName) + ' · ' + U.escapeHtml(r.studentGrade || '—') +
+        ' · ' + U.escapeHtml((ctx.lt ? ctx.lt.name : '')) + '. Yalnızca bu tür ve sınıfa uygun dersler listelenir.',
       fields: [{
         type: 'select',
         name: 'sessionId',
         label: 'Ders oturumu',
-        value: r.selectedSessionId || '',
+        value: (r.selectedSessionId && sessions.some(function (s) { return s.id === r.selectedSessionId; })) ? r.selectedSessionId : '',
         options: sessions.map(function (s) {
           var code = Store.getLessonCode ? Store.getLessonCode(s) : s.id;
-          return { value: s.id, label: code + ' · ' + U.formatDateKey(s.date) + ' ' + s.startTime + (s.endTime ? '–' + s.endTime : '') };
+          return { value: s.id, label: code + ' · ' + (s.gradeLevel || '') + ' · ' + U.formatDateKey(s.date) + ' ' + s.startTime + (s.endTime ? '–' + s.endTime : '') };
         })
       }],
       onSubmit: function (data) {
@@ -467,7 +526,34 @@
     var res = ctx.res;
     var sess = ctx.sess;
     var meeting = ctx.meeting;
-    var rejected = ctx.rejected;
+    var locked = ctx.locked;
+
+    // Kilitli (silinmiş / reddedilmiş / iptal) talebi yeniden aktifleştir → Bekliyor, stepper geri gelir.
+    var reactBtn = body.querySelector('#tmReactivate');
+    if (reactBtn) reactBtn.onclick = function () {
+      if (!guard('edit')) return;
+      var name = r.studentFirstName + ' ' + r.studentLastName;
+      function doReactivate() {
+        var result = Store.reactivateRequest(currentId);
+        if (!result.ok) { U.notifyError(result.error); return; }
+        U.notifySuccess('Talep yeniden aktifleştirildi.');
+        notifyChange();
+        open(currentId, 0);
+      }
+      if (Confirm) {
+        Confirm.open({
+          title: 'Aktif hale getir',
+          warning: name + ' adlı öğrencinin talebini yeniden aktifleştirmek istediğinize emin misiniz? Durum "Bekliyor" olur ve süreç (İletişim → Ders Ataması → Rezerve → Onay → Link) baştan devam eder.',
+          requireReason: false,
+          confirmLabel: 'Aktif hale getir',
+          cancelLabel: 'Vazgeç',
+          danger: false,
+          onConfirm: doReactivate
+        });
+      } else if (window.confirm('Talep aktif hale getirilsin mi?')) {
+        doReactivate();
+      }
+    };
 
     var waBtn = body.querySelector('#tmDrawerWa');
     if (waBtn && QuickMsg) {
@@ -488,7 +574,7 @@
     }
 
     var assignBtn = body.querySelector('#tmAssignSession');
-    if (assignBtn && !rejected) assignBtn.onclick = function () { openAssignSession(ctx); };
+    if (assignBtn && !locked) assignBtn.onclick = function () { openAssignSession(ctx); };
 
     var createBtn = body.querySelector('#tmCreateRes');
     if (createBtn) {

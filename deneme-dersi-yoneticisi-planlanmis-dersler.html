@@ -49,8 +49,8 @@
           </select>
           <span class="tm-dg-spacer"></span>
           <select class="tm-dg-control tm-dg-select tm-dg-select--narrow" id="tmSessionsPageSize">
-            <option value="10" selected>10</option>
-            <option value="20">20</option>
+            <option value="10">10</option>
+            <option value="20" selected>20</option>
             <option value="50">50</option>
           </select>
           <button type="button" class="tm-dg-action tm-dg-action--csv tm-dg-action--iconbtn" id="tmSessionsExport" data-tm-export title="CSV indir" aria-label="CSV indir"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="M7 10l5 5 5-5"></path><path d="M12 15V3"></path></svg></button>
@@ -64,6 +64,10 @@
       <div id="tmSessionsLoading" class="td-state">Yükleniyor…</div>
       <div id="tmSessionsTableWrap" class="tm-res-table-wrap tm-sessions-table-wrap tm-mobile-table-wrap" hidden>
         <table class="tm-res-table tm-res-table--rich">
+          <colgroup>
+            <col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:9%"><col style="width:5%">
+            <col style="width:13%"><col style="width:13%"><col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:7%"><col style="width:9%">
+          </colgroup>
           <thead>
             <tr>
               <th>Deneme Dersi ID</th><th>Meeting ID</th><th>Tarih</th><th>Saat</th><th>Ders türü</th><th>Sınıf</th><th>PDR öğretmeni</th><th>Branş öğretmeni</th>

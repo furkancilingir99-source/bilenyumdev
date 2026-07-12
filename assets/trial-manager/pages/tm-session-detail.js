@@ -90,7 +90,7 @@
   var COPY_ICON = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
   var X_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>';
 
-  // Görünen kimlik kodu: trialstudent-0001 / trialparent-0001
+  // Görünen kimlik kodu: ts-0001 / tp-0001
   function personCode(prefix, id) {
     var m = String(id || '').match(/(\d+)\s*$/);
     var seq = m ? m[1].padStart(4, '0') : '0000';
@@ -120,8 +120,8 @@
     var p = d.participants.find(function (x) { return x.reservation.id === reservationId; });
     if (!p) return;
     var st = p.student, pa = p.parent;
-    var studentCode = personCode('trialstudent', st && st.id);
-    var parentCode = personCode('trialparent', pa && pa.id);
+    var studentCode = personCode('ts', st && st.id);
+    var parentCode = personCode('tp', pa && pa.id);
     var ders = (d.lessonType ? d.lessonType.name : 'Ders') + ' · ' + (d.session.gradeLevel || '—');
     var dersTarihi = U.formatDateKey(d.session.date) + ' ' + d.session.startTime + '–' + d.session.endTime;
     var rezTarihi = (p.reservation && p.reservation.createdAt) ? U.formatDateTime(p.reservation.createdAt) : '—';
@@ -325,25 +325,49 @@
       '<button type="button" class="tm-btn tm-btn--primary" data-save-attendance data-tm-require="edit" style="margin-top:12px">Katılım sonuçlarını kaydet</button>';
   }
 
-  function renderAudit(d) {
-    var logs = Store.getAuditLogs().filter(function (l) {
-      return (l.entityType === 'trial_lesson_session' && l.entityId === d.session.id) ||
-        (l.entityType === 'online_meeting' && l.entityId === d.session.onlineMeetingId);
+  // Dersin TÜM yaşam döngüsü: oluşturuldu → öğretmen bilgilendirme → öğretmen/tür/sınıf/tarih
+  // değişiklikleri → öğrenci ekle/çıkar → iptal. Gerçek zaman damgaları + değişikliği yapan kişi.
+  function sessionHistory(d) {
+    var s = d.session;
+    var lessonCode = Store.getLessonCode ? Store.getLessonCode(s) : s.id;
+    var audits = Store.getAuditLogs().filter(function (l) {
+      return (l.entityType === 'trial_lesson_session' && l.entityId === s.id) ||
+        (l.entityType === 'online_meeting' && l.entityId === s.onlineMeetingId);
     });
-    if (!logs.length) return '<p class="tm-empty">Değişiklik geçmişi yok.</p>';
-    var rows = logs.map(function (l) {
-      var hasOld = l.previousValue !== undefined && l.previousValue !== null && l.previousValue !== '';
-      var hasNew = l.newValue !== undefined && l.newValue !== null && l.newValue !== '';
-      var oldCell = hasOld ? '<span class="tm-audit-old">' + U.escapeHtml(formatAuditValue(l.previousValue)) + '</span>' : '<span class="tm-audit-none">—</span>';
-      var newCell = hasNew ? '<span class="tm-audit-new">' + U.escapeHtml(formatAuditValue(l.newValue)) + '</span>' : '<span class="tm-audit-none">—</span>';
-      return '<tr><td>' + U.formatDateTime(l.createdAt) + '</td>' +
-        '<td>' + userCell(l.createdByUserId) + '</td>' +
-        '<td><span class="tm-audit-action">' + U.escapeHtml(SL.AUDIT_ACTION[l.action] || l.action) + '</span></td>' +
-        '<td>' + oldCell + '</td>' +
-        '<td>' + newCell + '</td>' +
-        '<td>' + U.escapeHtml(l.description) + (l.reason ? '<span class="tm-audit-reason">Neden: ' + U.escapeHtml(l.reason) + '</span>' : '') + '</td></tr>';
+    // Sentezlenen olaylarla çakışmasın diye atlanacak denetim aksiyonları (oluşturma + bilgilendirme).
+    var SKIP_INFORM = { pdr_teacher_informed: 1, branch_teacher_informed: 1, created: 1, updated: 1 };
+    var hasCancelAudit = audits.some(function (l) { return l.action === 'cancelled'; });
+    var ev = [];
+    ev.push({ at: s.createdAt, by: s.createdByUserId, text: 'Deneme dersi oluşturuldu (' + lessonCode + ').', oldV: '—', newV: 'Oluşturuldu' });
+    if (s.pdrTeacherInformed && s.pdrTeacherInformedAt) {
+      ev.push({ at: s.pdrTeacherInformedAt, by: s.pdrTeacherInformedByUserId, text: 'PDR öğretmeni bilgilendirildi' + (d.pdrTeacher ? ' (' + U.fullName(d.pdrTeacher.firstName, d.pdrTeacher.lastName) + ')' : '') + '.', oldV: 'Bilgilendirilmedi', newV: 'Bilgilendirildi' });
+    }
+    if (s.branchTeacherInformed && s.branchTeacherInformedAt) {
+      ev.push({ at: s.branchTeacherInformedAt, by: s.branchTeacherInformedByUserId, text: 'Branş öğretmeni bilgilendirildi' + (d.branchTeacher ? ' (' + U.fullName(d.branchTeacher.firstName, d.branchTeacher.lastName) + ')' : '') + '.', oldV: 'Bilgilendirilmedi', newV: 'Bilgilendirildi' });
+    }
+    if (s.status === 'cancelled' && !hasCancelAudit) {
+      ev.push({ at: s.updatedAt || s.createdAt, by: 'user-manager-1', text: 'Ders iptal edildi.', oldV: 'Onaylandı', newV: 'İptal Edildi' });
+    }
+    audits.filter(function (l) { return !SKIP_INFORM[l.action]; }).forEach(function (l) {
+      ev.push({ at: l.createdAt, by: l.createdByUserId, text: (l.description || (SL.AUDIT_ACTION[l.action] || l.action)) + (l.reason ? ' (Neden: ' + l.reason + ')' : ''), oldV: l.previousValue, newV: l.newValue });
+    });
+    ev.sort(function (a, b) { return String(b.at || '').localeCompare(String(a.at || '')); });
+    return ev;
+  }
+
+  function hval(v) { return (v === undefined || v === null || v === '') ? '—' : String(v); }
+  function renderAudit(d) {
+    var ev = sessionHistory(d);
+    if (!ev.length) return '<p class="tm-empty">Değişiklik geçmişi yok.</p>';
+    var rows = ev.map(function (e) {
+      return '<tr><td>' + U.escapeHtml(U.formatDateTime(e.at)) + '</td>' +
+        '<td>' + userCell(e.by) + '</td>' +
+        '<td>' + U.escapeHtml(e.text) + '</td>' +
+        '<td><span class="tm-audit-old">' + U.escapeHtml(hval(e.oldV)) + '</span></td>' +
+        '<td><span class="tm-audit-new">' + U.escapeHtml(hval(e.newV)) + '</span></td></tr>';
     }).join('');
-    return '<table class="tm-inner-table"><thead><tr><th>Tarih</th><th>Yapan Kişi</th><th>İşlem</th><th>Eski Durum</th><th>Yeni Durum</th><th>Açıklama</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    return '<table class="tm-inner-table tm-upcoming-table tm-fixed-table"><colgroup><col style="width:16%"><col style="width:20%"><col style="width:32%"><col style="width:16%"><col style="width:16%"></colgroup>' +
+      '<thead><tr><th>Tarih &amp; Saat</th><th>Değişikliği yapan</th><th>Değişiklik / İşlem</th><th>Eski Durum</th><th>Yeni Durum</th></tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
   function renderTab(idx, bodyEl) {
@@ -829,10 +853,10 @@
     });
   }
 
-  function buildDrawerOpts(sessionId, tab) {
+  function buildDrawerOpts(sessionId, tab, extra) {
     var d = Store.getSessionWithDetails(sessionId);
     if (!d) return null;
-    return {
+    var opts = {
       title: (d.lessonType ? d.lessonType.name : 'Ders') + ' · ' + U.formatDateKey(d.session.date),
       subtitle: d.session.startTime + ' – ' + d.session.endTime + ' · ' + SL.sessionLabel(d.session.status),
       expandHref: 'deneme-dersi-yoneticisi-planlanmis-ders-detay.html?id=' + encodeURIComponent(sessionId),
@@ -842,12 +866,18 @@
       activeTab: tab || 0,
       onTab: function (idx, bodyEl) { activeTab = idx; renderTab(idx, bodyEl); }
     };
+    // İsteğe bağlı "Geri Dön" — çağıran bir önceki ekrana dönüş sağlayabilsin.
+    if (extra && typeof extra.onBack === 'function') {
+      opts.onBack = extra.onBack;
+      if (extra.backLabel) opts.backLabel = extra.backLabel;
+    }
+    return opts;
   }
 
-  function open(sessionId, tab) {
+  function open(sessionId, tab, extra) {
     if (!Store || !Drawer) return;
     currentSessionId = sessionId;
-    var opts = buildDrawerOpts(sessionId, tab);
+    var opts = buildDrawerOpts(sessionId, tab, extra);
     if (opts) Drawer.open(opts);
   }
 

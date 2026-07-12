@@ -16,21 +16,13 @@
   var cardsEl = document.getElementById('tmAuditCards');
   var searchInput = document.getElementById('tmAuditSearch');
   var entityFilter = document.getElementById('tmAuditEntity');
-  var actionFilter = document.getElementById('tmAuditAction');
-  var startInput = document.getElementById('tmAuditStart');
-  var endInput = document.getElementById('tmAuditEnd');
   var countEl = document.getElementById('tmAuditCount');
   var exportBtn = document.getElementById('tmAuditExport');
   var page = 1;
   var pageSize = 25;
-
-  function defaultDates() {
-    var end = new Date();
-    var start = new Date();
-    start.setDate(start.getDate() - 30);
-    if (startInput) startInput.value = start.toISOString().slice(0, 10);
-    if (endInput) endInput.value = end.toISOString().slice(0, 10);
-  }
+  var EYE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+  function hval(v) { return (v === undefined || v === null || v === '') ? '—' : String(v); }
+  function category(l) { return SL.auditCategory ? SL.auditCategory(l.entityType) : (SL.AUDIT_ENTITY[l.entityType] || l.entityType); }
 
   function userLabel(userId) {
     if (!userId) return '—';
@@ -39,48 +31,35 @@
   }
 
   function initFromUrl() {
-    var entity = U.qs('entity');
     var entityId = U.qs('entityId') || U.qs('id');
-    if (entity && entityFilter && entityFilter.querySelector('option[value="' + entity + '"]')) {
-      entityFilter.value = entity;
-    }
     if (entityId && searchInput) searchInput.value = entityId;
   }
 
+  // "Tüm varlıklar" filtresi — DEĞİŞİKLİK TÜRÜ (Rezervasyon Talepleri / Deneme Dersleri /
+  // Öğrenci / Veli / Öğretmen) benzersiz kategorilerle doldurulur.
   function initFilters() {
-    if (entityFilter && SL && SL.AUDIT_ENTITY) {
+    if (entityFilter && SL && SL.AUDIT_CATEGORY) {
+      var cats = [];
+      Object.keys(SL.AUDIT_CATEGORY).forEach(function (k) { var c = SL.AUDIT_CATEGORY[k]; if (c !== 'Diğer' && cats.indexOf(c) < 0) cats.push(c); });
       entityFilter.innerHTML = '<option value="all">Tüm varlıklar</option>' +
-        Object.keys(SL.AUDIT_ENTITY).map(function (k) {
-          return '<option value="' + k + '">' + SL.AUDIT_ENTITY[k] + '</option>';
-        }).join('');
-    }
-    if (actionFilter && SL && SL.AUDIT_ACTION) {
-      actionFilter.innerHTML = '<option value="all">Tüm işlemler</option>' +
-        Object.keys(SL.AUDIT_ACTION).map(function (k) {
-          return '<option value="' + k + '">' + SL.AUDIT_ACTION[k] + '</option>';
-        }).join('');
+        cats.map(function (c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
     }
     initFromUrl();
   }
 
   function filtered() {
-    var start = startInput ? startInput.value : '';
-    var end = endInput ? endInput.value : '';
-    var entity = entityFilter ? entityFilter.value : 'all';
-    var action = actionFilter ? actionFilter.value : 'all';
+    var cat = entityFilter ? entityFilter.value : 'all';
     var q = searchInput ? searchInput.value : '';
     return Store.getAuditLogs().filter(function (l) {
-      var d = l.createdAt.slice(0, 10);
-      if (start && d < start) return false;
-      if (end && d > end) return false;
-      if (entity !== 'all' && l.entityType !== entity) return false;
-      if (action !== 'all' && l.action !== action) return false;
+      if (cat !== 'all' && category(l) !== cat) return false;
       if (q) {
-        var hay = l.id + ' ' + l.entityId + ' ' + l.description + ' ' + (l.reason || '') + ' ' + userLabel(l.createdByUserId);
+        var hay = l.id + ' ' + l.entityId + ' ' + (l.description || '') + ' ' + (l.reason || '') + ' ' +
+          userLabel(l.createdByUserId) + ' ' + category(l) + ' ' + hval(l.previousValue) + ' ' + hval(l.newValue) +
+          ' ' + (SL.AUDIT_ACTION[l.action] || l.action);
         if (hay.toLowerCase().indexOf(q.toLowerCase()) < 0) return false;
       }
       return true;
-    });
+    }).sort(function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); });
   }
 
   function rowData(l) {
@@ -98,19 +77,19 @@
   }
 
   function cardHtml(l) {
-    var r = rowData(l);
     return '<article class="tm-list-card" data-audit-id="' + l.id + '">' +
-      '<div class="tm-list-card-head"><div><strong>' + U.escapeHtml(r.action) + '</strong></div>' +
-      '<span class="tm-badge tm-badge--muted">' + U.escapeHtml(r.entityType) + '</span></div>' +
+      '<div class="tm-list-card-head"><div><strong>' + U.escapeHtml(category(l)) + '</strong>' +
+        '<code class="tm-res-code-cell">' + U.escapeHtml(l.entityId) + '</code></div>' +
+      '<span class="tm-badge tm-badge--muted">' + U.escapeHtml(SL.AUDIT_ACTION[l.action] || l.action) + '</span></div>' +
       '<div class="tm-list-card-body">' +
-        '<div><span class="tm-list-card-label">Tarih</span> ' + U.formatDateTime(r.date) + '</div>' +
-        '<div><span class="tm-list-card-label">Kayıt</span> ' + U.escapeHtml(r.entityId) + '</div>' +
-        '<div><span class="tm-list-card-label">Açıklama</span> ' + U.escapeHtml(r.description) + '</div>' +
-        '<div><span class="tm-list-card-label">Kullanıcı</span> ' + U.escapeHtml(r.user) + '</div>' +
+        '<div><span class="tm-list-card-label">Tarih & Saat</span> ' + U.formatDateTime(l.createdAt) + '</div>' +
+        '<div><span class="tm-list-card-label">Değişikliği Yapan</span> ' + U.escapeHtml(userLabel(l.createdByUserId)) + '</div>' +
+        '<div><span class="tm-list-card-label">Eski → Yeni</span> <span class="tm-audit-old">' + U.escapeHtml(hval(l.previousValue)) + '</span> → <span class="tm-audit-new">' + U.escapeHtml(hval(l.newValue)) + '</span></div>' +
+        (l.description ? '<div><span class="tm-list-card-label">Değişiklik</span> ' + U.escapeHtml(l.description) + '</div>' : '') +
       '</div>' +
       '<div class="tm-list-card-foot">' +
         '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-open-entity data-type="' +
-          U.escapeHtml(l.entityType) + '" data-id="' + U.escapeHtml(l.entityId) + '">Kayda git</button>' +
+          U.escapeHtml(l.entityType) + '" data-id="' + U.escapeHtml(l.entityId) + '">İlgili kaydı aç</button>' +
       '</div></article>';
   }
 
@@ -134,16 +113,15 @@
       var p = U.paginate(all, page, pageSize);
       if (countEl) countEl.textContent = p.total + ' kayıt';
       tbody.innerHTML = p.items.map(function (l) {
-        var r = rowData(l);
         return '<tr data-audit-id="' + l.id + '">' +
-          '<td>' + U.formatDateTime(r.date) + '</td>' +
-          '<td>' + U.escapeHtml(r.entityType) + '</td>' +
-          '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-open-entity data-type="' +
-            U.escapeHtml(l.entityType) + '" data-id="' + U.escapeHtml(l.entityId) + '">' + U.escapeHtml(r.entityId) + '</button></td>' +
-          '<td>' + U.escapeHtml(r.action) + '</td>' +
-          '<td>' + U.escapeHtml(r.description) + '</td>' +
-          '<td>' + U.escapeHtml(r.reason || '—') + '</td>' +
-          '<td>' + U.escapeHtml(r.user) + '</td></tr>';
+          '<td>' + U.formatDateTime(l.createdAt) + '</td>' +
+          '<td>' + U.escapeHtml(userLabel(l.createdByUserId)) + '</td>' +
+          '<td><code class="tm-res-code-cell">' + U.escapeHtml(l.entityId) + '</code></td>' +
+          '<td>' + U.escapeHtml(category(l)) + '</td>' +
+          '<td><span class="tm-audit-old">' + U.escapeHtml(hval(l.previousValue)) + '</span></td>' +
+          '<td><span class="tm-audit-new">' + U.escapeHtml(hval(l.newValue)) + '</span></td>' +
+          '<td><span class="tm-row-actions"><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-open-entity data-type="' +
+            U.escapeHtml(l.entityType) + '" data-id="' + U.escapeHtml(l.entityId) + '" title="İlgili kaydı aç" aria-label="İlgili kaydı aç">' + EYE_ICON + '</button></span></td></tr>';
       }).join('');
       if (cardsEl) cardsEl.innerHTML = p.items.map(cardHtml).join('');
       U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });
@@ -160,25 +138,20 @@
 
   if (searchInput) searchInput.addEventListener('input', U.debounce(function () { page = 1; render(); }, 200));
   if (entityFilter) entityFilter.addEventListener('change', function () { page = 1; render(); });
-  if (actionFilter) actionFilter.addEventListener('change', function () { page = 1; render(); });
-  if (startInput) startInput.addEventListener('change', function () { page = 1; render(); });
-  if (endInput) endInput.addEventListener('change', function () { page = 1; render(); });
   if (exportBtn && Export) {
     exportBtn.addEventListener('click', function () {
       if (Perms && !Perms.guard('export')) return;
-      Export.exportTable('denetim-gunlugu.csv', filtered().map(rowData), [
-        { key: 'date', label: 'Tarih', value: function (r) { return U.formatDateTime(r.date); } },
-        { key: 'entityType', label: 'Varlık' },
-        { key: 'entityId', label: 'Kayıt ID' },
-        { key: 'action', label: 'İşlem' },
-        { key: 'description', label: 'Açıklama' },
-        { key: 'reason', label: 'Neden' },
-        { key: 'user', label: 'Kullanıcı' }
+      Export.exportTable('denetim-gunlugu.csv', filtered(), [
+        { key: 'date', label: 'Değişiklik Tarihi & Saati', value: function (l) { return U.formatDateTime(l.createdAt); } },
+        { key: 'user', label: 'Değişikliği Yapan', value: function (l) { return userLabel(l.createdByUserId); } },
+        { key: 'entityId', label: 'Kayıt ID', value: function (l) { return l.entityId; } },
+        { key: 'category', label: 'Değişiklik Türü', value: function (l) { return category(l); } },
+        { key: 'old', label: 'Eski Durum', value: function (l) { return hval(l.previousValue); } },
+        { key: 'new', label: 'Yeni Durum', value: function (l) { return hval(l.newValue); } }
       ]);
     });
   }
 
-  defaultDates();
   initFilters();
   render();
   window.TMOnSessionChange = render;

@@ -10,6 +10,7 @@
   var Export = window.TMExportUtils;
   var Rules = window.TMSchedulingRules;
   var Form = window.TMFormDialog;
+  var Confirm = window.TMConfirmDialog;
   var Perms = window.TMPermissions;
   if (!Store) return;
 
@@ -264,10 +265,178 @@
     hintEl.textContent = '';
   }
 
+  var EYE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
   var EDIT_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>';
-  function editBtn(id) {
-    return '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-detail="' + id + '" title="Düzenle" aria-label="Düzenle">' + EDIT_ICON + '</button>';
+  var X_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+
+  // İşlem hücresi: Görüntüle her zaman; Düzenle ve İptal (çarpı) yalnızca TAMAMLANMAMIŞ derslerde.
+  function actionCell(s) {
+    var view = '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-detail="' + s.id + '" title="Görüntüle" aria-label="Görüntüle">' + EYE_ICON + '</button>';
+    // Tamamlanan ve iptal edilen dersler düzenlenemez/iptal edilemez → yalnızca görüntüle.
+    if (s.status === 'completed' || s.status === 'cancelled') return '<span class="tm-row-actions">' + view + '</span>';
+    var edit = '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-edit-session="' + s.id + '" title="Düzenle" aria-label="Dersi düzenle">' + EDIT_ICON + '</button>';
+    var cancel = '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon tm-btn--danger" data-cancel-session="' + s.id + '" title="Dersi iptal et" aria-label="Dersi iptal et">' + X_ICON + '</button>';
+    return '<span class="tm-row-actions">' + view + edit + cancel + '</span>';
   }
+
+  // Dersi iptal et (çarpı) — onay ister, neden zorunlu.
+  function confirmCancelSession(sessionId) {
+    var s = Store.getSessionById(sessionId);
+    if (!s || s.status === 'completed' || s.status === 'cancelled') return;
+    if (Perms && !Perms.guard('cancel')) return;
+    var enrolled = (s.enrolledStudentIds || []).length;
+    function doCancel(reason) {
+      var res = Store.cancelSession(sessionId, reason);
+      if (!res || !res.ok) { U.notifyError((res && res.error) || 'Ders iptal edilemedi.'); return; }
+      U.notifySuccess('Ders iptal edildi.');
+      if (window.TMOnSessionChange) window.TMOnSessionChange(); else render();
+    }
+    if (Confirm) {
+      Confirm.open({
+        title: 'Dersi iptal et',
+        warning: (Store.getLessonCode ? Store.getLessonCode(s) : s.id) + ' dersini iptal etmek istediğinize emin misiniz?' +
+          (enrolled ? ' Bu derse atanmış ' + enrolled + ' öğrencinin rezervasyonu da iptal edilir.' : ''),
+        requireReason: true,
+        confirmLabel: 'Dersi İptal Et',
+        cancelLabel: 'Vazgeç',
+        danger: true,
+        onConfirm: doCancel
+      });
+    } else if (window.confirm('Dersi iptal etmek istediğinize emin misiniz?')) {
+      doCancel('Liste üzerinden iptal edildi.');
+    }
+  }
+
+  // Ders düzenleme modalı — Tarih, Saat, Ders Türü, Sınıf, PDR/Branş öğretmeni + Katılımcılar.
+  function openEditSessionModal(sessionId) {
+    var session = Store.getSessionById(sessionId);
+    if (!session || session.status === 'completed' || session.status === 'cancelled') return;
+    if (Perms && !Perms.guard('edit')) return;
+
+    var lessonTypes = Store.getLessonTypes();
+    var grades = Store.getGrades ? Store.getGrades() : ['5. Sınıf', '6. Sınıf', '7. Sınıf', '8. Sınıf'];
+    var slots = (Rules && Rules.HOURLY_SLOTS) || ['11:00', '12:00', '13:00', '14:00'];
+    var pdrTeachers = Store.getTeachers().filter(function (t) { return t.isActive && (!Rules || Rules.isTeacherPdr(t.id)); });
+    var branchTeachers = Store.getTeachers().filter(function (t) { return t.isActive && (!Rules || Rules.isTeacherBranchTeacher(t.id)); });
+
+    function opt(v, l, sel) { return '<option value="' + U.escapeHtml(String(v)) + '"' + (sel ? ' selected' : '') + '>' + U.escapeHtml(l) + '</option>'; }
+    function field(label, ctrl) { return '<label class="tm-form-field">' + label + ctrl + '</label>'; }
+    function teacherOpts(list, cur) { return list.map(function (t) { return opt(t.id, U.fullName(t.firstName, t.lastName), t.id === cur); }).join(''); }
+
+    function fieldsHtml(s) {
+      return '<div class="tm-detail-grid tm-detail-grid--modal">' +
+        field('Ders Tarihi', '<input class="tm-dg-control" type="date" data-fld="date" value="' + U.escapeHtml(s.date) + '">') +
+        field('Ders Saati', '<select class="tm-dg-control" data-fld="start">' + slots.map(function (t) { return opt(t, t + '–' + (Rules ? Rules.addMinutes(t, 50) : t), t === s.startTime); }).join('') + '</select>') +
+        field('Ders Türü', '<select class="tm-dg-control" data-fld="lt">' + lessonTypes.map(function (lt) { return opt(lt.id, lt.name, lt.id === s.lessonTypeId); }).join('') + '</select>') +
+        field('Sınıf', '<select class="tm-dg-control" data-fld="grade">' + grades.map(function (g) { return opt(g, g, g === s.gradeLevel); }).join('') + '</select>') +
+        field('PDR Öğretmeni', '<select class="tm-dg-control" data-fld="pdr">' + teacherOpts(pdrTeachers, s.pdrTeacherId) + '</select>') +
+        field('Branş Öğretmeni', '<select class="tm-dg-control" data-fld="branch">' + teacherOpts(branchTeachers, s.branchTeacherId) + '</select>') +
+        field('Değişiklik nedeni <span class="tm-req">*</span>', '<input class="tm-dg-control" type="text" data-fld="reason" placeholder="Zorunlu">') +
+        '</div>';
+    }
+
+    function participantsHtml() {
+      var resv = Store.getReservationsForSession(sessionId).filter(function (r) { return r.status !== 'cancelled'; });
+      var list = resv.map(function (r) {
+        var st = Store.getStudentById(r.studentId);
+        return '<li class="tm-edit-part"><span>' + U.escapeHtml(st ? U.fullName(st.firstName, st.lastName) : '—') +
+          (st && st.grade ? ' · ' + U.escapeHtml(st.grade) : '') + '</span>' +
+          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon tm-btn--danger" data-remove-part="' + r.id + '" title="Katılımcıyı çıkar" aria-label="Katılımcıyı çıkar">' + X_ICON + '</button></li>';
+      }).join('');
+      var eligible = Store.getEligibleStudentsForSession ? Store.getEligibleStudentsForSession(sessionId) : [];
+      var add = eligible.length
+        ? '<div class="tm-edit-addpart"><select class="tm-dg-control" data-add-part>' + eligible.map(function (st) { return opt(st.id, U.fullName(st.firstName, st.lastName) + (st.grade ? ' · ' + st.grade : '')); }).join('') + '</select>' +
+          '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-add-part-btn>Ekle</button></div>'
+        : '<p class="tm-empty" style="margin:6px 0 0">Eklenebilecek uygun öğrenci yok.</p>';
+      return '<ul class="tm-edit-partlist">' + (list || '<li class="tm-empty">Katılımcı yok.</li>') + '</ul>' + add;
+    }
+
+    var existing = document.getElementById('tmSessionEditModal');
+    if (existing) existing.parentNode.removeChild(existing);
+    var overlay = document.createElement('div');
+    overlay.className = 'tm-crit-overlay is-open';
+    overlay.id = 'tmSessionEditModal';
+    overlay.innerHTML =
+      '<div class="tm-crit-dialog tm-detail-modal" role="dialog" aria-modal="true" aria-label="Ders düzenle">' +
+        '<header class="tm-crit-head"><div class="tm-detail-modal-titles">' +
+          '<h2 class="tm-crit-title">Ders Düzenle</h2>' +
+          '<p class="tm-detail-modal-sub">' + U.escapeHtml(Store.getLessonCode ? Store.getLessonCode(session) : session.id) + '</p>' +
+        '</div><button type="button" class="tm-drawer-close" data-close aria-label="Kapat">&times;</button></header>' +
+        '<div class="tm-detail-modal-body">' +
+          '<div class="tm-detail-section"><h3 class="tm-detail-section-title">Ders Bilgileri</h3><div data-fields></div></div>' +
+          '<div class="tm-detail-section"><h3 class="tm-detail-section-title">Katılımcılar</h3><div data-participants></div></div>' +
+        '</div>' +
+        '<footer class="tm-crit-foot"><button type="button" class="tm-btn tm-btn--ghost" data-close>İptal</button>' +
+          '<button type="button" class="tm-btn tm-btn--primary" data-save>Kaydet</button></footer>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    var fieldsWrap = overlay.querySelector('[data-fields]');
+    var partWrap = overlay.querySelector('[data-participants]');
+    function refreshFields() { fieldsWrap.innerHTML = fieldsHtml(Store.getSessionById(sessionId)); }
+    function refreshParticipants() { partWrap.innerHTML = participantsHtml(); bindParticipants(); }
+    function getReason() { var el = fieldsWrap.querySelector('[data-fld="reason"]'); return el ? el.value.trim() : ''; }
+
+    function bindParticipants() {
+      partWrap.querySelectorAll('[data-remove-part]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var reason = getReason() || 'Katılımcı listesi düzenlendi.';
+          var res = Store.removeStudentFromSession(sessionId, b.getAttribute('data-remove-part'), reason);
+          if (!res || !res.ok) { U.notifyError((res && res.error) || 'Katılımcı çıkarılamadı.'); return; }
+          refreshParticipants();
+          if (window.TMOnSessionChange) window.TMOnSessionChange();
+        });
+      });
+      var addBtn = partWrap.querySelector('[data-add-part-btn]');
+      if (addBtn) addBtn.addEventListener('click', function () {
+        var sel = partWrap.querySelector('[data-add-part]');
+        if (!sel || !sel.value) return;
+        var res = Store.addStudentToSession(sessionId, sel.value);
+        if (!res || !res.ok) { U.notifyError((res && res.error) || 'Katılımcı eklenemedi.'); return; }
+        refreshParticipants();
+        if (window.TMOnSessionChange) window.TMOnSessionChange();
+      });
+    }
+
+    function close() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); document.removeEventListener('keydown', onKey); }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    document.addEventListener('keydown', onKey);
+
+    function save() {
+      var reason = getReason();
+      if (!reason) { U.notifyError('Değişiklik nedeni zorunludur.'); return; }
+      var s = Store.getSessionById(sessionId);
+      var g = function (f) { var el = fieldsWrap.querySelector('[data-fld="' + f + '"]'); return el ? el.value : ''; };
+      var steps = [];
+      if (g('pdr') && g('pdr') !== s.pdrTeacherId) steps.push(function () { return Store.changeSessionPdrTeacher(sessionId, g('pdr'), reason); });
+      if (g('branch') && g('branch') !== s.branchTeacherId) steps.push(function () { return Store.changeSessionBranchTeacher(sessionId, g('branch'), reason); });
+      if (g('grade') && g('grade') !== s.gradeLevel) steps.push(function () { return Store.changeSessionGradeLevel(sessionId, g('grade'), reason); });
+      if (g('lt') && g('lt') !== s.lessonTypeId) steps.push(function () { return Store.changeSessionLessonType(sessionId, g('lt'), reason); });
+      if ((g('date') && g('date') !== s.date) || (g('start') && g('start') !== s.startTime)) {
+        steps.push(function () { return Store.rescheduleSession(sessionId, g('date') || s.date, g('start') || s.startTime, reason); });
+      }
+      if (!steps.length) { close(); return; }
+      var errors = [];
+      steps.forEach(function (fn) { var r = fn(); if (!r || !r.ok) errors.push(r && r.error ? r.error : 'Bilinmeyen hata'); });
+      if (window.TMOnSessionChange) window.TMOnSessionChange(); else render();
+      if (errors.length) {
+        U.notifyError('Bazı değişiklikler uygulanamadı: ' + errors.join(' | '));
+        refreshFields();
+      } else {
+        U.notifySuccess('Ders bilgileri güncellendi.');
+        close();
+      }
+    }
+
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay || e.target.closest('[data-close]')) close();
+      else if (e.target.closest('[data-save]')) save();
+    });
+
+    refreshFields();
+    refreshParticipants();
+  }
+
 
   function rowHtml(r) {
     var s = r.session;
@@ -282,7 +451,7 @@
       '<td>' + U.escapeHtml(r.branchTeacherName) + (r.missingTeachers && !s.branchTeacherId ? ' <span class="tm-badge tm-badge--warn">Eksik</span>' : '') + '</td>' +
       '<td>' + r.capacity + '</td><td>' + r.enrolled + '</td><td>' + r.remaining + '</td>' +
       '<td>' + SL.sessionBadge(s.status) + '</td>' +
-      '<td style="white-space:nowrap">' + editBtn(s.id) + '</td></tr>';
+      '<td style="white-space:nowrap">' + actionCell(s) + '</td></tr>';
   }
 
   function cardHtml(r) {
@@ -299,9 +468,7 @@
         '<div><span class="tm-list-card-label">Kapasite</span> ' + r.enrolled + '/' + r.capacity + ' · boş ' + r.remaining + '</div>' +
         '<div><span class="tm-list-card-label">Meeting ID</span> <code class="tm-res-code-cell">' + U.escapeHtml(String(r.meetingId)) + '</code></div>' +
       '</div>' +
-      '<div class="tm-list-card-foot">' +
-        '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-detail="' + s.id + '" title="Düzenle" aria-label="Düzenle">' + EDIT_ICON + ' Düzenle</button>' +
-      '</div>' +
+      '<div class="tm-list-card-foot">' + actionCell(s) + '</div>' +
     '</article>';
   }
 
@@ -311,6 +478,18 @@
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
         if (window.TMSessionDetail) window.TMSessionDetail.open(btn.getAttribute('data-detail'));
+      });
+    });
+    root.querySelectorAll('[data-edit-session]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        openEditSessionModal(btn.getAttribute('data-edit-session'));
+      });
+    });
+    root.querySelectorAll('[data-cancel-session]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        confirmCancelSession(btn.getAttribute('data-cancel-session'));
       });
     });
     root.querySelectorAll('tr[data-id], .tm-list-card[data-id]').forEach(function (el) {

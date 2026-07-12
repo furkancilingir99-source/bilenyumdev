@@ -27,17 +27,12 @@
 
   var NAV_ITEMS = [
     { key: 'operasyon', href: 'deneme-dersi-yoneticisi-dashboard.html', label: 'Operasyon Merkezi', icon: ICON.home, badgeMetric: 'actionableCount' },
-    { key: 'deneme-dersleri', href: 'deneme-dersi-yoneticisi-planlanmis-dersler.html', label: 'Deneme Dersleri', icon: ICON.calendar },
     { key: 'rezervasyon-talepleri', href: 'deneme-dersi-yoneticisi-rezervasyonlar.html', label: 'Rezervasyon Talepleri', icon: ICON.inbox, badgeMetric: 'orphanRequestCount' },
+    { key: 'deneme-dersleri', href: 'deneme-dersi-yoneticisi-planlanmis-dersler.html', label: 'Deneme Dersleri', icon: ICON.calendar },
     { key: 'ogrenciler', href: 'deneme-dersi-yoneticisi-ogrenciler.html', label: 'Öğrenciler', icon: ICON.user },
     { key: 'veliler', href: 'deneme-dersi-yoneticisi-veliler.html', label: 'Veliler', icon: ICON.users },
     { key: 'ogretmenler', href: 'deneme-dersi-yoneticisi-ogretmenler.html', label: 'Öğretmenler', icon: ICON.teacher },
-    { key: 'online-linkler', href: 'deneme-dersi-yoneticisi-online-linkler.html', label: 'Online Ders Linkleri', icon: ICON.link, badgeMetric: 'linkNotSentCount' },
-    { key: 'iletisim', href: 'deneme-dersi-yoneticisi-iletisim.html', label: 'İletişim Takibi', icon: ICON.phone, badgeMetric: 'pendingApprovalCount' },
-    { key: 'raporlar', href: 'deneme-dersi-yoneticisi-raporlar.html', label: 'Raporlar', icon: ICON.chart },
-    { key: 'denetim', href: 'deneme-dersi-yoneticisi-denetim.html', label: 'Denetim Günlüğü', icon: ICON.audit },
-    { key: 'kullanicilar', href: 'deneme-dersi-yoneticisi-kullanicilar.html', label: 'Kullanıcılar ve Yetkiler', icon: ICON.shield },
-    { key: 'ayarlar', href: 'deneme-dersi-yoneticisi-ayarlar.html', label: 'Ayarlar', icon: ICON.settings }
+    { key: 'denetim', href: 'deneme-dersi-yoneticisi-denetim.html', label: 'Denetim Günlüğü', icon: ICON.audit }
   ];
 
   var ICON_GLOBE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
@@ -124,7 +119,6 @@
       );
     }).join('');
     return (
-      '<div class="tm-sidebar-brand">Deneme Dersi Yönetimi</div>' +
       '<nav class="tm-sidebar-nav">' + links + '</nav>'
     );
   }

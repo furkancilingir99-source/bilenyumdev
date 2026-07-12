@@ -68,9 +68,9 @@ body.tm-admin-body .hud {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--tm-surface) !important;
-  border-bottom: 1px solid var(--tm-border);
-  box-shadow: var(--tm-shadow);
+  background: #f1eff9 !important;
+  border-bottom: 1px solid #e2ddf0;
+  box-shadow: none;
   min-height: 60px;
   height: auto;
   padding: 10px 16px !important;
@@ -271,21 +271,23 @@ body.tm-admin-body .player-clan {
   display: flex;
   align-items: stretch;
   width: 100%;
-  min-height: calc(100vh - 64px);
 }
 
 body.tm-admin-body .tm-sidebar {
-  width: 240px;
+  width: 152px;
   flex-shrink: 0;
-  background: linear-gradient(185deg, #332f6e 0%, #26234f 100%) !important;
-  color: #e7e3f3;
-  padding: 14px 10px 20px;
+  background: #ffffff !important;
+  color: #4a4778;
+  padding: 14px 9px 16px;
   overflow-y: auto;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 0;
+  border-radius: 18px;
+  box-shadow: 0 6px 22px rgba(40, 38, 90, 0.08);
+  margin: 12px 0 12px 12px;
   position: sticky;
-  top: 64px;
+  top: 76px;
   align-self: flex-start;
-  max-height: calc(100vh - 64px);
+  max-height: calc(100vh - 88px);
   z-index: 50;
 }
 
@@ -314,63 +316,75 @@ body.tm-admin-body .tm-sidebar {
 .tm-sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 6px;
 }
 
+/* Dikey blok: ikon üstte, etiket altta (görseldeki format) */
 body.tm-admin-body .tm-sidebar-link {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 11px !important;
-  padding: 10px 12px !important;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #c4bee4 !important;
+  justify-content: center;
+  gap: 8px !important;
+  padding: 14px 8px !important;
+  border-radius: 14px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.25;
+  color: #6b6797 !important;
   text-decoration: none;
   transition: background 0.15s, color 0.15s;
   position: relative;
 }
 
 .tm-sidebar-link svg {
-  width: 17px;
-  height: 17px;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
-  opacity: 0.72;
-  transition: opacity 0.15s;
+  opacity: 0.9;
+  color: #7a769e;
+  transition: opacity 0.15s, color 0.15s;
 }
 
 body.tm-admin-body .tm-sidebar-link:hover {
-  background: rgba(255, 255, 255, 0.07);
-  color: #ffffff !important;
+  background: #f5f3fb;
+  color: #3e3a8e !important;
 }
 
 .tm-sidebar-link:hover svg {
   opacity: 1;
+  color: #3e3a8e;
 }
 
 body.tm-admin-body .tm-sidebar-link.is-active {
-  background: linear-gradient(90deg, rgba(230, 8, 123, 0.28), rgba(230, 8, 123, 0.10));
-  color: #ffffff !important;
-  font-weight: 600;
-  box-shadow: inset 0 0 0 1px rgba(230, 8, 123, 0.30);
+  background: #fdeaf4;
+  color: #28265a !important;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px rgba(230, 8, 123, 0.20);
 }
 
 .tm-sidebar-link.is-active svg {
   opacity: 1;
-  color: #ff8dc4;
+  color: #e6087b;
 }
 
 .tm-sidebar-badge {
-  margin-left: auto;
-  min-width: 20px;
-  height: 19px;
-  padding: 0 6px;
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  margin-left: 0;
+  min-width: 18px;
+  height: 17px;
+  padding: 0 5px;
   border-radius: 9px;
   background: #f59e0b;
   color: #3a2906;
-  font-size: 10.5px;
+  font-size: 9.5px;
   font-weight: 700;
-  line-height: 19px;
+  line-height: 17px;
   text-align: center;
   flex-shrink: 0;
 }
@@ -410,7 +424,7 @@ a.is-perm-disabled {
 .tm-admin-main {
   flex: 1;
   min-width: 0;
-  padding: 16px 20px 32px;
+  padding: 12px 18px 16px;
 }
 
 .tm-page-head {
@@ -421,14 +435,13 @@ a.is-perm-disabled {
   font-size: 20px;
   font-weight: 700;
   color: #28265a;
-  margin: 0 0 4px;
-}
-
-.tm-page-sub {
-  font-size: 13px;
-  color: #7a769e;
   margin: 0;
 }
+
+/* Sayfa başlığı ve alt açıklaması tüm deneme dersi yöneticisi ekranlarında gizli */
+body.tm-admin-body .tm-page-head,
+body.tm-admin-body .tm-page-sub,
+body.tm-admin-body .tm-page-title { display: none; }
 
 .tm-metric-row {
   display: grid;
@@ -849,6 +862,21 @@ body.tm-drawer-open { overflow: hidden; }
 .tm-stack-line { line-height: 1.6; }
 .tm-stack-line + .tm-stack-line { margin-top: 4px; }
 
+/* Veli detay modalı — Rezervasyonlar sekmesi çok sütunlu; modal genişletildi */
+#tmParentModal .tm-detail-modal { width: min(1140px, 96vw); }
+/* Sabit düzenli modal tabloları — colgroup genişliklerine uysun, taşma yerine sarsın */
+.tm-fixed-table { table-layout: fixed; width: 100%; }
+.tm-fixed-table th, .tm-fixed-table td { overflow-wrap: anywhere; word-break: break-word; }
+.tm-fixed-table td code.tm-res-code-cell { white-space: normal; word-break: break-all; }
+
+/* Veliler tablosu — çok öğrencili velilerde Öğrenci ID/Ad/Sınıf sütunlarında
+   her öğrenci arasına ayırıcı çizgi (üç sütunda hizalı). */
+body[data-tm-page="veliler"] .tm-res-table td .tm-stack-line + .tm-stack-line {
+  border-top: 1px solid #e2ddf0;
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
 .tm-crit-block {
   margin-bottom: 10px;
 }
@@ -965,8 +993,8 @@ body.tm-drawer-open { overflow: hidden; }
 .tm-audit-who { font-weight: 600; color: #3e3a8e; white-space: nowrap; }
 .tm-audit-reason { display: block; font-size: 11px; color: #7a769e; margin-top: 2px; font-style: italic; }
 .tm-audit-action { display: inline-block; font-weight: 700; color: #3e3a8e; }
-.tm-audit-old { display: inline-block; color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; padding: 2px 8px; border-radius: 5px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
-.tm-audit-new { display: inline-block; color: #15803d; background: #dcfce7; border: 1px solid #86efac; padding: 2px 8px; border-radius: 5px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.tm-audit-old { display: inline-block; max-width: 100%; color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; padding: 2px 7px; border-radius: 5px; font-size: 11px; font-weight: 600; white-space: normal; overflow-wrap: anywhere; word-break: break-word; line-height: 1.35; }
+.tm-audit-new { display: inline-block; max-width: 100%; color: #15803d; background: #dcfce7; border: 1px solid #86efac; padding: 2px 7px; border-radius: 5px; font-size: 11px; font-weight: 600; white-space: normal; overflow-wrap: anywhere; word-break: break-word; line-height: 1.35; }
 .tm-audit-none { color: #b3afce; }
 
 /* Talep durum adımları (stepper) — belirgin dolu pill izi */
@@ -1056,11 +1084,13 @@ td .tm-btn--icon { padding: 6px 8px; }
 .tm-comm-by-name { display: block; font-weight: 600; color: #28265a; }
 .tm-comm-by-role { display: block; font-size: 11px; color: #7a769e; }
 
-/* Otomatik rezervasyon kodu (REZTRIAL-...) */
+/* Otomatik rezervasyon kodu (rT-...) */
 .tm-res-code { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 10px 14px; border-radius: 10px; background: linear-gradient(135deg, #ece9fa, #f4f2fb); border: 1px solid #cbc5e6; }
 .tm-res-code-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #7a769e; }
 .tm-res-code-val { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 14px; font-weight: 800; color: #3e3a8e; letter-spacing: 0.02em; }
-.tm-res-code-cell { display: inline-block; font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 11px; font-weight: 700; color: #3e3a8e; background: #f1eff9; padding: 2px 7px; border-radius: 5px; white-space: nowrap; }
+.tm-res-code-cell { display: inline-block; font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 10.5px; font-weight: 700; color: #3e3a8e; background: #f1eff9; padding: 2px 6px; border-radius: 5px; white-space: nowrap; letter-spacing: -0.01em; }
+/* Kod sütunları içeriğe göre daralsın (yatayda küçük) */
+.tm-res-table td:has(> .tm-res-code-cell:only-child), .tm-res-table th.tm-col-code { width: 1%; white-space: nowrap; }
 .tm-list-card-head .tm-res-code-cell { margin-top: 3px; }
 
 /* Veli iletişim kartı (büyük, adım 1) */
@@ -1178,10 +1208,21 @@ body.tm-admin-body textarea.tm-contact-note {
 
 @media (max-width: 960px) {
   .tm-split { grid-template-columns: 1fr; }
-  .tm-sidebar-brand,
-  .tm-sidebar-link span {
-    display: inline;
+  /* Mobil çekmecede yatay satır düzeni (ikon solda, etiket sağda) */
+  body.tm-admin-body .tm-sidebar-link {
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    font-size: 13px !important;
+    font-weight: 500;
+    gap: 12px !important;
+    padding: 11px 14px !important;
+    border-radius: 10px;
   }
+  body.tm-admin-body .tm-sidebar-link svg { width: 18px !important; height: 18px !important; }
+  .tm-sidebar-badge { position: static; margin-left: auto; }
   .tm-detail-grid {
     grid-template-columns: 1fr;
   }
@@ -1773,19 +1814,58 @@ body.tm-admin-body .tm-res-table-wrap {
 
 body.tm-admin-body .tm-res-table {
   width: 100%;
-  min-width: 900px;
+  min-width: 0;
+  table-layout: fixed;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 12px;
   color: #28265a;
   background: #fff;
 }
 
 body.tm-admin-body .tm-res-table th,
 body.tm-admin-body .tm-res-table td {
-  padding: 10px 12px;
+  padding: 8px 9px;
   text-align: left;
   border-bottom: 1px solid #e7e3f3;
   vertical-align: middle;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+/* İlk ve son sütun panelin yuvarlak kenarına yapışmasın — nefes payı */
+body.tm-admin-body .tm-res-table th:first-child,
+body.tm-admin-body .tm-res-table td:first-child { padding-left: 14px; }
+/* İşlem sütunu — ikonlar SOLDAN hizalı ve her satırda AYNI konumda başlar. Böylece 1/2/3
+   ikonlu satırlar arasında kayma/zıplama olmaz; başlık da aynı hizada. */
+body.tm-admin-body .tm-res-table th:last-child,
+body.tm-admin-body .tm-res-table td:last-child { width: 92px; padding-left: 12px; padding-right: 8px; white-space: nowrap; text-align: left; }
+body.tm-admin-body .tm-res-table td:last-child .tm-row-actions { display: inline-flex; justify-content: flex-start; gap: 4px; }
+
+/* İşlem sütunu ikon butonları — sade, çerçevesiz görünüm (kutulu ghost görünümü kaldırıldı) */
+body.tm-admin-body .tm-res-table td .tm-btn--icon {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #9a97b8;
+  transition: color 0.12s ease, background 0.12s ease;
+}
+body.tm-admin-body .tm-res-table td .tm-btn--icon:hover { background: #fdeaf4; color: #e6087b; }
+body.tm-admin-body .tm-res-table td .tm-btn--icon.tm-btn--danger { background: transparent; color: #c0344a; }
+body.tm-admin-body .tm-res-table td .tm-btn--icon.tm-btn--danger:hover { background: #fde8e8; color: #b91c1c; }
+/* Liste tablolarında kod hücreleri (rT-/tL-/ts-…) satıra sığması için kırılabilir */
+body.tm-admin-body .tm-res-table td .tm-res-code-cell {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+/* Liste tablolarında rozetler dar sütuna sığsın */
+body.tm-admin-body .tm-res-table td .tm-badge {
+  white-space: normal;
+  font-size: 10px;
+  padding: 1px 6px;
+  line-height: 1.3;
 }
 
 /* Sütunlar arası dikey ayırıcı çizgiler */
@@ -1795,14 +1875,17 @@ body.tm-admin-body .tm-res-table td:not(:last-child) {
 }
 
 body.tm-admin-body .tm-res-table th {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   color: #7a769e;
   background: #faf9fd;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.2;
 }
+/* Kod/İşlem sütunu başlıkları sarmasın (dar kalsın) */
+body.tm-admin-body .tm-res-table th:last-child { white-space: nowrap; }
 
 body.tm-admin-body .tm-res-table tbody tr:hover {
   background: #faf9fd;
@@ -1901,12 +1984,12 @@ body.tm-admin-body .tm-action-item {
     visibility: visible;
   }
 
-  .tm-sidebar {
+  body.tm-admin-body .tm-sidebar {
     position: fixed;
     top: 60px;
     left: 0;
     bottom: 0;
-    width: min(280px, 88vw);
+    width: min(280px, 88vw) !important;
     transform: translateX(-100%);
     transition: transform 0.25s ease;
     z-index: 300;
@@ -2375,6 +2458,26 @@ body.tm-admin-body .tm-dg-toolbar-row--filters .tm-dg-control[type="date"] {
 .tm-cal-body { padding: 16px 18px; overflow: auto; }
 .tm-cal-grid { display: grid; gap: 6px; min-width: 560px; }
 
+/* Günlük tarih gezinme çubuğu */
+.tm-cal-daynav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px 0;
+  flex-wrap: wrap;
+}
+.tm-cal-daynav input[type="date"] { min-width: 150px; }
+
+/* Günlük saat-saat tablo */
+.tm-cal-daytable { width: 100%; }
+.tm-cal-daytable td, .tm-cal-daytable th { vertical-align: middle; }
+.tm-cal-row-time { white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 600; color: #4a4778; width: 110px; }
+.tm-cal-row-meta { color: #7a769e; font-size: 11.5px; margin-left: 4px; }
+.tm-cal-row-muted { color: #9a97b6; }
+.tm-cal-row.is-busy { background: #fdf4fb; }
+.tm-cal-row.is-free { background: #f3fbf6; }
+.tm-cal-row.is-off td { color: #9a97b6; }
+
 .tm-cal-corner { }
 .tm-cal-dayhead {
   text-align: center;
@@ -2481,3 +2584,180 @@ body.tm-admin-body .tm-dg-toolbar-row--filters .tm-dg-control[type="date"] {
 @media (max-width: 760px) {
   .tm-switcher { display: none; }
 }
+
+/* Çok sütunlu zengin tablolar (Planlanmış Dersler, Rezervasyon Talepleri) — İşlem sütunu
+   ikonlara göre dar kalsın, yatay scroll olmasın; kalan genişlik metin sütunlarına gitsin. */
+body.tm-admin-body .tm-res-table--rich td:last-child,
+body.tm-admin-body .tm-res-table--rich th:last-child { padding-right: 6px; padding-left: 10px; width: auto; }
+body.tm-admin-body .tm-res-table--rich td .tm-row-actions { gap: 3px; }
+body.tm-admin-body .tm-res-table--rich td .tm-btn--icon { width: 24px; height: 24px; }
+body.tm-admin-body .tm-res-table--rich td .tm-btn--icon svg { width: 15px; height: 15px; }
+
+/* Öğretmen drawer — Yaklaşan dersler tablosunda sütun ayırıcı çizgiler */
+.tm-upcoming-table th:not(:last-child),
+.tm-upcoming-table td:not(:last-child) { border-right: 1px solid #ece9f6; }
+
+/* Drawer/modal içi bölüm başlıkları (Öğretmen Bilgileri / Performans vb.) */
+.tm-detail-section { margin-bottom: 16px; }
+.tm-detail-section:last-child { margin-bottom: 0; }
+.tm-detail-section-title {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7a769e;
+}
+
+/* Ders düzenleme modalı — katılımcı listesi */
+.tm-edit-partlist { list-style: none; margin: 0 0 10px; padding: 0; }
+.tm-edit-part {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 6px 10px; border: 1px solid #ece9f6; border-radius: 8px; margin-bottom: 6px;
+  font-size: 12.5px; color: #34315f; background: #faf9fd;
+}
+.tm-edit-addpart { display: flex; gap: 8px; align-items: center; }
+.tm-edit-addpart .tm-dg-control { flex: 1 1 auto; min-width: 0; }
+
+/* Veli düzenleme modalı — sekmeli öğrenci düzenleme */
+.tm-edit-pane[hidden] { display: none !important; }
+.tm-drawer-tab.tm-edit-addstudent { color: #b3096a; font-weight: 700; }
+.tm-drawer-tab.tm-edit-addstudent:hover { color: #e6087b; }
+
+/* ---- Operasyon Merkezi özet kartları ---- */
+.tm-dash-grid { display: grid; gap: 12px; margin-bottom: 12px; }
+.tm-dash-grid--2 { grid-template-columns: 1.6fr 1fr; }
+.tm-dash-grid--3 { grid-template-columns: repeat(3, 1fr); }
+
+/* Operasyon Merkezi: iki kart tüm ekran yüksekliğini kaplasın; her kart kendi içinde
+   dikey kayarak bir sürü satır göstersin (sayfa gövdesi kaymaz). */
+body.tm-admin-body[data-tm-page="operasyon"] { height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
+body.tm-admin-body[data-tm-page="operasyon"] .tm-admin-layout { flex: 1 1 auto; min-height: 0; }
+body.tm-admin-body[data-tm-page="operasyon"] .tm-admin-main { display: flex !important; flex-direction: column !important; min-height: 0; overflow: hidden; padding: 12px 18px 12px !important; }
+body.tm-admin-body[data-tm-page="operasyon"] #tmDashRoot { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+body.tm-admin-body[data-tm-page="operasyon"] .tm-dash-grid--2 { flex: 1 1 auto; min-height: 0; margin-bottom: 0; }
+body.tm-admin-body[data-tm-page="operasyon"] .tm-dash-card { min-height: 0; }
+body.tm-admin-body[data-tm-page="operasyon"] .tm-dash-preview { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+body.tm-admin-body[data-tm-page="operasyon"] .tm-dash-preview .tm-res-table-wrap { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+/* Kaydırırken başlık satırı sabit kalsın */
+body.tm-admin-body[data-tm-page="operasyon"] .tm-dash-mini thead th { position: sticky; top: 0; z-index: 1; }
+
+.tm-dash-card {
+  background: #ffffff;
+  border: 1px solid #ece9f6;
+  border-radius: 14px;
+  padding: 13px 15px;
+  box-shadow: 0 4px 16px rgba(40, 38, 90, 0.05);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.tm-dash-preview .tm-res-table-wrap { min-width: 0; overflow-x: auto; }
+.tm-dash-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.tm-dash-card-title { margin: 0; font-size: 16px; font-weight: 700; color: #28265a; }
+.tm-dash-card-link {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #b3096a;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.tm-dash-card-link:hover { color: #e6087b; }
+
+/* Kartın sağ üstündeki "yeni bildirim" rozeti */
+.tm-dash-card-badge {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #b3096a;
+  background: #fdeaf4;
+  border: 1px solid #f6c9e0;
+  border-radius: 999px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+.tm-dash-card-badge.is-zero {
+  color: #7a769e;
+  background: #f1eff9;
+  border-color: #e2ddf0;
+}
+
+.tm-dash-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 10px;
+}
+.tm-dash-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 9px;
+  border-radius: 9px;
+  background: #f4f2fb;
+  border: 1px solid #ece9f6;
+}
+.tm-dash-tile-val { font-size: 16px; font-weight: 800; line-height: 1.05; color: #28265a; }
+.tm-dash-tile-label { font-size: 9.5px; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; color: #7a769e; }
+.tm-dash-tile.is-accent .tm-dash-tile-val { color: #b3096a; }
+.tm-dash-tile.is-warn .tm-dash-tile-val { color: #b45309; }
+.tm-dash-tile.is-danger .tm-dash-tile-val { color: #c0344a; }
+
+@media (max-width: 900px) {
+  .tm-dash-grid--2, .tm-dash-grid--3 { grid-template-columns: 1fr; }
+}
+
+/* İki kart kalınca dikeyde uzasınlar; buton en alta insin. */
+.tm-dash-grid--2 { align-items: stretch; }
+.tm-dash-grid--2 .tm-dash-preview { flex: 1 1 auto; display: flex; flex-direction: column; }
+.tm-dash-grid--2 .tm-dash-preview .tm-dash-detail-btn { margin-top: auto; }
+
+/* Deneme Dersleri kartı — sayfa yansıması + detay butonu */
+.tm-dash-preview { margin-top: 10px; }
+.tm-dash-mini { width: 100%; font-size: 11.5px; border-collapse: collapse; table-layout: fixed; }
+.tm-dash-mini th {
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 9.5px;
+  color: #6b6797;
+  background: #f1eff9;
+  border-bottom: 1px solid #e0dbf2;
+  border-right: 1px solid #e6e1f2;
+  padding: 5px 7px;
+  text-align: left;
+}
+.tm-dash-mini td { color: #34315f; padding: 4px 8px; border-bottom: 1px solid #f0edf8; border-right: 1px solid #f0edf8; white-space: normal; overflow-wrap: anywhere; word-break: break-word; line-height: 1.3; vertical-align: middle; }
+.tm-dash-mini code.tm-res-code-cell { font-size: 10.5px; word-break: break-all; }
+.tm-dash-mini th:last-child, .tm-dash-mini td:last-child { border-right: none; }
+.tm-dash-mini tbody tr:last-child td { border-bottom: none; }
+
+/* Tıklanabilir satırlar + sade görüntüle ikonu (kutulu görünüm yok) */
+.tm-dash-row { cursor: pointer; transition: background 0.12s ease; }
+.tm-dash-row:hover { background: #f7f4fc; }
+.tm-dash-row-act { width: 30px; text-align: center; padding-left: 2px; padding-right: 2px; }
+.tm-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #9a97b8;
+  cursor: pointer;
+  transition: color 0.12s ease, background 0.12s ease;
+}
+.tm-dash-row:hover .tm-icon-btn { color: #7a769e; }
+.tm-icon-btn:hover { color: #e6087b; background: #fdeaf4; }
+
+.tm-dash-detail-btn { display: block; width: 100%; text-align: center; margin-top: 10px; padding: 7px 10px; }

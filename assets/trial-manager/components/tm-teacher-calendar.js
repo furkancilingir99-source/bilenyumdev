@@ -1,6 +1,7 @@
 /**
- * Öğretmen program takvimi — haftalık modal görünüm.
+ * Öğretmen program takvimi — GÜNLÜK saat-saat görünüm (tarih seçilebilir/gezinilebilir).
  * TMTeacherCalendar.open(teacherId)
+ * Her saat: Dolu (deneme dersi veya sınıf dersi) / Boş (müsait) / Kapalı (müsait değil).
  */
 (function (global) {
   'use strict';
@@ -10,15 +11,11 @@
   }
   function U() { return global.TMUtils; }
 
-  var DAYS = [
-    { dow: 1, label: 'Pzt' }, { dow: 2, label: 'Sal' }, { dow: 3, label: 'Çar' },
-    { dow: 4, label: 'Per' }, { dow: 5, label: 'Cum' }, { dow: 6, label: 'Cmt' }
-  ];
+  var DAY_NAMES = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+  // Günün saat-saat blokları (çalışma günü).
+  var DAY_HOURS = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+  var GRADES = ['5. Sınıf', '6. Sınıf', '7. Sınıf', '8. Sınıf'];
 
-  function slots() {
-    var R = global.TMSchedulingRules;
-    return (R && R.HOURLY_SLOTS) || ['11:00', '12:00', '13:00', '14:00'];
-  }
   function addMin(t, n) {
     var R = global.TMSchedulingRules;
     if (R && R.addMinutes) return R.addMinutes(t, n);
@@ -29,12 +26,42 @@
     var p = String(dateStr).split('-');
     return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)).getDay();
   }
+  function addDays(dateStr, n) {
+    var p = String(dateStr).split('-');
+    var d = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+    d.setDate(d.getDate() + n);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function isPdrTeacher(t) { return t.teacherType === 'pdr_teacher' || t.teacherType === 'pdr'; }
 
+  // Belirli saatte öğretmen müsait mi (haftalık müsaitlik penceresi 50 dk dersi kapsıyor mu).
   function isAvailable(teacher, dow, slot) {
     var end = addMin(slot, 50);
     return (teacher.availability || []).some(function (a) {
       return a.dayOfWeek === dow && a.isAvailable && a.startTime <= slot && a.endTime >= end;
     });
+  }
+
+  // Öğretmenin sınıf (normal) dersleri — haftalık tekrar eden, deterministik demo programı.
+  // Deneme dersleriyle çakışmaması için render sırasında deneme dersi olan saatler önceliklidir.
+  function classLessonsFor(teacher, S, dateStr) {
+    var dow = dowOf(dateStr);
+    var res = {};
+    if (dow === 0 || dow === 6) return res; // hafta sonu sınıf dersi yok
+    var m = String(teacher.id).match(/(\d+)$/);
+    var idNum = m ? parseInt(m[1], 10) : 0;
+    var pdr = isPdrTeacher(teacher);
+    var subject = pdr ? 'Rehberlik' : ((teacher.branchLessonTypeIds || []).map(function (id) {
+      var lt = S.getLessonTypeById(id); return lt ? lt.name : id;
+    })[0] || 'Ders');
+    var candidateHours = ['08:00', '09:00', '10:00', '16:00', '17:00', '18:00'];
+    candidateHours.forEach(function (h, i) {
+      if (((idNum * 7 + dow * 3 + i * 5) % 3) === 0) {
+        var g = GRADES[(idNum + dow + i) % GRADES.length];
+        res[h] = { label: pdr ? (g + ' Rehberlik dersi') : (g + ' ' + subject) };
+      }
+    });
+    return res;
   }
 
   function ensureOverlay() {
@@ -49,11 +76,16 @@
           '<div><h2 class="tm-cal-title" data-cal-title></h2><p class="tm-cal-sub" data-cal-sub></p></div>' +
           '<button type="button" class="tm-drawer-close" data-cal-close aria-label="Kapat">×</button>' +
         '</div>' +
+        '<div class="tm-cal-daynav">' +
+          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-cal-prev aria-label="Önceki gün">‹</button>' +
+          '<input type="date" class="tm-dg-control" data-cal-date>' +
+          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-cal-next aria-label="Sonraki gün">›</button>' +
+          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-cal-today>Bugün</button>' +
+        '</div>' +
         '<div class="tm-cal-body" data-cal-body></div>' +
         '<div class="tm-cal-legend">' +
-          '<span><i class="tm-cal-key is-free"></i> Müsait</span>' +
-          '<span><i class="tm-cal-key is-busy"></i> Dolu (ders atanmış)</span>' +
-          '<span><i class="tm-cal-key is-off"></i> Kapalı</span>' +
+          '<span><i class="tm-cal-key is-busy"></i> Dolu (ders var)</span>' +
+          '<span><i class="tm-cal-key is-free"></i> Boş (ders yok)</span>' +
         '</div>' +
       '</div>';
     document.body.appendChild(ov);
@@ -72,72 +104,80 @@
     document.body.classList.remove('tm-drawer-open');
   }
 
+  function statusBadge(kind) {
+    if (kind === 'busy') return '<span class="tm-badge tm-badge--orange">Dolu</span>';
+    if (kind === 'free') return '<span class="tm-badge tm-badge--green">Boş</span>';
+    return '<span class="tm-badge tm-badge--muted">Kapalı</span>';
+  }
+
   function open(teacherId) {
     var S = store();
     var u = U();
     if (!S) return;
     var t = S.getTeacherById(teacherId);
     if (!t) return;
-    var today = S.todayKey();
-    var sessions = S.getSessionsForTeacher(teacherId).filter(function (s) {
-      return s.status !== 'cancelled' && s.date >= today;
-    });
-    // hücre başına: en yakın oturum
-    var byCell = {};
-    sessions.forEach(function (s) {
-      var key = dowOf(s.date) + '|' + s.startTime;
-      if (!byCell[key] || s.date < byCell[key].nearest.date) {
-        byCell[key] = byCell[key] || { list: [] };
-        byCell[key].nearest = s;
-      }
-      byCell[key].list = byCell[key].list || [];
-      byCell[key].list.push(s);
-    });
-
     var ov = ensureOverlay();
-    var isPdr = t.teacherType === 'pdr_teacher' || t.teacherType === 'pdr';
-    ov.querySelector('[data-cal-title]').textContent = u.fullName(t.firstName, t.lastName);
-    var branch = isPdr ? 'PDR / Rehberlik' : (t.branchLessonTypeIds || []).map(function (id) {
+    var pdr = isPdrTeacher(t);
+    var branch = pdr ? 'PDR / Rehberlik' : (t.branchLessonTypeIds || []).map(function (id) {
       var lt = S.getLessonTypeById(id); return lt ? lt.name : id;
     }).join(', ');
-    ov.querySelector('[data-cal-sub]').textContent = branch + ' · ' + sessions.length + ' yaklaşan ders';
+    ov.querySelector('[data-cal-title]').textContent = u.fullName(t.firstName, t.lastName);
 
-    var sl = slots();
-    var head = '<div class="tm-cal-grid" style="grid-template-columns:64px repeat(' + DAYS.length + ',1fr)">' +
-      '<div class="tm-cal-corner"></div>' +
-      DAYS.map(function (d) { return '<div class="tm-cal-dayhead">' + d.label + '</div>'; }).join('');
-    var bodyCells = sl.map(function (slot) {
-      var rowHead = '<div class="tm-cal-timehead">' + slot + '</div>';
-      var cells = DAYS.map(function (d) {
-        var key = d.dow + '|' + slot;
-        var booked = byCell[key];
-        if (booked) {
-          var s = booked.nearest;
-          var lt = S.getLessonTypeById(s.lessonTypeId);
-          var more = booked.list.length > 1 ? ' +' + (booked.list.length - 1) : '';
-          return '<button type="button" class="tm-cal-cell is-busy" data-cal-session="' + s.id + '">' +
-            '<span class="tm-cal-cell-lt">' + u.escapeHtml(lt ? lt.name : 'Ders') + more + '</span>' +
-            '<span class="tm-cal-cell-meta">' + (s.enrolledStudentIds ? s.enrolledStudentIds.length : 0) + '/20 · ' + u.formatDateKey(s.date) + '</span>' +
-          '</button>';
-        }
-        if (isAvailable(t, d.dow, slot)) {
-          return '<div class="tm-cal-cell is-free"><span class="tm-cal-cell-lt">Müsait</span></div>';
-        }
-        return '<div class="tm-cal-cell is-off">—</div>';
-      }).join('');
-      return rowHead + cells;
-    }).join('');
-    ov.querySelector('[data-cal-body]').innerHTML = head + bodyCells + '</div>';
+    var dateInput = ov.querySelector('[data-cal-date]');
+    var current = S.todayKey();
 
-    ov.querySelectorAll('[data-cal-session]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var sid = btn.getAttribute('data-cal-session');
-        close();
-        if (global.TMSessionDetail && global.TMSessionDetail.open) global.TMSessionDetail.open(sid);
-        else window.location.href = 'deneme-dersi-yoneticisi-planlanmis-ders-detay.html?id=' + encodeURIComponent(sid);
+    function renderDay(dateStr) {
+      current = dateStr;
+      if (dateInput.value !== dateStr) dateInput.value = dateStr;
+      var dow = dowOf(dateStr);
+      // O güne ait deneme dersleri (iptal hariç), başlangıç saatine göre.
+      var trialByHour = {};
+      S.getSessionsForTeacher(teacherId).forEach(function (s) {
+        if (s.status !== 'cancelled' && s.date === dateStr) trialByHour[s.startTime] = s;
       });
-    });
+      var classByHour = classLessonsFor(t, S, dateStr);
 
+      var busyCount = 0, freeCount = 0;
+      var rows = DAY_HOURS.map(function (h) {
+        var label = h + '–' + addMin(h, 60);
+        var trial = trialByHour[h];
+        var klass = classByHour[h];
+        var kind, detay;
+        if (trial) {
+          busyCount++;
+          var lt = S.getLessonTypeById(trial.lessonTypeId);
+          var cap = trial.capacity || 20;
+          detay = 'Deneme dersi · ' + u.escapeHtml((lt ? lt.name : 'Ders') + ' · ' + (trial.gradeLevel || '')) +
+            ' <span class="tm-cal-row-meta">' + (trial.enrolledStudentIds ? trial.enrolledStudentIds.length : 0) + '/' + cap + ' öğrenci</span>';
+          kind = 'busy';
+        } else if (klass) {
+          busyCount++;
+          detay = 'Sınıf dersi · ' + u.escapeHtml(klass.label);
+          kind = 'busy';
+        } else {
+          freeCount++;
+          detay = '<span class="tm-cal-row-muted">Ders yok</span>';
+          kind = 'free';
+        }
+        return '<tr class="tm-cal-row is-' + kind + '"><td class="tm-cal-row-time">' + label + '</td>' +
+          '<td>' + statusBadge(kind) + '</td>' +
+          '<td>' + detay + '</td></tr>';
+      }).join('');
+
+      ov.querySelector('[data-cal-sub]').textContent =
+        branch + ' · ' + DAY_NAMES[dow] + ' ' + u.formatDateKey(dateStr);
+      ov.querySelector('[data-cal-body]').innerHTML =
+        '<table class="tm-inner-table tm-cal-daytable"><thead><tr><th>Saat</th><th>Durum</th><th>Ders</th></tr></thead><tbody>' +
+        rows + '</tbody></table>';
+    }
+
+    // Gezinme
+    dateInput.onchange = function () { if (dateInput.value) renderDay(dateInput.value); };
+    ov.querySelector('[data-cal-prev]').onclick = function () { renderDay(addDays(current, -1)); };
+    ov.querySelector('[data-cal-next]').onclick = function () { renderDay(addDays(current, 1)); };
+    ov.querySelector('[data-cal-today]').onclick = function () { renderDay(S.todayKey()); };
+
+    renderDay(current);
     ov.classList.add('is-open');
     document.body.classList.add('tm-drawer-open');
   }

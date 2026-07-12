@@ -1,261 +1,226 @@
 /**
- * Operasyon Merkezi
+ * Operasyon Merkezi — özet kart panosu (Deneme Dersleri · Rezervasyon Talepleri /
+ * Öğrenciler · Veliler · Öğretmenler). Her kart ilgili sayfaya götürür.
  */
 (function () {
   'use strict';
 
   var Store = (window.TMBridge && window.TMBridge.store()) || window.TMStore;
-  var Api = window.TMApi;
   var U = window.TMUtils;
   var SL = window.TMStatusLabels;
-  if (!Store && !Api) return;
-
-  function metrics() {
-    if (Api && Api.getOperationMetrics) return Api.getOperationMetrics();
-    return Store.getOperationMetrics();
-  }
+  if (!Store) return;
 
   var loading = document.getElementById('tmDashLoading');
   var root = document.getElementById('tmDashRoot');
 
-  function revealActionsFromHash() {
-    if (location.hash !== '#tmDashActions') return;
-    var panel = document.getElementById('tmDashActions');
-    if (panel) {
-      panel.hidden = false;
-      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  function today() { return Store.todayKey ? Store.todayKey() : new Date().toISOString().slice(0, 10); }
+
+  // Talep durumu — Rezervasyon Talepleri sayfasıyla birebir aynı mantık.
+  function requestDurum(r) {
+    if (r.deleted || r.status === 'rejected' || r.status === 'cancelled') return 'cancelled';
+    var res = Store.getReservationByRequestId(r.id);
+    if (res && res.status !== 'cancelled' && res.parentApprovalStatus === 'approved' && res.linkSent) return 'approved';
+    return 'pending';
+  }
+
+  function card(el, title, badgeCount, extraHtml) {
+    if (!el) return;
+    var n = badgeCount || 0;
+    var badge = '<span class="tm-dash-card-badge' + (n > 0 ? '' : ' is-zero') + '" title="' +
+      n + ' yeni bildirim">' + (n > 99 ? '99+' : n) + ' yeni bildirim</span>';
+    el.innerHTML =
+      '<div class="tm-dash-card-head">' +
+        '<h2 class="tm-dash-card-title">' + U.escapeHtml(title) + '</h2>' + badge +
+      '</div>' +
+      (extraHtml || '');
+  }
+
+  // Ortak yardımcılar
+  function code(prefix, id) { var m = String(id || '').match(/(\d+)\s*$/); return prefix + '-' + (m ? m[1].padStart(4, '0') : '0000'); }
+  // widths: sütun genişliği ağırlıkları (içerik uzunluğuna göre orantılı). Toplamları 100 olmalı.
+  function miniTable(headers, rowsHtml, emptyText, widths) {
+    if (!rowsHtml) return '<div class="tm-dash-preview"><p class="tm-empty" style="margin:8px 0 0">' + emptyText + '</p></div>';
+    var cols = (widths && widths.length === headers.length)
+      ? '<colgroup>' + widths.map(function (w) { return '<col style="width:' + w + '%">'; }).join('') + '</colgroup>'
+      : '';
+    return '<div class="tm-dash-preview"><div class="tm-res-table-wrap"><table class="tm-inner-table tm-dash-mini">' + cols + '<thead><tr>' +
+      headers.map(function (h) { return '<th>' + U.escapeHtml(h) + '</th>'; }).join('') +
+      '</tr></thead><tbody>' + rowsHtml + '</tbody></table></div></div>';
+  }
+  function detailButton(href) {
+    return '<a class="tm-btn tm-btn--primary tm-dash-detail-btn" href="' + href + '">Detaylı Görüntüle &rarr;</a>';
+  }
+  function reqDurumBadge(r) {
+    var d = requestDurum(r);
+    if (d === 'cancelled') return '<span class="tm-badge tm-badge--red">İptal Edildi</span>';
+    if (d === 'approved') return '<span class="tm-badge tm-badge--green">Onaylandı</span>';
+    return '<span class="tm-badge tm-badge--muted">Bekliyor</span>';
+  }
+
+  var EYE_ICON = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+
+  // Deneme Dersleri yansıması — yaklaşan dersler (planlanmış-dersler ile aynı veri).
+  function sessionsPreview() {
+    var td = today();
+    var list = Store.getSessions().filter(function (s) { return s.status !== 'cancelled' && s.date >= td; })
+      .sort(function (a, b) { return a.date === b.date ? a.startTime.localeCompare(b.startTime) : a.date.localeCompare(b.date); })
+      .slice(0, 100);
+    var rows = list.map(function (s) {
+      var lt = Store.getLessonTypeById(s.lessonTypeId);
+      var meeting = Store.getMeetingBySessionId(s.id);
+      return '<tr class="tm-dash-row" data-open-session="' + U.escapeHtml(s.id) + '">' +
+        '<td><code class="tm-res-code-cell">' + U.escapeHtml(Store.getLessonCode(s)) + '</code></td>' +
+        '<td><code class="tm-res-code-cell">' + U.escapeHtml(meeting && meeting.meetingId ? meeting.meetingId : '—') + '</code></td>' +
+        '<td>' + U.formatDateKey(s.date) + '</td>' +
+        '<td>' + U.escapeHtml(s.startTime || '—') + '</td>' +
+        '<td>' + U.escapeHtml(lt ? lt.name : '—') + '</td>' +
+        '<td>' + U.escapeHtml(s.gradeLevel || '—') + '</td>' +
+        '<td class="tm-dash-row-act"><button type="button" class="tm-icon-btn" title="Ders detayını görüntüle" aria-label="Ders detayını görüntüle">' + EYE_ICON + '</button></td></tr>';
+    }).join('');
+    return miniTable(['Ders ID', 'Meeting ID', 'Tarih', 'Saat', 'Ders', 'Sınıf', ''],
+      rows, 'Yaklaşan ders yok.', [16, 18, 16, 11, 15, 15, 9]) +
+      detailButton('deneme-dersi-yoneticisi-planlanmis-dersler.html');
+  }
+
+  // Kompakt tarih (gg.aa.yyyy) — dar önizleme sütunları için.
+  function shortDate(dateKey) {
+    var m = String(dateKey || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return m ? m[3] + '.' + m[2] + '.' + m[1] : (dateKey || '—');
+  }
+  // Kompakt tarih + saat (gg.aa.yyyy ss:dd) — talebin geldiği an.
+  function shortDateTime(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return shortDate(String(iso).slice(0, 10));
+    var p = function (n) { return String(n).padStart(2, '0'); };
+    return p(d.getDate()) + '.' + p(d.getMonth() + 1) + '.' + d.getFullYear() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  // Velinin formda seçtiği ders saati (zorunlu, boş olamaz).
+  function requestedLessonDate(r) {
+    var sid = r.preferredSessionId || r.selectedSessionId;
+    var s = sid ? Store.getSessionById(sid) : null;
+    return s ? shortDate(s.date) + ' ' + s.startTime : '—';
+  }
+
+  // Rezervasyon Talepleri yansıması — gerçek talep verisi (rezervasyonlar.html ile aynı).
+  function requestsPreview() {
+    var list = Store.getRequests().slice().sort(function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); }).slice(0, 100);
+    var rows = list.map(function (r) {
+      var lt = Store.getLessonTypeById(r.requestedLessonTypeId);
+      return '<tr class="tm-dash-row" data-open-request="' + U.escapeHtml(r.id) + '">' +
+        '<td>' + U.escapeHtml(shortDateTime(r.createdAt)) + '</td>' +
+        '<td>' + U.escapeHtml(requestedLessonDate(r)) + '</td>' +
+        '<td><code class="tm-res-code-cell">' + U.escapeHtml(Store.getReservationCode(r.id)) + '</code></td>' +
+        '<td class="tm-dash-wrap">' + U.escapeHtml(r.studentFirstName + ' ' + r.studentLastName) + '</td>' +
+        '<td class="tm-dash-wrap">' + U.escapeHtml(r.parentFirstName + ' ' + r.parentLastName) + '</td>' +
+        '<td>' + U.escapeHtml(r.parentPhone || '—') + '</td>' +
+        '<td>' + U.escapeHtml(r.studentGrade || '—') + '</td>' +
+        '<td>' + U.escapeHtml(lt ? lt.name : '—') + '</td>' +
+        '<td class="tm-dash-row-act"><button type="button" class="tm-icon-btn" title="Talebi görüntüle" aria-label="Talebi görüntüle">' + EYE_ICON + '</button></td></tr>';
+    }).join('');
+    return miniTable(['Talep tarihi', 'İstediği Ders Tarihi', 'Rez. ID', 'Öğrenci', 'Veli', 'Telefon', 'Sınıf', 'Ders', ''],
+      rows, 'Talep yok.', [12, 15, 13, 15, 15, 8, 7, 8, 7]) +
+      detailButton('deneme-dersi-yoneticisi-rezervasyonlar.html');
+  }
+
+  // Öğrenciler yansıması — birkaç öğrenci.
+  function studentsPreview() {
+    var list = Store.getStudents().slice(0, 2);
+    var rows = list.map(function (st) {
+      return '<tr><td><code class="tm-res-code-cell">' + U.escapeHtml(code('ts', st.id)) + '</code></td>' +
+        '<td>' + U.escapeHtml(U.fullName(st.firstName, st.lastName)) + '</td>' +
+        '<td>' + U.escapeHtml(st.grade || '—') + '</td></tr>';
+    }).join('');
+    return miniTable(['ID', 'Öğrenci', 'Sınıf'], rows, 'Öğrenci yok.') +
+      detailButton('deneme-dersi-yoneticisi-ogrenciler.html');
+  }
+
+  // Veliler yansıması — birkaç veli.
+  function parentsPreview() {
+    var list = Store.getParents().slice(0, 2);
+    var rows = list.map(function (pa) {
+      return '<tr><td>' + U.escapeHtml(U.fullName(pa.firstName, pa.lastName)) + '</td>' +
+        '<td>' + U.escapeHtml(pa.phone || '—') + '</td>' +
+        '<td>' + ((pa.studentIds || []).length) + '</td></tr>';
+    }).join('');
+    return miniTable(['Veli', 'Telefon', 'Öğr.'], rows, 'Veli yok.') +
+      detailButton('deneme-dersi-yoneticisi-veliler.html');
+  }
+
+  // Öğretmenler yansıması — birkaç öğretmen.
+  function teachersPreview() {
+    var list = Store.getTeachers().slice(0, 2);
+    var rows = list.map(function (t) {
+      var isPdr = t.teacherType === 'pdr_teacher' || t.teacherType === 'pdr';
+      var count = Store.getSessionsForTeacher(t.id).filter(function (s) { return s.status !== 'cancelled'; }).length;
+      return '<tr><td>' + U.escapeHtml(U.fullName(t.firstName, t.lastName)) + '</td>' +
+        '<td>' + (isPdr ? 'PDR' : 'Branş') + '</td>' +
+        '<td>' + count + '</td></tr>';
+    }).join('');
+    return miniTable(['Öğretmen', 'Tip', 'Ders'], rows, 'Öğretmen yok.') +
+      detailButton('deneme-dersi-yoneticisi-ogretmenler.html');
+  }
+
+  // Kart başlıklarındaki "yeni bildirim" sayıları — bildirim merkezi ile aynı kaynak (gerçek veri).
+  function notifCounts() {
+    var m = Store.getOperationMetrics ? Store.getOperationMetrics() : {};
+    var orphanIds = {};
+    (m.orphanRequests || []).forEach(function (r) { orphanIds[r.id] = 1; });
+    var newNotOrphan = (m.newRequests || []).filter(function (r) { return !orphanIds[r.id]; }).length;
+    var requests = (m.orphanRequestCount || 0) + newNotOrphan +
+      (m.pendingApprovalCount || 0) + (m.linkNotSentCount || 0);
+    var sessions = (m.teacherNotInformedCount || 0) + (m.needsAttendanceCount || 0) +
+      (m.missingTeacherAssignmentCount || 0) + (m.todaySessionCount || 0);
+    return { requests: requests, sessions: sessions };
+  }
+
+  function bindSessionRows() {
+    var cardEl = document.getElementById('tmCardSessions');
+    if (!cardEl) return;
+    cardEl.querySelectorAll('[data-open-session]').forEach(function (row) {
+      row.addEventListener('click', function () {
+        if (window.getSelection && String(window.getSelection()).length) return;
+        var id = row.getAttribute('data-open-session');
+        if (window.TMSessionDetail && window.TMSessionDetail.open) window.TMSessionDetail.open(id);
+        else window.location.href = 'deneme-dersi-yoneticisi-planlanmis-ders-detay.html?id=' + encodeURIComponent(id);
+      });
+    });
+  }
+
+  function bindRequestRows() {
+    var cardEl = document.getElementById('tmCardRequests');
+    if (!cardEl) return;
+    cardEl.querySelectorAll('[data-open-request]').forEach(function (row) {
+      row.addEventListener('click', function () {
+        if (window.getSelection && String(window.getSelection()).length) return;
+        var id = row.getAttribute('data-open-request');
+        if (window.TMRequestDrawer && window.TMRequestDrawer.open) window.TMRequestDrawer.open(id);
+        else window.location.href = 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(id);
+      });
+    });
   }
 
   function render() {
     try {
-    var m = metrics();
-    var statsEl = document.getElementById('tmDashStats');
-    if (statsEl) {
-      statsEl.innerHTML =
-        metric(m.actionableCount, 'Toplam aksiyon bekleyen', '#tmDashActions', 'warn') +
-        metric(m.todaySessionCount, 'Bugünkü ders', 'deneme-dersi-yoneticisi-planlanmis-dersler.html?today=1') +
-        metric(m.todayStudentCount, 'Bugünkü öğrenci', 'deneme-dersi-yoneticisi-planlanmis-dersler.html') +
-        metric(m.pendingApprovalCount, 'Onay bekleyen', 'deneme-dersi-yoneticisi-iletisim.html?tab=pending', 'warn') +
-        metric(m.linkNotSentCount, 'Link gönderilmemiş', 'deneme-dersi-yoneticisi-iletisim.html?tab=link', 'warn') +
-        metric(m.orphanRequestCount, 'Rezervasyonsuz talep', 'deneme-dersi-yoneticisi-rezervasyonlar.html?filter=orphan', 'warn') +
-        metric(m.newRequestCount, 'Yeni web talebi', 'deneme-dersi-yoneticisi-rezervasyonlar.html?status=new', 'warn') +
-        metric(m.teacherNotInformedCount, 'Öğretmen bilgilendirilmemiş', 'deneme-dersi-yoneticisi-iletisim.html?tab=pdr_teacher', 'warn') +
-        metric(m.missingTeacherAssignmentCount || 0, 'Eksik öğretmen ataması', 'deneme-dersi-yoneticisi-planlanmis-dersler.html?missingTeachers=1', 'warn') +
-        metric(m.cancelledCount, 'İptal edilen ders', 'deneme-dersi-yoneticisi-planlanmis-dersler.html?status=cancelled', 'danger') +
-        metric(m.needsAttendanceCount, 'Katılım girilmemiş', 'deneme-dersi-yoneticisi-planlanmis-dersler.html?needsAttendance=1', 'warn') +
-        metric(m.conversionCount, 'Kayıta dönüşüm', 'deneme-dersi-yoneticisi-ogrenciler.html');
-    }
+      var n = notifCounts();
 
-    renderTodayLessons(m.todaySessions);
-    renderActions(m);
-    renderAlerts(m);
-    revealActionsFromHash();
-    if (loading) loading.hidden = true;
-    if (root) root.hidden = false;
+      // Rezervasyon Talepleri (solda)
+      card(document.getElementById('tmCardRequests'), 'Rezervasyon Talepleri', n.requests, requestsPreview());
+
+      // Deneme Dersleri (sağda)
+      card(document.getElementById('tmCardSessions'), 'Deneme Dersleri', n.sessions, sessionsPreview());
+
+      bindSessionRows();
+      bindRequestRows();
+
+      if (loading) loading.hidden = true;
+      if (root) root.hidden = false;
     } catch (err) {
-      if (loading) {
-        loading.hidden = false;
-        loading.textContent = 'Özet yüklenemedi: ' + (err.message || err);
-      }
+      if (loading) { loading.hidden = false; loading.textContent = 'Özet yüklenemedi: ' + (err.message || err); }
       console.error(err);
     }
   }
 
-  function metric(val, label, href, tone) {
-    var cls = 'tm-metric' + (tone ? ' is-' + tone : '');
-    var inner = '<span class="tm-metric-value">' + val + '</span><span class="tm-metric-label">' + U.escapeHtml(label) + '</span>';
-    return href ? '<a class="' + cls + '" href="' + href + '">' + inner + '</a>' : '<div class="' + cls + '">' + inner + '</div>';
-  }
-
-  function reservationDetailHref(r) {
-    if (r && r.requestId) {
-      return 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(r.requestId);
-    }
-    return 'deneme-dersi-yoneticisi-rezervasyonlar.html';
-  }
-
-  function renderTodayLessons(sessions) {
-    var wrap = document.getElementById('tmTodayLessons');
-    if (!wrap) return;
-    if (!sessions.length) {
-      wrap.innerHTML = '<p class="tm-empty">Bugün planlanmış ders yok.</p>';
-      return;
-    }
-    var rows = sessions.map(function (s) {
-      var d = Store.getSessionWithDetails(s.id);
-      var lt = d.lessonType ? d.lessonType.name : '—';
-      var pdrName = d.pdrTeacher ? U.fullName(d.pdrTeacher.firstName, d.pdrTeacher.lastName) : '—';
-      var branchName = d.branchTeacher ? U.fullName(d.branchTeacher.firstName, d.branchTeacher.lastName) : '—';
-      var cap = s.enrolledStudentIds.length + '/20';
-      var linkOk = d.meeting && d.meeting.status === 'active';
-      return '<tr data-session="' + s.id + '" style="cursor:pointer">' +
-        '<td>' + s.startTime + '</td><td>' + lt + '</td>' +
-        '<td>' + U.escapeHtml(pdrName) + ' / ' + U.escapeHtml(branchName) + '</td>' +
-        '<td>' + cap + '</td><td>' + s.enrolledStudentIds.length + '</td>' +
-        '<td>' + (linkOk ? '<span class="tm-badge tm-badge--green">Aktif</span>' : '<span class="tm-badge tm-badge--red">Pasif</span>') + '</td>' +
-        '<td>' + (s.pdrTeacherInformed && s.branchTeacherInformed ? 'Evet' : 'Kısmi/Hayır') + '</td>' +
-        '<td>' + SL.sessionBadge(s.status) + '</td>' +
-        '<td><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-open-session="' + s.id + '">Detay</button></td></tr>';
-    }).join('');
-    wrap.innerHTML = '<div class="tm-res-table-wrap"><table class="tm-inner-table"><thead><tr><th>Saat</th><th>Ders</th><th>PDR / Branş</th><th>Kapasite</th><th>Öğrenci</th><th>Link</th><th>Öğrt.bilgi</th><th>Durum</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>';
-    wrap.querySelectorAll('[data-open-session]').forEach(function (btn) {
-      btn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        if (window.TMSessionDetail) window.TMSessionDetail.open(btn.getAttribute('data-open-session'));
-      });
-    });
-    wrap.querySelectorAll('tr[data-session]').forEach(function (tr) {
-      tr.addEventListener('click', function () {
-        if (window.TMSessionDetail) window.TMSessionDetail.open(tr.getAttribute('data-session'));
-      });
-    });
-  }
-
-  function openAction(a) {
-    if (!a) return;
-    if (a.kind === 'request') {
-      if (window.TMRequestDrawer && window.TMRequestDrawer.open) window.TMRequestDrawer.open(a.id);
-      else window.location.href = 'deneme-dersi-yoneticisi-rezervasyon-detay.html?id=' + encodeURIComponent(a.id);
-    } else if (a.kind === 'session') {
-      if (window.TMSessionDetail && window.TMSessionDetail.open) window.TMSessionDetail.open(a.id);
-      else window.location.href = 'deneme-dersi-yoneticisi-planlanmis-ders-detay.html?id=' + encodeURIComponent(a.id) + (a.tab != null ? '&tab=' + a.tab : '');
-    }
-  }
-
-  function renderActions(m) {
-    var list = document.getElementById('tmDashActionsList');
-    var panel = document.getElementById('tmDashActions');
-    if (!list) return;
-    var items = [];
-    function push(cat, tone, text, action) { items.push({ cat: cat, tone: tone, text: text, action: action }); }
-
-    m.orphanRequests.slice(0, 4).forEach(function (r) {
-      push('Talep', 'danger', 'Rezervasyonsuz talep · ' + r.studentFirstName + ' ' + r.studentLastName, { kind: 'request', id: r.id });
-    });
-    m.newRequests.slice(0, 3).forEach(function (r) {
-      if (m.orphanRequests.some(function (o) { return o.id === r.id; })) return;
-      push('Talep', 'info', 'Yeni talep · ' + r.studentFirstName + ' ' + r.studentLastName, { kind: 'request', id: r.id });
-    });
-    m.pendingApproval.slice(0, 5).forEach(function (r) {
-      var st = Store.getStudentById(r.studentId);
-      push('Veli onayı', 'warn', 'Onay bekliyor · ' + (st ? U.fullName(st.firstName, st.lastName) : r.id), { kind: 'request', id: r.requestId });
-    });
-    m.linkNotSent.slice(0, 3).forEach(function (r) {
-      var st = Store.getStudentById(r.studentId);
-      push('Link', 'warn', 'Link gönderilmedi · ' + (st ? U.fullName(st.firstName, st.lastName) : r.id), { kind: 'request', id: r.requestId });
-    });
-    var pdrList = (m.pdrNotInformed && m.pdrNotInformed.slice(0, 2)) || [];
-    var brList = (m.branchNotInformed && m.branchNotInformed.slice(0, 2)) || [];
-    if (!pdrList.length && !brList.length) pdrList = (m.teacherNotInformed || []).slice(0, 3);
-    pdrList.forEach(function (s) { push('Öğretmen', 'warn', 'PDR bilgilendir · ' + s.title, { kind: 'session', id: s.id }); });
-    brList.forEach(function (s) { push('Öğretmen', 'warn', 'Branş bilgilendir · ' + s.title, { kind: 'session', id: s.id }); });
-    m.needsAttendance.slice(0, 3).forEach(function (s) {
-      push('Katılım', 'info', 'Katılım gir · ' + s.title, { kind: 'session', id: s.id, tab: 4 });
-    });
-
-    if (!items.length) {
-      if (panel) panel.hidden = true;
-      return;
-    }
-    if (panel) panel.hidden = false;
-    var toneCls = { danger: 'is-danger', warn: 'is-warn', info: 'is-info' };
-    list.innerHTML = items.map(function (it, i) {
-      return '<li class="tm-action-item" data-act-idx="' + i + '" role="button" tabindex="0">' +
-        '<span class="tm-action-chip ' + (toneCls[it.tone] || '') + '">' + U.escapeHtml(it.cat) + '</span>' +
-        '<span class="tm-action-text">' + U.escapeHtml(it.text) + '</span>' +
-        '<span class="tm-action-open">Aç →</span>' +
-      '</li>';
-    }).join('');
-    list.querySelectorAll('[data-act-idx]').forEach(function (row) {
-      var handler = function () {
-        var it = items[parseInt(row.getAttribute('data-act-idx'), 10)];
-        if (it) openAction(it.action);
-      };
-      row.addEventListener('click', handler);
-      row.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); } });
-    });
-  }
-
-  function renderAlerts(m) {
-    var wrap = document.getElementById('tmDashAlerts');
-    if (!wrap) return;
-    var alerts = [];
-    var R = window.TMSchedulingRules;
-    var conflictKeys = {};
-    Store.getSessions().forEach(function (s) {
-      if (s.status === 'cancelled') return;
-      if (s.enrolledStudentIds.length >= 20) {
-        alerts.push({ msg: 'Kapasite dolu: ' + s.title, type: 'warn', sessionId: s.id });
-      }
-      if (!s.pdrTeacherId || !s.branchTeacherId) {
-        alerts.push({ msg: 'Eksik öğretmen ataması: ' + s.title, type: 'danger', sessionId: s.id });
-      }
-      var pdr = Store.getTeacherById(s.pdrTeacherId);
-      var branch = Store.getTeacherById(s.branchTeacherId);
-      if (branch && !RulesEligibleBranch(s)) {
-        alerts.push({ msg: 'Branş uyumsuzluğu: ' + s.title, type: 'danger', sessionId: s.id });
-      }
-      if (pdr && R && !R.isTeacherPdr(s.pdrTeacherId)) {
-        alerts.push({ msg: 'PDR rolü uyumsuz: ' + s.title, type: 'danger', sessionId: s.id });
-      }
-      [pdr, branch].forEach(function (teacher) {
-        if (!teacher) return;
-        var tid = teacher.id;
-        if (R && R.hasTeacherConflict(tid, s.date, s.startTime, s.endTime, s.id)) {
-          var ckey = tid + '|' + s.date + '|' + s.startTime;
-          if (!conflictKeys[ckey]) {
-            conflictKeys[ckey] = true;
-            alerts.push({
-              msg: 'Öğretmen çakışması: ' + U.fullName(teacher.firstName, teacher.lastName) + ' · ' + U.formatDateKey(s.date) + ' ' + s.startTime,
-              type: 'danger',
-              sessionId: s.id
-            });
-          }
-        }
-        if (R && !R.isTeacherAvailable(tid, s.date, s.startTime, s.endTime)) {
-          alerts.push({
-            msg: 'Müsaitlik dışı ders: ' + U.fullName(teacher.firstName, teacher.lastName) + ' · ' + U.formatDateKey(s.date) + ' ' + s.startTime,
-            type: 'warn',
-            sessionId: s.id,
-            teacherId: tid
-          });
-        }
-      });
-      if (s.pdrTeacherId && s.branchTeacherId && s.pdrTeacherId === s.branchTeacherId) {
-        alerts.push({ msg: 'PDR ve branş aynı kişi: ' + s.title, type: 'danger', sessionId: s.id });
-      }
-    });
-    Store.getReservations().forEach(function (r) {
-      if (r.status === 'cancelled') return;
-      var pa = Store.getParentById(r.parentId);
-      if (pa && (!pa.phone || !pa.email)) {
-        var st = Store.getStudentById(r.studentId);
-        alerts.push({
-          msg: 'Eksik veli iletişim: ' + (st ? U.fullName(st.firstName, st.lastName) : r.studentId),
-          type: 'warn',
-          sessionId: r.sessionId
-        });
-      }
-    });
-    if (!alerts.length) { wrap.innerHTML = '<p class="tm-empty">Çakışma veya uyarı yok.</p>'; return; }
-    wrap.innerHTML = alerts.slice(0, 8).map(function (a) {
-      var btn = a.sessionId ? ' <button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-alert-session="' + a.sessionId + '">Detay</button>' : '';
-      return '<div class="tm-alert-row' + (a.type === 'danger' ? ' is-danger' : '') + '">' + U.escapeHtml(a.msg) + btn + '</div>';
-    }).join('');
-    wrap.querySelectorAll('[data-alert-session]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        if (window.TMSessionDetail) window.TMSessionDetail.open(btn.getAttribute('data-alert-session'));
-      });
-    });
-  }
-
-  function RulesEligibleBranch(s) {
-    var R = window.TMSchedulingRules;
-    return R ? R.isBranchTeacherEligibleForLessonType(s.branchTeacherId, s.lessonTypeId) : true;
-  }
-
   window.TMOnSessionChange = render;
   render();
-  window.addEventListener('hashchange', revealActionsFromHash);
 })();

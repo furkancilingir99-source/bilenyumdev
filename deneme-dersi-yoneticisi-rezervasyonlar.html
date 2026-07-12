@@ -34,16 +34,22 @@
         <div class="tm-dg-toolbar-row">
           <input type="search" class="tm-dg-control tm-dg-search" id="tmRequestsSearch" placeholder="Ara: öğrenci, veli, telefon…">
           <select class="tm-dg-control tm-dg-select" id="tmRequestsContact">
-            <option value="all">Tüm iletişim durumları</option>
+            <option value="all">İletişim durumu seç</option>
             <option value="positive">Olumlu</option>
             <option value="negative">Olumsuz</option>
             <option value="unreachable">Ulaşılamadı</option>
             <option value="none">Görüşülmedi</option>
           </select>
           <select class="tm-dg-control tm-dg-select" id="tmRequestsAssignment">
-            <option value="all">Tüm ders atamaları</option>
+            <option value="all">Ders Ataması durumu</option>
             <option value="assigned">Ataması yapıldı</option>
             <option value="unassigned">Ataması yapılmadı</option>
+          </select>
+          <select class="tm-dg-control tm-dg-select" id="tmRequestsReservationStatus">
+            <option value="all">Rezervasyon Durumu</option>
+            <option value="pending">Bekliyor</option>
+            <option value="approved">Onaylandı</option>
+            <option value="cancelled">İptal Edildi</option>
           </select>
           <span class="tm-dg-spacer"></span>
           <select class="tm-dg-control tm-dg-select tm-dg-select--narrow" id="tmRequestsPageSize">
@@ -56,10 +62,14 @@
       <div id="tmRequestsLoading" class="td-state">Yükleniyor…</div>
       <div id="tmRequestsTableWrap" class="tm-res-table-wrap tm-mobile-table-wrap" hidden>
         <table class="tm-res-table tm-res-table--rich">
+          <colgroup>
+            <col style="width:10%"><col style="width:10%"><col style="width:9%"><col style="width:8%"><col style="width:6%"><col style="width:10%">
+            <col style="width:8%"><col style="width:5%"><col style="width:6%"><col style="width:6%"><col style="width:6%"><col style="width:5%"><col style="width:5%"><col style="width:6%">
+          </colgroup>
           <thead>
             <tr>
-              <th>Talep tarihi</th><th>Rez. ID</th><th>Veli</th><th>Telefon</th><th>E-posta</th>
-              <th>Öğrenci</th><th>Sınıf</th><th>Ders türü</th><th>Ders ID</th><th>İletişim Bilgisi</th><th>Ders Ataması</th><th>İşlem</th>
+              <th>Talep tarihi</th><th>İstediği Ders Tarihi</th><th>Rez. ID</th><th>Veli</th><th>Telefon</th><th>E-posta</th>
+              <th>Öğrenci</th><th>Sınıf</th><th>Ders türü</th><th>Ders ID</th><th>İletişim Bilgisi</th><th>Ders Ataması</th><th>Durum</th><th>İşlem</th>
             </tr>
           </thead>
           <tbody id="tmRequestsBody"></tbody>

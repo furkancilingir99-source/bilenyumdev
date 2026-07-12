@@ -30,9 +30,14 @@
       <header class="tm-dg-toolbar"><div class="tm-dg-toolbar-row">
         <input type="search" class="tm-dg-control tm-dg-search" id="tmTeachersSearch" placeholder="Ara…">
         <select class="tm-dg-control tm-dg-select" id="tmTeachersType">
-          <option value="all">Tüm tipler</option>
+          <option value="all">Tip Seç</option>
           <option value="pdr">PDR / Rehberlik</option>
           <option value="branch">Branş öğretmeni</option>
+        </select>
+        <select class="tm-dg-control tm-dg-select" id="tmTeachersBranch">
+          <option value="all">Branş Seç</option>
+          <option value="lt-mat">Matematik</option>
+          <option value="lt-fen">Fen</option>
         </select>
         <span class="tm-dg-spacer"></span>
         <select class="tm-dg-control tm-dg-select tm-dg-select--narrow" id="tmTeachersPageSize"><option value="10">10</option></select>
@@ -42,7 +47,7 @@
       <div id="tmTeachersLoading" class="td-state">Yükleniyor…</div>
       <div id="tmTeachersTableWrap" class="tm-res-table-wrap tm-mobile-table-wrap" hidden>
         <table class="tm-res-table"><thead><tr>
-          <th>Öğretmen ID</th><th>Öğretmen</th><th>Tip</th><th>Branş</th><th>Telefon</th><th>Bugün</th><th>Bu hafta</th><th>İşlemler</th>
+          <th>Öğretmen ID</th><th>Öğretmen</th><th>Tip</th><th>Branş</th><th>Telefon</th><th>E-posta</th><th>Deneme Dersi Sayısı</th><th>İşlemler</th>
         </tr></thead><tbody id="tmTeachersBody"></tbody></table>
       </div>
       <div id="tmTeachersCards" class="tm-list-cards tm-mobile-cards" hidden></div>

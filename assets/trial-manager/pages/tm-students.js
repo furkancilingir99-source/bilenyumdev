@@ -93,6 +93,23 @@
     showReservationDetail(reservationId);
   }
 
+  // Aldığı Dersler durumu — dersin/rezervasyonun durumuna göre Tamamlandı / Onaylandı / İptal Edildi.
+  function takenBadge(r, s) {
+    if (r.status === 'cancelled' || (s && s.status === 'cancelled')) return '<span class="tm-badge tm-badge--red">İptal Edildi</span>';
+    if ((s && s.status === 'completed') || r.status === 'attended' || r.status === 'no_show') return '<span class="tm-badge tm-badge--green">Tamamlandı</span>';
+    return '<span class="tm-badge tm-badge--blue">Onaylandı</span>';
+  }
+  // Aldığı Dersler satırına tıklayınca ilgili dersin detay drawer'ı açılır; "Geri Dön" öğrenci
+  // drawer'ının "Aldığı Dersler" sekmesine döner.
+  function viewSessionFromStudent(sessionId, student) {
+    if (!sessionId) return;
+    if (window.TMSessionDetail && window.TMSessionDetail.open) {
+      window.TMSessionDetail.open(sessionId, 0, { onBack: function () { openDetail(student, 2); } });
+    } else {
+      window.location.href = 'deneme-dersi-yoneticisi-planlanmis-ders-detay.html?id=' + encodeURIComponent(sessionId);
+    }
+  }
+
   function openDetail(st, activeTab) {
     if (!Drawer) return;
     var student = Store.getStudentById(st.id) || st;
@@ -103,7 +120,7 @@
     Drawer.open({
       title: U.fullName(student.firstName, student.lastName),
       subtitle: student.grade + ' · ' + (lt ? lt.name : ''),
-      tabs: [{ label: 'Bilgiler' }, { label: 'Rezervasyonlar' }],
+      tabs: [{ label: 'Bilgiler' }, { label: 'Rezervasyonlar' }, { label: 'Aldığı Dersler' }],
       activeTab: activeTab || 0,
       onTab: function (idx, body) {
         if (idx === 0) {
@@ -126,7 +143,10 @@
               ' bölümünden düzenleme yapabilirsiniz.</p>';
           if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(body);
         } else if (idx === 1) {
-          body.innerHTML = resHistory.length ? '<table class="tm-inner-table"><thead><tr><th>Atandığı Ders</th><th>Ders ID</th><th>Rezervasyon ID</th><th>Ders Tarihi</th><th>Ders Saati</th><th>İletişim</th><th>Ders Ataması</th><th>İşlemler</th></tr></thead><tbody>' +
+          body.innerHTML = resHistory.length
+            ? '<table class="tm-inner-table tm-upcoming-table tm-fixed-table"><colgroup>' +
+                '<col style="width:15%"><col style="width:12%"><col style="width:18%"><col style="width:18%"><col style="width:13%"><col style="width:13%"><col style="width:11%">' +
+              '</colgroup><thead><tr><th>Atandığı Ders</th><th>Ders ID</th><th>Rez. ID</th><th>Tarih / Saat</th><th>İletişim</th><th>Ders Ataması</th><th>İşlem</th></tr></thead><tbody>' +
             resHistory.map(function (r) {
               var s = Store.getSessionById(r.sessionId);
               var lt2 = s ? Store.getLessonTypeById(s.lessonTypeId) : null;
@@ -141,8 +161,7 @@
                 '<td>' + U.escapeHtml(lt2 ? lt2.name : '—') + '</td>' +
                 '<td><code class="tm-res-code-cell">' + U.escapeHtml(code) + '</code></td>' +
                 '<td><code class="tm-res-code-cell">' + U.escapeHtml(reservationCode(r)) + '</code></td>' +
-                '<td>' + (s ? U.escapeHtml(U.formatDateKey(s.date)) : '—') + '</td>' +
-                '<td>' + (s ? U.escapeHtml(s.startTime + '–' + s.endTime) : '—') + '</td>' +
+                '<td>' + (s ? U.escapeHtml(U.formatDateKey(s.date) + ' ' + s.startTime + '–' + s.endTime) : '—') + '</td>' +
                 '<td>' + contactBadge(contactStatus) + '</td>' +
                 '<td>' + assignmentBadge(assigned) + '</td>' +
                 '<td style="white-space:nowrap"><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-res-view="' + r.id + '" title="Görüntüle" aria-label="Rezervasyonu görüntüle" tabindex="-1">' + EYE_ICON + '</button></td>' +
@@ -160,11 +179,39 @@
               viewReservation(btn.getAttribute('data-res-view'), student);
             });
           });
-        } else {
-          var logs = Store.getCommunicationLogs().filter(function (l) { return l.studentId === student.id; });
-          body.innerHTML = logs.length ? logs.map(function (l) {
-            return '<p style="font-size:13px;margin:6px 0">' + U.formatDateTime(l.createdAt) + ' — ' + U.escapeHtml(l.summary) + '</p>';
-          }).join('') : '<p class="tm-empty">İletişim kaydı yok.</p>';
+        } else if (idx === 2) {
+          // Aldığı Dersler — öğrencinin GERÇEKTEN atandığı derslerin (rezervasyon → oturum) listesi.
+          // İptaller de gösterilir (durum: İptal Edildi). Veriler oturum + rezervasyondan gelir.
+          var taken = Store.getReservationsForStudent(student.id)
+            .filter(function (r) { return r.sessionId && Store.getSessionById(r.sessionId); })
+            .sort(function (a, b) {
+              var sa = Store.getSessionById(a.sessionId), sb = Store.getSessionById(b.sessionId);
+              return String(sb.date + sb.startTime).localeCompare(String(sa.date + sa.startTime));
+            });
+          body.innerHTML = taken.length
+            ? '<table class="tm-inner-table tm-upcoming-table"><thead><tr>' +
+                '<th>Ders Tarihi</th><th>Ders ID</th><th>Meeting ID</th><th>Ders Türü</th><th>Sınıf</th><th>Durum</th>' +
+              '</tr></thead><tbody>' + taken.map(function (r) {
+                var s = Store.getSessionById(r.sessionId);
+                var lt3 = Store.getLessonTypeById(s.lessonTypeId);
+                var meeting = Store.getMeetingBySessionId ? Store.getMeetingBySessionId(s.id) : null;
+                var lessonCode = Store.getLessonCode ? Store.getLessonCode(s) : s.id;
+                return '<tr data-sess-open="' + s.id + '" style="cursor:pointer">' +
+                  '<td>' + U.escapeHtml(U.formatDateKey(s.date)) + '</td>' +
+                  '<td><code class="tm-res-code-cell">' + U.escapeHtml(lessonCode) + '</code></td>' +
+                  '<td><code class="tm-res-code-cell">' + U.escapeHtml(meeting && meeting.meetingId ? meeting.meetingId : '—') + '</code></td>' +
+                  '<td>' + U.escapeHtml(lt3 ? lt3.name : '—') + '</td>' +
+                  '<td>' + U.escapeHtml(s.gradeLevel || '—') + '</td>' +
+                  '<td>' + takenBadge(r, s) + '</td>' +
+                  '</tr>';
+              }).join('') + '</tbody></table>'
+            : '<p class="tm-empty">Alınan ders yok.</p>';
+          body.querySelectorAll('[data-sess-open]').forEach(function (tr) {
+            tr.addEventListener('click', function () {
+              viewSessionFromStudent(tr.getAttribute('data-sess-open'), student);
+            });
+          });
+          if (Perms && Perms.applyPageChrome) Perms.applyPageChrome(body);
         }
       }
     });
@@ -172,7 +219,11 @@
 
   function filtered() {
     var items = U.filterSearch(Store.getStudents(), searchInput ? searchInput.value : '', function (st) {
-      return st.firstName + ' ' + st.lastName + ' ' + st.grade;
+      // Öğrenci adı/sınıfının yanı sıra Öğrenci ID (ts-…) ve velinin adı/ID/telefonu
+      // ile de aranabilsin; diğer ekranlardan kopyalanan kimlikler burada bulunsun.
+      var pa = st.parentIds && st.parentIds[0] ? Store.getParentById(st.parentIds[0]) : null;
+      return st.firstName + ' ' + st.lastName + ' ' + st.grade + ' ' + studentCode(st) +
+        (pa ? ' ' + pa.firstName + ' ' + pa.lastName + ' ' + parentCode(pa.id) + ' ' + (pa.phone || '') : '');
     });
     // Alfabetik (ad soyad) sıralama
     return U.sortBy(items, function (st) {
@@ -184,14 +235,14 @@
   var EYE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
   function studentCode(st) {
     var m = String(st.id || '').match(/(\d+)\s*$/);
-    return 'trialstudent-' + (m ? m[1].padStart(4, '0') : '0000');
+    return 'ts-' + (m ? m[1].padStart(4, '0') : '0000');
   }
   function parentCode(id) {
     var m = String(id || '').match(/(\d+)\s*$/);
-    return 'trialparent-' + (m ? m[1].padStart(4, '0') : '0000');
+    return 'tp-' + (m ? m[1].padStart(4, '0') : '0000');
   }
   function editBtn(id) {
-    return '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-detail="' + id + '" title="Düzenle" aria-label="Düzenle">' + EDIT_ICON + '</button>';
+    return '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-detail="' + id + '" title="Görüntüle" aria-label="Görüntüle">' + EYE_ICON + '</button>';
   }
 
   function contactBadge(status) {
@@ -205,7 +256,7 @@
       ? '<span class="tm-badge tm-badge--green">Yapıldı</span>'
       : '<span class="tm-badge tm-badge--orange">Yapılmadı</span>';
   }
-  // Rezervasyon görünen kodu — mümkünse talebin REZTRIAL kodu, değilse rezervasyondan türetilir.
+  // Rezervasyon görünen kodu — mümkünse talebin rT kodu, değilse rezervasyondan türetilir.
   function reservationCode(r) {
     if (r.requestId && Store.getReservationCode) {
       var c = Store.getReservationCode(r.requestId);
@@ -215,7 +266,7 @@
     var dateKey = (s && s.date) ? s.date : (r.createdAt ? String(r.createdAt).slice(0, 10) : '');
     var compact = dateKey ? dateKey.replace(/-/g, '') : '00000000';
     var m = String(r.id).match(/(\d+)\s*$/);
-    return 'REZTRIAL-' + compact + '-' + (m ? m[1].padStart(4, '0') : '0000');
+    return 'rT-' + compact + '-' + (m ? m[1].padStart(4, '0') : '0000');
   }
 
   function infoCell(label, value) {

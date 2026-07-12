@@ -29,34 +29,9 @@
     <div id="tmDashLoading" class="td-state">Yükleniyor…</div>
 
     <div id="tmDashRoot" hidden>
-      <div id="tmDashStats" class="tm-metric-row"></div>
-
-      <section class="tm-panel" id="tmDashActions" hidden>
-        <div class="tm-panel-head"><h2 class="tm-panel-title">Aksiyon bekleyenler</h2></div>
-        <ul id="tmDashActionsList" class="tm-action-list"></ul>
-      </section>
-
-      <section class="tm-panel">
-        <div class="tm-panel-head">
-          <h2 class="tm-panel-title">Bugünkü dersler</h2>
-          <a href="deneme-dersi-yoneticisi-planlanmis-dersler.html" class="tm-panel-link">Tüm dersler</a>
-        </div>
-        <div id="tmTodayLessons" style="padding:0 16px 16px"></div>
-      </section>
-
-      <div class="tm-split">
-        <section class="tm-panel">
-          <div class="tm-panel-head"><h2 class="tm-panel-title">Çakışma ve uyarılar</h2></div>
-          <div id="tmDashAlerts"></div>
-        </section>
-        <section class="tm-panel">
-          <div class="tm-panel-head"><h2 class="tm-panel-title">Hızlı erişim</h2></div>
-          <div style="padding:12px 16px;display:flex;flex-wrap:wrap;gap:8px">
-            <a class="tm-btn tm-btn--primary" href="deneme-dersi-yoneticisi-ders-planla.html" data-tm-require="create">+ Yeni ders planla</a>
-            <a class="tm-btn tm-btn--ghost" href="deneme-dersi-yoneticisi-rezervasyonlar.html">Rezervasyon talepleri</a>
-            <a class="tm-btn tm-btn--ghost" href="deneme-dersi-yoneticisi-iletisim.html">İletişim takibi</a>
-          </div>
-        </section>
+      <div class="tm-dash-grid tm-dash-grid--2">
+        <section class="tm-dash-card" id="tmCardRequests"></section>
+        <section class="tm-dash-card" id="tmCardSessions"></section>
       </div>
     </div>
   </main>

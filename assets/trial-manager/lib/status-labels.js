@@ -139,7 +139,14 @@
     teacher_informed: 'Öğretmen bilgilendirildi',
     attendance_marked: 'Katılım işaretlendi',
     converted_to_enrollment: 'Kayda dönüştürüldü',
-    permission_changed: 'Yetki değiştirildi'
+    permission_changed: 'Yetki değiştirildi',
+    contact_updated: 'İletişim durumu güncellendi',
+    session_changed: 'Atanan ders değiştirildi',
+    grade_changed: 'Sınıf değiştirildi',
+    name_changed: 'Ad/soyad güncellendi',
+    phone_changed: 'Telefon güncellendi',
+    email_changed: 'E-posta güncellendi',
+    family_updated: 'Veli/öğrenci güncellendi'
   };
 
   var AUDIT_ENTITY = {
@@ -151,6 +158,20 @@
     teacher: 'Öğretmen',
     user: 'Kullanıcı'
   };
+
+  // Değişiklik Türü — hangi bölümde yapıldı (Denetim Günlüğü + Geçmiş sekmeleri).
+  var AUDIT_CATEGORY = {
+    trial_lesson_request: 'Rezervasyon Talepleri',
+    trial_lesson_reservation: 'Rezervasyon Talepleri',
+    reservation: 'Rezervasyon Talepleri',
+    trial_lesson_session: 'Deneme Dersleri',
+    online_meeting: 'Deneme Dersleri',
+    student: 'Öğrenci',
+    parent: 'Veli',
+    teacher: 'Öğretmen',
+    user: 'Kullanıcı'
+  };
+  function auditCategory(entityType) { return AUDIT_CATEGORY[entityType] || 'Diğer'; }
 
   function badgeHtml(map, key, fallback) {
     var item = map[key];
@@ -179,6 +200,8 @@
     TEACHER_TYPE: TEACHER_TYPE,
     AUDIT_ACTION: AUDIT_ACTION,
     AUDIT_ENTITY: AUDIT_ENTITY,
+    AUDIT_CATEGORY: AUDIT_CATEGORY,
+    auditCategory: auditCategory,
     dataSourceBadge: function (s) { return badgeHtml(DATA_SOURCE, s); },
     dataSourceLabel: function (s) { return label(DATA_SOURCE, s); },
     teacherTypeBadge: function (t) { return badgeHtml(TEACHER_TYPE, t); },

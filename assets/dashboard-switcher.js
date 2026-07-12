@@ -60,7 +60,7 @@
   };
 
   var ITEMS = [
-    { key: 'website', href: '/', label: 'Website', short: 'Website', icon: ICON_WEBSITE, cls: 'is-website' },
+    { key: 'website', href: 'index.html', label: 'Website', short: 'Website', icon: ICON_WEBSITE, cls: 'is-website' },
     { key: 'veli', href: 'veli-dashboard.html', label: 'Veli Dashboard', short: 'Veli', icon: ICON_VELI, cls: 'is-veli' },
     { key: 'student', href: 'ogrenci-dashboard.html', label: 'Öğrenci Dashboard', short: 'Öğrenci', icon: ICON_STUDENT, cls: 'is-student' },
     { key: 'teacher', href: 'ogretmen-dashboard.html', label: 'Öğretmen Dashboard', short: 'Öğretmen', icon: ICON_TEACHER, cls: 'is-teacher' },
