@@ -1,0 +1,94 @@
+/**
+ * Soru Yazarı — yalnızca bu ekrana özel küçük eklemeler. Renk/radius/gölge/spacing mevcut
+ * deneme dersi panelinden (trial-manager-admin.css) devralınır; yeni tasarım dili yoktur.
+ */
+
+/* Sayfa başlığı görünür kalsın (tm-page-title gizlenir; kendi sınıfımızı kullanıyoruz). */
+.sy-page-head { margin: 0 0 14px; }
+.sy-page-title { margin: 0 0 4px; font-size: 20px; font-weight: 700; color: #28265a; letter-spacing: -0.01em; }
+.sy-page-sub { margin: 0; font-size: 13px; line-height: 1.5; color: #7a769e; max-width: 900px; }
+
+/* Seviye Belirleme — sınıf bazlı açılır alt menü (mevcut sidebar stilini bozmaz). */
+.sy-nav-group { display: block; }
+.sy-nav-parent { position: relative; }
+.sy-nav-caret { position: absolute; top: 8px; right: 8px; opacity: 0.6; transition: transform 0.15s ease; }
+.sy-nav-parent.is-open .sy-nav-caret { transform: rotate(180deg); }
+.sy-subnav { display: none; flex-direction: column; gap: 3px; margin: 4px 6px 8px; padding-top: 4px; border-top: 1px solid #efecf8; }
+.sy-subnav.is-open { display: flex; }
+.sy-subnav-link {
+  display: block; text-align: center; text-decoration: none;
+  padding: 7px 6px; border-radius: 10px;
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.02em;
+  color: #6b6797; background: transparent; transition: background 0.12s ease, color 0.12s ease;
+}
+.sy-subnav-link:hover { background: #f5f3fb; color: #3e3a8e; }
+.sy-subnav-link.is-active { background: #fdeaf4; color: #28265a; box-shadow: inset 0 0 0 1px #f6c9e0; }
+
+/* Seviye Belirleme — sınav kartları (mevcut tm-dash-card stilini kullanır). */
+.sy-exam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.sy-exam-card { cursor: pointer; transition: box-shadow 0.14s ease, transform 0.14s ease, border-color 0.14s ease; }
+.sy-exam-card:hover { box-shadow: 0 8px 22px rgba(40, 38, 90, 0.10); transform: translateY(-1px); border-color: #f6c9e0; }
+.sy-exam-card:focus-visible { outline: 2px solid #e6087b; outline-offset: 2px; }
+.sy-exam-meta { display: flex; justify-content: center; align-items: center; gap: 16px; margin: 14px 0; padding: 10px; border-radius: 10px; background: #f4f2fb; font-size: 12.5px; color: #7a769e; text-align: center; }
+.sy-exam-meta strong { color: #28265a; font-size: 16px; }
+.sy-status-badge { display: inline-flex; align-items: center; gap: 4px; }
+.sy-status-badge svg { display: block; }
+.sy-exam-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sy-exam-open-btn { display: inline-block; }
+.sy-exam-add {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  min-height: 120px; border: 1.5px dashed #d9d3ee; border-radius: 14px; background: #faf9fd;
+  color: #7a769e; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.sy-exam-add:hover { border-color: #e6087b; color: #b3096a; background: #fdf4fa; }
+.sy-exam-add-plus { font-size: 26px; line-height: 1; color: #b3096a; }
+.sy-back { margin-bottom: 8px; }
+
+.sy-panel { padding: 0; }
+.sy-filter-row { flex-wrap: wrap; row-gap: 8px; }
+.sy-filter-row .tm-dg-control { min-width: 120px; }
+.sy-filter-row .tm-dg-search { min-width: 200px; flex: 1 1 220px; }
+
+.sy-list { padding: 0; }
+.sy-empty { padding: 40px 16px; text-align: center; color: #7a769e; }
+
+/* Liste tablosu — mevcut tm-res-table üstüne yalnızca sürükleme sütunu davranışı. */
+.sy-table { table-layout: auto; }
+.sy-table th, .sy-table td { white-space: nowrap; }
+.sy-table td.sy-td-q { white-space: normal; min-width: 220px; max-width: 340px; color: #28265a; }
+.sy-th-drag { width: 30px; }
+.sy-td-drag { width: 30px; text-align: center; color: #b3afce; cursor: grab; }
+.sy-td-drag:active { cursor: grabbing; }
+.sy-td-drag svg { display: inline-block; vertical-align: middle; }
+.sy-table tr.sy-dragging { opacity: 0.45; }
+.sy-table tr.sy-drop-target td { box-shadow: inset 0 2px 0 #e6087b; }
+.sy-img-flag { display: inline-flex; vertical-align: middle; color: #7a769e; margin-left: 4px; }
+.sy-td-act { width: 92px; }
+
+/* Editör modalı — mevcut tm-detail-modal davranışı; sadece genişlik + iç bölümler. */
+.sy-edit-modal { width: min(880px, 96vw); }
+.sy-edit-section { margin-bottom: 16px; }
+.sy-edit-section:last-child { margin-bottom: 0; }
+.sy-edit-title { margin: 0 0 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #7a769e; }
+
+/* Şık editörü */
+.sy-options { display: flex; flex-direction: column; gap: 8px; }
+.sy-option-row { display: flex; align-items: center; gap: 10px; }
+.sy-option-radio { display: inline-flex; align-items: center; gap: 6px; min-width: 42px; font-weight: 700; color: #28265a; }
+.sy-option-radio input { accent-color: #e6087b; width: 16px; height: 16px; }
+.sy-option-row .tm-dg-control { flex: 1 1 auto; min-width: 0; }
+.sy-hint { margin: 4px 0 0; font-size: 12px; color: #7a769e; }
+
+/* Görsel alanı */
+.sy-image-block { margin-top: 10px; }
+.tm-form-field-label, .sy-image-block .tm-form-field-label { display: block; font-size: 12.5px; color: #4a4778; margin-bottom: 6px; }
+.sy-image-preview { display: flex; align-items: center; justify-content: center; min-height: 92px; border: 1px dashed #d9d3ee; border-radius: 10px; background: #faf9fd; overflow: hidden; margin-bottom: 8px; }
+.sy-image-preview img { max-width: 100%; max-height: 180px; border-radius: 8px; display: block; }
+.sy-image-empty { font-size: 12px; color: #b3afce; }
+.sy-image-actions { display: flex; gap: 8px; align-items: center; }
+.sy-image-actions .tm-dg-control { flex: 1 1 auto; min-width: 0; }
+
+@media (max-width: 760px) {
+  .sy-page-title { font-size: 18px; }
+  .sy-filter-row .tm-dg-control { min-width: 46%; }
+}

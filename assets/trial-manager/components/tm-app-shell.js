@@ -42,7 +42,8 @@
     { key: 'veli', href: 'veli-dashboard.html', short: 'Veli', label: 'Veli Dashboard', icon: ICON.users },
     { key: 'student', href: 'ogrenci-dashboard.html', short: 'Öğrenci', label: 'Öğrenci Dashboard', icon: ICON.user },
     { key: 'teacher', href: 'ogretmen-dashboard.html', short: 'Öğretmen', label: 'Öğretmen Dashboard', icon: ICON.teacher },
-    { key: 'trial-manager', href: 'deneme-dersi-yoneticisi-dashboard.html', short: 'Deneme', label: 'Deneme Dersi Yöneticisi', icon: ICON.calendar }
+    { key: 'trial-manager', href: 'deneme-dersi-yoneticisi-dashboard.html', short: 'Deneme', label: 'Deneme Dersi Yöneticisi', icon: ICON.calendar },
+    { key: 'question-author', href: 'soru-yazari-dashboard.html', short: 'Soru Yazarı', label: 'Soru Yazarı Dashboard', icon: ICON.audit }
   ];
 
   function renderSwitcher() {

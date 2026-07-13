@@ -42,6 +42,11 @@
       '<path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>' +
     '</svg>';
 
+  var ICON_QUESTION_AUTHOR =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>' +
+    '</svg>';
+
   var WEBSITE_PAGES = {
     '': true,
     'index.html': true,
@@ -64,7 +69,8 @@
     { key: 'veli', href: 'veli-dashboard.html', label: 'Veli Dashboard', short: 'Veli', icon: ICON_VELI, cls: 'is-veli' },
     { key: 'student', href: 'ogrenci-dashboard.html', label: 'Öğrenci Dashboard', short: 'Öğrenci', icon: ICON_STUDENT, cls: 'is-student' },
     { key: 'teacher', href: 'ogretmen-dashboard.html', label: 'Öğretmen Dashboard', short: 'Öğretmen', icon: ICON_TEACHER, cls: 'is-teacher' },
-    { key: 'trial-manager', href: 'deneme-dersi-yoneticisi-dashboard.html', label: 'Deneme Dersi Yöneticisi', short: 'Deneme', icon: ICON_TRIAL_MANAGER, cls: 'is-trial-manager' }
+    { key: 'trial-manager', href: 'deneme-dersi-yoneticisi-dashboard.html', label: 'Deneme Dersi Yöneticisi', short: 'Deneme', icon: ICON_TRIAL_MANAGER, cls: 'is-trial-manager' },
+    { key: 'question-author', href: 'soru-yazari-dashboard.html', label: 'Soru Yazarı Dashboard', short: 'Soru Yazarı', icon: ICON_QUESTION_AUTHOR, cls: 'is-question-author' }
   ];
 
   function pageName() {
