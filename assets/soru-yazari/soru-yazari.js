@@ -39,11 +39,21 @@
     { id: 'science', name: 'Fen Bilimleri', section: 'numeric' },
     { id: 'turkish', name: 'Türkçe', section: 'verbal' },
     { id: 'social', name: 'Sosyal Bilgiler', section: 'verbal' },
-    { id: 'religion', name: 'Din Kültürü', section: 'verbal' },
+    { id: 'religion', name: 'Din Kültürü ve Ahlak Bilgisi', section: 'verbal' },
     { id: 'english', name: 'İngilizce', section: 'verbal' }
   ];
   var SUBJ = {}; SUBJECTS.forEach(function (s) { SUBJ[s.id] = s; });
   var SECTION_LABEL = { numeric: 'Sayısal', verbal: 'Sözel' };
+  // Ders başına ayırt edici renk + dersi çağrıştıran ikon.
+  var SUBJECT_STYLE = {
+    mathematics: { color: '#2563eb', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="9" y2="11"/><line x1="12" y1="11" x2="13" y2="11"/><line x1="15.5" y1="11" x2="16.5" y2="11"/><line x1="8" y1="15" x2="9" y2="15"/><line x1="12" y1="15" x2="13" y2="15"/><line x1="15.5" y1="14" x2="16.5" y2="17"/><line x1="16.5" y1="14" x2="15.5" y2="17"/></svg>' },
+    science: { color: '#059669', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4.5"/><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(120 12 12)"/></svg>' },
+    turkish: { color: '#db2777', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2H2z"/><path d="M22 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2H22z"/></svg>' },
+    social: { color: '#d97706', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' },
+    religion: { color: '#0d9488', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21a9 9 0 1 1 0-18 7 7 0 1 0 0 18z"/><path d="M18.5 8.5l.7 1.9 2 .1-1.6 1.3.6 2-1.7-1.2-1.7 1.2.6-2-1.6-1.3 2-.1z"/></svg>' },
+    english: { color: '#7c3aed', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg>' }
+  };
+  function subjectStyle(id) { return SUBJECT_STYLE[id] || { color: '#7a769e', icon: '' }; }
   var GRADES = ['5', '6', '7', '8'];
   function gradeLabel(g) { return g + '. Sınıf'; }
   var MONTHS = [
@@ -196,7 +206,8 @@
   NAV_ORDER.forEach(function (k) { filters[k] = {}; });
   // Seviye Belirleme: sınıf → sınav kartları → sorular akışı.
   var placementGrade = '5';    // seçili sınıf
-  var placementExam = null;    // seçili sınav no (null = kart görünümü)
+  var placementExam = null;    // seçili sınav no (null = sınav kartları)
+  var placementSubject = null; // seçili ders (null = ders kartları)
   var placementMenuOpen = true; // alt menü açık/kapalı
 
   /* ----------------------------- Filtre çubuğu ----------------------------- */
@@ -214,8 +225,11 @@
     // Seviye Belirleme'de sınıf sol menüden/sınavdan gelir; filtre çubuğunda tekrar gösterme.
     if (key !== 'placement') els.push(selectEl('gradeLevel', 'Tüm sınıflar', GRADES.map(function (g) { return { v: g, l: gradeLabel(g) }; }), f.gradeLevel));
     if (s.hasSubject) {
-      els.push(selectEl('subject', 'Tüm dersler', SUBJECTS.map(function (x) { return { v: x.id, l: x.name }; }), f.subject));
-      els.push(selectEl('section', 'Tüm bölümler', [{ v: 'numeric', l: 'Sayısal' }, { v: 'verbal', l: 'Sözel' }], f.section));
+      // Seviye Belirleme'de ders, ders kartından geldiği için filtre çubuğunda gösterilmez.
+      if (key !== 'placement') {
+        els.push(selectEl('subject', 'Tüm dersler', SUBJECTS.map(function (x) { return { v: x.id, l: x.name }; }), f.subject));
+        els.push(selectEl('section', 'Tüm bölümler', [{ v: 'numeric', l: 'Sayısal' }, { v: 'verbal', l: 'Sözel' }], f.section));
+      }
       els.push(selectEl('topic', 'Tüm konular', allTopicsFor(key).map(function (t) { return { v: t, l: t }; }), f.topic));
     }
     if (s.hasWeek) els.push(selectEl('lessonMode', 'KİD / RUD', LESSON_MODES.map(function (m) { return { v: m.id, l: m.id }; }), f.lessonMode));
@@ -242,6 +256,7 @@
     if (key === 'placement') {
       if (placementGrade) list = list.filter(function (q) { return q.gradeLevel === placementGrade; });
       if (placementExam != null) list = list.filter(function (q) { return (q.examNo || 1) === placementExam; });
+      if (placementSubject) list = list.filter(function (q) { return q.subject === placementSubject; });
     }
     if (f.q) { var qq = f.q.toLowerCase(); list = list.filter(function (q) { return (q.questionText || '').toLowerCase().indexOf(qq) >= 0; }); }
     if (f.month && f.month !== 'all') list = list.filter(function (q) { return q.month === f.month; });
@@ -347,30 +362,55 @@
     return '<div class="sy-exam-grid">' + cards + '</div>';
   }
 
+  // Sınav içindeki ders kartları — her ders farklı renk + ikon, soru sayısı, "Sınavı Düzenle".
+  function renderSubjectCards(grade, exam) {
+    var qs = db.questions.filter(function (q) { return q.contentType === 'placement_exam' && q.gradeLevel === grade && (q.examNo || 1) === exam; });
+    var cards = SUBJECTS.map(function (sub) {
+      var st = subjectStyle(sub.id);
+      var count = qs.filter(function (q) { return q.subject === sub.id; }).length;
+      return '<article class="tm-dash-card sy-subject-card" data-sy-subject="' + sub.id + '" role="button" tabindex="0" style="--sy-c:' + st.color + '">' +
+        '<div class="sy-subject-top"><span class="sy-subject-icon">' + st.icon + '</span>' +
+          '<h2 class="sy-subject-name">' + esc(sub.name) + '</h2><span class="sy-subject-tag">' + esc(SECTION_LABEL[sub.section]) + '</span></div>' +
+        '<div class="sy-exam-meta"><span><strong>' + count + '</strong> soru</span></div>' +
+        '<span class="tm-btn tm-btn--primary tm-btn--sm sy-subject-edit" data-sy-subject="' + sub.id + '">Sınavı Düzenle &rarr;</span>' +
+      '</article>';
+    }).join('');
+    return '<div class="sy-exam-grid sy-subject-grid">' + cards + '</div>';
+  }
+  function bindSubjectCards(main) {
+    main.querySelectorAll('[data-sy-subject]').forEach(function (el) {
+      function open() { placementSubject = el.getAttribute('data-sy-subject'); renderSection(); }
+      el.addEventListener('click', open);
+      el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    });
+    var back = main.querySelector('[data-sy-subject-back]');
+    if (back) back.addEventListener('click', function () { placementExam = null; placementSubject = null; renderSection(); });
+  }
+
   /* ----------------------------- Bölüm render ----------------------------- */
   function renderSection() {
     var main = document.getElementById('syMain');
     var s = SECTIONS[activeSection];
 
-    // Seviye Belirleme: sınıf seçilmemiş → yönlendirme; sınav seçilmemiş → kartlar; seçilmiş → sorular.
-    if (activeSection === 'placement' && (!placementGrade || placementExam == null)) {
-      var head, bodyHtml;
-      if (!placementGrade) {
-        head = '<div class="sy-page-head"><h1 class="sy-page-title">Seviye Belirleme Sınavı</h1><p class="sy-page-sub">Soldaki menüden bir sınıf seçin; o sınıfa ait Seviye Belirleme Sınavları kart olarak listelenir.</p></div>';
-        bodyHtml = '<p class="tm-empty sy-empty">Başlamak için sol menüden bir sınıf seçin.</p>';
-      } else {
-        head = '<div class="sy-page-head"><h1 class="sy-page-title">Seviye Belirleme Sınavı · ' + esc(gradeLabel(placementGrade)) + '</h1><p class="sy-page-sub">Bir sınava tıklayarak sorularını görüntüleyin, düzenleyin ve yeni soru ekleyin.</p></div>';
-        bodyHtml = renderExamCards(placementGrade);
-      }
-      main.innerHTML = head + bodyHtml;
+    // Seviye Belirleme: sınav seçilmemiş → sınav kartları; ders seçilmemiş → ders kartları; seçilmiş → sorular.
+    if (activeSection === 'placement' && placementExam == null) {
+      main.innerHTML = '<div class="sy-page-head"><h1 class="sy-page-title">Seviye Belirleme Sınavı · ' + esc(gradeLabel(placementGrade)) + '</h1><p class="sy-page-sub">Bir sınav seçin; ardından ders kartlarından soruları yönetin.</p></div>' + renderExamCards(placementGrade);
       bindExamCards(main);
+      return;
+    }
+    if (activeSection === 'placement' && placementSubject == null) {
+      main.innerHTML = '<div class="sy-page-head">' +
+        '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm sy-back" data-sy-subject-back>&larr; Sınavlara dön</button>' +
+        '<h1 class="sy-page-title">Seviye Belirleme Sınavı - ' + placementExam + ' · ' + esc(gradeLabel(placementGrade)) + '</h1>' +
+        '<p class="sy-page-sub">Düzenlemek istediğiniz dersi seçin.</p></div>' + renderSubjectCards(placementGrade, placementExam);
+      bindSubjectCards(main);
       return;
     }
 
     var titleHtml, backHtml = '';
     if (activeSection === 'placement') {
-      titleHtml = 'Seviye Belirleme Sınavı - ' + placementExam + ' · ' + esc(gradeLabel(placementGrade));
-      backHtml = '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm sy-back" data-sy-exam-back>&larr; Sınavlara dön</button>';
+      titleHtml = 'Seviye Belirleme Sınavı - ' + placementExam + ' · ' + esc(gradeLabel(placementGrade)) + ' · ' + esc(SUBJ[placementSubject] ? SUBJ[placementSubject].name : '');
+      backHtml = '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm sy-back" data-sy-subject-listback>&larr; Derslere dön</button>';
     } else {
       titleHtml = esc(s.label);
     }
@@ -394,7 +434,7 @@
 
   function bindExamCards(main) {
     main.querySelectorAll('[data-sy-exam-open]').forEach(function (el) {
-      function open() { placementExam = parseInt(el.getAttribute('data-sy-exam-open'), 10); renderSection(); }
+      function open() { placementExam = parseInt(el.getAttribute('data-sy-exam-open'), 10); placementSubject = null; renderSection(); }
       el.addEventListener('click', open);
       el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
     });
@@ -446,8 +486,8 @@
         el.addEventListener('change', apply);
       }
     });
-    var backBtn = main.querySelector('[data-sy-exam-back]');
-    if (backBtn) backBtn.addEventListener('click', function () { placementExam = null; renderSection(); });
+    var backBtn = main.querySelector('[data-sy-subject-listback]');
+    if (backBtn) backBtn.addEventListener('click', function () { placementSubject = null; renderSection(); });
     var addBtn = main.querySelector('[data-sy-add]');
     if (addBtn) addBtn.addEventListener('click', function () { openEditor(null); });
     main.querySelectorAll('[data-sy-edit]').forEach(function (b) { b.addEventListener('click', function () { openEditor(findQ(b.getAttribute('data-sy-edit'))); }); });
@@ -536,7 +576,10 @@
     var nextOrder = (orders.length ? Math.max.apply(null, orders) : 0) + 1;
     var q = { id: nowSeq('question'), contentType: s.contentType, gradeLevel: (activeSection === 'placement' ? placementGrade : '5'), questionText: '', imageUrl: null, questionType: s.attention ? 'multi_select_attention' : 'multiple_choice', options: [{ id: 'A', text: '', isCorrect: true }, { id: 'B', text: '', isCorrect: false }, { id: 'C', text: '', isCorrect: false }, { id: 'D', text: '', isCorrect: false }], correctTextAnswer: '', correctNumberAnswer: null, caseSensitive: false, score: 10, xp: s.hasXp ? 20 : null, order: nextOrder, isActive: true };
     if (activeSection === 'placement') q.examNo = placementExam || 1;
-    if (s.hasSubject) { q.subject = 'mathematics'; q.section = 'numeric'; q.topic = ''; q.subTopic = ''; }
+    if (s.hasSubject) {
+      q.subject = (activeSection === 'placement' && placementSubject) ? placementSubject : 'mathematics';
+      q.section = SUBJ[q.subject] ? SUBJ[q.subject].section : 'numeric'; q.topic = ''; q.subTopic = '';
+    }
     if (s.hasMonth) { q.month = 'january'; q.year = 2026; }
     if (s.hasWeek) { q.educationWeek = 1; q.lessonMode = 'RUD'; q.homeworkTitle = ''; }
     if (s.hasQuarter) q.quarter = 'q1';
@@ -728,6 +771,7 @@
         activeSection = 'placement';
         placementGrade = a.getAttribute('data-sy-grade');
         placementExam = null;
+        placementSubject = null;
         placementMenuOpen = true;
         reSidebar(); renderSection(); closeMobile();
       });

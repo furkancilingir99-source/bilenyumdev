@@ -26,8 +26,8 @@
 
 /* Seviye Belirleme — sınav kartları (mevcut tm-dash-card stilini kullanır). */
 .sy-exam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
-.sy-exam-card { cursor: pointer; transition: box-shadow 0.14s ease, transform 0.14s ease, border-color 0.14s ease; }
-.sy-exam-card:hover { box-shadow: 0 8px 22px rgba(40, 38, 90, 0.10); transform: translateY(-1px); border-color: #f6c9e0; }
+.sy-exam-card { cursor: pointer; transition: box-shadow 0.14s ease, border-color 0.14s ease; }
+.sy-exam-card:hover { box-shadow: 0 8px 22px rgba(40, 38, 90, 0.10); border-color: #f6c9e0; }
 .sy-exam-card:focus-visible { outline: 2px solid #e6087b; outline-offset: 2px; }
 .sy-exam-meta { display: flex; justify-content: center; align-items: center; gap: 16px; margin: 14px 0; padding: 10px; border-radius: 10px; background: #f4f2fb; font-size: 12.5px; color: #7a769e; text-align: center; }
 .sy-exam-meta strong { color: #28265a; font-size: 16px; }
@@ -43,6 +43,25 @@
 .sy-exam-add:hover { border-color: #e6087b; color: #b3096a; background: #fdf4fa; }
 .sy-exam-add-plus { font-size: 26px; line-height: 1; color: #b3096a; }
 .sy-back { margin-bottom: 8px; }
+
+/* Sınav içi ders kartları — her ders kendi rengi (--sy-c) + ikonu. */
+.sy-subject-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.sy-subject-card { border-top: 3px solid var(--sy-c, #7a769e); }
+.sy-subject-card:hover { border-color: var(--sy-c, #f6c9e0); border-top-color: var(--sy-c, #7a769e); }
+.sy-subject-top { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.sy-subject-icon {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 12px;
+  color: var(--sy-c, #7a769e); background: color-mix(in srgb, var(--sy-c, #7a769e) 12%, #ffffff);
+}
+.sy-subject-icon svg { width: 22px; height: 22px; display: block; }
+.sy-subject-name { margin: 0; font-size: 15px; font-weight: 700; color: #28265a; line-height: 1.2; }
+.sy-subject-tag { margin-left: auto; font-size: 10px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--sy-c, #7a769e); }
+.sy-subject-edit { display: inline-block; }
+/* color-mix desteklemeyen tarayıcılarda ikon arka planı için sade fallback. */
+@supports not (background: color-mix(in srgb, red 10%, white)) {
+  .sy-subject-icon { background: #f4f2fb; }
+}
 
 .sy-panel { padding: 0; }
 .sy-filter-row { flex-wrap: wrap; row-gap: 8px; }
