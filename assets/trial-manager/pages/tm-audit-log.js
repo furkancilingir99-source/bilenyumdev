@@ -21,7 +21,54 @@
   var page = 1;
   var pageSize = 25;
   var EYE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+  var NOTE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="13" y2="17"></line></svg>';
   function hval(v) { return (v === undefined || v === null || v === '') ? '—' : String(v); }
+
+  function findLog(id) { return Store.getAuditLogs().find(function (x) { return x.id === id; }); }
+  // Değişiklik açıklamasını SAYFADAN AYRILMADAN gösteren salt-okunur modal.
+  function openDescModal(id) {
+    var l = findLog(id); if (!l) return;
+    var existing = document.getElementById('tmAuditDescModal');
+    if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+    function cell(label, val) { return '<div><div class="tm-detail-cell-label">' + U.escapeHtml(label) + '</div><div class="tm-detail-cell-value">' + val + '</div></div>'; }
+    var ov = document.createElement('div');
+    ov.className = 'tm-crit-overlay is-open';
+    ov.id = 'tmAuditDescModal';
+    ov.style.zIndex = '9600';
+    ov.innerHTML =
+      '<div class="tm-crit-dialog tm-detail-modal" role="dialog" aria-modal="true">' +
+        '<header class="tm-crit-head"><div class="tm-detail-modal-titles">' +
+          '<h2 class="tm-crit-title">Değişiklik Açıklaması</h2>' +
+          '<p class="tm-detail-modal-sub">' + U.escapeHtml(category(l)) + ' · ' + U.formatDateTime(l.createdAt) + '</p>' +
+        '</div><button type="button" class="tm-drawer-close" data-close aria-label="Kapat">&times;</button></header>' +
+        '<div class="tm-detail-modal-body">' +
+          '<p class="tm-audit-desc-text">' + U.escapeHtml(l.description || 'Bu kayıt için açıklama girilmemiş.') + '</p>' +
+          '<div class="tm-detail-grid tm-detail-grid--modal">' +
+            cell('İşlem', U.escapeHtml(SL.AUDIT_ACTION[l.action] || l.action)) +
+            cell('Kayıt ID', '<code class="tm-res-code-cell">' + U.escapeHtml(l.entityId) + '</code>') +
+            cell('Değişikliği Yapan', U.escapeHtml(userLabel(l.createdByUserId))) +
+            cell('Tarih & Saat', U.formatDateTime(l.createdAt)) +
+            cell('Eski Durum', '<span class="tm-audit-old">' + U.escapeHtml(hval(l.previousValue)) + '</span>') +
+            cell('Yeni Durum', '<span class="tm-audit-new">' + U.escapeHtml(hval(l.newValue)) + '</span>') +
+            cell('Gerekçe', U.escapeHtml(hval(l.reason))) +
+          '</div>' +
+        '</div>' +
+        '<footer class="tm-crit-foot">' +
+          '<button type="button" class="tm-btn tm-btn--ghost" data-close>Kapat</button>' +
+          '<button type="button" class="tm-btn tm-btn--primary" data-open-entity data-type="' +
+            U.escapeHtml(l.entityType) + '" data-id="' + U.escapeHtml(l.entityId) + '">İlgili kaydı aç</button>' +
+        '</footer>' +
+      '</div>';
+    document.body.appendChild(ov);
+    function close() { if (ov.parentNode) ov.parentNode.removeChild(ov); document.removeEventListener('keydown', onKey); }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    ov.addEventListener('click', function (e) {
+      if (e.target === ov || e.target.closest('[data-close]')) { close(); return; }
+      var go = e.target.closest('[data-open-entity]');
+      if (go) { close(); if (AuditNav) AuditNav.openEntity(go.getAttribute('data-type'), go.getAttribute('data-id')); }
+    });
+    document.addEventListener('keydown', onKey);
+  }
   function category(l) { return SL.auditCategory ? SL.auditCategory(l.entityType) : (SL.AUDIT_ENTITY[l.entityType] || l.entityType); }
 
   function userLabel(userId) {
@@ -88,6 +135,7 @@
         (l.description ? '<div><span class="tm-list-card-label">Değişiklik</span> ' + U.escapeHtml(l.description) + '</div>' : '') +
       '</div>' +
       '<div class="tm-list-card-foot">' +
+        '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost" data-audit-desc="' + U.escapeHtml(l.id) + '">Açıklamayı görüntüle</button>' +
         '<button type="button" class="tm-btn tm-btn--sm tm-btn--primary" data-open-entity data-type="' +
           U.escapeHtml(l.entityType) + '" data-id="' + U.escapeHtml(l.entityId) + '">İlgili kaydı aç</button>' +
       '</div></article>';
@@ -99,6 +147,12 @@
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
         if (AuditNav) AuditNav.openEntity(btn.getAttribute('data-type'), btn.getAttribute('data-id'));
+      });
+    });
+    root.querySelectorAll('[data-audit-desc]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        openDescModal(btn.getAttribute('data-audit-desc'));
       });
     });
   }
@@ -120,8 +174,11 @@
           '<td>' + U.escapeHtml(category(l)) + '</td>' +
           '<td><span class="tm-audit-old">' + U.escapeHtml(hval(l.previousValue)) + '</span></td>' +
           '<td><span class="tm-audit-new">' + U.escapeHtml(hval(l.newValue)) + '</span></td>' +
-          '<td><span class="tm-row-actions"><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-open-entity data-type="' +
-            U.escapeHtml(l.entityType) + '" data-id="' + U.escapeHtml(l.entityId) + '" title="İlgili kaydı aç" aria-label="İlgili kaydı aç">' + EYE_ICON + '</button></span></td></tr>';
+          '<td><span class="tm-row-actions">' +
+            '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-audit-desc="' + U.escapeHtml(l.id) + '" title="Açıklamayı görüntüle" aria-label="Açıklamayı görüntüle">' + NOTE_ICON + '</button>' +
+            '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-open-entity data-type="' +
+            U.escapeHtml(l.entityType) + '" data-id="' + U.escapeHtml(l.entityId) + '" title="İlgili kaydı aç" aria-label="İlgili kaydı aç">' + EYE_ICON + '</button>' +
+          '</span></td></tr>';
       }).join('');
       if (cardsEl) cardsEl.innerHTML = p.items.map(cardHtml).join('');
       U.renderPagination(paginationEl, p.page, p.pages, function (np) { page = np; render(); });

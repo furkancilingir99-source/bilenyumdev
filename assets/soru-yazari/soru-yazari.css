@@ -10,7 +10,8 @@
 
 /* Seviye Belirleme — sınıf bazlı açılır alt menü (mevcut sidebar stilini bozmaz). */
 .sy-nav-group { display: block; }
-.sy-nav-parent { position: relative; }
+/* <button> öğeleri <a> gibi tam genişlik almıyordu → aktif başlık dar kutu gibi görünüyordu. */
+.sy-nav-parent { position: relative; width: 100%; box-sizing: border-box; align-self: stretch; }
 .sy-nav-caret { position: absolute; top: 8px; right: 8px; opacity: 0.6; transition: transform 0.15s ease; }
 .sy-nav-parent.is-open .sy-nav-caret { transform: rotate(180deg); }
 .sy-subnav { display: none; flex-direction: column; gap: 3px; margin: 4px 6px 8px; padding-top: 4px; border-top: 1px solid #efecf8; }
@@ -25,16 +26,25 @@
 .sy-subnav-link.is-active { background: #fdeaf4; color: #28265a; box-shadow: inset 0 0 0 1px #f6c9e0; }
 
 /* Seviye Belirleme — sınav kartları (mevcut tm-dash-card stilini kullanır). */
-.sy-exam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
-.sy-exam-card { cursor: pointer; transition: box-shadow 0.14s ease, border-color 0.14s ease; }
+.sy-exam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); grid-auto-rows: 1fr; gap: 14px; }
+.sy-exam-card {
+  display: flex; flex-direction: column; min-width: 0;
+  cursor: pointer; transition: box-shadow 0.14s ease, border-color 0.14s ease;
+}
 .sy-exam-card:hover { box-shadow: 0 8px 22px rgba(40, 38, 90, 0.10); border-color: #f6c9e0; }
 .sy-exam-card:focus-visible { outline: 2px solid #e6087b; outline-offset: 2px; }
+/* Başlık + durum rozeti: rozet kırpılmasın, uzun ad taşmadan sarsın. */
+.sy-exam-card .tm-dash-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.sy-exam-card .tm-dash-card-title { min-width: 0; font-size: 15px; line-height: 1.3; overflow-wrap: anywhere; }
 .sy-exam-meta { display: flex; justify-content: center; align-items: center; gap: 16px; margin: 14px 0; padding: 10px; border-radius: 10px; background: #f4f2fb; font-size: 12.5px; color: #7a769e; text-align: center; }
 .sy-exam-meta strong { color: #28265a; font-size: 16px; }
-.sy-status-badge { display: inline-flex; align-items: center; gap: 4px; }
+.sy-status-badge { display: inline-flex; align-items: center; gap: 4px; flex: 0 0 auto; white-space: nowrap; }
 .sy-status-badge svg { display: block; }
-.sy-exam-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.sy-exam-open-btn { display: inline-block; }
+/* Alt sıra: [Taslağa al] [düzenle][sil] üstte, birincil eylem tam genişlikte altta → hiç taşmaz. */
+.sy-exam-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: auto; }
+.sy-exam-toggle { flex: 1 1 auto; min-width: 0; }
+.sy-exam-tools { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 4px; }
+.sy-exam-open-btn { flex: 1 1 100%; display: block; text-align: center; }
 .sy-exam-add {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
   min-height: 120px; border: 1.5px dashed #d9d3ee; border-radius: 14px; background: #faf9fd;
@@ -44,20 +54,56 @@
 .sy-exam-add-plus { font-size: 26px; line-height: 1; color: #b3096a; }
 .sy-back { margin-bottom: 8px; }
 
+/* Sınav kartındaki tarih/saat satırı */
+.sy-exam-sched { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0 0 12px; font-size: 12px; color: #4a4778; }
+.sy-sched-lbl { color: #7a769e; }
+.sy-sched-grid { margin-top: 4px; }
+
+/* Haftalık ödevler — KİD/RUD kart açıklaması */
+.sy-mode-desc { margin: 2px 0 0; font-size: 12px; line-height: 1.5; color: #7a769e; }
+
+/* Haftalık ödevler — 1..32 hafta kartları */
+.sy-week-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; }
+.sy-week-card {
+  display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer;
+  padding: 12px 10px; border: 1.5px solid #e7e3f4; border-radius: 12px; background: #fff;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+.sy-week-card:hover { border-color: #e6087b; box-shadow: 0 6px 16px rgba(40, 38, 90, 0.08); }
+.sy-week-card:focus-visible { outline: 2px solid #e6087b; outline-offset: 2px; }
+.sy-week-no {
+  display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px;
+  border-radius: 10px; background: #f4f2fb; color: #7a769e; font-size: 14px; font-weight: 700;
+}
+.sy-week-card.has-q .sy-week-no { background: #fdeaf4; color: #b3096a; }
+.sy-week-lbl { font-size: 12.5px; font-weight: 600; color: #28265a; }
+.sy-week-cnt { font-size: 11px; color: #7a769e; }
+.sy-week-card.has-q .sy-week-cnt { color: #b3096a; font-weight: 600; }
+
+/* Seçici tablosunda satır tıklanabilir */
+.sy-pick-table tbody tr { cursor: pointer; }
+
 /* Sınav içi ders kartları — her ders kendi rengi (--sy-c) + ikonu. */
-.sy-subject-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-.sy-subject-card { border-top: 3px solid var(--sy-c, #7a769e); }
+.sy-subject-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.sy-subject-card { display: flex; flex-direction: column; min-width: 0; border-top: 3px solid var(--sy-c, #7a769e); }
 .sy-subject-card:hover { border-color: var(--sy-c, #f6c9e0); border-top-color: var(--sy-c, #7a769e); }
-.sy-subject-top { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+/* İkon | (ad + etiket alt alta) | kaldır — ad için gerçek yer kalsın, satır taşmasın. */
+.sy-subject-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px; min-width: 0; }
 .sy-subject-icon {
   flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
   width: 40px; height: 40px; border-radius: 12px;
   color: var(--sy-c, #7a769e); background: color-mix(in srgb, var(--sy-c, #7a769e) 12%, #ffffff);
 }
 .sy-subject-icon svg { width: 22px; height: 22px; display: block; }
-.sy-subject-name { margin: 0; font-size: 15px; font-weight: 700; color: #28265a; line-height: 1.2; }
-.sy-subject-tag { margin-left: auto; font-size: 10px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--sy-c, #7a769e); }
-.sy-subject-edit { display: inline-block; }
+.sy-subject-titles { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 3px; padding-top: 2px; }
+.sy-subject-name { margin: 0; font-size: 14.5px; font-weight: 700; color: #28265a; line-height: 1.25; overflow-wrap: anywhere; }
+.sy-subject-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--sy-c, #7a769e); }
+/* Ders kartındaki kaldır düğmesi — kart tıklamasını engellemeden, yer kaplayarak (kayma olmasın) */
+.sy-subject-del { flex: 0 0 auto; opacity: 0.45; transition: opacity 0.12s ease; }
+.sy-subject-card:hover .sy-subject-del,
+.sy-subject-del:hover,
+.sy-subject-del:focus-visible { opacity: 1; }
+.sy-subject-edit { display: block; margin-top: auto; text-align: center; }
 /* color-mix desteklemeyen tarayıcılarda ikon arka planı için sade fallback. */
 @supports not (background: color-mix(in srgb, red 10%, white)) {
   .sy-subject-icon { background: #f4f2fb; }
@@ -71,10 +117,24 @@
 .sy-list { padding: 0; }
 .sy-empty { padding: 40px 16px; text-align: center; color: #7a769e; }
 
-/* Liste tablosu — mevcut tm-res-table üstüne yalnızca sürükleme sütunu davranışı. */
-.sy-table { table-layout: auto; }
+/* Liste tablosu — mevcut tm-res-table üstüne yalnızca sürükleme sütunu davranışı.
+   NOT: .tm-res-table "table-layout: fixed" kullanıyor; bu her sütuna eşit genişlik verip
+   Puan gibi dar sütunları Alt Konu kadar genişletiyordu. İçeriğe göre genişlesin diye
+   aynı özgüllükte (body.tm-admin-body ...) auto'ya çekiyoruz. */
+body.tm-admin-body .sy-table { table-layout: auto; width: 100%; }
 .sy-table th, .sy-table td { white-space: nowrap; }
-.sy-table td.sy-td-q { white-space: normal; min-width: 220px; max-width: 340px; color: #28265a; }
+/* Soru ID: tema kod hücrelerini "word-break: break-all" ile harf harf kırıyor;
+   bu sütunda tek satırda kalması gerekiyor. */
+body.tm-admin-body .sy-table th.sy-col-id,
+body.tm-admin-body .sy-table td.sy-col-id { width: 1%; white-space: nowrap; }
+body.tm-admin-body .sy-table td .tm-res-code-cell {
+  white-space: nowrap; overflow-wrap: normal; word-break: normal;
+}
+/* Uzun metinli sütunlar sarsın ki tablo sayfaya sığsın */
+.sy-table td.sy-td-q { white-space: normal; min-width: 180px; max-width: 300px; color: #28265a; }
+.sy-table td.sy-td-sub { white-space: normal; max-width: 260px; }
+.sy-table td.sy-td-ans { white-space: normal; max-width: 200px; }
+.sy-table th.sy-col-topic, .sy-table td.sy-col-topic { white-space: normal; max-width: 180px; }
 .sy-th-drag { width: 30px; }
 .sy-td-drag { width: 30px; text-align: center; color: #b3afce; cursor: grab; }
 .sy-td-drag:active { cursor: grabbing; }
@@ -89,6 +149,166 @@
 .sy-edit-section { margin-bottom: 16px; }
 .sy-edit-section:last-child { margin-bottom: 0; }
 .sy-edit-title { margin: 0 0 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #7a769e; }
+
+/* Giriş yöntemi seçimi (kendin yaz / vektörel ekle) */
+.sy-choice { padding: 8px 0 4px; }
+.sy-choice-lead { margin: 0 0 14px; font-size: 14px; font-weight: 600; color: #4a4778; text-align: center; }
+.sy-choice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.sy-choice-card {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
+  padding: 22px 18px; border: 1.5px solid #e7e3f4; border-radius: 14px; background: #faf9fd;
+  cursor: pointer; transition: border-color 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+}
+.sy-choice-card:hover { border-color: #e6087b; background: #fdf4fa; box-shadow: 0 8px 22px rgba(40, 38, 90, 0.10); }
+.sy-choice-icon { display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 14px; color: #b3096a; background: #fdeaf4; }
+.sy-choice-title { font-size: 15px; font-weight: 700; color: #28265a; }
+.sy-choice-desc { font-size: 12px; line-height: 1.5; color: #7a769e; }
+
+/* Sekmeler (Soru Bilgileri | Soru İçeriği | Cevap) */
+.sy-tabs { display: flex; gap: 4px; margin: 0 0 16px; border-bottom: 1px solid #efecf8; }
+.sy-tab-btn {
+  appearance: none; border: 0; background: transparent; cursor: pointer;
+  padding: 9px 14px; margin-bottom: -1px; font-size: 13px; font-weight: 600; color: #7a769e;
+  border-bottom: 2px solid transparent; border-radius: 8px 8px 0 0; transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+.sy-tab-btn:hover { color: #3e3a8e; background: #f5f3fb; }
+.sy-tab-btn.is-active { color: #28265a; border-bottom-color: #e6087b; }
+.sy-tabpane { display: none; }
+.sy-tabpane.is-active { display: block; }
+
+/* Uzun seçenekli açılır menüler (Konu/Alt Konu) modal ızgarasını bozmasın:
+   ilgili alanlar tam satıra yayılır ve kontroller hücreye sığacak şekilde kısılır. */
+.sy-edit-modal .tm-detail-grid--modal > .tm-form-field { min-width: 0; }
+.sy-edit-modal .tm-form-field--wide { grid-column: 1 / -1; }
+.sy-edit-modal .tm-form-field .tm-dg-control,
+.sy-edit-modal .tm-form-field select.tm-dg-control { width: 100%; max-width: 100%; box-sizing: border-box; }
+.sy-edit-modal select.tm-dg-control { text-overflow: ellipsis; }
+
+/* "Soru seç" — havuzdan seçim; birincil "Soru ekle"den farklı renk (mor). */
+.sy-btn-pick {
+  background: #5b4bd6; border-color: #5b4bd6; color: #fff;
+}
+.sy-btn-pick:hover { background: #4a3cc0; border-color: #4a3cc0; color: #fff; }
+.sy-btn-pick:focus-visible { outline: 2px solid #5b4bd6; outline-offset: 2px; }
+
+/* Havuzdan soru seçme listesi */
+.sy-pick-modal { width: min(820px, 96vw); }
+.sy-pick-search { width: 100%; margin-bottom: 12px; }
+.sy-pick-list { max-height: 52vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+.sy-pick-row {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; cursor: pointer;
+  border: 1.5px solid #e7e3f4; border-radius: 12px; background: #faf9fd;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.sy-pick-row:hover { border-color: #5b4bd6; background: #fff; }
+.sy-pick-row:has(input:checked) { border-color: #5b4bd6; background: #fff; box-shadow: inset 3px 0 0 #5b4bd6; }
+.sy-pick-row.is-used { opacity: 0.55; cursor: not-allowed; }
+.sy-pick-row input { margin-top: 2px; accent-color: #5b4bd6; width: 16px; height: 16px; flex: 0 0 auto; }
+.sy-pick-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.sy-pick-q { font-size: 13px; font-weight: 600; color: #28265a; line-height: 1.4; overflow-wrap: anywhere; }
+.sy-pick-meta { font-size: 11.5px; color: #7a769e; overflow-wrap: anywhere; }
+.sy-pick-modal .tm-crit-foot { display: flex; align-items: center; gap: 8px; }
+.sy-pick-modal .tm-crit-foot .tm-dg-spacer { flex: 1 1 auto; }
+/* Seçim tablosu + sayfalama */
+.sy-pick-table th.sy-pick-cb, .sy-pick-table td.sy-pick-cb { width: 34px; text-align: center; }
+.sy-pick-table td.sy-pick-cb input { accent-color: #5b4bd6; width: 16px; height: 16px; }
+.sy-pick-table tbody tr:hover { background: #faf9fd; }
+/* Sayfalama: « ‹ 1 2 3 4 5 › » + kayıt sayısı */
+.sy-pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; margin: 14px 0 4px; }
+.sy-pg-btn, .sy-pg-num {
+  min-width: 30px; height: 30px; padding: 0 8px; cursor: pointer;
+  border: 1px solid #e0dbf0; border-radius: 8px; background: #fff;
+  font-size: 12.5px; font-weight: 600; color: #4a4778;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+.sy-pg-btn:hover:not([disabled]), .sy-pg-num:hover:not(.is-active) { background: #f5f3fb; border-color: #d4cdea; }
+.sy-pg-num.is-active { background: #e6087b; border-color: #e6087b; color: #fff; cursor: default; }
+.sy-pg-btn[disabled] { opacity: 0.4; cursor: not-allowed; }
+.sy-pg-info { margin-left: 8px; font-size: 12px; color: #7a769e; }
+
+/* Soru önizleme modalı */
+.sy-preview-modal { width: min(900px, 96vw); }
+.sy-pv-list { display: flex; flex-direction: column; gap: 14px; max-height: 68vh; overflow-y: auto; }
+.sy-pv-q { border: 1px solid #e7e3f4; border-radius: 14px; background: #fff; overflow: hidden; }
+.sy-pv-head { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; background: #f7f5fc; border-bottom: 1px solid #ece8f7; }
+.sy-pv-no { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 8px; background: #e6087b; color: #fff; font-size: 12.5px; font-weight: 700; }
+.sy-pv-meta { flex: 1 1 auto; min-width: 0; font-size: 12px; color: #4a4778; line-height: 1.45; overflow-wrap: anywhere; }
+.sy-pv-meta strong { color: #28265a; }
+.sy-pv-tags { display: block; margin-top: 2px; font-size: 11px; color: #7a769e; }
+.sy-pv-body { padding: 14px; }
+.sy-pv-rich { font-size: 14px; line-height: 1.65; color: #28265a; margin: 0 0 10px; overflow-wrap: anywhere; }
+.sy-pv-rich ul, .sy-pv-rich ol { margin: 6px 0 6px 22px; }
+.sy-pv-img { margin: 10px 0; text-align: center; }
+.sy-pv-img img { max-width: 100%; max-height: 260px; border-radius: 10px; border: 1px solid #ece8f7; }
+.sy-pv-result { margin: 10px 0; padding: 10px 12px; border-left: 3px solid #e6087b; background: #fdf4fa; border-radius: 0 10px 10px 0; font-size: 14px; line-height: 1.6; color: #28265a; }
+.sy-pv-opts { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.sy-pv-opt { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; border: 1px solid #ece8f7; border-radius: 10px; font-size: 13.5px; color: #4a4778; }
+.sy-pv-opt.is-correct { border-color: #86efac; background: #f0fdf4; color: #166534; font-weight: 600; }
+.sy-pv-key { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 6px; background: #f1eff9; font-size: 12px; font-weight: 700; color: #3e3a8e; }
+.sy-pv-opt.is-correct .sy-pv-key { background: #bbf7d0; color: #166534; }
+.sy-pv-answer { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: #f0fdf4; border: 1px solid #86efac; font-size: 13.5px; color: #166534; }
+.sy-pv-empty { padding: 40px 16px; text-align: center; color: #7a769e; }
+.sy-pv-vec { display: inline-block; margin-bottom: 10px; padding: 4px 10px; border-radius: 999px; background: #ede9fe; color: #5b21b6; font-size: 11.5px; font-weight: 700; letter-spacing: 0.02em; }
+.sy-vec-file { margin: 8px 0; font-size: 12.5px; color: #4a4778; }
+.sy-vec-file strong { color: #28265a; }
+
+/* Yeni sınav — ders seçimi */
+.sy-newexam-modal { width: min(640px, 96vw); }
+.sy-pick-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.sy-pick-head .tm-form-field-label { margin: 0; }
+.sy-pick-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.sy-pick-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px; cursor: pointer;
+  border: 1.5px solid #e7e3f4; border-radius: 12px; background: #faf9fd;
+  font-size: 13px; font-weight: 600; color: #4a4778;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.sy-pick-item:hover { border-color: var(--sy-c, #e6087b); background: #fff; }
+.sy-pick-item:has(input:checked) { border-color: var(--sy-c, #e6087b); background: #fff; box-shadow: inset 3px 0 0 var(--sy-c, #e6087b); }
+.sy-pick-item input { accent-color: var(--sy-c, #e6087b); width: 16px; height: 16px; flex: 0 0 auto; }
+.sy-pick-icon { flex: 0 0 auto; display: inline-flex; color: var(--sy-c, #7a769e); }
+.sy-pick-icon svg { width: 20px; height: 20px; display: block; }
+.sy-pick-name { line-height: 1.25; }
+.sy-pick-count { display: block; margin-top: 2px; font-size: 10.5px; font-weight: 600; color: #7a769e; }
+.sy-newexam-modal .tm-form-field { margin-bottom: 16px; }
+.sy-newexam-modal .tm-crit-foot { display: flex; align-items: center; gap: 8px; }
+.sy-newexam-modal .tm-crit-foot .tm-dg-spacer { flex: 1 1 auto; }
+
+/* Otomatik dolan alan (ör. Bölüm) — düzenlenebilir input gibi görünmesin:
+   kesikli kenarlık + soluk zemin + "Otomatik" rozeti. Yükseklik diğer kontrollerle hizalı. */
+.sy-edit-modal .sy-auto-value {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  box-sizing: border-box; width: 100%; min-height: 36px; padding: 6px 10px;
+  border: 1px dashed #d4cdea; border-radius: 10px; background: #f4f2fb;
+  font-size: 13px; font-weight: 600; color: #4a4778; cursor: default;
+}
+.sy-edit-modal .sy-auto-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sy-edit-modal .sy-auto-badge {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border: 1px solid #e7e3f4; border-radius: 999px; background: #fff;
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #7a769e;
+}
+.sy-edit-modal .sy-auto-badge svg { display: block; }
+
+/* Zengin metin editörü */
+.sy-rte-field { margin-bottom: 14px; }
+.sy-rte { border: 1px solid #d9d3ee; border-radius: 10px; overflow: hidden; background: #fff; }
+.sy-rte-toolbar { display: flex; flex-wrap: wrap; gap: 2px; padding: 6px; background: #f7f5fc; border-bottom: 1px solid #ece8f7; }
+.sy-rte-btn {
+  min-width: 30px; height: 28px; padding: 0 8px; border: 1px solid transparent; border-radius: 7px;
+  background: transparent; color: #4a4778; font-size: 13px; line-height: 1; cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.sy-rte-btn:hover { background: #fff; border-color: #d9d3ee; }
+.sy-rte-btn b, .sy-rte-btn i, .sy-rte-btn u { pointer-events: none; }
+.sy-rte-area { min-height: 96px; max-height: 260px; overflow-y: auto; padding: 10px 12px; font-size: 13.5px; line-height: 1.6; color: #28265a; outline: none; }
+.sy-rte-area:focus { box-shadow: inset 0 0 0 2px rgba(230, 8, 123, 0.14); }
+.sy-rte-area:empty::before { content: attr(data-placeholder); color: #b3afce; }
+.sy-rte-area ul, .sy-rte-area ol { margin: 4px 0 4px 22px; }
+
+/* Vektörel yükleme alanı */
+.sy-vector-block { margin-bottom: 14px; }
+.sy-image-file { padding: 6px; font-size: 12px; }
 
 /* Şık editörü */
 .sy-options { display: flex; flex-direction: column; gap: 8px; }
