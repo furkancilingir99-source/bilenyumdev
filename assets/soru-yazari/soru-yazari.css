@@ -33,9 +33,12 @@
 }
 .sy-exam-card:hover { box-shadow: 0 8px 22px rgba(40, 38, 90, 0.10); border-color: #f6c9e0; }
 .sy-exam-card:focus-visible { outline: 2px solid #e6087b; outline-offset: 2px; }
-/* Başlık + durum rozeti: rozet kırpılmasın, uzun ad taşmadan sarsın. */
-.sy-exam-card .tm-dash-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+/* Başlık + durum rozeti: rozet her zaman başlığın ALT satırında dursun.
+   (Yan yana konumda kısa adlarda aynı satıra, uzun adlarda alta düşüp
+   kartlar arasında hizasızlık yaratıyordu.) */
+.sy-exam-card .tm-dash-card-head { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
 .sy-exam-card .tm-dash-card-title { min-width: 0; font-size: 15px; line-height: 1.3; overflow-wrap: anywhere; }
+.sy-exam-card .sy-status-badge { align-self: flex-start; }
 .sy-exam-meta { display: flex; justify-content: center; align-items: center; gap: 16px; margin: 14px 0; padding: 10px; border-radius: 10px; background: #f4f2fb; font-size: 12.5px; color: #7a769e; text-align: center; }
 .sy-exam-meta strong { color: #28265a; font-size: 16px; }
 .sy-status-badge { display: inline-flex; align-items: center; gap: 4px; flex: 0 0 auto; white-space: nowrap; }
@@ -62,23 +65,43 @@
 /* Haftalık ödevler — KİD/RUD kart açıklaması */
 .sy-mode-desc { margin: 2px 0 0; font-size: 12px; line-height: 1.5; color: #7a769e; }
 
-/* Haftalık ödevler — 1..32 hafta kartları */
-.sy-week-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; }
+/* Haftalık ödevler — 1..32 hafta kartları (ait olduğu dersin rengini taşır) */
+.sy-week-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(162px, 1fr)); gap: 12px; }
 .sy-week-card {
-  display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer;
-  padding: 12px 10px; border: 1.5px solid #e7e3f4; border-radius: 12px; background: #fff;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer;
+  padding: 14px 12px 12px; border: 1.5px solid #e7e3f4; border-radius: 14px; background: #fff;
+  border-top: 3px solid var(--sy-c, #7a769e);
   transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
-.sy-week-card:hover { border-color: #e6087b; box-shadow: 0 6px 16px rgba(40, 38, 90, 0.08); }
-.sy-week-card:focus-visible { outline: 2px solid #e6087b; outline-offset: 2px; }
+.sy-week-card:hover { border-color: var(--sy-c, #e6087b); border-top-color: var(--sy-c, #7a769e); box-shadow: 0 6px 16px rgba(40, 38, 90, 0.10); }
+.sy-week-card:focus-visible { outline: 2px solid var(--sy-c, #e6087b); outline-offset: 2px; }
 .sy-week-no {
-  display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px;
-  border-radius: 10px; background: #f4f2fb; color: #7a769e; font-size: 14px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px;
+  border-radius: 11px; font-size: 15px; font-weight: 700;
+  background: #f4f2fb; color: #7a769e;
 }
-.sy-week-card.has-q .sy-week-no { background: #fdeaf4; color: #b3096a; }
-.sy-week-lbl { font-size: 12.5px; font-weight: 600; color: #28265a; }
-.sy-week-cnt { font-size: 11px; color: #7a769e; }
-.sy-week-card.has-q .sy-week-cnt { color: #b3096a; font-weight: 600; }
+.sy-week-card.has-q .sy-week-no {
+  background: color-mix(in srgb, var(--sy-c, #7a769e) 14%, #ffffff);
+  color: var(--sy-c, #b3096a);
+}
+.sy-week-lbl { font-size: 13px; font-weight: 700; color: #28265a; }
+.sy-week-date { font-size: 10.5px; color: #7a769e; }
+.sy-week-cnt { font-size: 11.5px; color: #7a769e; }
+.sy-week-card.has-q .sy-week-cnt { color: var(--sy-c, #b3096a); font-weight: 700; }
+/* Önizleme: köşede değil, soru sayısının altında tam genişlikte */
+.sy-week-pv {
+  margin-top: 8px; width: 100%;
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 6px 8px; cursor: pointer;
+  border: 1px solid #e7e3f4; border-radius: 9px; background: #faf9fd;
+  font-size: 11.5px; font-weight: 600; color: #4a4778;
+  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+}
+.sy-week-pv svg { width: 14px; height: 14px; display: block; }
+.sy-week-pv:hover, .sy-week-pv:focus-visible { border-color: var(--sy-c, #e6087b); color: var(--sy-c, #b3096a); background: #fff; }
+@supports not (background: color-mix(in srgb, red 10%, white)) {
+  .sy-week-card.has-q .sy-week-no { background: #f4f2fb; }
+}
 
 /* Seçici tablosunda satır tıklanabilir */
 .sy-pick-table tbody tr { cursor: pointer; }
@@ -189,6 +212,8 @@ body.tm-admin-body .sy-table td .tm-res-code-cell {
   background: #5b4bd6; border-color: #5b4bd6; color: #fff;
 }
 .sy-btn-pick:hover { background: #4a3cc0; border-color: #4a3cc0; color: #fff; }
+/* Havuzdan seçim tek ekleme yolu olduğunda birincil eylem gibi dursun */
+.sy-btn-pick--main { padding-left: 16px; padding-right: 16px; font-weight: 700; }
 .sy-btn-pick:focus-visible { outline: 2px solid #5b4bd6; outline-offset: 2px; }
 
 /* Havuzdan soru seçme listesi */
@@ -226,9 +251,45 @@ body.tm-admin-body .sy-table td .tm-res-code-cell {
 .sy-pg-btn[disabled] { opacity: 0.4; cursor: not-allowed; }
 .sy-pg-info { margin-left: 8px; font-size: 12px; color: #7a769e; }
 
-/* Soru önizleme modalı */
-.sy-preview-modal { width: min(900px, 96vw); }
+/* Soru önizleme modalı — geniş ve yüksek */
+.sy-preview-modal { width: min(1180px, 96vw); max-width: 96vw; }
 .sy-pv-list { display: flex; flex-direction: column; gap: 14px; max-height: 68vh; overflow-y: auto; }
+/* Tek soruluk gezgin */
+.sy-pv-single { min-height: 420px; max-height: 68vh; overflow-y: auto; }
+/* Önceki · 1/1 · Sonraki grubu modalda yatayda tam ortada dursun:
+   iki yan alan eşit esner, orta grup ortalanır. */
+.sy-pv-foot { display: flex; align-items: center; gap: 10px; }
+.sy-pv-side { flex: 1 1 0; display: flex; align-items: center; min-width: 0; }
+.sy-pv-side--end { justify-content: flex-end; }
+.sy-pv-navgroup { flex: 0 0 auto; display: flex; align-items: center; gap: 10px; }
+.sy-pv-nav[disabled] { opacity: 0.4; pointer-events: none; }
+.sy-pv-counter { font-size: 13px; font-weight: 700; color: #28265a; min-width: 62px; text-align: center; }
+/* Önizleme sekmeleri (Sayısal / Sözel) */
+.sy-pv-tabs { margin: 0 16px; }
+/* Ders alt sekmeleri */
+.sy-pv-subtabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px 0; }
+.sy-pv-subtabs[hidden] { display: none; }
+.sy-pv-subtab {
+  padding: 5px 12px; cursor: pointer;
+  border: 1px solid #e0dbf0; border-radius: 999px; background: #fff;
+  font-size: 12px; font-weight: 600; color: #4a4778;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+.sy-pv-subtab:hover { background: #f5f3fb; border-color: #d4cdea; }
+.sy-pv-subtab.is-active { background: #3e3a8e; border-color: #3e3a8e; color: #fff; }
+.sy-pv-subtab.is-active .sy-pv-tabcount { color: #d9d5f5; }
+.sy-pv-tabcount { font-weight: 600; color: #7a769e; }
+.sy-tab-btn.is-active .sy-pv-tabcount { color: #b3096a; }
+.sy-pv-dots[hidden], .sy-pv-navgroup[hidden] { display: none; }
+.sy-pv-dots { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; padding: 10px 16px 0; border-top: 1px solid #efecf8; }
+.sy-pv-dot {
+  min-width: 26px; height: 26px; padding: 0 6px; cursor: pointer;
+  border: 1px solid #e0dbf0; border-radius: 7px; background: #fff;
+  font-size: 11.5px; font-weight: 600; color: #7a769e;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.sy-pv-dot:hover { background: #f5f3fb; border-color: #d4cdea; }
+.sy-pv-dot.is-active { background: #e6087b; border-color: #e6087b; color: #fff; }
 .sy-pv-q { border: 1px solid #e7e3f4; border-radius: 14px; background: #fff; overflow: hidden; }
 .sy-pv-head { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; background: #f7f5fc; border-bottom: 1px solid #ece8f7; }
 .sy-pv-no { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 8px; background: #e6087b; color: #fff; font-size: 12.5px; font-weight: 700; }
@@ -251,6 +312,47 @@ body.tm-admin-body .sy-table td .tm-res-code-cell {
 .sy-pv-vec { display: inline-block; margin-bottom: 10px; padding: 4px 10px; border-radius: 999px; background: #ede9fe; color: #5b21b6; font-size: 11.5px; font-weight: 700; letter-spacing: 0.02em; }
 .sy-vec-file { margin: 8px 0; font-size: 12.5px; color: #4a4778; }
 .sy-vec-file strong { color: #28265a; }
+
+/* Burdon Dikkat Testi */
+.sy-btn-burdon { background: #0d9488; border-color: #0d9488; color: #fff; }
+.sy-btn-burdon:hover { background: #0b7f74; border-color: #0b7f74; color: #fff; }
+.sy-burdon-bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+  margin: 0 0 10px; padding: 10px 12px; border-radius: 10px; background: #f4f2fb;
+  font-size: 12.5px; color: #4a4778;
+}
+.sy-burdon-bar strong { color: #28265a; }
+.sy-burdon-instr {
+  margin: 0 0 12px; padding: 12px 14px; border-left: 3px solid #0d9488; border-radius: 0 10px 10px 0;
+  background: #f0fdfa; font-size: 13.5px; line-height: 1.6; color: #134e4a;
+}
+.sy-burdon-grid {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 12px; border: 1px solid #e7e3f4; border-radius: 12px; background: #fff;
+  overflow-x: auto;
+}
+.sy-burdon-row { display: flex; align-items: center; gap: 8px; }
+.sy-burdon-rowno, .sy-burdon-rowcnt {
+  flex: 0 0 auto; min-width: 24px; text-align: center;
+  font-size: 10.5px; font-weight: 700; color: #b3afce;
+}
+.sy-burdon-rowcnt { color: #0d9488; }
+.sy-burdon-letters { display: flex; gap: 2px; }
+.sy-burdon-l {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 22px; border-radius: 4px;
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; font-weight: 600;
+  color: #28265a; background: #faf9fd;
+}
+.sy-burdon-l.is-target { background: #ccfbf1; color: #0f766e; font-weight: 800; }
+.sy-burdon-note {
+  margin: 0 0 12px; padding: 8px 12px; border-radius: 8px;
+  background: #fef3c7; border: 1px solid #fde68a; color: #92400e; font-size: 12px; font-weight: 600;
+}
+.sy-burdon-formulas { margin-top: 14px; }
+.sy-burdon-interp { margin-top: 16px; }
+.sy-burdon-interp h4 { margin: 14px 0 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: #7a769e; }
+.sy-burdon-interp ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.7; color: #4a4778; }
 
 /* Yeni sınav — ders seçimi */
 .sy-newexam-modal { width: min(640px, 96vw); }

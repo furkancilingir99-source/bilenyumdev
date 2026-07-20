@@ -78,6 +78,9 @@
     { id: 'find_target_numbers', name: 'Sayı bulma' }, { id: 'find_target_colors', name: 'Renk bulma' }
   ];
   var ATASK = {}; ATTENTION_TASKS.forEach(function (a) { ATASK[a.id] = a.name; });
+  // Burdon sabitleri seed sırasında da gerekli → dosyanın başında tanımlı.
+  var BURDON_LETTERS = ['A', 'B', 'C', 'D', 'E', 'G', 'H', 'K', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'Y', 'Z'];
+  var BURDON_INSTRUCTION = 'Sayfadaki harfler arasında yalnızca A ve B harflerini mümkün olduğunca hızlı ve doğru şekilde işaretlemenizi istiyorum. Süre başladığında çalışmaya başlayabilirsiniz.';
   // Örnek konu/alt konu (soru yazarına açılır menü doldurmak için).
   var TOPICS = {
     mathematics: { 'Üslü İfadeler': ['Üslü İfadelerde Toplama ve Çıkarma', 'Üslü İfadelerde Çarpma ve Bölme'], 'Kareköklü İfadeler': ['Kareköklü İfadelerde Çarpma ve Bölme', 'Kareköklü İfadelerde Toplama ve Çıkarma'], 'Çarpanlar ve Katlar': ['EBOB - EKOK', 'Asal Çarpanlar'] },
@@ -205,13 +208,13 @@
       label: 'Dikkat Testi — İlk Giriş', contentType: 'attention_initial',
       desc: 'Platforma ilk girişte uygulanan dikkat ölçüm testi. Çoklu seçim ve süre limiti destekler.',
       hasSubject: false, hasMonth: false, hasWeek: false, hasQuarter: false, hasXp: false, attention: true,
-      page: 'soru-yazari-dikkat-ilk-giris.html'
+      attentionFlow: true, page: 'soru-yazari-dikkat-ilk-giris.html'
     },
     attention_quarterly: {
       label: 'Dikkat Testi — 3 Aylık', contentType: 'attention_quarterly',
       desc: 'Dikkat gelişimini izlemek için 3 ayda bir yayınlanan dikkat testi. Dönem bazında yönetilir.',
       hasSubject: false, hasMonth: false, hasWeek: false, hasQuarter: true, hasXp: false, attention: true,
-      page: 'soru-yazari-dikkat-3-aylik.html'
+      attentionFlow: true, page: 'soru-yazari-dikkat-3-aylik.html'
     },
     weekly: {
       label: 'Haftalık Ödevler', contentType: 'weekly_homework',
@@ -223,7 +226,7 @@
   var NAV_ORDER = ['pool', 'placement', 'monthly', 'weekly', 'attention_initial', 'attention_quarterly'];
 
   /* ----------------------------- Mock store ----------------------------- */
-  var SKEY = 'bilenyum_soru_yazari_v11';
+  var SKEY = 'bilenyum_soru_yazari_v18';
   var AUTHOR_NAME = 'Soru Yazarı'; // oturumdaki içerik yazarı (yeni sorular ona atanır)
   var SEED_AUTHORS = ['Onur Demirli', 'Elif Kaya', 'Mert Yılmaz', 'Zeynep Ak', 'Burak Şen'];
   function nowSeq(prefix) { return prefix + '-' + Math.random().toString(36).slice(2, 8); }
@@ -244,191 +247,186 @@
     function mc(texts, correctIdx) {
       return ['A', 'B', 'C', 'D'].map(function (id, i) { return { id: id, text: texts[i], isCorrect: i === correctIdx }; });
     }
-    // [konu, altKonu, metin, tip, cevap, puan]  tip: 'mc' | 'txt' | 'num'
-    function addAcademic(grade, subject, rows) {
-      rows.forEach(function (r, i) {
-        pid++;
-        var o = {
-          id: 'pool-' + String(pid).padStart(3, '0'),
-          poolType: 'academic', inputMode: 'manual', imageUrl: null,
-          gradeLevel: grade, subject: subject,
-          section: SUBJ[subject] ? SUBJ[subject].section : 'numeric',
-          topic: r[0], subTopic: r[1], questionText: r[2],
-          questionType: r[3] === 'mc' ? 'multiple_choice' : (r[3] === 'txt' ? 'text_answer' : 'number_answer'),
-          options: [], correctTextAnswer: null, correctNumberAnswer: null,
-          score: r[5], addedBy: SEED_AUTHORS[pid % SEED_AUTHORS.length]
-        };
-        if (r[3] === 'mc') o.options = mc(r[4][0], r[4][1]);
-        else if (r[3] === 'txt') { o.correctTextAnswer = r[4]; o.caseSensitive = false; }
-        else o.correctNumberAnswer = r[4];
-        var dd = new Date(2026, 0, 8); dd.setDate(dd.getDate() + pid);
-        dd.setHours(9 + (pid % 8), (pid * 13) % 60, 0, 0);
-        o.createdAt = dd.toISOString();
-        pool.push(o); P[grade + '_' + subject + '_' + (i + 1)] = o;
-      });
+    /* ---- Akademik havuz: her (sınıf × ders) için POOL_PER_COMBO soru ----
+       Konu/alt konu daima o sınıf+dersin geçerli müfredatından seçilir. */
+    var POOL_PER_COMBO = 18;
+    function topicPair(grade, subject, i) {
+      var map = (CURRICULUM[grade] && CURRICULUM[grade][subject]) || TOPICS[subject] || {};
+      var keys = Object.keys(map);
+      if (!keys.length) return ['', ''];
+      var t = keys[i % keys.length];
+      var subs = map[t] || [];
+      return [t, subs.length ? subs[i % subs.length] : ''];
     }
-
-    /* ---- Matematik ---- */
-    addAcademic('5', 'mathematics', [
-      ['Çarpanlar ve Katlar', 'EBOB - EKOK', '12 ve 18 sayılarının EBOB’u kaçtır?', 'num', 6, 10],
-      ['Çarpanlar ve Katlar', 'Asal Çarpanlar', '36 sayısının asal çarpanlarına ayrılmış hâli hangisidir?', 'mc', [['2² · 3²', '2 · 3', '2³ · 3', '2² · 3'], 0], 10],
-      ['Üslü İfadeler', 'Üslü İfadelerde Toplama ve Çıkarma', '3² + 3² işleminin sonucu kaçtır?', 'num', 18, 10],
-      ['Üslü İfadeler', 'Üslü İfadelerde Çarpma ve Bölme', '2² · 2³ işleminin sonucu kaçtır?', 'num', 32, 10],
-      ['Çarpanlar ve Katlar', 'EBOB - EKOK', '6 ve 8 sayılarının EKOK’u kaçtır?', 'num', 24, 10]
-    ]);
-    addAcademic('6', 'mathematics', [
-      ['Çarpanlar ve Katlar', 'EBOB - EKOK', '8 ve 12 sayılarının EKOK’u kaçtır?', 'num', 24, 10],
-      ['Üslü İfadeler', 'Üslü İfadelerde Çarpma ve Bölme', '2⁵ ÷ 2² işleminin sonucu kaçtır?', 'num', 8, 10],
-      ['Çarpanlar ve Katlar', 'Asal Çarpanlar', '45 sayısının kaç farklı asal çarpanı vardır?', 'num', 2, 10],
-      ['Üslü İfadeler', 'Üslü İfadelerde Toplama ve Çıkarma', '5² - 4² işleminin sonucu kaçtır?', 'num', 9, 10],
-      ['Kareköklü İfadeler', 'Kareköklü İfadelerde Çarpma ve Bölme', '√16 işleminin sonucu kaçtır?', 'num', 4, 10]
-    ]);
-    addAcademic('7', 'mathematics', [
-      ['Üslü İfadeler', 'Üslü İfadelerde Çarpma ve Bölme', '(-2)³ · (-2)² işleminin sonucu kaçtır?', 'num', -32, 15],
-      ['Çarpanlar ve Katlar', 'Asal Çarpanlar', '60 sayısının kaç farklı asal çarpanı vardır?', 'num', 3, 10],
-      ['Kareköklü İfadeler', 'Kareköklü İfadelerde Çarpma ve Bölme', '√8 · √2 işleminin sonucu kaçtır?', 'num', 4, 10],
-      ['Üslü İfadeler', 'Üslü İfadelerde Toplama ve Çıkarma', '10² + 10² ifadesinin sonucu hangisidir?', 'mc', [['200', '100', '1000', '20'], 0], 10],
-      ['Çarpanlar ve Katlar', 'EBOB - EKOK', '18 ve 24 sayılarının EBOB’u kaçtır?', 'num', 6, 10]
-    ]);
-    addAcademic('8', 'mathematics', [
-      ['Kareköklü İfadeler', 'Kareköklü ifadelerde çarpma ve bölme işlemlerini yapar.', '√12 · √3 işleminin sonucu kaçtır?', 'mc', [['6', '4', '9', '12'], 0], 10],
-      ['Üslü İfadeler', 'Tam sayıların, tam sayı kuvvetlerini hesaplar.', '(-2)⁴ işleminin sonucu kaçtır?', 'num', 16, 10],
-      ['Üçgenler', 'Pisagor bağıntısını oluşturur, ilgili problemleri çözer.', 'Dik kenarları 6 cm ve 8 cm olan dik üçgenin hipotenüsü kaç cm’dir?', 'num', 10, 15],
-      ['Çarpanlar ve Katlar', 'İki doğal sayının en büyük ortak bölenini (EBOB) ve en küçük ortak katını (EKOK) hesaplar, ilgili problemleri çözer.', '24 ve 36 sayılarının EBOB’u kaçtır?', 'num', 12, 10],
-      ['Cebirsel İfadeler ve Özdeşlikler', 'Özdeşlikleri modellerle açıklar.', '(a + b)² ifadesinin açılımı hangisidir?', 'mc', [['a² + 2ab + b²', 'a² + b²', 'a² - 2ab + b²', '2a + 2b'], 0], 15],
-      ['Doğrusal Denklemler', 'Birinci dereceden bir bilinmeyenli denklemleri çözer.', '3x - 6 = 0 denkleminin çözümü kaçtır?', 'num', 2, 10],
-      ['Basit Olayların Olma Olasılığı', 'Basit bir olayın olma olasılığını hesaplar.', 'Bir zar atıldığında 6 gelme olasılığı kaçtır?', 'mc', [['1/6', '1/3', '1/2', '1/12'], 0], 10]
-    ]);
-
-    /* ---- Fen Bilimleri ---- */
-    addAcademic('5', 'science', [
-      ['Madde ve Endüstri', 'Fiziksel ve Kimyasal Değişim', 'Kâğıdın yırtılması hangi tür değişimdir?', 'mc', [['Fiziksel değişim', 'Kimyasal değişim', 'Isısal değişim', 'Biyolojik değişim'], 0], 10],
-      ['Basınç', 'Katı Basıncı', 'Kar ayakkabısı kullanmak basıncı nasıl etkiler?', 'mc', [['Azaltır', 'Artırır', 'Değiştirmez', 'İkiye katlar'], 0], 10],
-      ['Basınç', 'Sıvı Basıncı', 'Bir havuzda derine inildikçe sıvı basıncı nasıl değişir?', 'mc', [['Artar', 'Azalır', 'Değişmez', 'Sıfırlanır'], 0], 10],
-      ['Madde ve Endüstri', 'Periyodik Sistem', 'Saf maddeleri karışımlardan ayıran özellik hangisidir?', 'mc', [['Belirli erime noktası olması', 'Renksiz olması', 'Katı olması', 'Ağır olması'], 0], 10]
-    ]);
-    addAcademic('6', 'science', [
-      ['Madde ve Endüstri', 'Periyodik Sistem', 'Periyodik tabloda dönem sayısı kaçtır?', 'mc', [['7', '8', '18', '5'], 0], 10],
-      ['DNA ve Genetik Kod', 'Kalıtım', 'Kalıtsal özellikleri taşıyan yapı hangisidir?', 'mc', [['DNA', 'Ribozom', 'Koful', 'Lizozom'], 0], 10],
-      ['Basınç', 'Katı Basıncı', 'Yüzey alanı artarsa katı basıncı nasıl değişir?', 'mc', [['Azalır', 'Artar', 'Değişmez', 'İkiye katlanır'], 0], 10],
-      ['Madde ve Endüstri', 'Fiziksel ve Kimyasal Değişim', 'Demirin paslanması hangi tür değişimdir?', 'mc', [['Kimyasal değişim', 'Fiziksel değişim', 'Isısal değişim', 'Hâl değişimi'], 0], 10]
-    ]);
-    addAcademic('7', 'science', [
-      ['Basınç', 'Sıvı Basıncı', 'Sıvı basıncı aşağıdakilerden hangisine bağlı değildir?', 'mc', [['Sıvının yüksekliği', 'Sıvının yoğunluğu', 'Kabın şekli', 'Yer çekimi ivmesi'], 2], 10],
-      ['DNA ve Genetik Kod', 'Mutasyon', 'DNA dizilimindeki kalıcı değişikliklere ne ad verilir?', 'txt', 'mutasyon', 10],
-      ['DNA ve Genetik Kod', 'Kalıtım', 'Anne ve babadan yavruya geçen özelliklere ne denir?', 'txt', 'kalıtsal', 10],
-      ['Madde ve Endüstri', 'Periyodik Sistem', 'Periyodik tabloda soy gazlar hangi grupta yer alır?', 'mc', [['8A', '1A', '2A', '7A'], 0], 10]
-    ]);
-    addAcademic('8', 'science', [
-      ['DNA ve Genetik Kod', 'Kalıtım', 'DNA’nın yapı birimi nedir?', 'txt', 'nükleotit', 10],
-      ['Basınç', 'Katı Basıncı', 'Basıncın SI birimi aşağıdakilerden hangisidir?', 'mc', [['Pascal', 'Newton', 'Joule', 'Watt'], 0], 10],
-      ['DNA ve Genetik Kod', 'Mutasyon', 'Mutasyona neden olabilen etkenlerden biri hangisidir?', 'mc', [['Radyasyon', 'Bol su içmek', 'Uyumak', 'Yürümek'], 0], 10],
-      ['Madde ve Endüstri', 'Fiziksel ve Kimyasal Değişim', 'Asit ve bazın tepkimesine ne ad verilir?', 'txt', 'nötrleşme', 15]
-    ]);
-
-    /* ---- Türkçe ---- */
-    addAcademic('5', 'turkish', [
-      ['Sözcükte Anlam', 'Eş ve Zıt Anlam', '“Cömert” sözcüğünün zıt anlamlısı nedir?', 'txt', 'cimri', 10],
-      ['Cümlenin Ögeleri', 'Özne ve Yüklem', '“Ali kitabı okudu.” cümlesinin öznesi hangisidir?', 'txt', 'ali', 10],
-      ['Sözcükte Anlam', 'Gerçek ve Mecaz Anlam', '“Soğuk hava” tamlamasındaki “soğuk” hangi anlamdadır?', 'mc', [['Gerçek anlam', 'Mecaz anlam', 'Terim anlam', 'Eş sesli'], 0], 10],
-      ['Cümlenin Ögeleri', 'Nesne ve Tümleç', '“Kardeşim eve gitti.” cümlesinde “eve” hangi ögedir?', 'mc', [['Dolaylı tümleç', 'Özne', 'Nesne', 'Yüklem'], 0], 10]
-    ]);
-    addAcademic('6', 'turkish', [
-      ['Sözcükte Anlam', 'Gerçek ve Mecaz Anlam', '“Tatlı dil yılanı deliğinden çıkarır.” cümlesindeki “tatlı” hangi anlamdadır?', 'mc', [['Gerçek anlam', 'Mecaz anlam', 'Terim anlam', 'Eş sesli'], 1], 10],
-      ['Fiilimsiler', 'İsim-Fiil', '“Yüzmek en iyi spordur.” cümlesindeki isim-fiil hangisidir?', 'txt', 'yüzmek', 10],
-      ['Cümlenin Ögeleri', 'Özne ve Yüklem', '“Öğrenciler bahçede oynuyor.” cümlesinin yüklemi hangisidir?', 'txt', 'oynuyor', 10],
-      ['Sözcükte Anlam', 'Eş ve Zıt Anlam', '“Sevinç” sözcüğünün eş anlamlısı nedir?', 'txt', 'mutluluk', 10]
-    ]);
-    addAcademic('7', 'turkish', [
-      ['Fiilimsiler', 'İsim-Fiil', '“Koşmak sağlıklıdır.” cümlesindeki isim-fiil hangisidir?', 'txt', 'koşmak', 10],
-      ['Cümlenin Ögeleri', 'Nesne ve Tümleç', '“Annem bize börek yaptı.” cümlesinde “börek” hangi ögedir?', 'mc', [['Belirtisiz nesne', 'Özne', 'Zarf tümleci', 'Yüklem'], 0], 10],
-      ['Fiilimsiler', 'Zarf-Fiil', '“Gülerek içeri girdi.” cümlesindeki zarf-fiil hangisidir?', 'txt', 'gülerek', 10],
-      ['Sözcükte Anlam', 'Gerçek ve Mecaz Anlam', '“Ağır bir söz söyledi.” cümlesindeki “ağır” hangi anlamdadır?', 'mc', [['Mecaz anlam', 'Gerçek anlam', 'Terim anlam', 'Eş sesli'], 0], 10]
-    ]);
-    addAcademic('8', 'turkish', [
-      ['Fiilimsiler', 'Sıfat-Fiil', '“Akan sular durulur.” cümlesindeki sıfat-fiil hangisidir?', 'txt', 'akan', 10],
-      ['Cümlenin Ögeleri', 'Özne ve Yüklem', '“Yağmur sabaha kadar yağdı.” cümlesinin öznesi hangisidir?', 'txt', 'yağmur', 10],
-      ['Fiilimsiler', 'Zarf-Fiil', '“Eve gelince ödevini yaptı.” cümlesindeki zarf-fiil hangisidir?', 'txt', 'gelince', 10],
-      ['Sözcükte Anlam', 'Eş ve Zıt Anlam', '“Tutumlu” sözcüğünün zıt anlamlısı hangisidir?', 'mc', [['Savurgan', 'Cimri', 'Cömert', 'Dikkatli'], 0], 10]
-    ]);
-
-    /* ---- Sosyal Bilgiler ---- */
-    addAcademic('5', 'social', [
-      ['Bir Kahraman Doğuyor', 'Mustafa Kemal’in Hayatı', 'Mustafa Kemal hangi şehirde doğmuştur?', 'mc', [['Selanik', 'Manastır', 'İstanbul', 'Sofya'], 0], 10],
-      ['Bir Kahraman Doğuyor', 'Fikir Akımları', 'Bir toplumu bir arada tutan ortak değerlere ne denir?', 'mc', [['Kültür', 'Ticaret', 'Sanayi', 'Coğrafya'], 0], 10],
-      ['Milli Uyanış', 'Kongreler', 'Kongreler hangi amaçla toplanmıştır?', 'mc', [['Vatanın kurtuluşunu planlamak', 'Ticaret yapmak', 'Vergi toplamak', 'Okul açmak'], 0], 10],
-      ['Milli Uyanış', 'Cepheler', 'Kurtuluş Savaşı’nda cepheler hangi amaçla açılmıştır?', 'mc', [['Düşman işgalini durdurmak', 'Ticaret yolu açmak', 'Şehir kurmak', 'Nüfus saymak'], 0], 10]
-    ]);
-    addAcademic('6', 'social', [
-      ['Bir Kahraman Doğuyor', 'Mustafa Kemal’in Hayatı', 'Mustafa Kemal’in askerlik eğitimi aldığı şehir hangisidir?', 'mc', [['Manastır', 'İzmir', 'Ankara', 'Bursa'], 0], 10],
-      ['Bir Kahraman Doğuyor', 'Fikir Akımları', 'Osmanlı’yı kurtarmaya yönelik fikir akımlarından biri hangisidir?', 'mc', [['Osmanlıcılık', 'Kapitalizm', 'Feodalizm', 'Merkantilizm'], 0], 10],
-      ['Milli Uyanış', 'Kongreler', 'Sivas Kongresi hangi yılda toplanmıştır?', 'num', 1919, 10],
-      ['Milli Uyanış', 'Cepheler', 'Doğu Cephesi komutanı kimdir?', 'mc', [['Kâzım Karabekir', 'İsmet İnönü', 'Fevzi Çakmak', 'Refet Bele'], 0], 10]
-    ]);
-    addAcademic('7', 'social', [
-      ['Milli Uyanış', 'Kongreler', 'Erzurum Kongresi hangi yılda toplanmıştır?', 'num', 1919, 10],
-      ['Milli Uyanış', 'Cepheler', 'Batı Cephesi’nde yapılan savaşlardan biri hangisidir?', 'mc', [['I. İnönü Savaşı', 'Çanakkale Savaşı', 'Preveze Savaşı', 'Malazgirt Savaşı'], 0], 10],
-      ['Bir Kahraman Doğuyor', 'Mustafa Kemal’in Hayatı', 'Mustafa Kemal’e “Kemal” adını veren kişi kimdir?', 'mc', [['Matematik öğretmeni', 'Babası', 'Annesi', 'Komutanı'], 0], 10],
-      ['Bir Kahraman Doğuyor', 'Fikir Akımları', 'Türkçülük akımının savunduğu temel düşünce nedir?', 'mc', [['Türk milliyetçiliği', 'Din birliği', 'Batılılaşma', 'Ekonomik özgürlük'], 0], 10]
-    ]);
-    addAcademic('8', 'social', [
-      ['Milli Uyanış', 'Cepheler', 'Kurtuluş Savaşı’nda Batı Cephesi komutanı kimdir?', 'mc', [['İsmet İnönü', 'Kâzım Karabekir', 'Fevzi Çakmak', 'Ali Fuat Cebesoy'], 0], 10],
-      ['Milli Uyanış', 'Kongreler', 'Misakımillî hangi mecliste kabul edilmiştir?', 'mc', [['Son Osmanlı Mebusan Meclisi', 'TBMM', 'Danıştay', 'Divanıhümayun'], 0], 15],
-      ['Bir Kahraman Doğuyor', 'Mustafa Kemal’in Hayatı', 'Mustafa Kemal Samsun’a hangi yıl çıkmıştır?', 'num', 1919, 10],
-      ['Bir Kahraman Doğuyor', 'Fikir Akımları', 'Cumhuriyet’in ilan edildiği yıl hangisidir?', 'num', 1923, 10]
-    ]);
-
-    /* ---- Din Kültürü ve Ahlak Bilgisi ---- */
-    addAcademic('5', 'religion', [
-      ['Zekat ve Sadaka', 'Paylaşma', 'İhtiyaç sahiplerine karşılıksız yapılan yardıma ne denir?', 'txt', 'sadaka', 10],
-      ['Zekat ve Sadaka', 'İbadetler', 'Zekât kimlere verilir?', 'mc', [['İhtiyaç sahiplerine', 'Zenginlere', 'Herkese', 'Kimseye'], 0], 10],
-      ['Kader İnancı', 'İnsan İradesi', 'İnsanın seçim yapabilme yeteneğine ne ad verilir?', 'txt', 'irade', 10],
-      ['Kader İnancı', 'Tevekkül', 'Çalışıp sonucu Allah’a bırakmaya ne denir?', 'txt', 'tevekkül', 10]
-    ]);
-    addAcademic('6', 'religion', [
-      ['Zekat ve Sadaka', 'Paylaşma', 'Paylaşmanın toplumdaki en önemli sonucu nedir?', 'mc', [['Dayanışmanın artması', 'Rekabetin artması', 'Ticaretin azalması', 'Nüfusun artması'], 0], 10],
-      ['Kader İnancı', 'İnsan İradesi', 'İnsanın yaptığı seçimlerden sorumlu olmasının sebebi nedir?', 'mc', [['İrade sahibi olması', 'Güçlü olması', 'Zengin olması', 'Yaşlı olması'], 0], 10],
-      ['Zekat ve Sadaka', 'İbadetler', 'Zekât hangi şartlarda farz olur?', 'mc', [['Belirli bir zenginliğe ulaşınca', 'Her ay', 'Doğunca', 'Okula başlayınca'], 0], 10],
-      ['Kader İnancı', 'Tevekkül', 'Tevekkül eden kişi öncelikle ne yapar?', 'mc', [['Üzerine düşeni yapar', 'Bekler', 'Vazgeçer', 'Başkasına bırakır'], 0], 10]
-    ]);
-    addAcademic('7', 'religion', [
-      ['Kader İnancı', 'İnsan İradesi', 'İnsanın seçim yapabilme yeteneğine ne ad verilir?', 'txt', 'irade', 10],
-      ['Kader İnancı', 'Tevekkül', 'Tevekkül kavramı aşağıdakilerden hangisini ifade eder?', 'mc', [['Çalışıp sonucu Allah’a bırakmak', 'Hiç çalışmamak', 'Yalnızca dua etmek', 'Kadere karşı çıkmak'], 0], 10],
-      ['Zekat ve Sadaka', 'Paylaşma', 'Sadakanın en küçük şekli aşağıdakilerden hangisidir?', 'mc', [['Güler yüz göstermek', 'Altın vermek', 'Ev bağışlamak', 'Araba almak'], 0], 10],
-      ['Zekat ve Sadaka', 'İbadetler', 'Zekât oranı genel olarak kaçta kaçtır?', 'mc', [['1/40', '1/10', '1/4', '1/2'], 0], 10]
-    ]);
-    addAcademic('8', 'religion', [
-      ['Kader İnancı', 'Tevekkül', 'Tevekkül kavramı aşağıdakilerden hangisini ifade eder?', 'mc', [['Çalışıp sonucu Allah’a bırakmak', 'Hiç çalışmamak', 'Yalnızca dua etmek', 'Kadere karşı çıkmak'], 0], 10],
-      ['Kader İnancı', 'İnsan İradesi', 'Kader inancı insanın sorumluluğunu ortadan kaldırır mı?', 'mc', [['Hayır, irade sahibidir', 'Evet, tamamen', 'Kısmen kaldırır', 'Bilinemez'], 0], 15],
-      ['Zekat ve Sadaka', 'Paylaşma', 'Paylaşma ve yardımlaşmanın ahlaki değeri nedir?', 'mc', [['Toplumsal dayanışma', 'Bireysel kazanç', 'Rekabet', 'Üstünlük'], 0], 10],
-      ['Zekat ve Sadaka', 'İbadetler', 'Zekât vermenin amacı aşağıdakilerden hangisidir?', 'mc', [['Malı temizlemek ve paylaşmak', 'Zengin görünmek', 'Ticaret yapmak', 'Vergi ödemek'], 0], 10]
-    ]);
-
-    /* ---- İngilizce ---- */
-    addAcademic('5', 'english', [
-      ['Friendship', 'Making Friends', 'Choose the correct word: Nice to ___ you.', 'mc', [['meet', 'met', 'meeting', 'meets'], 0], 10],
-      ['Friendship', 'Feelings', 'Choose the correct word: I am very ___ today.', 'mc', [['happy', 'happily', 'happiness', 'happier'], 0], 10],
-      ['Tourism', 'Places', 'Choose the correct word: We buy bread at the ___.', 'mc', [['bakery', 'museum', 'library', 'station'], 0], 10],
-      ['Tourism', 'Directions', 'Choose the correct word: Go ___ and turn left.', 'mc', [['straight', 'strong', 'street', 'string'], 0], 10]
-    ]);
-    addAcademic('6', 'english', [
-      ['Friendship', 'Making Friends', 'Choose the correct word: My best ___ is Ali.', 'mc', [['friend', 'friendly', 'friendship', 'friends'], 0], 10],
-      ['Friendship', 'Feelings', 'Choose the correct word: She feels ___ because she lost her cat.', 'mc', [['sad', 'sadly', 'sadness', 'sadder'], 0], 10],
-      ['Tourism', 'Places', 'Choose the correct word: You can borrow books from the ___.', 'mc', [['library', 'bakery', 'hospital', 'garage'], 0], 10],
-      ['Tourism', 'Directions', 'Choose the correct word: The bank is ___ to the school.', 'mc', [['next', 'nice', 'near by', 'nearest'], 0], 10]
-    ]);
-    addAcademic('7', 'english', [
-      ['Friendship', 'Feelings', 'Choose the correct word: I feel ___ when I see my friends.', 'mc', [['happy', 'table', 'run', 'blue'], 0], 10],
-      ['Friendship', 'Making Friends', 'Choose the correct word: Let’s ___ friends!', 'mc', [['be', 'been', 'being', 'was'], 0], 10],
-      ['Tourism', 'Places', 'Choose the correct word: We stayed at a ___ during our holiday.', 'mc', [['hotel', 'pencil', 'bridge', 'forest'], 0], 10],
-      ['Tourism', 'Directions', 'Choose the correct word: Turn ___ at the traffic lights.', 'mc', [['right', 'write', 'rite', 'ride'], 0], 10]
-    ]);
-    addAcademic('8', 'english', [
-      ['Tourism', 'Places', 'Choose the correct word: I want to visit a ___ to see historical objects.', 'mc', [['museum', 'bakery', 'pharmacy', 'garage'], 0], 10],
-      ['Tourism', 'Directions', 'Choose the correct word: The station is ___ the post office.', 'mc', [['opposite', 'opposite of', 'oppose', 'opposition'], 0], 10],
-      ['Friendship', 'Feelings', 'Choose the correct word: He was ___ about the good news.', 'mc', [['excited', 'exciting', 'excite', 'excitement'], 0], 10],
-      ['Friendship', 'Making Friends', 'Choose the correct word: We have been friends ___ 2019.', 'mc', [['since', 'for', 'from', 'during'], 0], 15]
-    ]);
+    function gcd(a, b) { while (b) { var t = b; b = a % b; a = t; } return a; }
+    function lcm(a, b) { return a * b / gcd(a, b); }
+    // Sayısal cevaptan 4 şıklı soru üretir: doğru cevap + inandırıcı çeldiriciler.
+    function numChoices(correct, alts, pos) {
+      var opts = [correct];
+      alts.forEach(function (v) { if (opts.length < 4 && v > 0 && opts.indexOf(v) < 0) opts.push(v); });
+      var extra = correct + 1;
+      while (opts.length < 4) { if (opts.indexOf(extra) < 0) opts.push(extra); extra++; }
+      var rest = opts.slice(1), arr = [], ri = 0, idx = pos % 4;
+      for (var i = 0; i < 4; i++) arr.push(String(i === idx ? correct : rest[ri++]));
+      return { opts: arr, ans: idx };
+    }
+    // Matematik: yarısı 4 seçenekli, yarısı sayısal cevaplı; cevaplar hesaplanır.
+    function mathItems(grade) {
+      var g = Number(grade), out = [];
+      for (var i = 0; i < POOL_PER_COMBO; i++) {
+        var a = 6 + ((i * 3 + g) % 18), b = 4 + ((i * 5 + g * 2) % 16), k = i % 6;
+        var text, ans, alts;
+        if (k === 0) { text = a + ' ve ' + b + ' sayılarının EBOB’u kaçtır?'; ans = gcd(a, b); alts = [ans * 2, a, b]; }
+        else if (k === 1) { text = a + ' ve ' + b + ' sayılarının EKOK’u kaçtır?'; ans = lcm(a, b); alts = [a * b, ans / 2, a + b]; }
+        else if (k === 2) { text = '(' + a + ' + ' + b + ') · 2 işleminin sonucu kaçtır?'; ans = (a + b) * 2; alts = [a + b, a * b, ans + 2]; }
+        else if (k === 3) { text = 'Bir kenarı ' + a + ' cm olan karenin alanı kaç cm²dir?'; ans = a * a; alts = [a * 4, a * 2, ans + a]; }
+        else if (k === 4) { text = a + 'x - ' + (a * 3) + ' = 0 denkleminin çözümü kaçtır?'; ans = 3; alts = [a, a * 3, 1]; }
+        else { text = 'Kenar uzunlukları ' + a + ' cm ve ' + b + ' cm olan dikdörtgenin çevresi kaç cm’dir?'; ans = 2 * (a + b); alts = [a * b, a + b, ans + 4]; }
+        if (i % 2 === 0) {
+          var ch = numChoices(ans, alts, i + g);
+          out.push({ text: text, type: 'mc', opts: ch.opts, ans: ch.ans });
+        } else {
+          out.push({ text: text, type: 'num', ans: ans });
+        }
+      }
+      return out;
+    }
+    // Diğer dersler: çoktan seçmeli/sözel soru bankaları
+    var BANK = {
+      science: [
+        ['Kâğıdın yırtılması hangi tür değişimdir?', ['Fiziksel değişim', 'Kimyasal değişim', 'Isısal değişim', 'Biyolojik değişim'], 0],
+        ['Demirin paslanması hangi tür değişimdir?', ['Kimyasal değişim', 'Fiziksel değişim', 'Hâl değişimi', 'Isısal değişim'], 0],
+        ['Periyodik tabloda dönem sayısı kaçtır?', ['7', '8', '18', '5'], 0],
+        ['Kalıtsal özellikleri taşıyan yapı hangisidir?', ['DNA', 'Ribozom', 'Koful', 'Lizozom'], 0],
+        ['Sıvı basıncı aşağıdakilerden hangisine bağlı değildir?', ['Kabın şekli', 'Sıvının yüksekliği', 'Sıvının yoğunluğu', 'Yer çekimi'], 0],
+        ['Basıncın SI birimi hangisidir?', ['Pascal', 'Newton', 'Joule', 'Watt'], 0],
+        ['Yüzey alanı artarsa katı basıncı nasıl değişir?', ['Azalır', 'Artar', 'Değişmez', 'İkiye katlanır'], 0],
+        ['Soy gazlar periyodik tabloda hangi gruptadır?', ['8A', '1A', '2A', '7A'], 0],
+        ['DNA’nın yapı birimi nedir?', ['Nükleotit', 'Aminoasit', 'Glikoz', 'Yağ asidi'], 0],
+        ['Mutasyona neden olabilen etken hangisidir?', ['Radyasyon', 'Su içmek', 'Uyumak', 'Yürümek'], 0],
+        ['Saf maddeyi karışımdan ayıran özellik nedir?', ['Belirli erime noktası', 'Renksiz olması', 'Katı olması', 'Ağır olması'], 0],
+        ['Asit ve bazın tepkimesine ne ad verilir?', ['Nötrleşme', 'Erime', 'Süblimleşme', 'Yoğuşma'], 0],
+        ['Derine inildikçe sıvı basıncı nasıl değişir?', ['Artar', 'Azalır', 'Değişmez', 'Sıfırlanır'], 0],
+        ['Kar ayakkabısı basıncı nasıl etkiler?', ['Azaltır', 'Artırır', 'Değiştirmez', 'İkiye katlar'], 0],
+        ['Hücrenin enerji üretim merkezi hangisidir?', ['Mitokondri', 'Çekirdek', 'Koful', 'Zar'], 0],
+        ['Işığın saydam ortamda yön değiştirmesine ne denir?', ['Kırılma', 'Yansıma', 'Soğurulma', 'Dağılma'], 0],
+        ['Maddenin ısı alarak sıvıdan gaza geçmesi nedir?', ['Buharlaşma', 'Yoğuşma', 'Donma', 'Erime'], 0],
+        ['Besin zincirinin ilk halkası hangisidir?', ['Üreticiler', 'Tüketiciler', 'Ayrıştırıcılar', 'Etçiller'], 0]
+      ],
+      turkish: [
+        ['“Cömert” sözcüğünün zıt anlamlısı hangisidir?', ['Cimri', 'Eli açık', 'Yardımsever', 'İyi'], 0],
+        ['“Sevinç” sözcüğünün eş anlamlısı hangisidir?', ['Mutluluk', 'Üzüntü', 'Öfke', 'Korku'], 0],
+        ['“Tatlı dil yılanı deliğinden çıkarır.” cümlesindeki “tatlı” hangi anlamdadır?', ['Mecaz anlam', 'Gerçek anlam', 'Terim anlam', 'Eş sesli'], 0],
+        ['“Soğuk hava” tamlamasındaki “soğuk” hangi anlamdadır?', ['Gerçek anlam', 'Mecaz anlam', 'Terim anlam', 'Eş sesli'], 0],
+        ['“Ali kitabı okudu.” cümlesinin öznesi hangisidir?', ['Ali', 'Kitabı', 'Okudu', 'Yok'], 0],
+        ['“Kardeşim eve gitti.” cümlesinde “eve” hangi ögedir?', ['Dolaylı tümleç', 'Özne', 'Nesne', 'Yüklem'], 0],
+        ['“Annem bize börek yaptı.” cümlesinde “börek” hangi ögedir?', ['Belirtisiz nesne', 'Özne', 'Zarf tümleci', 'Yüklem'], 0],
+        ['“Yüzmek en iyi spordur.” cümlesindeki isim-fiil hangisidir?', ['Yüzmek', 'İyi', 'Spor', 'En'], 0],
+        ['“Akan sular durulur.” cümlesindeki sıfat-fiil hangisidir?', ['Akan', 'Sular', 'Durulur', 'Yok'], 0],
+        ['“Gülerek içeri girdi.” cümlesindeki zarf-fiil hangisidir?', ['Gülerek', 'İçeri', 'Girdi', 'Yok'], 0],
+        ['“Eve gelince ödevini yaptı.” cümlesindeki zarf-fiil hangisidir?', ['Gelince', 'Eve', 'Ödevini', 'Yaptı'], 0],
+        ['“Tutumlu” sözcüğünün zıt anlamlısı hangisidir?', ['Savurgan', 'Cimri', 'Cömert', 'Dikkatli'], 0],
+        ['“Ağır bir söz söyledi.” cümlesindeki “ağır” hangi anlamdadır?', ['Mecaz anlam', 'Gerçek anlam', 'Terim anlam', 'Eş sesli'], 0],
+        ['“Öğrenciler bahçede oynuyor.” cümlesinin yüklemi hangisidir?', ['Oynuyor', 'Öğrenciler', 'Bahçede', 'Yok'], 0],
+        ['“Yağmur sabaha kadar yağdı.” cümlesinin öznesi hangisidir?', ['Yağmur', 'Sabaha', 'Kadar', 'Yağdı'], 0],
+        ['Cümlede yargı bildiren öge hangisidir?', ['Yüklem', 'Özne', 'Nesne', 'Tümleç'], 0],
+        ['“Kitap okumayı severim.” cümlesindeki isim-fiil hangisidir?', ['Okumayı', 'Kitap', 'Severim', 'Yok'], 0],
+        ['Eş sesli sözcük hangisinde vardır?', ['Yüz', 'Masa', 'Kalem', 'Defter'], 0]
+      ],
+      social: [
+        ['Mustafa Kemal hangi şehirde doğmuştur?', ['Selanik', 'Manastır', 'İstanbul', 'Sofya'], 0],
+        ['Mustafa Kemal’e “Kemal” adını kim vermiştir?', ['Matematik öğretmeni', 'Babası', 'Annesi', 'Komutanı'], 0],
+        ['Erzurum Kongresi hangi yılda toplanmıştır?', ['1919', '1920', '1921', '1918'], 0],
+        ['Sivas Kongresi hangi yılda toplanmıştır?', ['1919', '1920', '1922', '1923'], 0],
+        ['Cumhuriyet hangi yıl ilan edilmiştir?', ['1923', '1920', '1919', '1924'], 0],
+        ['Kurtuluş Savaşı’nda Batı Cephesi komutanı kimdir?', ['İsmet İnönü', 'Kâzım Karabekir', 'Fevzi Çakmak', 'Ali Fuat Cebesoy'], 0],
+        ['Doğu Cephesi komutanı kimdir?', ['Kâzım Karabekir', 'İsmet İnönü', 'Refet Bele', 'Fevzi Çakmak'], 0],
+        ['Misakımillî hangi mecliste kabul edilmiştir?', ['Son Osmanlı Mebusan Meclisi', 'TBMM', 'Danıştay', 'Divanıhümayun'], 0],
+        ['Osmanlı’yı kurtarmaya yönelik fikir akımlarından biri hangisidir?', ['Osmanlıcılık', 'Kapitalizm', 'Feodalizm', 'Merkantilizm'], 0],
+        ['Türkçülük akımının savunduğu temel düşünce nedir?', ['Türk milliyetçiliği', 'Din birliği', 'Batılılaşma', 'Ekonomik özgürlük'], 0],
+        ['Mustafa Kemal Samsun’a hangi yıl çıkmıştır?', ['1919', '1918', '1920', '1921'], 0],
+        ['Kongreler hangi amaçla toplanmıştır?', ['Vatanın kurtuluşunu planlamak', 'Ticaret yapmak', 'Vergi toplamak', 'Okul açmak'], 0],
+        ['Bir toplumu bir arada tutan ortak değerlere ne denir?', ['Kültür', 'Ticaret', 'Sanayi', 'Coğrafya'], 0],
+        ['TBMM hangi yıl açılmıştır?', ['1920', '1919', '1921', '1923'], 0],
+        ['Mustafa Kemal askerlik eğitimini hangi şehirde almıştır?', ['Manastır', 'İzmir', 'Ankara', 'Bursa'], 0],
+        ['Batı Cephesi’nde yapılan savaşlardan biri hangisidir?', ['I. İnönü Savaşı', 'Çanakkale Savaşı', 'Preveze Savaşı', 'Malazgirt Savaşı'], 0],
+        ['Ülkemizde nüfus sayımı hangi kurum tarafından yapılır?', ['TÜİK', 'MEB', 'TSE', 'TRT'], 0],
+        ['Haritada yükseltiyi gösteren renk hangisidir?', ['Kahverengi', 'Mavi', 'Yeşil', 'Sarı'], 0]
+      ],
+      religion: [
+        ['İhtiyaç sahiplerine karşılıksız yapılan yardıma ne denir?', ['Sadaka', 'Zekât', 'Fitre', 'Kurban'], 0],
+        ['Zekât kimlere verilir?', ['İhtiyaç sahiplerine', 'Zenginlere', 'Herkese', 'Kimseye'], 0],
+        ['İnsanın seçim yapabilme yeteneğine ne ad verilir?', ['İrade', 'Kader', 'Tevekkül', 'Kaza'], 0],
+        ['Çalışıp sonucu Allah’a bırakmaya ne denir?', ['Tevekkül', 'Sabır', 'Şükür', 'Dua'], 0],
+        ['Zekât oranı genel olarak kaçta kaçtır?', ['1/40', '1/10', '1/4', '1/2'], 0],
+        ['Sadakanın en küçük şekli hangisidir?', ['Güler yüz göstermek', 'Altın vermek', 'Ev bağışlamak', 'Araba almak'], 0],
+        ['Paylaşmanın toplumdaki en önemli sonucu nedir?', ['Dayanışmanın artması', 'Rekabetin artması', 'Ticaretin azalması', 'Nüfusun artması'], 0],
+        ['Tevekkül eden kişi öncelikle ne yapar?', ['Üzerine düşeni yapar', 'Bekler', 'Vazgeçer', 'Başkasına bırakır'], 0],
+        ['Kader inancı insanın sorumluluğunu ortadan kaldırır mı?', ['Hayır, irade sahibidir', 'Evet, tamamen', 'Kısmen kaldırır', 'Bilinemez'], 0],
+        ['Zekât vermenin amacı hangisidir?', ['Malı temizlemek ve paylaşmak', 'Zengin görünmek', 'Ticaret yapmak', 'Vergi ödemek'], 0],
+        ['Zekât hangi durumda farz olur?', ['Belirli bir zenginliğe ulaşınca', 'Her ay', 'Doğunca', 'Okula başlayınca'], 0],
+        ['Paylaşma ve yardımlaşmanın ahlaki değeri nedir?', ['Toplumsal dayanışma', 'Bireysel kazanç', 'Rekabet', 'Üstünlük'], 0],
+        ['İnsanın yaptığı seçimlerden sorumlu olmasının sebebi nedir?', ['İrade sahibi olması', 'Güçlü olması', 'Zengin olması', 'Yaşlı olması'], 0],
+        ['Namaz günde kaç vakittir?', ['5', '3', '4', '6'], 0],
+        ['Ramazan ayında tutulan ibadet hangisidir?', ['Oruç', 'Hac', 'Zekât', 'Kurban'], 0],
+        ['Yardımlaşmayı ifade eden kavram hangisidir?', ['İnfak', 'İsraf', 'Cimrilik', 'Gösteriş'], 0],
+        ['Doğru sözlü olmaya ne denir?', ['Sıdk', 'Yalan', 'Gıybet', 'İftira'], 0],
+        ['İyilik yapmayı teşvik eden davranış hangisidir?', ['Hayırseverlik', 'Bencillik', 'Kıskançlık', 'Öfke'], 0]
+      ],
+      english: [
+        ['Choose the correct word: Nice to ___ you.', ['meet', 'met', 'meeting', 'meets'], 0],
+        ['Choose the correct word: I am very ___ today.', ['happy', 'happily', 'happiness', 'happier'], 0],
+        ['Choose the correct word: We buy bread at the ___.', ['bakery', 'museum', 'library', 'station'], 0],
+        ['Choose the correct word: Go ___ and turn left.', ['straight', 'strong', 'street', 'string'], 0],
+        ['Choose the correct word: My best ___ is Ali.', ['friend', 'friendly', 'friendship', 'friends'], 0],
+        ['Choose the correct word: She feels ___ because she lost her cat.', ['sad', 'sadly', 'sadness', 'sadder'], 0],
+        ['Choose the correct word: You can borrow books from the ___.', ['library', 'bakery', 'hospital', 'garage'], 0],
+        ['Choose the correct word: I feel ___ when I see my friends.', ['happy', 'table', 'run', 'blue'], 0],
+        ['Choose the correct word: Let’s ___ friends!', ['be', 'been', 'being', 'was'], 0],
+        ['Choose the correct word: We stayed at a ___ during our holiday.', ['hotel', 'pencil', 'bridge', 'forest'], 0],
+        ['Choose the correct word: Turn ___ at the traffic lights.', ['right', 'write', 'rite', 'ride'], 0],
+        ['Choose the correct word: I want to visit a ___ to see historical objects.', ['museum', 'bakery', 'pharmacy', 'garage'], 0],
+        ['Choose the correct word: The station is ___ the post office.', ['opposite', 'oppose', 'opposition', 'opposing'], 0],
+        ['Choose the correct word: He was ___ about the good news.', ['excited', 'exciting', 'excite', 'excitement'], 0],
+        ['Choose the correct word: We have been friends ___ 2019.', ['since', 'for', 'from', 'during'], 0],
+        ['Choose the correct word: There ___ many people in the park.', ['are', 'is', 'was', 'am'], 0],
+        ['Choose the correct word: She ___ to school every day.', ['goes', 'go', 'going', 'gone'], 0],
+        ['Choose the correct word: My father is a ___. He cooks food.', ['chef', 'pilot', 'nurse', 'driver'], 0]
+      ]
+    };
+    function pushPool(grade, subject, i, item) {
+      pid++;
+      var tp = topicPair(grade, subject, i);
+      var o = {
+        id: 'pool-' + String(pid).padStart(4, '0'),
+        poolType: 'academic', inputMode: 'manual', imageUrl: null,
+        gradeLevel: grade, subject: subject,
+        section: SUBJ[subject] ? SUBJ[subject].section : 'numeric',
+        topic: tp[0], subTopic: tp[1], questionText: item.text,
+        questionType: item.type === 'num' ? 'number_answer' : 'multiple_choice',
+        options: [], correctTextAnswer: null, correctNumberAnswer: null,
+        score: item.score || 10, addedBy: SEED_AUTHORS[pid % SEED_AUTHORS.length]
+      };
+      if (item.type === 'num') o.correctNumberAnswer = item.ans;
+      else o.options = mc(item.opts, item.ans);
+      var dd = new Date(2026, 0, 8); dd.setDate(dd.getDate() + (pid % 240));
+      dd.setHours(9 + (pid % 8), (pid * 13) % 60, 0, 0);
+      o.createdAt = dd.toISOString();
+      pool.push(o); P[grade + '_' + subject + '_' + (i + 1)] = o;
+    }
+    GRADES.forEach(function (grade) {
+      SUBJECTS.forEach(function (sub) {
+        if (sub.id === 'mathematics') {
+          mathItems(grade).forEach(function (it, i) { pushPool(grade, 'mathematics', i, it); });
+        } else {
+          var bank = BANK[sub.id] || [];
+          for (var i = 0; i < POOL_PER_COMBO; i++) {
+            var b = bank[(i + Number(grade)) % bank.length];
+            pushPool(grade, sub.id, i, { text: b[0], type: 'mc', opts: b[1], ans: b[2] });
+          }
+        }
+      });
+    });
 
     /* ---------------- Görselli ve vektörel sorular ----------------
        Görseller inline SVG data-URI'dir: dış istek yok, her ortamda görünür. */
@@ -519,25 +517,36 @@
       questionType: 'multiple_choice', options: mc(['Salı', 'Pazartesi', 'Çarşamba', 'Perşembe'], 0), score: 10, addedBy: 'Mert Yılmaz'
     });
 
-    /* ---------------- Dikkat soruları ----------------
-       NOT: Dikkat soru tipleri üzerinde ayrıca çalışılacağı için şimdilik HAVUZA
-       eklenmiyorlar; yalnızca Dikkat Testi materyallerinde doğrudan yer alıyorlar.
-       (Soru Havuzu > Dikkat Soruları bölümü bu nedenle boş görünür.) */
-    var attentionSeeds = {};
-    function addAttention(key, o) {
-      o.inputMode = 'manual'; o.imageUrl = null;
-      o.questionType = 'multi_select_attention'; o.allowMultipleSelection = true;
-      if (!o.addedBy) o.addedBy = SEED_AUTHORS[Object.keys(attentionSeeds).length % SEED_AUTHORS.length];
-      attentionSeeds[key] = o;
-    }
-    addAttention('a_5_1', { gradeLevel: '5', attentionTaskType: 'find_target_letters', questionText: 'Ekrandaki B harflerini seçiniz.', instruction: 'Ekrandaki tüm B harflerine tıklayın.', timeLimitSeconds: 60, targetItems: ['B'], distractorItems: ['C', 'D', 'E', 'P', 'R'], correctTargetsCount: 3, score: 15 });
-    addAttention('a_5_2', { gradeLevel: '5', attentionTaskType: 'find_target_colors', questionText: 'Kırmızı daireleri işaretleyiniz.', instruction: 'Tüm kırmızı daireleri seçin.', timeLimitSeconds: 45, targetItems: ['Kırmızı daire'], distractorItems: ['Mavi daire', 'Sarı kare'], correctTargetsCount: 4, score: 15 });
-    addAttention('a_6_1', { gradeLevel: '6', attentionTaskType: 'find_target_numbers', questionText: 'Ekrandaki 7 rakamlarını seçiniz.', instruction: 'Tüm 7 rakamlarına tıklayın.', timeLimitSeconds: 60, targetItems: ['7'], distractorItems: ['1', '4', '9'], correctTargetsCount: 5, score: 15 });
-    addAttention('a_6_2', { gradeLevel: '6', attentionTaskType: 'find_target_shapes', questionText: 'Üçgenleri işaretleyiniz.', instruction: 'Ekrandaki tüm üçgenleri seçin.', timeLimitSeconds: 50, targetItems: ['Üçgen'], distractorItems: ['Kare', 'Daire', 'Altıgen'], correctTargetsCount: 4, score: 15 });
-    addAttention('a_7_1', { gradeLevel: '7', attentionTaskType: 'find_target_letters', questionText: 'Ekrandaki M harflerini seçiniz.', instruction: 'Ekrandaki tüm M harflerine tıklayın.', timeLimitSeconds: 45, targetItems: ['M'], distractorItems: ['N', 'W', 'V'], correctTargetsCount: 4, score: 15 });
-    addAttention('a_7_2', { gradeLevel: '7', attentionTaskType: 'find_target_numbers', questionText: 'Ekrandaki çift sayıları seçiniz.', instruction: 'Tüm çift sayılara tıklayın.', timeLimitSeconds: 55, targetItems: ['2', '4', '6', '8'], distractorItems: ['1', '3', '5'], correctTargetsCount: 6, score: 20 });
-    addAttention('a_8_1', { gradeLevel: '8', attentionTaskType: 'find_target_shapes', questionText: 'Beşgenleri işaretleyiniz.', instruction: 'Ekrandaki tüm beşgenleri seçin.', timeLimitSeconds: 40, targetItems: ['Beşgen'], distractorItems: ['Kare', 'Üçgen', 'Daire'], correctTargetsCount: 3, score: 20 });
-    addAttention('a_8_2', { gradeLevel: '8', attentionTaskType: 'find_target_colors', questionText: 'Yeşil kareleri işaretleyiniz.', instruction: 'Tüm yeşil kareleri seçin.', timeLimitSeconds: 40, targetItems: ['Yeşil kare'], distractorItems: ['Yeşil daire', 'Mavi kare'], correctTargetsCount: 5, score: 20 });
+    /* ---------------- Soru Havuzu: Dikkat Testleri (Burdon) ----------------
+       Çoklu seçim tipi kaldırıldı; dikkat bölümü artık Burdon testlerinden oluşur.
+       Sınıf seviyesi yoktur. Tablo ve toplam hedef sayısı hesaplanarak üretilir. */
+    var BURDON_PRESETS = [
+      { name: 'Burdon Dikkat Testi - A Formu', targets: ['A', 'B'], rows: 20, perRow: 30, ratio: 30, min: 5, seed: 20260101 },
+      { name: 'Burdon Dikkat Testi - B Formu', targets: ['A', 'B'], rows: 18, perRow: 28, ratio: 28, min: 5, seed: 20260202 },
+      { name: 'Burdon Dikkat Testi - C Formu', targets: ['A', 'B', 'C'], rows: 20, perRow: 30, ratio: 26, min: 5, seed: 20260303 },
+      { name: 'Burdon Dikkat Testi - Kısa Form', targets: ['A', 'B'], rows: 12, perRow: 24, ratio: 32, min: 3, seed: 20260404 },
+      { name: 'Burdon Dikkat Testi - Uzun Form', targets: ['A', 'B'], rows: 25, perRow: 32, ratio: 30, min: 8, seed: 20260505 },
+      { name: 'Burdon Dikkat Testi - D Formu', targets: ['M', 'N'], rows: 20, perRow: 30, ratio: 29, min: 5, seed: 20260606 }
+    ];
+    BURDON_PRESETS.forEach(function (pr, i) {
+      pid++;
+      var b = burdonRebuild(Object.assign(burdonDefaults(), {
+        targetLetters: pr.targets, rows: pr.rows, perRow: pr.perRow,
+        targetRatio: pr.ratio, durationSeconds: pr.min * 60, seed: pr.seed
+      }));
+      b.id = 'pool-' + String(pid).padStart(4, '0');
+      b.poolType = 'attention';
+      b.questionText = pr.name;
+      b.questionType = 'burdon_attention';
+      b.gradeLevel = null;
+      b.instruction = 'Sayfadaki harfler arasında yalnızca ' + pr.targets.join(' ve ') +
+        ' harflerini mümkün olduğunca hızlı ve doğru şekilde işaretlemenizi istiyorum. Süre başladığında çalışmaya başlayabilirsiniz.';
+      b.addedBy = SEED_AUTHORS[pid % SEED_AUTHORS.length];
+      var dd = new Date(2026, 0, 8); dd.setDate(dd.getDate() + i * 6);
+      dd.setHours(10 + (i % 6), (i * 17) % 60, 0, 0);
+      b.createdAt = dd.toISOString();
+      pool.push(b); P['burdon_' + (i + 1)] = b;
+    });
 
     /* ---------------- Materyaller (havuzdan klonlanır) ---------------- */
     var list = [];
@@ -576,115 +585,143 @@
       if (o.xp === undefined) o.xp = null;
       return q(o);
     }
-    // Seviye Belirleme Sınavı — her sınıfın 1. sınavına 3-4 ders, 2./3. sınavlara birer kaç soru
-    [['5', 1, ['mathematics', 'science', 'turkish']], ['5', 2, ['mathematics', 'social']],
-     ['6', 1, ['mathematics', 'science', 'turkish', 'english']], ['6', 2, ['social', 'religion']],
-     ['7', 1, ['mathematics', 'science', 'turkish', 'religion']], ['7', 2, ['social', 'english']],
-     ['8', 1, ['mathematics', 'science', 'turkish']], ['8', 2, ['mathematics', 'english']],
-     ['8', 3, ['social', 'religion']]
-    ].forEach(function (spec) {
-      spec[2].forEach(function (sub, i) {
-        useQ(spec[0] + '_' + sub + '_' + (spec[1] === 1 ? 1 : 2), { contentType: 'placement_exam', examNo: spec[1], isActive: !(spec[0] === '5' && spec[1] === 1 && i === 0) });
+    /* ---- Sınav soruları: her sınıf × sınav × TÜM DERSLER, havuzdan ----
+       Her (sınıf, ders) için havuzda >=18 soru var. Dilimler çakışmasın diye
+       Seviye Belirleme 0-8, Aylık Deneme 9-17 aralığını kullanır: aynı soru iki
+       sınava birden düşmez ve her soru havuzdaki kaydıyla birebir eşleşir. */
+    var EXAM_PER_SUBJECT = 3;
+    function examCandidates(grade, subject) {
+      var all = pool.filter(function (p) {
+        return (p.poolType || 'academic') === 'academic' && p.gradeLevel === grade && p.subject === subject;
+      });
+      // Görselli/vektörel sorular öne alınsın ki sınavlarda da görünsünler.
+      var rich = all.filter(function (p) { return p.imageUrl || p.inputMode === 'vector'; });
+      var plain = all.filter(function (p) { return !(p.imageUrl || p.inputMode === 'vector'); });
+      return rich.concat(plain);
+    }
+    function usePoolObj(p, extra) {
+      var o = JSON.parse(JSON.stringify(p));
+      delete o.poolType; delete o.createdAt; delete o.id;
+      o.poolId = p.id;
+      Object.keys(extra).forEach(function (k) { o[k] = extra[k]; });
+      var gk = [o.contentType, o.gradeLevel, o.examNo || '', o.subject || ''].join('|');
+      orderSeq[gk] = (orderSeq[gk] || 0) + 1;
+      o.order = orderSeq[gk];
+      if (o.isActive === undefined) o.isActive = true;
+      if (o.xp === undefined) o.xp = null;
+      return q(o);
+    }
+    var MONTH_OF_EXAM = { 1: 'january', 2: 'february', 3: 'march' };
+    GRADES.forEach(function (grade) {
+      SUBJECTS.forEach(function (sub) {
+        var cands = examCandidates(grade, sub.id);
+        if (!cands.length) return;
+        [1, 2, 3].forEach(function (no) {
+          var pStart = (no - 1) * EXAM_PER_SUBJECT;
+          for (var i = 0; i < EXAM_PER_SUBJECT; i++) {
+            usePoolObj(cands[(pStart + i) % cands.length], { contentType: 'placement_exam', examNo: no });
+          }
+          var mStart = 3 * EXAM_PER_SUBJECT + (no - 1) * EXAM_PER_SUBJECT;
+          for (var j = 0; j < EXAM_PER_SUBJECT; j++) {
+            usePoolObj(cands[(mStart + j) % cands.length], { contentType: 'monthly_trial_exam', examNo: no, month: MONTH_OF_EXAM[no], year: 2026 });
+          }
+        });
       });
     });
-    // Aylık Deneme Sınavı — bazı sorular Seviye Belirleme ile ORTAK (çoklu kullanım)
-    [['5', 1, 'january', ['mathematics', 'turkish']], ['6', 1, 'january', ['mathematics', 'science']],
-     ['7', 1, 'february', ['english', 'turkish']], ['8', 1, 'january', ['mathematics', 'science']],
-     ['8', 2, 'february', ['mathematics']]
-    ].forEach(function (spec) {
-      spec[3].forEach(function (sub) {
-        useQ(spec[0] + '_' + sub + '_' + (spec[1] === 1 ? 1 : 4), { contentType: 'monthly_trial_exam', examNo: spec[1], month: spec[2], year: 2026 });
-      });
-    });
-    // Görselli ve vektörel sorular sınavlarda da yer alsın (önizlemede görünürler)
-    useQ('img_8_math', { contentType: 'placement_exam', examNo: 1 });
-    useQ('img_8_data', { contentType: 'placement_exam', examNo: 1 });
-    useQ('vec_8_math', { contentType: 'placement_exam', examNo: 1 });
-    useQ('img_7_science', { contentType: 'placement_exam', examNo: 1 });
-    useQ('vec_7_science', { contentType: 'placement_exam', examNo: 2 });
-    useQ('img_5_math', { contentType: 'placement_exam', examNo: 1 });
-    useQ('img_6_math', { contentType: 'placement_exam', examNo: 1 });
-    useQ('vec_6_math', { contentType: 'monthly_trial_exam', examNo: 1, month: 'january', year: 2026 });
-    useQ('img_8_math', { contentType: 'monthly_trial_exam', examNo: 1, month: 'january', year: 2026 });
-
-    // Dikkat testleri
-    useQ('a_5_1', { contentType: 'attention_initial' });
-    useQ('a_5_2', { contentType: 'attention_initial' });
-    useQ('a_6_1', { contentType: 'attention_initial' });
-    useQ('a_6_2', { contentType: 'attention_initial' });
-    useQ('a_7_1', { contentType: 'attention_quarterly', quarter: 'q1' });
-    useQ('a_7_2', { contentType: 'attention_quarterly', quarter: 'q1' });
-    useQ('a_8_1', { contentType: 'attention_quarterly', quarter: 'q2' });
-    useQ('a_8_2', { contentType: 'attention_quarterly', quarter: 'q2' });
-    // Sınav bölümlerine daha fazla soru (hepsi havuzdan gelir → tutarlı)
-    [['5', 1, ['mathematics', 'science', 'turkish', 'social', 'religion', 'english']],
-     ['6', 1, ['mathematics', 'science', 'turkish', 'social']],
-     ['7', 1, ['mathematics', 'science', 'turkish', 'english']],
-     ['8', 1, ['mathematics', 'science', 'social', 'religion']],
-     ['5', 2, ['mathematics', 'turkish', 'english']],
-     ['6', 2, ['mathematics', 'science', 'english']],
-     ['7', 2, ['mathematics', 'turkish', 'religion']],
-     ['8', 2, ['science', 'turkish', 'social']],
-     ['5', 3, ['mathematics', 'science']], ['6', 3, ['turkish', 'religion']],
-     ['7', 3, ['science', 'social']], ['8', 3, ['mathematics', 'english']]
-    ].forEach(function (spec) {
-      spec[2].forEach(function (sub) {
-        useQ(spec[0] + '_' + sub + '_3', { contentType: 'placement_exam', examNo: spec[1] });
-      });
-    });
-    [['5', 1, 'january', ['science', 'social']], ['6', 1, 'january', ['turkish', 'english']],
-     ['7', 1, 'february', ['mathematics', 'science']], ['8', 1, 'january', ['turkish', 'english']],
-     ['5', 2, 'february', ['mathematics', 'turkish']], ['6', 2, 'february', ['science', 'social']],
-     ['7', 2, 'march', ['turkish', 'religion']], ['8', 2, 'february', ['science', 'social']]
-    ].forEach(function (spec) {
-      spec[3].forEach(function (sub) {
-        useQ(spec[0] + '_' + sub + '_2', { contentType: 'monthly_trial_exam', examNo: spec[1], month: spec[2], year: 2026 });
-      });
+    // Gerçekçilik: birkaç soru pasif olsun (Durum sütunu boş kalmasın)
+    list.forEach(function (x, i) {
+      if ((x.contentType === 'placement_exam' || x.contentType === 'monthly_trial_exam') && i % 37 === 5) x.isActive = false;
     });
 
-    // Haftalık Ödevler — her sınıf × KİD/RUD × ders × hafta (havuzdan)
-    [['5', 'RUD', 'mathematics', 1], ['5', 'RUD', 'turkish', 1], ['5', 'KID', 'science', 2], ['5', 'KID', 'mathematics', 3],
-     ['6', 'KID', 'science', 1], ['6', 'RUD', 'mathematics', 2], ['6', 'RUD', 'turkish', 4], ['6', 'KID', 'english', 5],
-     ['7', 'RUD', 'turkish', 2], ['7', 'KID', 'mathematics', 3], ['7', 'RUD', 'religion', 6], ['7', 'KID', 'science', 8],
-     ['8', 'KID', 'mathematics', 2], ['8', 'RUD', 'science', 4], ['8', 'KID', 'turkish', 7], ['8', 'RUD', 'social', 10]
-    ].forEach(function (spec, i) {
-      useQ(spec[0] + '_' + spec[2] + '_' + ((i % 4) + 1), {
-        contentType: 'weekly_homework', gradeLevel: spec[0], lessonMode: spec[1],
-        educationWeek: spec[3], homeworkTitle: spec[3] + '. Hafta ' + spec[1] + ' Ödevi', xp: 20 + (i % 3) * 5
+    // Dikkat Testleri — havuzdaki Burdon testlerinden seçilir (sınıf seviyesi yok)
+    [['attention_initial', ['burdon_1', 'burdon_2', 'burdon_4'], null],
+     ['attention_quarterly', ['burdon_1', 'burdon_3', 'burdon_5', 'burdon_6'], ['q1', 'q1', 'q2', 'q3']]
+    ].forEach(function (spec) {
+      spec[1].forEach(function (key, i) {
+        var src = P[key];
+        if (!src) return;
+        var b = JSON.parse(JSON.stringify(src));
+        delete b.poolType; delete b.createdAt; delete b.id;
+        b.poolId = src.id;
+        b.contentType = spec[0];
+        b.gradeLevel = null;
+        b.isActive = true;
+        b.order = i + 1;
+        if (spec[2]) b.quarter = spec[2][i];
+        q(b);
       });
     });
-
-    // Haftalık Ödevler (XP materyale özgü)
-    useQ('5_mathematics_3', { contentType: 'weekly_homework', educationWeek: 1, lessonMode: 'RUD', homeworkTitle: '1. Hafta RUD Matematik Ödevi', xp: 20 });
-    useQ('6_science_3', { contentType: 'weekly_homework', educationWeek: 1, lessonMode: 'KID', homeworkTitle: '1. Hafta KİD Fen Ödevi', xp: 25 });
-    useQ('7_turkish_3', { contentType: 'weekly_homework', educationWeek: 2, lessonMode: 'RUD', homeworkTitle: '2. Hafta RUD Türkçe Ödevi', xp: 20 });
-    useQ('8_mathematics_3', { contentType: 'weekly_homework', educationWeek: 2, lessonMode: 'KID', homeworkTitle: '2. Hafta KİD Matematik Ödevi', xp: 30 });
-    useQ('7_religion_3', { contentType: 'weekly_homework', educationWeek: 3, lessonMode: 'RUD', homeworkTitle: '3. Hafta RUD Din Kültürü Ödevi', xp: 20 });
 
     /* ---------------- Havuz değişiklik geçmişi ----------------
        Her kaydın "yeni durum"u sorunun GÜNCEL değeriyle birebir aynıdır. */
     var poolHistory = [];
-    var hid = 0;
-    function ph(key, field, label, prev, next, by, dayOffset) {
-      if (!P[key]) return;
-      hid++;
-      var dd = new Date(2026, 2, 3); dd.setDate(dd.getDate() + dayOffset);
-      dd.setHours(9 + (hid % 8), (hid * 17) % 60, 0, 0);
-      poolHistory.push({ id: 'plog-' + String(hid).padStart(3, '0'), questionId: P[key].id, field: field, label: label, previousValue: String(prev), newValue: String(next), changedBy: by, changedAt: dd.toISOString() });
+    /* ---- Toplu değişiklik geçmişi üretimi ----
+       Kural: her kaydın "yeni durum"u sorunun GÜNCEL değeriyle birebir aynıdır,
+       "eski durum" ise ondan farklı, inandırıcı bir önceki değerdir. */
+    var histSeq = 0;
+    function pushHist(arr, targetId, field, label, prev, next, by, dayOffset) {
+      if (String(prev) === String(next)) return;   // aynıysa kayıt üretme
+      histSeq++;
+      var dd = new Date(2026, 1, 10); dd.setDate(dd.getDate() + dayOffset);
+      dd.setHours(8 + (histSeq % 10), (histSeq * 23) % 60, 0, 0);
+      arr.push({
+        id: (arr === poolHistory ? 'plog-' : 'qlog-') + String(histSeq).padStart(4, '0'),
+        questionId: targetId, field: field, label: label,
+        previousValue: String(prev), newValue: String(next),
+        changedBy: by, changedAt: dd.toISOString()
+      });
     }
-    ph('8_mathematics_1', 'score', 'Puan', '5', String(P['8_mathematics_1'].score), 'Onur Demirli', 2);
-    ph('8_mathematics_1', 'subTopic', 'Alt Konu', 'Kareköklü İfadelerde Çarpma ve Bölme', P['8_mathematics_1'].subTopic, 'Elif Kaya', 9);
-    ph('8_mathematics_3', 'score', 'Puan', '10', String(P['8_mathematics_3'].score), 'Zeynep Ak', 12);
-    ph('8_mathematics_3', 'gradeLevel', 'Sınıf Seviyesi', '7. Sınıf', gradeLabel(P['8_mathematics_3'].gradeLevel), 'Onur Demirli', 14);
-    ph('8_mathematics_2', 'questionType', 'Tip', '4 Seçenekli', QTYPE_LABEL[P['8_mathematics_2'].questionType], 'Mert Yılmaz', 5);
-    ph('7_science_1', 'topic', 'Konu', 'Madde ve Endüstri', P['7_science_1'].topic, 'Burak Şen', 6);
-    ph('7_turkish_1', 'correct', 'Cevap', 'koşma', P['7_turkish_1'].correctTextAnswer, 'Elif Kaya', 11);
-    ph('7_mathematics_1', 'score', 'Puan', '10', String(P['7_mathematics_1'].score), 'Mert Yılmaz', 8);
-    ph('8_mathematics_5', 'score', 'Puan', '10', String(P['8_mathematics_5'].score), 'Zeynep Ak', 15);
-    ph('8_science_4', 'score', 'Puan', '10', String(P['8_science_4'].score), 'Elif Kaya', 20);
-    ph('8_english_4', 'score', 'Puan', '10', String(P['8_english_4'].score), 'Mert Yılmaz', 21);
-    ph('8_social_2', 'score', 'Puan', '10', String(P['8_social_2'].score), 'Zeynep Ak', 22);
-    ph('8_religion_2', 'score', 'Puan', '10', String(P['8_religion_2'].score), 'Burak Şen', 23);
+    function altTopic(p) {
+      var map = (CURRICULUM[p.gradeLevel] && CURRICULUM[p.gradeLevel][p.subject]) || TOPICS[p.subject] || {};
+      var keys = Object.keys(map).filter(function (k) { return k !== p.topic; });
+      return keys.length ? keys[0] : null;
+    }
+    function altSubTopic(p) {
+      var map = (CURRICULUM[p.gradeLevel] && CURRICULUM[p.gradeLevel][p.subject]) || TOPICS[p.subject] || {};
+      var subs = (map[p.topic] || []).filter(function (x) { return x !== p.subTopic; });
+      return subs.length ? subs[0] : null;
+    }
+    var TYPE_ALT = { multiple_choice: 'Sözel Cevap', text_answer: '4 Seçenekli', number_answer: '4 Seçenekli' };
+    // Havuz sorularının yaklaşık üçte biri için 1-3 değişiklik kaydı
+    pool.forEach(function (p, i) {
+      if ((p.poolType || 'academic') !== 'academic') return;
+      if (i % 3 !== 0) return;
+      var by = SEED_AUTHORS[i % SEED_AUTHORS.length];
+      var day = 3 + (i % 40);
+      var variant = i % 5;
+      if (variant === 0) {
+        pushHist(poolHistory, p.id, 'score', 'Puan', Math.max(5, (p.score || 10) - 5), p.score, by, day);
+      } else if (variant === 1) {
+        var t = altTopic(p);
+        if (t) pushHist(poolHistory, p.id, 'topic', 'Konu', t, p.topic, by, day);
+        pushHist(poolHistory, p.id, 'score', 'Puan', (p.score || 10) + 5, p.score, SEED_AUTHORS[(i + 2) % SEED_AUTHORS.length], day + 4);
+      } else if (variant === 2) {
+        var st2 = altSubTopic(p);
+        if (st2) pushHist(poolHistory, p.id, 'subTopic', 'Alt Konu', st2, p.subTopic, by, day);
+      } else if (variant === 3) {
+        pushHist(poolHistory, p.id, 'questionType', 'Tip', TYPE_ALT[p.questionType] || '4 Seçenekli', QTYPE_LABEL[p.questionType], by, day);
+        var ans = correctText(p);
+        pushHist(poolHistory, p.id, 'correct', 'Cevap', ans + ' (taslak)', ans, SEED_AUTHORS[(i + 1) % SEED_AUTHORS.length], day + 6);
+      } else {
+        var g = String(Math.max(5, Number(p.gradeLevel) - 1));
+        pushHist(poolHistory, p.id, 'gradeLevel', 'Sınıf Seviyesi', gradeLabel(g), gradeLabel(p.gradeLevel), by, day);
+        pushHist(poolHistory, p.id, 'subTopic', 'Alt Konu', (p.subTopic || '') + ' (eski)', p.subTopic, SEED_AUTHORS[(i + 3) % SEED_AUTHORS.length], day + 9);
+      }
+    });
+    // Materyal içi (sınav/ödev) yerel değişiklikler: sıra ve durum
+    var questionHistory = [];
+    list.forEach(function (x, i) {
+      if (x.contentType !== 'placement_exam' && x.contentType !== 'monthly_trial_exam') return;
+      if (i % 7 !== 0) return;
+      var by = SEED_AUTHORS[(i + 1) % SEED_AUTHORS.length];
+      var day = 12 + (i % 30);
+      if (i % 14 === 0) {
+        pushHist(questionHistory, x.id, 'order', 'Sıra', (x.order || 1) + 1, x.order, by, day);
+      } else {
+        pushHist(questionHistory, x.id, 'isActive', 'Durum', x.isActive ? 'Pasif' : 'Aktif', x.isActive ? 'Aktif' : 'Pasif', by, day);
+      }
+    });
+
 
     // Sınav yayın durumu — 'published' (Yayında) | 'editing' (Düzenleniyor).
     // Anahtar: bölüm:sınıf-sınavNo (Seviye Belirleme ve Aylık Deneme ayrı ayrı tutulur).
@@ -714,7 +751,7 @@
       });
     });
     // Sınavın kapsadığı dersler / adı / silinmişleri / künyesi — aynı anahtar biçimi.
-    return { questions: list, examStatus: examStatus, examSubjects: {}, examNames: {}, examDeleted: {}, examMeta: examMeta, pool: pool, poolHistory: poolHistory };
+    return { questions: list, examStatus: examStatus, examSubjects: {}, examNames: {}, examDeleted: {}, examMeta: examMeta, pool: pool, poolHistory: poolHistory, questionHistory: questionHistory };
   }
 
   var db = loadDb() || seedDb();
@@ -725,6 +762,8 @@
   if (!db.examMeta) db.examMeta = {};
   if (!db.pool) db.pool = [];
   if (!db.poolHistory) db.poolHistory = [];
+  if (!db.weeklyDeleted) db.weeklyDeleted = {};
+  if (!db.questionHistory) db.questionHistory = [];
   if (!loadDb()) saveDb();
   // Tüm sınav kayıtları bölüm bazlı: "placement:5-1", "monthly:8-2" …
   function examKey(key, grade, no) { return key + ':' + grade + '-' + no; }
@@ -923,10 +962,14 @@
     if (s.attention) els.push(selectEl('attentionTaskType', 'Tüm görev tipleri', ATTENTION_TASKS.map(function (a) { return { v: a.id, l: a.name }; }), f.attentionTaskType));
     if (!s.attention) els.push(selectEl('questionType', 'Tüm soru tipleri', qTypesFor(key).map(function (t) { return { v: t, l: QTYPE_LABEL[t] }; }), f.questionType));
     els.push(selectEl('isActive', 'Tümü (aktif/pasif)', [{ v: 'active', l: 'Aktif' }, { v: 'passive', l: 'Pasif' }], f.isActive));
+    // Sınav ve haftalık ödev bölümlerinde soru YALNIZCA havuzdan seçilerek eklenir;
+    // serbest "Soru ekle" yalnızca dikkat testlerinde kalır.
+    var poolOnly = isExamFlow(key) || isWeeklyFlow(key);
     return '<div class="tm-dg-toolbar-row sy-filter-row">' + els.join('') +
       '<span class="tm-dg-spacer"></span>' +
-      '<button type="button" class="tm-btn tm-btn--primary tm-btn--sm" data-sy-add>+ Soru ekle</button>' +
-      '<button type="button" class="tm-btn tm-btn--sm sy-btn-pick" data-sy-pick>&#9776; Soru seç</button>' +
+      (poolOnly ? '' : '<button type="button" class="tm-btn tm-btn--primary tm-btn--sm" data-sy-add>+ Soru ekle</button>') +
+      '<button type="button" class="tm-btn tm-btn--sm sy-btn-pick' + (poolOnly ? ' sy-btn-pick--main' : '') + '" data-sy-pick>&#9776; Havuzdan Soru Seç</button>' +
+      (s.attention ? '<button type="button" class="tm-btn tm-btn--sm sy-btn-burdon" data-sy-burdon-add>+ Burdon Testi</button>' : '') +
       '<span class="tm-dg-count" data-sy-count>—</span></div>';
   }
   function allTopicsFor(key) {
@@ -948,10 +991,13 @@
       if (st.subject) list = list.filter(function (q) { return q.subject === st.subject; });
     } else if (isWeeklyFlow(key)) {
       var wst = ES(key);
-      if (wst.grade) list = list.filter(function (q) { return q.gradeLevel === wst.grade; });
-      if (wst.mode) list = list.filter(function (q) { return q.lessonMode === wst.mode; });
-      if (wst.subject) list = list.filter(function (q) { return q.subject === wst.subject; });
-      if (wst.week != null) list = list.filter(function (q) { return Number(q.educationWeek) === wst.week; });
+      if (wst.mode && wst.subject && wst.week != null) {
+        list = weeklyResolved(wst.grade, wst.mode, wst.subject, wst.week);
+      } else {
+        if (wst.grade) list = list.filter(function (q) { return q.gradeLevel === wst.grade; });
+        if (wst.mode) list = list.filter(function (q) { return q.lessonMode === wst.mode; });
+        if (wst.subject) list = list.filter(function (q) { return q.subject === wst.subject; });
+      }
     }
     if (f.q) { var qq = f.q.toLowerCase(); list = list.filter(function (q) { return (q.questionText || '').toLowerCase().indexOf(qq) >= 0; }); }
     if (f.month && f.month !== 'all') list = list.filter(function (q) { return q.month === f.month; });
@@ -1043,7 +1089,21 @@
         previewOptionsHtml(q) +
       '</div></article>';
   }
-  function openPreview(list, title, sub) {
+  // Önizleme: çok soruluysa ‹ / › gezgin + "3 / 15" sayacı + nokta navigasyonu,
+  // tek soruluysa navigasyon hiç gösterilmez. groups verilirse üstte sekmeler çıkar.
+  function openPreview(list, title, sub, groups) {
+    var G = (groups && groups.length) ? groups : [{ id: 'all', label: '', list: list || [] }];
+    var gi = 0, si = 0, idx = 0;
+    function subsOfCur() { var g = G[gi]; return (g && g.subs && g.subs.length) ? g.subs : null; }
+    function cur() {
+      var subs = subsOfCur();
+      if (subs) return (subs[si] && subs[si].list) || [];
+      return G[gi].list || [];
+    }
+    function groupCount(g) {
+      if (g.subs && g.subs.length) return g.subs.reduce(function (n, x) { return n + (x.list || []).length; }, 0);
+      return (g.list || []).length;
+    }
     var existing = document.getElementById('syPreviewModal');
     if (existing) existing.remove();
     var ov = document.createElement('div');
@@ -1052,20 +1112,111 @@
       '<div class="tm-crit-dialog tm-detail-modal sy-preview-modal" role="dialog" aria-modal="true">' +
         '<header class="tm-crit-head"><div class="tm-detail-modal-titles">' +
           '<h2 class="tm-crit-title">' + esc(title) + '</h2>' +
-          '<p class="tm-detail-modal-sub">' + esc(sub || '') + (list.length ? ' · ' + list.length + ' soru' : '') + '</p>' +
+          '<p class="tm-detail-modal-sub">' + esc(sub || '') + '</p>' +
         '</div><button type="button" class="tm-drawer-close" data-close aria-label="Kapat">&times;</button></header>' +
-        '<div class="tm-detail-modal-body">' +
-          (list.length
-            ? '<div class="sy-pv-list">' + list.map(previewQuestionHtml).join('') + '</div>'
-            : '<p class="sy-pv-empty">Bu bölümde önizlenecek soru bulunmuyor.</p>') +
-        '</div>' +
-        '<footer class="tm-crit-foot"><button type="button" class="tm-btn tm-btn--primary" data-close>Kapat</button></footer>' +
+        (G.length > 1 ? '<div class="sy-tabs sy-pv-tabs" data-pv-tabs></div>' : '') +
+        '<div class="sy-pv-subtabs" data-pv-subtabs hidden></div>' +
+        '<div class="tm-detail-modal-body" data-pv-body></div>' +
+        '<div class="sy-pv-dots" data-pv-dots hidden></div>' +
+        '<footer class="tm-crit-foot sy-pv-foot">' +
+          '<span class="sy-pv-side"></span>' +
+          '<span class="sy-pv-navgroup" data-pv-navgroup hidden>' +
+            '<button type="button" class="tm-btn tm-btn--ghost sy-pv-nav" data-pv-prev>&lsaquo; Önceki</button>' +
+            '<span class="sy-pv-counter" data-pv-counter></span>' +
+            '<button type="button" class="tm-btn tm-btn--ghost sy-pv-nav" data-pv-next>Sonraki &rsaquo;</button>' +
+          '</span>' +
+          '<span class="sy-pv-side sy-pv-side--end">' +
+            '<button type="button" class="tm-btn tm-btn--primary" data-close>Kapat</button>' +
+          '</span>' +
+        '</footer>' +
       '</div>';
     document.body.appendChild(ov);
+    var body = ov.querySelector('[data-pv-body]');
+    var dots = ov.querySelector('[data-pv-dots]');
+    var navg = ov.querySelector('[data-pv-navgroup]');
+    var tabs = ov.querySelector('[data-pv-tabs]');
+    var subtabs = ov.querySelector('[data-pv-subtabs]');
+
+    function draw() {
+      var lst = cur();
+      if (tabs) {
+        tabs.innerHTML = G.map(function (g, i) {
+          return '<button type="button" class="sy-tab-btn' + (i === gi ? ' is-active' : '') + '" data-pv-tab="' + i + '">' +
+            esc(g.label) + ' <span class="sy-pv-tabcount">(' + groupCount(g) + ')</span></button>';
+        }).join('');
+      }
+      // Üst sekmenin ders alt sekmeleri (Sayısal → Matematik/Fen, Sözel → Türkçe/Sosyal/DKAB/İngilizce)
+      var subs = subsOfCur();
+      if (subtabs) {
+        subtabs.hidden = !subs;
+        if (subs) {
+          subtabs.innerHTML = subs.map(function (sg, i) {
+            return '<button type="button" class="sy-pv-subtab' + (i === si ? ' is-active' : '') + '" data-pv-subtab="' + i + '">' +
+              esc(sg.label) + ' <span class="sy-pv-tabcount">(' + (sg.list || []).length + ')</span></button>';
+          }).join('');
+        }
+      }
+      if (!lst.length) {
+        body.innerHTML = '<p class="sy-pv-empty">Bu bölümde önizlenecek soru bulunmuyor.</p>';
+        navg.hidden = true; dots.hidden = true;
+        return;
+      }
+      body.innerHTML = '<div class="sy-pv-single">' + previewQuestionHtml(lst[idx], idx) + '</div>';
+      // Tek soruluk önizlemede gezinmeye gerek yok.
+      var multi = lst.length > 1;
+      navg.hidden = !multi;
+      dots.hidden = !multi;
+      if (multi) {
+        ov.querySelector('[data-pv-counter]').textContent = (idx + 1) + ' / ' + lst.length;
+        ov.querySelector('[data-pv-prev]').disabled = idx <= 0;
+        ov.querySelector('[data-pv-next]').disabled = idx >= lst.length - 1;
+        dots.innerHTML = lst.map(function (q, i) {
+          return '<button type="button" class="sy-pv-dot' + (i === idx ? ' is-active' : '') + '" data-pv-go="' + i + '" title="' + (i + 1) + '. soru">' + (i + 1) + '</button>';
+        }).join('');
+      } else {
+        // Tek soruluk gruba geçildiğinde önceki grubun noktaları/sayacı kalmasın.
+        dots.innerHTML = '';
+        ov.querySelector('[data-pv-counter]').textContent = '';
+      }
+    }
+    function go(n) { if (n < 0 || n >= cur().length) return; idx = n; draw(); }
+    draw();
+
     function close() { if (ov.parentNode) ov.remove(); document.removeEventListener('keydown', onKey); }
-    function onKey(e) { if (e.key === 'Escape') close(); }
+    function onKey(e) {
+      if (e.key === 'Escape') { close(); return; }
+      if (cur().length < 2) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(idx + 1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); go(idx - 1); }
+    }
     document.addEventListener('keydown', onKey);
-    ov.addEventListener('click', function (e) { if (e.target === ov || e.target.closest('[data-close]')) close(); });
+    ov.addEventListener('click', function (e) {
+      if (e.target === ov || e.target.closest('[data-close]')) { close(); return; }
+      var tb = e.target.closest('[data-pv-tab]');
+      if (tb) { gi = parseInt(tb.getAttribute('data-pv-tab'), 10) || 0; si = 0; idx = 0; draw(); return; }
+      var sb = e.target.closest('[data-pv-subtab]');
+      if (sb) { si = parseInt(sb.getAttribute('data-pv-subtab'), 10) || 0; idx = 0; draw(); return; }
+      if (e.target.closest('[data-pv-prev]')) { go(idx - 1); return; }
+      if (e.target.closest('[data-pv-next]')) { go(idx + 1); return; }
+      var d = e.target.closest('[data-pv-go]');
+      if (d) go(parseInt(d.getAttribute('data-pv-go'), 10));
+    });
+  }
+  // Sınav önizlemesi: Sayısal / Sözel üst sekmeleri, altlarında ders sekmeleri.
+  var SUBJECT_SHORT = { religion: 'DKAB' };
+  function subjectShort(id) { return SUBJECT_SHORT[id] || (SUBJ[id] ? SUBJ[id].name : id); }
+  function sectionGroups(all) {
+    function subsOf(sec) {
+      return SUBJECTS.filter(function (s) { return s.section === sec; }).map(function (s) {
+        return { id: s.id, label: subjectShort(s.id), list: all.filter(function (q) { return q.subject === s.id; }) };
+      });
+    }
+    function total(subs) { return subs.reduce(function (n, x) { return n + x.list.length; }, 0); }
+    var num = subsOf('numeric'), ver = subsOf('verbal');
+    return [
+      { id: 'numeric', label: 'Sayısal', subs: num, count: total(num) },
+      { id: 'verbal', label: 'Sözel', subs: ver, count: total(ver) }
+    ];
   }
   // Bir sınavın tüm soruları: önce ders sırası, sonra soru sırası.
   function examQuestionsOrdered(key, grade, no, subject) {
@@ -1081,6 +1232,9 @@
 
   function qCode(q) {
     var id = String(q.id || '');
+    // Haftalık ödevlerde sorular havuzdan türetilir; kendi kimlikleri yok →
+    // doğrudan havuz kodunu göster (havuzdaki karşılığı bir bakışta bulunsun).
+    if (id.indexOf('wq-') === 0 && q.poolId) return 'SH-' + String(q.poolId).replace(/^pool-/, '').padStart(4, '0');
     var m = id.match(/^question-(\d+)$/);
     if (m) return 'SR-' + m[1].padStart(4, '0');
     return 'SR-' + (id.replace(/^question-/, '').toUpperCase() || '0000');
@@ -1088,6 +1242,7 @@
   function rowActions(q) {
     return '<td class="sy-td-act"><span class="tm-row-actions">' +
       '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-sy-preview="' + q.id + '" title="Soruyu önizle">' + PREVIEW_ICON + '</button>' +
+      '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-sy-info="' + q.id + '" title="Soru künyesi ve değişiklik geçmişi">' + INFO_ICON + '</button>' +
       '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-sy-edit="' + q.id + '" title="Düzenle">' + EDIT_ICON + '</button>' +
       '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon tm-btn--danger" data-sy-del="' + q.id + '" title="Sil">' + DEL_ICON + '</button>' +
     '</span></td>';
@@ -1148,16 +1303,18 @@
       if (s.hasMonth) cells += '<td>' + esc(MONTH[q.month] || '—') + '</td>';
       if (s.hasWeek) cells += '<td>' + esc(q.educationWeek != null ? q.educationWeek + '. Hafta' : '—') + '</td><td>' + esc(LMODE[q.lessonMode] || '—') + '</td>';
       if (s.hasQuarter) cells += '<td>' + esc(QUARTER[q.quarter] || '—') + '</td>';
-      cells += '<td>' + esc(gradeLabel(q.gradeLevel)) + '</td>';
+      cells += '<td>' + (q.attentionTestType === 'burdon' ? '—' : esc(gradeLabel(q.gradeLevel))) + '</td>';
       if (s.hasSubject) cells += '<td>' + esc(SUBJ[q.subject] ? SUBJ[q.subject].name : '—') + '</td><td>' + esc(q.topic || '—') + (q.subTopic ? ' · ' + esc(q.subTopic) : '') + '</td>';
-      if (s.attention) cells += '<td>' + esc(ATASK[q.attentionTaskType] || '—') + '</td><td>' + esc(q.timeLimitSeconds != null ? q.timeLimitSeconds + ' sn' : '—') + '</td>';
-      cells += '<td>' + esc(QTYPE_LABEL[q.questionType] || q.questionType) + '</td><td>' + (q.score != null ? q.score : '—') + '</td>';
+      if (s.attention) {
+        var isB = q.attentionTestType === 'burdon';
+        cells += '<td>' + (isB ? 'Burdon Dikkat Testi' : esc(ATASK[q.attentionTaskType] || '—')) + '</td>' +
+          '<td>' + (isB ? esc(burdonDurationLabel(q.durationSeconds)) : esc(q.timeLimitSeconds != null ? q.timeLimitSeconds + ' sn' : '—')) + '</td>';
+      }
+      cells += '<td>' + (q.attentionTestType === 'burdon' ? 'Burdon Testi' : esc(QTYPE_LABEL[q.questionType] || q.questionType)) + '</td>' +
+        '<td>' + (q.attentionTestType === 'burdon' ? (q.totalTargets || 0) + ' hedef' : (q.score != null ? q.score : '—')) + '</td>';
       if (s.hasXp) cells += '<td>' + (q.xp != null ? q.xp : '—') + '</td>';
-      cells += '<td>' + correctSummary(q) + '</td><td>' + activeBadge(q) + '</td>' +
-        '<td class="sy-td-act"><span class="tm-row-actions">' +
-          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-sy-edit="' + q.id + '" title="Düzenle">' + EDIT_ICON + '</button>' +
-          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon tm-btn--danger" data-sy-del="' + q.id + '" title="Sil">' + DEL_ICON + '</button>' +
-        '</span></td>';
+      cells += '<td>' + (q.attentionTestType === 'burdon' ? esc((q.targetLetters || []).join(', ')) : correctSummary(q)) + '</td>' +
+        '<td>' + activeBadge(q) + '</td>' + rowActions(q);
       return '<tr data-row="' + q.id + '">' + cells + '</tr>';
     }).join('');
     return '<div class="tm-res-table-wrap sy-table-wrap"><table class="tm-res-table sy-table"><thead><tr>' + head + '</tr></thead><tbody data-sy-rows>' + rows + '</tbody></table></div>';
@@ -1334,10 +1491,10 @@
     var f = poolFilters;
     var els = [];
     els.push('<input type="search" class="tm-dg-control tm-dg-search" data-pool-filter="q" placeholder="Soru, konu veya kişi ara…" value="' + esc(f.q) + '">');
-    els.push(selectPool('gradeLevel', 'Tüm sınıflar', GRADES.map(function (g) { return { v: g, l: gradeLabel(g) }; }), f.gradeLevel));
+    if (isAcademic) els.push(selectPool('gradeLevel', 'Tüm sınıflar', GRADES.map(function (g) { return { v: g, l: gradeLabel(g) }; }), f.gradeLevel));
     if (isAcademic) els.push(selectPool('subject', 'Tüm dersler', SUBJECTS.map(function (x) { return { v: x.id, l: x.name }; }), f.subject));
-    els.push(selectPool('questionType', 'Tüm tipler',
-      (isAcademic ? ['multiple_choice', 'text_answer', 'number_answer'] : ['multi_select_attention']).map(function (t) { return { v: t, l: QTYPE_LABEL[t] }; }), f.questionType));
+    if (isAcademic) els.push(selectPool('questionType', 'Tüm tipler',
+      ['multiple_choice', 'text_answer', 'number_answer'].map(function (t) { return { v: t, l: QTYPE_LABEL[t] }; }), f.questionType));
 
     main.innerHTML =
       '<div class="sy-page-head"><h1 class="sy-page-title">Soru Havuzu · ' + esc(grp.label) + '</h1>' +
@@ -1345,7 +1502,7 @@
       '<section class="tm-panel tm-panel--datagrid sy-panel">' +
         '<div class="tm-dg-toolbar"><div class="tm-dg-toolbar-row sy-filter-row">' + els.join('') +
           '<span class="tm-dg-spacer"></span>' +
-          '<button type="button" class="tm-btn tm-btn--primary tm-btn--sm" data-pool-add>+ Soru ekle</button>' +
+          '<button type="button" class="tm-btn tm-btn--primary tm-btn--sm" data-pool-add>' + (isAcademic ? '+ Soru ekle' : '+ Yeni Burdon Testi') + '</button>' +
           '<span class="tm-dg-count" data-pool-count>—</span></div></div>' +
         '<div class="sy-list" data-pool-list></div>' +
       '</section>';
@@ -1365,21 +1522,31 @@
   }
   function poolTableHtml(list, isAcademic) {
     if (!list.length) return '<p class="tm-empty sy-empty">Bu filtrelere uygun soru bulunmuyor.</p>';
-    var head = '<th class="sy-col-id">Soru ID</th><th>Sınıf Seviyesi</th>' +
-      (isAcademic ? '<th>Ders</th><th>Konu</th><th>Alt Konu</th>' : '<th>Görev</th>') +
-      '<th>Tip</th><th>Puan</th><th>Cevap</th><th>Ekleyen Kişi</th><th>İşlem</th>';
+    var head = isAcademic
+      ? '<th class="sy-col-id">Soru ID</th><th>Sınıf Seviyesi</th><th>Ders</th><th>Konu</th><th>Alt Konu</th><th>Tip</th><th>Puan</th><th>Cevap</th><th>Ekleyen Kişi</th><th>İşlem</th>'
+      : '<th class="sy-col-id">Test ID</th><th>Test Adı</th><th>Süre</th><th>Hedef Harfler</th><th>Toplam Hedef</th><th>Satır × Harf</th><th>Ekleyen Kişi</th><th>İşlem</th>';
     var rows = list.map(function (p) {
-      return '<tr data-pool-row="' + p.id + '">' +
-        '<td class="sy-col-id"><code class="tm-res-code-cell">' + esc(poolCode(p)) + '</code></td>' +
-        '<td>' + esc(gradeLabel(p.gradeLevel)) + '</td>' +
-        (isAcademic
-          ? '<td>' + esc(SUBJ[p.subject] ? SUBJ[p.subject].name : '—') + '</td><td>' + esc(p.topic || '—') + '</td><td class="sy-td-sub">' + esc(p.subTopic || '—') + '</td>'
-          : '<td>' + esc(ATASK[p.attentionTaskType] || '—') + '</td>') +
-        '<td>' + esc(QTYPE_LABEL[p.questionType] || p.questionType) + '</td>' +
-        '<td>' + (p.score != null ? p.score : '—') + '</td>' +
-        '<td class="sy-td-sub">' + esc(correctText(p)) + '</td>' +
-        '<td>' + esc(p.addedBy || AUTHOR_NAME) + '</td>' +
+      var cells = isAcademic
+        ? '<td class="sy-col-id"><code class="tm-res-code-cell">' + esc(poolCode(p)) + '</code></td>' +
+          '<td>' + esc(gradeLabel(p.gradeLevel)) + '</td>' +
+          '<td>' + esc(SUBJ[p.subject] ? SUBJ[p.subject].name : '—') + '</td>' +
+          '<td>' + esc(p.topic || '—') + '</td>' +
+          '<td class="sy-td-sub">' + esc(p.subTopic || '—') + '</td>' +
+          '<td>' + esc(QTYPE_LABEL[p.questionType] || p.questionType) + '</td>' +
+          '<td>' + (p.score != null ? p.score : '—') + '</td>' +
+          '<td class="sy-td-sub">' + esc(correctText(p)) + '</td>' +
+          '<td>' + esc(p.addedBy || AUTHOR_NAME) + '</td>'
+        // Dikkat grubu: Burdon testi künyesi (sınıf seviyesi yoktur)
+        : '<td class="sy-col-id"><code class="tm-res-code-cell">' + esc(poolCode(p)) + '</code></td>' +
+          '<td>' + esc(p.questionText || 'Burdon Dikkat Testi') + '</td>' +
+          '<td>' + esc(burdonDurationLabel(p.durationSeconds)) + '</td>' +
+          '<td>' + esc((p.targetLetters || []).join(', ')) + '</td>' +
+          '<td><strong>' + (p.totalTargets || 0) + '</strong></td>' +
+          '<td>' + (p.rows || 0) + ' × ' + (p.perRow || 0) + '</td>' +
+          '<td>' + esc(p.addedBy || AUTHOR_NAME) + '</td>';
+      return '<tr data-pool-row="' + p.id + '">' + cells +
         '<td class="sy-td-act"><span class="tm-row-actions">' +
+          '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-pool-preview="' + p.id + '" title="Soruyu önizle" aria-label="Soruyu önizle">' + PREVIEW_ICON + '</button>' +
           '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-pool-info="' + p.id + '" title="Soru künyesi ve geçmişi" aria-label="Soru künyesi">' + INFO_ICON + '</button>' +
           '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-pool-edit="' + p.id + '" title="Düzenle" aria-label="Düzenle">' + EDIT_ICON + '</button>' +
           '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon tm-btn--danger" data-pool-del="' + p.id + '" title="Sil" aria-label="Sil">' + DEL_ICON + '</button>' +
@@ -1401,11 +1568,28 @@
       if (el.tagName === 'INPUT') el.addEventListener('input', (U && U.debounce) ? U.debounce(apply, 200) : apply);
       else el.addEventListener('change', apply);
     });
+    main.querySelectorAll('[data-pool-preview]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var pq2 = poolById(b.getAttribute('data-pool-preview'));
+        if (!pq2) return;
+        if (pq2.poolType === 'attention') { openBurdonPreview(pq2); return; }
+        openPreview([pq2], 'Soru Önizleme', 'Soru Havuzu · ' + poolCode(pq2));
+      });
+    });
     main.querySelectorAll('[data-pool-info]').forEach(function (b) { b.addEventListener('click', function () { openPoolDrawer(b.getAttribute('data-pool-info')); }); });
-    main.querySelectorAll('[data-pool-edit]').forEach(function (b) { b.addEventListener('click', function () { openPoolEditor(poolById(b.getAttribute('data-pool-edit'))); }); });
+    main.querySelectorAll('[data-pool-edit]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var pq2 = poolById(b.getAttribute('data-pool-edit'));
+        if (pq2 && pq2.poolType === 'attention') { openBurdonEditor(pq2, true); return; }
+        openPoolEditor(pq2);
+      });
+    });
     main.querySelectorAll('[data-pool-del]').forEach(function (b) { b.addEventListener('click', function () { confirmDeletePool(b.getAttribute('data-pool-del')); }); });
     var add = main.querySelector('[data-pool-add]');
-    if (add) add.addEventListener('click', function () { openPoolEditor(null); });
+    if (add) add.addEventListener('click', function () {
+      if (poolGroup === 'attention') { openBurdonEditor(null, true); return; }
+      openPoolEditor(null);
+    });
   }
   function confirmDeletePool(id) {
     var p = poolById(id); if (!p) return;
@@ -1496,102 +1680,102 @@
   }
   function cellHtml(label, val) { return '<div><div class="tm-detail-cell-label">' + esc(label) + '</div><div class="tm-detail-cell-value">' + val + '</div></div>'; }
 
-  /* ---- Havuz sorusu ekle / düzenle (değişiklikler geçmişe yazılır) ---- */
-  function openPoolEditor(p) {
-    var isNew = !p;
-    var isAcademic = poolGroup === 'academic';
-    var d = p ? JSON.parse(JSON.stringify(p)) : {
-      id: nowSeq('pool'), poolType: poolGroup, gradeLevel: '5',
-      subject: isAcademic ? 'mathematics' : undefined, section: 'numeric', topic: '', subTopic: '',
-      questionText: '', questionType: isAcademic ? 'multiple_choice' : 'multi_select_attention',
+  /* ---- Havuz sorusu ekle / düzenle ----
+     Sınav/ödev editörüyle AYNI kabuk: giriş yöntemi seçimi + 3 sekme
+     (Soru Bilgileri / Soru İçeriği / Cevap). Havuzda sınıf ve ders serbestçe seçilir. */
+  function poolSection() {
+    return poolGroup === 'attention'
+      ? { label: 'Soru Havuzu · Dikkat Soruları', hasSubject: false, hasMonth: false, hasWeek: false, hasQuarter: false, hasXp: false, attention: true, poolEditor: true }
+      : { label: 'Soru Havuzu · Akademik Sorular', hasSubject: true, hasMonth: false, hasWeek: false, hasQuarter: false, hasXp: false, attention: false, poolEditor: true };
+  }
+  function newPoolQuestion() {
+    var isAcademic = poolGroup !== 'attention';
+    return {
+      id: nowSeq('pool'), poolType: poolGroup, inputMode: 'manual',
+      gradeLevel: '5',
+      subject: isAcademic ? 'mathematics' : undefined,
+      section: 'numeric', topic: '', subTopic: '',
+      questionText: '', aboveImageHtml: '', belowImageHtml: '', resultHtml: '', imageUrl: null, vectorFileName: null,
+      questionType: isAcademic ? 'multiple_choice' : 'multi_select_attention',
       options: [{ id: 'A', text: '', isCorrect: true }, { id: 'B', text: '', isCorrect: false }, { id: 'C', text: '', isCorrect: false }, { id: 'D', text: '', isCorrect: false }],
       correctTextAnswer: '', correctNumberAnswer: null, caseSensitive: false, score: 10,
       attentionTaskType: 'find_target_letters', instruction: '', timeLimitSeconds: 60,
       allowMultipleSelection: true, targetItems: [], distractorItems: [], correctTargetsCount: 1,
-      addedBy: AUTHOR_NAME, createdAt: new Date().toISOString(), inputMode: 'manual'
+      addedBy: AUTHOR_NAME, createdAt: new Date().toISOString()
     };
+  }
+  function openPoolEditor(p) {
+    var s = poolSection();
+    var isNew = !p;
+    var d = p ? JSON.parse(JSON.stringify(p)) : newPoolQuestion();
+    d._isNew = isNew;
+    d._modeChosen = !isNew;
+    if (!d.inputMode) d.inputMode = 'manual';
     var existing = document.getElementById('syPoolEditModal');
     if (existing) existing.remove();
-    var meta = [];
-    meta.push(field('Sınıf Seviyesi', selEl('gradeLevel', d.gradeLevel, GRADES.map(function (g) { return { v: g, l: gradeLabel(g) }; })), true));
-    if (isAcademic) {
-      meta.push(field('Ders', selEl('subject', d.subject, SUBJECTS.map(function (x) { return { v: x.id, l: x.name }; })), true));
-      meta.push(field('Bölüm', autoValueHtml('section', SECTION_LABEL[d.section] || '—', 'Ders seçimine göre otomatik belirlenir')));
-      meta.push(wideField('Konu', topicSelectHtml('topic', topicsOf(d.gradeLevel, d.subject), d.topic, '— Konu seçin —')));
-      meta.push(wideField('Alt Konu', topicSelectHtml('subTopic', subtopicsOf(d.gradeLevel, d.subject, d.topic), d.subTopic, '— Alt konu seçin —')));
-      meta.push(wideField('Soru Tipi', selEl('questionType', d.questionType, [{ v: 'multiple_choice', l: '4 Seçenekli' }, { v: 'text_answer', l: 'Sözel Cevap' }, { v: 'number_answer', l: 'Sayısal Cevap' }]), true));
-    } else {
-      meta.push(wideField('Dikkat Görevi Tipi', selEl('attentionTaskType', d.attentionTaskType, ATTENTION_TASKS.map(function (a) { return { v: a.id, l: a.name }; })), true));
-    }
-    meta.push(field('Puan', inputEl('score', d.score, 'number')));
-
     var ov = document.createElement('div');
     ov.className = 'tm-crit-overlay is-open'; ov.id = 'syPoolEditModal';
     ov.innerHTML =
       '<div class="tm-crit-dialog tm-detail-modal sy-edit-modal" role="dialog" aria-modal="true">' +
         '<header class="tm-crit-head"><div class="tm-detail-modal-titles">' +
           '<h2 class="tm-crit-title">' + (isNew ? 'Havuza Yeni Soru' : 'Havuz Sorusunu Düzenle') + '</h2>' +
-          '<p class="tm-detail-modal-sub">Soru Havuzu · ' + esc(isAcademic ? 'Akademik Sorular' : 'Dikkat Soruları') + '</p>' +
+          '<p class="tm-detail-modal-sub">' + esc(s.label) + (isNew ? '' : ' · ' + esc(poolCode(d))) + '</p>' +
         '</div><button type="button" class="tm-drawer-close" data-close aria-label="Kapat">&times;</button></header>' +
-        '<div class="tm-detail-modal-body" data-pool-body>' +
-          '<div class="sy-edit-section"><h3 class="sy-edit-title">Soru Bilgileri</h3>' +
-            '<div class="tm-detail-grid tm-detail-grid--modal">' + meta.join('') + '</div></div>' +
-          '<div class="sy-edit-section"><h3 class="sy-edit-title">Soru İçeriği</h3>' +
-            '<label class="tm-form-field">' + fieldLabel('Soru Metni', true) +
-              '<textarea class="tm-dg-control" data-fld="questionText" rows="3">' + esc(d.questionText || '') + '</textarea></label>' +
-            (isAcademic ? '' : '<label class="tm-form-field">' + fieldLabel('Hedef Seçim Açıklaması') + '<textarea class="tm-dg-control" data-fld="instruction" rows="2">' + esc(d.instruction || '') + '</textarea></label>') +
-          '</div>' +
-          '<div class="sy-edit-section" data-answer-block><h3 class="sy-edit-title">Cevap</h3>' + answerBlock({ attention: !isAcademic }, d) + '</div>' +
-        '</div>' +
+        '<div class="tm-detail-modal-body" data-editor-body></div>' +
         '<footer class="tm-crit-foot"><button type="button" class="tm-btn tm-btn--ghost" data-close>İptal</button>' +
           '<button type="button" class="tm-btn tm-btn--primary" data-pool-save>Kaydet</button></footer>' +
       '</div>';
     document.body.appendChild(ov);
-    var body = ov.querySelector('[data-pool-body]');
-
-    // Ders/konu bağlantıları
-    var gradeSel = body.querySelector('[data-fld="gradeLevel"]');
-    var subjectSel = body.querySelector('[data-fld="subject"]');
-    var topicSel = body.querySelector('[data-fld="topic"]');
-    var subTopicSel = body.querySelector('[data-fld="subTopic"]');
-    function rebuildSubs() {
-      if (subTopicSel) fillTopicSelect(subTopicSel, subtopicsOf(gradeSel.value, subjectSel ? subjectSel.value : '', topicSel ? topicSel.value : ''), '', '— Alt konu seçin —');
-    }
-    function rebuildTopics() {
-      if (topicSel) fillTopicSelect(topicSel, topicsOf(gradeSel.value, subjectSel ? subjectSel.value : ''), '', '— Konu seçin —');
-      rebuildSubs();
-    }
-    if (gradeSel) gradeSel.addEventListener('change', rebuildTopics);
-    if (subjectSel) subjectSel.addEventListener('change', function () {
-      var sub = SUBJ[subjectSel.value]; var secEl = body.querySelector('[data-auto="section"] .sy-auto-text');
-      if (secEl && sub) secEl.textContent = SECTION_LABEL[sub.section];
-      rebuildTopics();
-    });
-    if (topicSel) topicSel.addEventListener('change', rebuildSubs);
-    var typeSel = body.querySelector('[data-fld="questionType"]');
-    if (typeSel) typeSel.addEventListener('change', function () {
-      d.questionType = typeSel.value;
-      body.querySelector('[data-answer-block]').innerHTML = '<h3 class="sy-edit-title">Cevap</h3>' + answerBlock({ attention: !isAcademic }, d);
-    });
+    var body = ov.querySelector('[data-editor-body]');
+    renderEditorBody(body, s, d);
 
     function close() { if (ov.parentNode) ov.remove(); document.removeEventListener('keydown', onKey); }
     function onKey(e) { if (e.key === 'Escape') close(); }
     document.addEventListener('keydown', onKey);
     ov.addEventListener('click', function (e) {
       if (e.target === ov || e.target.closest('[data-close]')) { close(); return; }
-      if (e.target.closest('[data-pool-save]')) { if (savePoolEditor(body, d, isNew, isAcademic)) close(); }
+      if (e.target.closest('[data-pool-save]')) { if (savePoolEditor(body, s, d, isNew)) close(); }
     });
   }
-  function savePoolEditor(body, d, isNew, isAcademic) {
+
+  function savePoolEditor(body, s, d, isNew) {
     var before = isNew ? null : poolById(d.id);
-    var qt = isAcademic ? (readVal(body, 'questionType') || d.questionType) : 'multi_select_attention';
+    var isAcademic = !s.attention;
+    var qt = s.attention ? 'multi_select_attention' : (readVal(body, 'questionType') || d.questionType);
+    var mode = readVal(body, 'inputMode') || d.inputMode || 'manual';
+
+    // İçerik: manuel modda zengin metin, vektörel modda dosya + kısa açıklama
+    var aboveHtml = '', belowHtml = '', resHtml = '', qText = '', vecName = null;
+    if (mode === 'vector') {
+      qText = (readVal(body, 'questionText') || '').trim();
+      vecName = (readVal(body, 'vectorFileName') || '').trim() || null;
+    } else {
+      aboveHtml = readRteHtml(body, 'aboveImageHtml');
+      belowHtml = readRteHtml(body, 'belowImageHtml');
+      resHtml = readRteHtml(body, 'resultHtml');
+      qText = readRteText(body, 'aboveImageHtml') || readRteText(body, 'belowImageHtml');
+    }
+
     var out = JSON.parse(JSON.stringify(isNew ? d : before));
-    out.poolType = isAcademic ? 'academic' : 'attention';
+    delete out._isNew; delete out._modeChosen;
+    out.poolType = poolGroup;
+    out.inputMode = mode;
+    out.vectorFileName = vecName;
     out.gradeLevel = readVal(body, 'gradeLevel');
-    out.questionText = (readVal(body, 'questionText') || '').trim();
+    out.questionText = qText;
+    out.aboveImageHtml = aboveHtml;
+    out.belowImageHtml = belowHtml;
+    out.resultHtml = resHtml;
+    out.imageUrl = (readVal(body, 'imageUrl') || '').trim() || null;
     out.score = parseInt(readVal(body, 'score'), 10) || 0;
     out.questionType = qt;
-    if (!out.questionText) { toast('Soru metni zorunludur.', 'error'); return false; }
+
+    if (!out.questionText && !(mode === 'vector' && out.imageUrl)) {
+      toast(mode === 'vector' ? 'Vektörel soru için dosya veya kısa açıklama gereklidir.' : 'Görsel üstü metin (soru metni) zorunludur.', 'error');
+      return false;
+    }
+    if (!out.questionText && out.imageUrl) out.questionText = 'Vektörel soru';
+
     if (isAcademic) {
       out.subject = readVal(body, 'subject');
       out.section = SUBJ[out.subject] ? SUBJ[out.subject].section : 'numeric';
@@ -1601,17 +1785,22 @@
       out.attentionTaskType = readVal(body, 'attentionTaskType') || d.attentionTaskType;
       out.instruction = (readVal(body, 'instruction') || '').trim();
     }
+
     out.options = []; out.correctTextAnswer = null; out.correctNumberAnswer = null;
     if (qt === 'multiple_choice') {
       var correct = body.querySelector('input[name="syCorrect"]:checked');
       var cid = correct ? correct.value : 'A';
-      out.options = ['A', 'B', 'C', 'D'].map(function (id) { var inp = body.querySelector('[data-opt="' + id + '"]'); return { id: id, text: inp ? inp.value.trim() : '', isCorrect: id === cid }; });
+      out.options = ['A', 'B', 'C', 'D'].map(function (id) {
+        var inp = body.querySelector('[data-opt="' + id + '"]');
+        return { id: id, text: inp ? inp.value.trim() : '', isCorrect: id === cid };
+      });
       if (out.options.every(function (o) { return !o.text; })) { toast('En az bir şık metni giriniz.', 'error'); return false; }
     } else if (qt === 'text_answer') {
       out.correctTextAnswer = (readVal(body, 'correctTextAnswer') || '').trim();
       out.caseSensitive = !!readVal(body, 'caseSensitive');
     } else if (qt === 'number_answer') {
-      var n = readVal(body, 'correctNumberAnswer'); out.correctNumberAnswer = n === '' || n == null ? null : Number(n);
+      var n = readVal(body, 'correctNumberAnswer');
+      out.correctNumberAnswer = n === '' || n == null ? null : Number(n);
     } else if (qt === 'multi_select_attention') {
       out.timeLimitSeconds = parseInt(readVal(body, 'timeLimitSeconds'), 10) || 60;
       out.allowMultipleSelection = !!readVal(body, 'allowMultipleSelection');
@@ -1621,18 +1810,21 @@
     }
 
     if (isNew) {
-      out.addedBy = AUTHOR_NAME; out.createdAt = new Date().toISOString();
+      out.addedBy = AUTHOR_NAME;
+      out.createdAt = new Date().toISOString();
       db.pool.push(out);
     } else {
-      // Değişen alanları geçmişe yaz (kim, eski → yeni).
+      // Değişen alanları geçmişe yaz: eski durum → yeni durum + değiştiren kişi
       var fields = [
         { f: 'gradeLevel', l: 'Sınıf Seviyesi', fmt: gradeLabel },
         { f: 'subject', l: 'Ders', fmt: function (v) { return SUBJ[v] ? SUBJ[v].name : v; } },
-        { f: 'topic', l: 'Konu' }, { f: 'subTopic', l: 'Alt Konu' },
+        { f: 'topic', l: 'Konu' },
+        { f: 'subTopic', l: 'Alt Konu' },
         { f: 'questionType', l: 'Tip', fmt: function (v) { return QTYPE_LABEL[v] || v; } },
         { f: 'score', l: 'Puan' },
         { f: 'attentionTaskType', l: 'Görev', fmt: function (v) { return ATASK[v] || v; } },
-        { f: 'questionText', l: 'Soru Metni' }
+        { f: 'questionText', l: 'Soru Metni' },
+        { f: 'inputMode', l: 'Giriş Yöntemi', fmt: function (v) { return v === 'vector' ? 'Vektörel' : 'Elle yazılmış'; } }
       ];
       fields.forEach(function (fd) {
         var a = before[fd.f], b = out[fd.f];
@@ -1830,12 +2022,66 @@
     KID: { color: '#0d9488', desc: 'Kavram İnşa Dersi haftalık ödevleri' },
     RUD: { color: '#7c3aed', desc: 'Rehberli Uygulama Dersi haftalık ödevleri' }
   };
-  function weeklyCount(grade, mode, subject, week) {
-    return db.questions.filter(function (q) {
+  /* Haftalık ödevler havuzdan DETERMİNİSTİK üretilir (23.040 kayıt depolanamaz).
+     Kural sabit olduğu için her açılışta aynı sorular gelir ve havuzla birebir tutarlıdır.
+     Kullanıcının düzenlediği/sildiği sorular ayrıca saklanır ve üretilenleri geçersiz kılar. */
+  var WEEKLY_PER_SUBJECT = 15;
+  var TERM_START = new Date(2026, 8, 14); // 14 Eylül 2026, Pazartesi
+  function weekRange(week) {
+    var s = new Date(TERM_START.getTime()); s.setDate(s.getDate() + (week - 1) * 7);
+    var e = new Date(s.getTime()); e.setDate(e.getDate() + 4); // Pzt–Cum
+    function d2(n) { return String(n).padStart(2, '0'); }
+    return { start: s, end: e, label: d2(s.getDate()) + '.' + d2(s.getMonth() + 1) + ' – ' + d2(e.getDate()) + '.' + d2(e.getMonth() + 1) + '.' + e.getFullYear() };
+  }
+  function weeklyPoolFor(grade, subject) {
+    return db.pool.filter(function (p) {
+      return (p.poolType || 'academic') === 'academic' && p.gradeLevel === grade && p.subject === subject;
+    });
+  }
+  function weeklyGenId(grade, mode, subject, week, i) { return 'wq-' + grade + '-' + mode + '-' + subject + '-' + week + '-' + (i + 1); }
+  function weeklyGenerated(grade, mode, subject, week) {
+    var cands = weeklyPoolFor(grade, subject);
+    if (!cands.length) return [];
+    var out = [];
+    var offset = ((week - 1) * 3 + (mode === 'KID' ? 0 : 5)) % cands.length;
+    for (var i = 0; i < WEEKLY_PER_SUBJECT; i++) {
+      var p = cands[(offset + i) % cands.length];
+      var q = JSON.parse(JSON.stringify(p));
+      delete q.poolType; delete q.createdAt;
+      q.poolId = p.id;
+      q.id = weeklyGenId(grade, mode, subject, week, i);
+      q.contentType = 'weekly_homework';
+      q.gradeLevel = grade; q.lessonMode = mode; q.subject = subject; q.educationWeek = week;
+      q.homeworkTitle = week + '. Hafta ' + (LMODE[mode] || mode) + ' ' + (SUBJ[subject] ? SUBJ[subject].name : '') + ' Ödevi';
+      q.order = i + 1;
+      q.isActive = true;
+      q.xp = 20;
+      q.generated = true;
+      out.push(q);
+    }
+    return out;
+  }
+  // Üretilenler + kullanıcı kayıtları (kullanıcı kaydı aynı id ile üretileni ezer)
+  function weeklyResolved(grade, mode, subject, week) {
+    var real = db.questions.filter(function (q) {
       return q.contentType === 'weekly_homework' && q.gradeLevel === grade &&
-        (!mode || q.lessonMode === mode) && (!subject || q.subject === subject) &&
-        (week == null || Number(q.educationWeek) === week);
-    }).length;
+        q.lessonMode === mode && q.subject === subject && Number(q.educationWeek) === week;
+    });
+    var byId = {}; real.forEach(function (r) { byId[r.id] = true; });
+    var gen = weeklyGenerated(grade, mode, subject, week).filter(function (g) {
+      return !byId[g.id] && !db.weeklyDeleted[g.id];
+    });
+    return real.concat(gen).sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+  }
+  // Sayımlar analitik hesaplanır (23k nesne üretmeden).
+  function weeklyCount(grade, mode, subject, week) {
+    if (mode && subject && week != null) return weeklyResolved(grade, mode, subject, week).length;
+    var perWeek = weeklyPoolFor(grade, subject || 'mathematics').length ? WEEKLY_PER_SUBJECT : 0;
+    if (mode && subject) return perWeek * WEEKS.length;
+    if (mode) {
+      return SUBJECTS.reduce(function (n, s) { return n + (weeklyPoolFor(grade, s.id).length ? WEEKLY_PER_SUBJECT * WEEKS.length : 0); }, 0);
+    }
+    return 0;
   }
   function renderModeCards(grade) {
     return '<div class="sy-exam-grid">' + LESSON_MODES.map(function (m) {
@@ -1865,13 +2111,19 @@
     }).join('') + '</div>';
   }
   function renderWeekCards(grade, mode, subject) {
-    return '<div class="sy-week-grid">' + WEEKS.map(function (n) {
+    // Kartlar ait oldukları dersin rengini taşısın.
+    var stl = subjectStyle(subject);
+    return '<div class="sy-week-grid" style="--sy-c:' + stl.color + '">' + WEEKS.map(function (n) {
       var cnt = weeklyCount(grade, mode, subject, n);
-      return '<button type="button" class="sy-week-card' + (cnt ? ' has-q' : '') + '" data-sy-week="' + n + '">' +
+      var wr = weekRange(n);
+      return '<div class="sy-week-card' + (cnt ? ' has-q' : '') + '" data-sy-week="' + n + '" role="button" tabindex="0">' +
         '<span class="sy-week-no">' + n + '</span>' +
         '<span class="sy-week-lbl">' + n + '. Hafta</span>' +
+        '<span class="sy-week-date">' + esc(wr.label) + '</span>' +
         '<span class="sy-week-cnt">' + cnt + ' soru</span>' +
-      '</button>';
+        '<button type="button" class="sy-week-pv" data-sy-week-preview="' + n + '" title="Bu haftayı önizle">' +
+          PREVIEW_ICON + '<span>Önizle</span></button>' +
+      '</div>';
     }).join('') + '</div>';
   }
   function weeklyCrumb(st) {
@@ -1935,11 +2187,580 @@
       el.addEventListener('click', open);
       el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
     });
+    main.querySelectorAll('[data-sy-week-preview]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var w = parseInt(el.getAttribute('data-sy-week-preview'), 10);
+        openPreview(weeklyResolved(st.grade, st.mode, st.subject, w),
+          w + '. Hafta · ' + (SUBJ[st.subject] ? SUBJ[st.subject].name : ''),
+          SECTIONS.weekly.label + ' · ' + gradeLabel(st.grade) + ' · ' + (LMODE[st.mode] || st.mode) + ' · ' + weekRange(w).label);
+      });
+    });
     main.querySelectorAll('[data-sy-week]').forEach(function (el) {
-      el.addEventListener('click', function () { st.week = parseInt(el.getAttribute('data-sy-week'), 10); renderSection(); pushNav(); });
+      function open() { st.week = parseInt(el.getAttribute('data-sy-week'), 10); renderSection(); pushNav(); }
+      el.addEventListener('click', open);
+      el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
     });
     var back = main.querySelector('[data-sy-wback]');
     if (back) back.addEventListener('click', function () { history.back(); });
+  }
+
+  /* ========================= BURDON DİKKAT TESTİ =========================
+     Klasik dikkat sorusundan farklı: süreli bir harf tablosu üzerinde hedef
+     harfleri (varsayılan A ve B) işaretleme testi. Sınıf seviyesi yoktur.
+     Toplam hedef sayısı tablodan HESAPLANIR (elle girilmez) ki puanlama tutarlı olsun. */
+  function burdonDefaults() {
+    return {
+      attentionTestType: 'burdon',
+      questionText: 'Burdon Dikkat Testi',
+      instruction: BURDON_INSTRUCTION,
+      durationSeconds: 300,
+      targetLetters: ['A', 'B'],
+      rows: 20, perRow: 30, targetRatio: 30,
+      allowBack: false,
+      gradeLevel: null,
+      seed: 20260914
+    };
+  }
+  // Deterministik üretim: aynı tohum → aynı tablo (her açılışta veri değişmesin).
+  function burdonRng(seed) {
+    var s = (seed >>> 0) || 1;
+    return function () {
+      s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0;
+      return s / 4294967296;
+    };
+  }
+  function buildBurdonGrid(o) {
+    var targets = (o.targetLetters || ['A', 'B']).map(function (x) { return String(x).toUpperCase(); }).filter(Boolean);
+    if (!targets.length) targets = ['A', 'B'];
+    var fillers = BURDON_LETTERS.filter(function (L) { return targets.indexOf(L) < 0; });
+    var rnd = burdonRng(o.seed);
+    var rows = Math.max(1, parseInt(o.rows, 10) || 20);
+    var perRow = Math.max(1, parseInt(o.perRow, 10) || 30);
+    var ratio = Math.min(80, Math.max(5, parseInt(o.targetRatio, 10) || 30));
+    var grid = [], rowTargets = [], total = 0;
+    for (var r = 0; r < rows; r++) {
+      var row = [], rt = 0;
+      for (var c = 0; c < perRow; c++) {
+        if (rnd() * 100 < ratio) { row.push(targets[Math.floor(rnd() * targets.length)]); rt++; }
+        else row.push(fillers[Math.floor(rnd() * fillers.length)]);
+      }
+      grid.push(row); rowTargets.push(rt); total += rt;
+    }
+    return { grid: grid, rowTargets: rowTargets, totalTargets: total };
+  }
+  function burdonRebuild(d) {
+    var g = buildBurdonGrid(d);
+    d.grid = g.grid; d.rowTargets = g.rowTargets; d.totalTargets = g.totalTargets;
+    return d;
+  }
+  function burdonDurationLabel(sec) {
+    var s = parseInt(sec, 10) || 0;
+    var m = Math.floor(s / 60), r = s % 60;
+    return m ? (m + ' dk' + (r ? ' ' + r + ' sn' : '')) : (s + ' sn');
+  }
+  function burdonGridHtml(d, marked) {
+    if (!d.grid || !d.grid.length) return '<p class="tm-empty">Harf tablosu henüz oluşturulmadı.</p>';
+    var targets = (d.targetLetters || []).map(function (x) { return String(x).toUpperCase(); });
+    return '<div class="sy-burdon-grid">' + d.grid.map(function (row, i) {
+      return '<div class="sy-burdon-row">' +
+        '<span class="sy-burdon-rowno">' + (i + 1) + '</span>' +
+        '<span class="sy-burdon-letters">' + row.map(function (L) {
+          var isT = targets.indexOf(L) >= 0;
+          return '<span class="sy-burdon-l' + (marked && isT ? ' is-target' : '') + '">' + esc(L) + '</span>';
+        }).join('') + '</span>' +
+        '<span class="sy-burdon-rowcnt">' + (d.rowTargets ? d.rowTargets[i] : '') + '</span>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+  // Puanlama kuralları — yalnızca panelde (soru yazarı/uygulayıcı) görünür.
+  function burdonScoringHtml(d) {
+    var total = d.totalTargets || 0;
+    return '<div class="sy-burdon-score">' +
+      '<p class="sy-burdon-note">Bu bölüm yalnızca panelde görünür; öğrenciye gösterilmez.</p>' +
+      '<div class="tm-detail-grid tm-detail-grid--modal">' +
+        cellHtml('Toplam Hedef Harf', '<strong>' + total + '</strong> (tablodan hesaplandı)') +
+        cellHtml('Hedef Harfler', esc((d.targetLetters || []).join(', '))) +
+        cellHtml('Süre', esc(burdonDurationLabel(d.durationSeconds))) +
+        cellHtml('Geri Dönüş', d.allowBack ? 'İzin veriliyor' : 'İzin verilmiyor') +
+      '</div>' +
+      '<table class="tm-inner-table sy-burdon-formulas"><thead><tr><th>Ölçüm</th><th>Formül</th><th>Örnek (' + total + ' hedef)</th></tr></thead><tbody>' +
+        '<tr><td>Doğru işaretleme</td><td>İşaretlenen hedef harf sayısı</td><td>150</td></tr>' +
+        '<tr><td>Atlama</td><td>Toplam hedef − doğru</td><td>' + total + ' − 150 = ' + Math.max(0, total - 150) + '</td></tr>' +
+        '<tr><td>Yanlış işaretleme</td><td>Hedef olmayan harflerin işaretlenmesi</td><td>12</td></tr>' +
+        '<tr><td>Net puan</td><td>Doğru − Yanlış</td><td>150 − 12 = 138</td></tr>' +
+        '<tr><td>Hata oranı</td><td>(Atlama + Yanlış) / Toplam hedef</td><td>' + (total ? '(' + Math.max(0, total - 150) + ' + 12) / ' + total + ' = %' + Math.round((Math.max(0, total - 150) + 12) / total * 100) : '—') + '</td></tr>' +
+      '</tbody></table>' +
+      '<div class="sy-burdon-interp">' +
+        '<h4>Satır Analizi</h4><ul>' +
+          '<li>İlk satırlar iyi, son satırlar kötü → dikkat sürdürülebilirliği sorunu</li>' +
+          '<li>İlk satırlar kötü, sonra açılma → uyum süresi problemi</li>' +
+          '<li>Dağınık hata dağılımı → dikkat dalgalanması</li>' +
+          '<li>Düzenli artan hata → mental yorgunluk</li>' +
+        '</ul>' +
+        '<h4>Yorumlama Profili</h4><ul>' +
+          '<li>Yavaş ama az hatalı → temkinli, kaygılı, mükemmeliyetçi</li>' +
+          '<li>Hızlı ama çok yanlış işaretleme → dürtüsel profil (DEHB hiperaktif tip)</li>' +
+          '<li>Çok atlama, az yanlış → dikkat eksikliği baskın profil</li>' +
+          '<li>Hem atlama hem yanlış yüksek → dağınık dikkat + kontrol zayıflığı</li>' +
+        '</ul>' +
+      '</div></div>';
+  }
+
+  function openBurdonEditor(q, isPool) {
+    var s = isPool ? { label: 'Soru Havuzu · Dikkat Soruları' } : SECTIONS[activeSection];
+    var isNew = !q;
+    var d = q ? JSON.parse(JSON.stringify(q)) : burdonRebuild(burdonDefaults());
+    if (!d.grid) burdonRebuild(d);
+    var existing = document.getElementById('syBurdonModal');
+    if (existing) existing.remove();
+    var ov = document.createElement('div');
+    ov.className = 'tm-crit-overlay is-open'; ov.id = 'syBurdonModal';
+    ov.innerHTML =
+      '<div class="tm-crit-dialog tm-detail-modal sy-preview-modal" role="dialog" aria-modal="true">' +
+        '<header class="tm-crit-head"><div class="tm-detail-modal-titles">' +
+          '<h2 class="tm-crit-title">' + (isNew ? 'Yeni Burdon Dikkat Testi' : 'Burdon Testini Düzenle') + '</h2>' +
+          '<p class="tm-detail-modal-sub">' + esc(s.label) + ' · Sınıf seviyesi yoktur</p>' +
+        '</div><button type="button" class="tm-drawer-close" data-close aria-label="Kapat">&times;</button></header>' +
+        '<div class="sy-tabs sy-pv-tabs">' +
+          '<button type="button" class="sy-tab-btn is-active" data-bd-tab="info">Test Bilgileri</button>' +
+          '<button type="button" class="sy-tab-btn" data-bd-tab="grid">Harf Tablosu</button>' +
+          '<button type="button" class="sy-tab-btn" data-bd-tab="score">Puanlama ve Yorum</button>' +
+        '</div>' +
+        '<div class="tm-detail-modal-body" data-bd-body></div>' +
+        '<footer class="tm-crit-foot"><button type="button" class="tm-btn tm-btn--ghost" data-close>İptal</button>' +
+          '<button type="button" class="tm-btn tm-btn--primary" data-bd-save>Kaydet</button></footer>' +
+      '</div>';
+    document.body.appendChild(ov);
+    var body = ov.querySelector('[data-bd-body]');
+    var tab = 'info';
+
+    function readForm() {
+      function v(sel) { var el = body.querySelector(sel); return el ? el.value : null; }
+      if (tab !== 'info') return;
+      d.questionText = (v('[data-bd="title"]') || '').trim() || 'Burdon Dikkat Testi';
+      d.instruction = (v('[data-bd="instruction"]') || '').trim();
+      d.durationSeconds = (parseInt(v('[data-bd="minutes"]'), 10) || 5) * 60;
+      d.targetLetters = (v('[data-bd="targets"]') || 'A,B').split(',').map(function (x) { return x.trim().toUpperCase(); }).filter(Boolean);
+      d.rows = parseInt(v('[data-bd="rows"]'), 10) || 20;
+      d.perRow = parseInt(v('[data-bd="perRow"]'), 10) || 30;
+      d.targetRatio = parseInt(v('[data-bd="ratio"]'), 10) || 30;
+      var ab = body.querySelector('[data-bd="allowBack"]');
+      d.allowBack = ab ? ab.checked : false;
+    }
+    function draw() {
+      if (tab === 'info') {
+        body.innerHTML =
+          '<div class="tm-detail-grid tm-detail-grid--modal">' +
+            field('Test Adı', '<input class="tm-dg-control" data-bd="title" value="' + esc(d.questionText) + '">', true) +
+            field('Süre (dakika)', '<input class="tm-dg-control" type="number" min="1" max="30" data-bd="minutes" value="' + (Math.round((d.durationSeconds || 300) / 60)) + '">', true) +
+            field('Hedef Harfler (virgülle)', '<input class="tm-dg-control" data-bd="targets" value="' + esc((d.targetLetters || []).join(', ')) + '">', true) +
+            field('Hedef Yoğunluğu (%)', '<input class="tm-dg-control" type="number" min="5" max="80" data-bd="ratio" value="' + (d.targetRatio || 30) + '">') +
+            field('Satır Sayısı', '<input class="tm-dg-control" type="number" min="1" max="40" data-bd="rows" value="' + (d.rows || 20) + '">') +
+            field('Satır Başına Harf', '<input class="tm-dg-control" type="number" min="5" max="60" data-bd="perRow" value="' + (d.perRow || 30) + '">') +
+            field('Toplam Hedef Harf', autoValueHtml('burdonTotal', String(d.totalTargets || 0), 'Harf tablosundan hesaplanır')) +
+            '<label class="tm-form-field tm-form-check"><input type="checkbox" data-bd="allowBack"' + (d.allowBack ? ' checked' : '') + '> Geri dönüp düzeltmeye izin ver</label>' +
+          '</div>' +
+          '<label class="tm-form-field">' + fieldLabel('Yönerge (teste başlamadan okunur)', true) +
+            '<textarea class="tm-dg-control" data-bd="instruction" rows="3">' + esc(d.instruction || '') + '</textarea></label>' +
+          '<p class="sy-hint">Burdon testinin sınıf seviyesi yoktur; tüm kademelerde aynı biçimde uygulanır.</p>';
+      } else if (tab === 'grid') {
+        body.innerHTML =
+          '<div class="sy-burdon-bar">' +
+            '<span><strong>' + (d.totalTargets || 0) + '</strong> hedef harf · ' + (d.rows || 0) + ' satır × ' + (d.perRow || 0) + ' harf · Süre: ' + esc(burdonDurationLabel(d.durationSeconds)) + '</span>' +
+            '<button type="button" class="tm-btn tm-btn--sm sy-btn-pick" data-bd-regen>Tabloyu Yeniden Üret</button>' +
+          '</div>' +
+          '<p class="sy-hint">Hedef harfler vurgulanmıştır; öğrenciye vurgusuz gösterilir. Sağdaki sayılar satırdaki hedef sayısıdır (satır analizi için).</p>' +
+          burdonGridHtml(d, true);
+      } else {
+        body.innerHTML = burdonScoringHtml(d);
+      }
+    }
+    draw();
+
+    function close() { if (ov.parentNode) ov.remove(); document.removeEventListener('keydown', onKey); }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    document.addEventListener('keydown', onKey);
+    ov.addEventListener('click', function (e) {
+      if (e.target === ov || e.target.closest('[data-close]')) { close(); return; }
+      var tb = e.target.closest('[data-bd-tab]');
+      if (tb) {
+        readForm();
+        tab = tb.getAttribute('data-bd-tab');
+        ov.querySelectorAll('[data-bd-tab]').forEach(function (b) { b.classList.toggle('is-active', b === tb); });
+        draw();
+        return;
+      }
+      if (e.target.closest('[data-bd-regen]')) {
+        d.seed = (d.seed || 1) + 7919;
+        burdonRebuild(d);
+        draw();
+        toast('Harf tablosu yeniden üretildi (' + d.totalTargets + ' hedef).');
+        return;
+      }
+      if (e.target.closest('[data-bd-save]')) {
+        readForm();
+        if (!d.targetLetters.length) { toast('En az bir hedef harf giriniz.', 'error'); return; }
+        burdonRebuild(d);
+        var out = JSON.parse(JSON.stringify(d));
+        out.attentionTestType = 'burdon';
+        out.gradeLevel = null;              // Burdon'un sınıf seviyesi yok
+        out.questionType = 'burdon_attention';
+        out.isActive = out.isActive !== false;
+        out.addedBy = out.addedBy || AUTHOR_NAME;
+        out.inputMode = 'manual';
+        if (isPool) {
+          out.poolType = 'attention';
+          delete out.contentType; delete out.poolId; delete out.order;
+          if (isNew) { out.id = nowSeq('pool'); out.createdAt = new Date().toISOString(); db.pool.push(out); }
+          else { var pidx = db.pool.findIndex(function (x) { return x.id === out.id; }); if (pidx >= 0) db.pool[pidx] = out; else db.pool.push(out); }
+          saveDb(); renderPool(); close();
+          toast(isNew ? 'Dikkat testi havuza eklendi (' + out.totalTargets + ' hedef harf).' : 'Havuzdaki test güncellendi.');
+          return;
+        }
+        out.contentType = SECTIONS[activeSection].contentType;
+        if (isNew) {
+          out.id = nowSeq('question');
+          var orders = attentionTests(activeSection).map(function (x) { return x.order || 0; });
+          out.order = (orders.length ? Math.max.apply(null, orders) : 0) + 1;
+          db.questions.push(out);
+        } else {
+          var idx = db.questions.findIndex(function (x) { return x.id === out.id; });
+          if (idx >= 0) db.questions[idx] = out; else db.questions.push(out);
+        }
+        saveDb(); renderSection(); close();
+        toast(isNew ? 'Burdon testi eklendi (' + out.totalTargets + ' hedef harf).' : 'Burdon testi güncellendi.');
+      }
+    });
+  }
+
+  // Burdon testinin önizlemesi (yönerge + tablo + puanlama)
+  function openBurdonPreview(d) {
+    var existing = document.getElementById('syPreviewModal');
+    if (existing) existing.remove();
+    var ov = document.createElement('div');
+    ov.className = 'tm-crit-overlay is-open'; ov.id = 'syPreviewModal'; ov.style.zIndex = '9700';
+    ov.innerHTML =
+      '<div class="tm-crit-dialog tm-detail-modal sy-preview-modal" role="dialog" aria-modal="true">' +
+        '<header class="tm-crit-head"><div class="tm-detail-modal-titles">' +
+          '<h2 class="tm-crit-title">' + esc(d.questionText || 'Burdon Dikkat Testi') + '</h2>' +
+          '<p class="tm-detail-modal-sub">' + esc(burdonDurationLabel(d.durationSeconds)) + ' · ' + (d.totalTargets || 0) + ' hedef harf · Hedef: ' + esc((d.targetLetters || []).join(', ')) + '</p>' +
+        '</div><button type="button" class="tm-drawer-close" data-close aria-label="Kapat">&times;</button></header>' +
+        '<div class="sy-tabs sy-pv-tabs">' +
+          '<button type="button" class="sy-tab-btn is-active" data-bp-tab="test">Öğrenci Görünümü</button>' +
+          '<button type="button" class="sy-tab-btn" data-bp-tab="score">Puanlama ve Yorum</button>' +
+        '</div>' +
+        '<div class="tm-detail-modal-body" data-bp-body></div>' +
+        '<footer class="tm-crit-foot"><button type="button" class="tm-btn tm-btn--primary" data-close>Kapat</button></footer>' +
+      '</div>';
+    document.body.appendChild(ov);
+    var body = ov.querySelector('[data-bp-body]');
+    function draw(which) {
+      if (which === 'score') { body.innerHTML = burdonScoringHtml(d); return; }
+      body.innerHTML =
+        '<div class="sy-burdon-instr"><strong>Yönerge:</strong> ' + esc(d.instruction || '') + '</div>' +
+        '<div class="sy-burdon-bar"><span>Süre: ' + esc(burdonDurationLabel(d.durationSeconds)) +
+          ' · Geri dönüş: ' + (d.allowBack ? 'serbest' : 'yok') + '</span></div>' +
+        burdonGridHtml(d, false);
+    }
+    draw('test');
+    function close() { if (ov.parentNode) ov.remove(); document.removeEventListener('keydown', onKey); }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    document.addEventListener('keydown', onKey);
+    ov.addEventListener('click', function (e) {
+      if (e.target === ov || e.target.closest('[data-close]')) { close(); return; }
+      var tb = e.target.closest('[data-bp-tab]');
+      if (tb) {
+        ov.querySelectorAll('[data-bp-tab]').forEach(function (b) { b.classList.toggle('is-active', b === tb); });
+        draw(tb.getAttribute('data-bp-tab'));
+      }
+    });
+  }
+
+  /* ---- Dikkat Testi bölümleri: Burdon test kartları ---- */
+  function attentionTests(key) {
+    return db.questions.filter(function (q) {
+      return q.contentType === SECTIONS[key].contentType;
+    }).sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+  }
+  function renderAttentionCards() {
+    var main = document.getElementById('syMain');
+    var key = activeSection;
+    var s = SECTIONS[key];
+    var tests = attentionTests(key);
+    var cards = tests.map(function (t, i) {
+      var st = t.isActive ? 'published' : 'editing';
+      return '<article class="tm-dash-card sy-exam-card sy-burdon-card" data-bd-open="' + t.id + '" role="button" tabindex="0">' +
+        '<div class="tm-dash-card-head"><h2 class="tm-dash-card-title">' + esc(t.questionText || ('Burdon Dikkat Testi ' + (i + 1))) + '</h2>' +
+          (t.isActive
+            ? '<span class="tm-badge tm-badge--green sy-status-badge">' + CHECK_ICON + ' Yayında</span>'
+            : '<span class="tm-badge tm-badge--orange sy-status-badge">' + PENCIL_ICON + ' Düzenleniyor</span>') +
+        '</div>' +
+        '<div class="sy-exam-meta"><span><strong>' + (t.totalTargets || 0) + '</strong> hedef harf</span></div>' +
+        '<div class="sy-exam-sched">' +
+          '<span><span class="sy-sched-lbl">Süre:</span> ' + esc(burdonDurationLabel(t.durationSeconds)) + '</span>' +
+          '<span><span class="sy-sched-lbl">Hedef:</span> ' + esc((t.targetLetters || []).join(', ')) + '</span>' +
+          (s.hasQuarter && t.quarter ? '<span><span class="sy-sched-lbl">Dönem:</span> ' + esc(QUARTER[t.quarter] || t.quarter) + '</span>' : '') +
+        '</div>' +
+        '<div class="sy-exam-foot">' +
+          '<button type="button" class="tm-btn tm-btn--ghost tm-btn--sm sy-exam-toggle" data-bd-toggle="' + t.id + '">' +
+            (t.isActive ? 'Taslağa al' : 'Yayına al') + '</button>' +
+          '<span class="sy-exam-tools">' +
+            '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-bd-preview="' + t.id + '" title="Testi önizle">' + PREVIEW_ICON + '</button>' +
+            '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-bd-edit="' + t.id + '" title="Testi düzenle">' + EDIT_ICON + '</button>' +
+            '<button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon tm-btn--danger" data-bd-del="' + t.id + '" title="Testi sil">' + DEL_ICON + '</button>' +
+          '</span>' +
+          '<span class="tm-btn tm-btn--primary tm-btn--sm sy-exam-open-btn" data-bd-open="' + t.id + '">Testi Aç &rarr;</span>' +
+        '</div>' +
+      '</article>';
+    }).join('');
+    cards += '<button type="button" class="sy-exam-card sy-exam-add" data-bd-new>' +
+      '<span class="sy-exam-add-plus">+</span><span>Yeni Burdon Testi</span></button>';
+
+    main.innerHTML =
+      '<div class="sy-page-head"><h1 class="sy-page-title">' + esc(s.label) + '</h1>' +
+        '<p class="sy-page-sub">' + esc(s.desc) + ' Burdon testinin sınıf seviyesi yoktur.</p></div>' +
+      '<section class="tm-panel tm-panel--datagrid sy-panel">' +
+        '<div class="tm-dg-toolbar"><div class="tm-dg-toolbar-row sy-filter-row">' +
+          '<span class="tm-dg-spacer"></span>' +
+          '<button type="button" class="tm-btn tm-btn--sm sy-btn-pick sy-btn-pick--main" data-bd-pick>&#9776; Havuzdan Test Seç</button>' +
+          '<span class="tm-dg-count">' + tests.length + ' test</span>' +
+        '</div></div>' +
+        '<div class="sy-list">' + '<div class="sy-exam-grid">' + cards + '</div>' + '</div>' +
+      '</section>';
+    bindAttentionCards(main);
+  }
+  function bindAttentionCards(main) {
+    function byId(id) { return db.questions.find(function (x) { return x.id === id; }); }
+    main.querySelectorAll('[data-bd-open]').forEach(function (el) {
+      function open() { var t = byId(el.getAttribute('data-bd-open')); if (t) openBurdonPreview(t); }
+      el.addEventListener('click', open);
+      el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    });
+    main.querySelectorAll('[data-bd-preview]').forEach(function (el) {
+      el.addEventListener('click', function (e) { e.stopPropagation(); var t = byId(el.getAttribute('data-bd-preview')); if (t) openBurdonPreview(t); });
+    });
+    main.querySelectorAll('[data-bd-edit]').forEach(function (el) {
+      el.addEventListener('click', function (e) { e.stopPropagation(); var t = byId(el.getAttribute('data-bd-edit')); if (t) openBurdonEditor(t); });
+    });
+    main.querySelectorAll('[data-bd-del]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var t = byId(el.getAttribute('data-bd-del')); if (!t) return;
+        function doDel() {
+          db.questions = db.questions.filter(function (x) { return x.id !== t.id; });
+          saveDb(); renderSection(); toast('Test silindi.');
+        }
+        var warn = '“' + (t.questionText || 'Burdon testi') + '” testini silmek istediğinize emin misiniz?';
+        if (Confirm) Confirm.open({ title: 'Testi sil', warning: warn, requireReason: false, confirmLabel: 'Sil', cancelLabel: 'Vazgeç', danger: true, onConfirm: doDel });
+        else if (window.confirm(warn)) doDel();
+      });
+    });
+    main.querySelectorAll('[data-bd-toggle]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var t = byId(el.getAttribute('data-bd-toggle')); if (!t) return;
+        var toPublish = !t.isActive;
+        function apply() { t.isActive = toPublish; saveDb(); renderSection(); toast(toPublish ? 'Test yayına alındı.' : 'Test taslağa alındı.'); }
+        if (Confirm) Confirm.open({
+          title: toPublish ? 'Testi yayına al' : 'Testi taslağa al',
+          warning: '“' + (t.questionText || '') + '” testini ' + (toPublish ? 'yayına almak' : 'taslağa almak') + ' istediğinize emin misiniz?',
+          requireReason: false, confirmLabel: toPublish ? 'Yayına al' : 'Taslağa al', cancelLabel: 'Vazgeç', danger: !toPublish, onConfirm: apply
+        });
+        else apply();
+      });
+    });
+    var nw = main.querySelector('[data-bd-new]');
+    if (nw) nw.addEventListener('click', function () { openBurdonEditor(null); });
+    var pk = main.querySelector('[data-bd-pick]');
+    if (pk) pk.addEventListener('click', function () { openBurdonPicker(); });
+  }
+
+  /* ---- Havuzdan Burdon testi seçme ---- */
+  function openBurdonPicker() {
+    var s = SECTIONS[activeSection];
+    var used = {};
+    db.questions.forEach(function (q) { if (q.contentType === s.contentType && q.poolId) used[q.poolId] = true; });
+    var cands = db.pool.filter(function (p) { return p.poolType === 'attention' && !used[p.id]; });
+    var selected = {};
+    var existing = document.getElementById('syPickModal');
+    if (existing) existing.remove();
+    var ov = document.createElement('div');
+    ov.className = 'tm-crit-overlay is-open'; ov.id = 'syPickModal';
+    ov.innerHTML =
+      '<div class="tm-crit-dialog tm-detail-modal sy-pick-modal" role="dialog" aria-modal="true">' +
+        '<header class="tm-crit-head"><div class="tm-detail-modal-titles">' +
+          '<h2 class="tm-crit-title">Havuzdan Dikkat Testi Seç</h2>' +
+          '<p class="tm-detail-modal-sub">' + esc(s.label) + ' · Soru Havuzu › Dikkat Soruları</p>' +
+        '</div><button type="button" class="tm-drawer-close" data-close aria-label="Kapat">&times;</button></header>' +
+        '<div class="tm-detail-modal-body">' +
+          (cands.length
+            ? '<div class="tm-res-table-wrap"><table class="tm-res-table sy-table sy-pick-table"><thead><tr>' +
+                '<th class="sy-pick-cb"></th><th class="sy-col-id">Test ID</th><th>Test Adı</th><th>Süre</th><th>Hedef Harfler</th><th>Toplam Hedef</th><th>Önizle</th>' +
+              '</tr></thead><tbody>' + cands.map(function (p) {
+                return '<tr data-pick-row="' + p.id + '">' +
+                  '<td class="sy-pick-cb"><input type="checkbox" data-pick value="' + p.id + '"></td>' +
+                  '<td class="sy-col-id"><code class="tm-res-code-cell">' + esc(poolCode(p)) + '</code></td>' +
+                  '<td>' + esc(p.questionText || '') + '</td>' +
+                  '<td>' + esc(burdonDurationLabel(p.durationSeconds)) + '</td>' +
+                  '<td>' + esc((p.targetLetters || []).join(', ')) + '</td>' +
+                  '<td>' + (p.totalTargets || 0) + '</td>' +
+                  '<td class="sy-td-act"><button type="button" class="tm-btn tm-btn--sm tm-btn--ghost tm-btn--icon" data-pick-preview="' + p.id + '" title="Önizle">' + PREVIEW_ICON + '</button></td>' +
+                '</tr>';
+              }).join('') + '</tbody></table></div>'
+            : '<p class="tm-empty sy-empty">Havuzda bu bölüme eklenmemiş dikkat testi bulunmuyor.</p>') +
+        '</div>' +
+        '<footer class="tm-crit-foot"><span class="tm-dg-count" data-pick-count>0 test seçildi</span>' +
+          '<span class="tm-dg-spacer"></span>' +
+          '<button type="button" class="tm-btn tm-btn--ghost" data-close>Vazgeç</button>' +
+          '<button type="button" class="tm-btn tm-btn--primary" data-pick-add>Seçilenleri Ekle</button></footer>' +
+      '</div>';
+    document.body.appendChild(ov);
+    function count() { return Object.keys(selected).filter(function (k) { return selected[k]; }).length; }
+    function refresh() { ov.querySelector('[data-pick-count]').textContent = count() + ' test seçildi'; }
+    function close() { if (ov.parentNode) ov.remove(); document.removeEventListener('keydown', onKey); }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    document.addEventListener('keydown', onKey);
+    ov.addEventListener('change', function (e) {
+      var cb = e.target.closest('[data-pick]'); if (!cb) return;
+      selected[cb.value] = cb.checked; refresh();
+    });
+    ov.addEventListener('click', function (e) {
+      if (e.target === ov || e.target.closest('[data-close]')) { close(); return; }
+      var pvb = e.target.closest('[data-pick-preview]');
+      if (pvb) { e.stopPropagation(); var pp = poolById(pvb.getAttribute('data-pick-preview')); if (pp) openBurdonPreview(pp); return; }
+      var row = e.target.closest('[data-pick-row]');
+      if (row && !e.target.closest('[data-pick]')) {
+        var box = row.querySelector('[data-pick]');
+        if (box) { box.checked = !box.checked; selected[box.value] = box.checked; refresh(); }
+        return;
+      }
+      if (e.target.closest('[data-pick-add]')) {
+        var ids = Object.keys(selected).filter(function (k) { return selected[k]; });
+        if (!ids.length) { toast('En az bir test seçiniz.', 'error'); return; }
+        function doAdd() {
+          var orders = attentionTests(activeSection).map(function (x) { return x.order || 0; });
+          var next = (orders.length ? Math.max.apply(null, orders) : 0) + 1;
+          ids.forEach(function (pid2) {
+            var p = poolById(pid2); if (!p) return;
+            var b = JSON.parse(JSON.stringify(p));
+            delete b.poolType; delete b.createdAt;
+            b.id = nowSeq('question');
+            b.poolId = p.id;
+            b.contentType = s.contentType;
+            b.gradeLevel = null;
+            b.isActive = true;
+            b.order = next++;
+            if (s.hasQuarter) b.quarter = b.quarter || 'q1';
+            db.questions.push(b);
+          });
+          saveDb(); renderSection(); close();
+          toast(ids.length + ' dikkat testi havuzdan eklendi.');
+        }
+        var warn = ids.length + ' testi “' + s.label + '” bölümüne eklemek istediğinize emin misiniz?';
+        if (Confirm) Confirm.open({ title: 'Testleri ekle', warning: warn, requireReason: false, confirmLabel: 'Ekle', cancelLabel: 'Vazgeç', onConfirm: doAdd });
+        else doAdd();
+      }
+    });
+  }
+
+  /* ---- Materyal sorusu künyesi + değişiklik geçmişi (sağ drawer) ----
+     İçerik havuzdan geldiği için geçmiş iki kaynaktan birleştirilir:
+     "Havuz" (sorunun kendisinde yapılan değişiklikler) ve
+     "Bu materyal" (sınav/ödev içindeki sıra, durum gibi yerel değişiklikler). */
+  function questionHistoryOf(q) {
+    var rows = [];
+    (db.poolHistory || []).forEach(function (h) {
+      if (q.poolId && h.questionId === q.poolId) rows.push({ src: 'Havuz', h: h });
+    });
+    (db.questionHistory || []).forEach(function (h) {
+      if (h.questionId === q.id) rows.push({ src: 'Bu materyal', h: h });
+    });
+    return rows.sort(function (a, b) { return String(b.h.changedAt).localeCompare(String(a.h.changedAt)); });
+  }
+  function logQuestionChange(questionId, field, label, prev, next) {
+    db.questionHistory.push({
+      id: nowSeq('qlog'), questionId: questionId, field: field, label: label,
+      previousValue: prev == null ? '' : String(prev), newValue: next == null ? '' : String(next),
+      changedBy: AUTHOR_NAME, changedAt: new Date().toISOString()
+    });
+  }
+  function openQuestionDrawer(id) {
+    var q = findQ(id); if (!q) return;
+    var src = q.poolId ? poolById(q.poolId) : null;
+    var hist = questionHistoryOf(q);
+    var usage = q.poolId ? poolUsage(q.poolId) : [];
+    var existing = document.getElementById('syQuestionDrawer');
+    if (existing) existing.remove();
+
+    var infoHtml = '<div class="tm-detail-grid tm-detail-grid--modal">' +
+      cellHtml('Soru ID', '<code class="tm-res-code-cell">' + esc(qCode(q)) + '</code>') +
+      cellHtml('Havuz Kaydı', src ? '<code class="tm-res-code-cell">' + esc(poolCode(src)) + '</code>' : '—') +
+      cellHtml('Sınıf Seviyesi', esc(q.gradeLevel ? gradeLabel(q.gradeLevel) : '—')) +
+      cellHtml('Ders', esc(SUBJ[q.subject] ? SUBJ[q.subject].name : '—')) +
+      cellHtml('Konu', esc(q.topic || '—')) +
+      cellHtml('Alt Konu', esc(q.subTopic || '—')) +
+      cellHtml('Tip', esc(QTYPE_LABEL[q.questionType] || q.questionType)) +
+      cellHtml('Puan', String(q.score != null ? q.score : '—')) +
+      cellHtml('Cevap', esc(correctText(q))) +
+      cellHtml('Sıra', String(q.order || '—')) +
+      cellHtml('Durum', activeBadge(q)) +
+      cellHtml('Ekleyen Kişi', esc(q.addedBy || AUTHOR_NAME)) +
+      '</div>';
+
+    var histHtml = hist.length
+      ? '<table class="tm-inner-table"><thead><tr><th>Tarih & Saat</th><th>Değiştiren</th><th>Kaynak</th><th>Alan</th><th>Eski Durum</th><th>Yeni Durum</th></tr></thead><tbody>' +
+        hist.map(function (r) {
+          return '<tr><td>' + esc(fmtDateTime(r.h.changedAt)) + '</td><td>' + esc(r.h.changedBy) + '</td>' +
+            '<td><span class="tm-badge ' + (r.src === 'Havuz' ? 'tm-badge--blue' : 'tm-badge--muted') + '">' + esc(r.src) + '</span></td>' +
+            '<td>' + esc(r.h.label) + '</td>' +
+            '<td><span class="tm-audit-old">' + esc(r.h.previousValue === '' ? '—' : r.h.previousValue) + '</span></td>' +
+            '<td><span class="tm-audit-new">' + esc(r.h.newValue === '' ? '—' : r.h.newValue) + '</span></td></tr>';
+        }).join('') + '</tbody></table>'
+      : '<p class="tm-empty">Bu soruda henüz değişiklik yapılmamış.</p>';
+
+    var useHtml = usage.length
+      ? '<table class="tm-inner-table"><thead><tr><th>Materyal</th><th>Ayrıntı</th><th>Sınıf</th><th>Ders</th><th>Durum</th></tr></thead><tbody>' +
+        usage.map(function (u) {
+          return '<tr><td>' + esc(u.material) + '</td><td>' + esc(u.detail) + '</td><td>' + esc(u.grade) + '</td><td>' + esc(u.subject) + '</td>' +
+            '<td>' + (u.status ? '<span class="tm-badge tm-badge--green">Aktif</span>' : '<span class="tm-badge tm-badge--muted">Pasif</span>') + '</td></tr>';
+        }).join('') + '</tbody></table>'
+      : '<p class="tm-empty">Bu soru başka bir materyalde kullanılmıyor.</p>';
+
+    var ov = document.createElement('div');
+    ov.className = 'tm-drawer-overlay'; ov.id = 'syQuestionDrawer';
+    ov.innerHTML =
+      '<aside class="tm-drawer" role="dialog" aria-modal="true">' +
+        '<header class="tm-drawer-head"><div>' +
+          '<h2 class="tm-drawer-title">' + esc(qCode(q)) + '</h2>' +
+          '<p class="tm-drawer-sub">' + esc((q.questionText || '').slice(0, 90)) + '</p>' +
+        '</div><button type="button" class="tm-drawer-close" data-close aria-label="Kapat">&times;</button></header>' +
+        '<div class="tm-drawer-tabs">' +
+          '<button type="button" class="tm-drawer-tab is-active" data-qtab="info">Soru Bilgileri</button>' +
+          '<button type="button" class="tm-drawer-tab" data-qtab="history">Değişiklik Geçmişi' + (hist.length ? ' (' + hist.length + ')' : '') + '</button>' +
+          '<button type="button" class="tm-drawer-tab" data-qtab="usage">Kullanıldığı Materyaller' + (usage.length ? ' (' + usage.length + ')' : '') + '</button>' +
+        '</div>' +
+        '<div class="tm-drawer-body">' +
+          '<div data-qpane="info">' + infoHtml + '</div>' +
+          '<div data-qpane="history" hidden>' + histHtml + '</div>' +
+          '<div data-qpane="usage" hidden>' + useHtml + '</div>' +
+        '</div>' +
+      '</aside>';
+    document.body.appendChild(ov);
+    void ov.offsetWidth;
+    ov.classList.add('is-open');
+    function close() { ov.classList.remove('is-open'); document.removeEventListener('keydown', onKey); setTimeout(function () { if (ov.parentNode) ov.remove(); }, 250); }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    document.addEventListener('keydown', onKey);
+    ov.addEventListener('click', function (e) {
+      if (e.target === ov || e.target.closest('[data-close]')) { close(); return; }
+      var tab = e.target.closest('[data-qtab]');
+      if (tab) {
+        var id2 = tab.getAttribute('data-qtab');
+        ov.querySelectorAll('[data-qtab]').forEach(function (t) { t.classList.toggle('is-active', t === tab); });
+        ov.querySelectorAll('[data-qpane]').forEach(function (p) { p.hidden = p.getAttribute('data-qpane') !== id2; });
+      }
+    });
   }
 
   /* ----------------------------- Bölüm render ----------------------------- */
@@ -1948,6 +2769,7 @@
     var s = SECTIONS[activeSection];
     if (s.poolFlow) { renderPool(); return; }
     if (s.weeklyFlow) { renderWeekly(); return; }
+    if (s.attentionFlow) { renderAttentionCards(); return; }
 
     // Sınav akışı: sınav seçilmemiş → sınav kartları; ders seçilmemiş → ders kartları; seçilmiş → sorular.
     var st = ES();
@@ -2171,7 +2993,10 @@
       el.addEventListener('click', function (e) {
         e.stopPropagation();
         var no = parseInt(el.getAttribute('data-sy-exam-preview'), 10);
-        openPreview(examQuestionsOrdered(key, st.grade, no), examNameOf(key, st.grade, no), SECTIONS[key].label + ' · ' + gradeLabel(st.grade));
+        var all = examQuestionsOrdered(key, st.grade, no);
+        openPreview(null, examNameOf(key, st.grade, no),
+          SECTIONS[key].label + ' · ' + gradeLabel(st.grade) + ' · ' + all.length + ' soru',
+          sectionGroups(all));
       });
     });
     main.querySelectorAll('[data-sy-exam-info]').forEach(function (el) {
@@ -2251,17 +3076,38 @@
     if (addBtn) addBtn.addEventListener('click', function () { openEditor(null); });
     var pickBtn = main.querySelector('[data-sy-pick]');
     if (pickBtn) pickBtn.addEventListener('click', function () { openPoolPicker(); });
+    var bdBtn = main.querySelector('[data-sy-burdon-add]');
+    if (bdBtn) bdBtn.addEventListener('click', function () { openBurdonEditor(null); });
     main.querySelectorAll('[data-sy-preview]').forEach(function (b) {
       b.addEventListener('click', function () {
         var q = findQ(b.getAttribute('data-sy-preview'));
-        if (q) openPreview([q], 'Soru Önizleme', editorContextLabel(SECTIONS[activeSection]));
+        if (!q) return;
+        if (q.attentionTestType === 'burdon') { openBurdonPreview(q); return; }
+        openPreview([q], 'Soru Önizleme', editorContextLabel(SECTIONS[activeSection]));
       });
     });
-    main.querySelectorAll('[data-sy-edit]').forEach(function (b) { b.addEventListener('click', function () { openEditor(findQ(b.getAttribute('data-sy-edit'))); }); });
+    main.querySelectorAll('[data-sy-info]').forEach(function (b) {
+      b.addEventListener('click', function () { openQuestionDrawer(b.getAttribute('data-sy-info')); });
+    });
+    main.querySelectorAll('[data-sy-edit]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var q = findQ(b.getAttribute('data-sy-edit'));
+        if (q && q.attentionTestType === 'burdon') { openBurdonEditor(q); return; }
+        openEditor(q);
+      });
+    });
     main.querySelectorAll('[data-sy-del]').forEach(function (b) { b.addEventListener('click', function () { confirmDelete(b.getAttribute('data-sy-del')); }); });
     bindDrag(main);
   }
-  function findQ(id) { return db.questions.find(function (q) { return q.id === id; }); }
+  function findQ(id) {
+    var real = db.questions.find(function (q) { return q.id === id; });
+    if (real) return real;
+    if (String(id).indexOf('wq-') === 0 && isWeeklyFlow()) {
+      var st = ES();
+      return weeklyResolved(st.grade, st.mode, st.subject, st.week).find(function (q) { return q.id === id; });
+    }
+    return undefined;
+  }
 
   /* ----------------------------- Drag & drop sıralama ----------------------------- */
   function bindDrag(main) {
@@ -2297,7 +3143,11 @@
   /* ----------------------------- Sil ----------------------------- */
   function confirmDelete(id) {
     var q = findQ(id); if (!q) return;
-    function doDel() { db.questions = db.questions.filter(function (x) { return x.id !== id; }); saveDb(); refreshList(); toast('Soru silindi.'); }
+    function doDel() {
+      if (q.generated) db.weeklyDeleted[id] = true;
+      db.questions = db.questions.filter(function (x) { return x.id !== id; });
+      saveDb(); refreshList(); toast('Soru silindi.');
+    }
     if (Confirm) Confirm.open({ title: 'Soruyu sil', warning: '“' + (q.questionText || '').slice(0, 60) + '” sorusunu silmek istediğinize emin misiniz?', requireReason: false, confirmLabel: 'Sil', cancelLabel: 'Vazgeç', danger: true, onConfirm: doDel });
     else if (window.confirm('Soruyu silmek istediğinize emin misiniz?')) doDel();
   }
@@ -2401,7 +3251,9 @@
   function textToHtml(t) { return esc(String(t == null ? '' : t)).replace(/\n/g, '<br>'); }
   function setFooterSave(body, show) {
     var foot = body.parentNode ? body.parentNode.querySelector('.tm-crit-foot') : null;
-    if (!foot) return; var save = foot.querySelector('[data-save]'); if (save) save.style.display = show ? '' : 'none';
+    if (!foot) return;
+    // Materyal editöründe [data-save], havuz editöründe [data-pool-save]
+    foot.querySelectorAll('[data-save], [data-pool-save]').forEach(function (b) { b.style.display = show ? '' : 'none'; });
   }
 
   // Yeni soru: önce giriş yöntemi seçilir (kendin yaz / vektörel ekle).
@@ -2435,9 +3287,12 @@
   }
   function infoPaneHtml(s, d) {
     var meta = [];
-    var total = orderTotal(d); var posOpts = [];
-    for (var i = 1; i <= total; i++) posOpts.push({ v: String(i), l: i + '. sıra' });
-    meta.push(field('Soru Sırası', selEl('orderPos', String(currentOrderPos(d)), posOpts), true));
+    // Soru sırası yalnızca bir materyalin (sınav/ödev) içindeyken anlamlı; havuzda yok.
+    if (!s.poolEditor) {
+      var total = orderTotal(d); var posOpts = [];
+      for (var i = 1; i <= total; i++) posOpts.push({ v: String(i), l: i + '. sıra' });
+      meta.push(field('Soru Sırası', selEl('orderPos', String(currentOrderPos(d)), posOpts), true));
+    }
     // Sınav akışında sınıf ve ders, açık olan sınav/ders kartından gelir → değiştirilemez.
     var locked = (isExamFlow() && ES().exam != null) || (isWeeklyFlow() && ES().week != null);
     if (locked) {
@@ -2705,7 +3560,28 @@
     }
 
     if (isNew) db.questions.push(out);
-    else { var idx = db.questions.findIndex(function (x) { return x.id === out.id; }); if (idx >= 0) db.questions[idx] = out; else db.questions.push(out); }
+    else {
+      var idx = db.questions.findIndex(function (x) { return x.id === out.id; });
+      // Materyal içindeki değişiklikleri geçmişe yaz (eski → yeni + değiştiren)
+      var before = idx >= 0 ? db.questions[idx] : null;
+      if (before) {
+        [{ f: 'score', l: 'Puan' },
+         { f: 'topic', l: 'Konu' },
+         { f: 'subTopic', l: 'Alt Konu' },
+         { f: 'questionType', l: 'Tip', fmt: function (v) { return QTYPE_LABEL[v] || v; } },
+         { f: 'questionText', l: 'Soru Metni' },
+         { f: 'isActive', l: 'Durum', fmt: function (v) { return v ? 'Aktif' : 'Pasif'; } }
+        ].forEach(function (fd) {
+          var a = before[fd.f], b = out[fd.f];
+          if (String(a == null ? '' : a) === String(b == null ? '' : b)) return;
+          logQuestionChange(out.id, fd.f, fd.l, fd.fmt ? fd.fmt(a) : a, fd.fmt ? fd.fmt(b) : b);
+        });
+        var aAns = correctText(before), bAns = correctText(out);
+        if (aAns !== bAns) logQuestionChange(out.id, 'correct', 'Cevap', aAns, bAns);
+      }
+      if (idx >= 0) db.questions[idx] = out;
+      else db.questions.push(out); // üretilen haftalık soru → kalıcı kayda dönüşür
+    }
 
     // Seçilen "Soru Sırası"na göre görünümdeki soruları yeniden sırala.
     var desiredPos = parseInt(readVal(body, 'orderPos'), 10);
@@ -2774,8 +3650,12 @@
         var st = examState[key];
         activeSection = key;
         st.grade = a.getAttribute('data-sy-grade');
+        // Sınıf değişince o bölümün en üst katmanına dön: sınav akışında sınav
+        // kartlarına, haftalık ödevlerde KİD/RUD seçimine.
         st.exam = null;
         st.subject = null;
+        st.mode = null;
+        st.week = null;
         st.menuOpen = true;
         reSidebar(); renderSection(); replaceNav(); closeMobile();
       });
