@@ -176,9 +176,30 @@
     } catch (e) {}
   }
 
+  // ====== ÇIKIŞ YAP ======
+  // Oturum işaretlerini temizler, sunucudaki çerezi düşürür, giriş sayfasına döner.
+  function logout() {
+    clearBrowserSession();
+    return fetch('/api/logout', { method: 'POST', credentials: 'same-origin' })
+      .catch(function () {})
+      .then(function () { location.replace('/giris'); });
+  }
+
+  // "Çıkış Yap" her sayfada çalışsın. shell.js yüklü sayfalarda o önce işleyip
+  // preventDefault çağırdığından burada ikinci kez tetiklenmez.
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-logout], .hud-menu-item.is-danger');
+    if (!btn || e.defaultPrevented) return;
+    e.preventDefault();
+    if (btn.disabled) return;
+    btn.disabled = true;
+    logout();
+  });
+
   window.BilenyumBrowserSession = {
     markLoggedIn: markBrowserSession,
-    clear: clearBrowserSession
+    clear: clearBrowserSession,
+    logout: logout
   };
 
   if (!isLoginPage() && !isLocalFile()) {

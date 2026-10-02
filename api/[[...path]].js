@@ -85,11 +85,45 @@ async function handleLogin(req, res) {
     return;
   }
 
-  var result = await supabase.auth.signInWithPassword({ email: email, password: password });
-  var data = result.data;
-  var error = result.error;
+  var result, data, error;
+  try {
+    result = await supabase.auth.signInWithPassword({ email: email, password: password });
+    data = result.data;
+    error = result.error;
+  } catch (e) {
+    res.statusCode = 503;
+    res.end(JSON.stringify({
+      ok: false,
+      error: 'Giriş servisine ulaşılamıyor. Supabase projesi duraklatılmış veya erişilemiyor olabilir.'
+    }));
+    return;
+  }
 
-  if (error || !data.session) {
+  // Altyapı hatasını kimlik hatasıyla karıştırma: 400/401/422 dışındaki her şey altyapı sorunudur
+  if (error) {
+    var status = Number(error.status) || 0;
+    var authStatuses = [400, 401, 422];
+    var retryable = error.name === 'AuthRetryableFetchError';
+    if (retryable || (status && authStatuses.indexOf(status) === -1)) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({
+        ok: false,
+        error: 'Giriş servisine ulaşılamıyor' + (status ? ' (kod ' + status + ')' : '')
+          + '. Supabase projesi duraklatılmış olabilir.'
+      }));
+      return;
+    }
+    if (/api\s*key/i.test(error.message || '')) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({
+        ok: false,
+        error: 'Supabase API anahtarı geçersiz. Vercel ortam değişkenlerini kontrol edin.'
+      }));
+      return;
+    }
+  }
+
+  if (error || !data || !data.session) {
     var msg = 'Kullanıcı adı veya şifre hatalı.';
     if (error && error.message && /confirm/i.test(error.message)) {
       msg = 'E-posta onaylanmamış. Supabase panelinde kullanıcıyı Auto Confirm ile oluşturun.';

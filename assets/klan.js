@@ -1,207 +1,126 @@
 (function () {
   'use strict';
 
-  var P = 'bilenyum.';
-
-  var CLAN_CATALOG = {
-    'Alfa Klanı':  { slug: 'alfa',  emoji: '⚡', totalXp: 184250 },
-    'Beta Klanı':  { slug: 'beta',  emoji: '🔷', totalXp: 192400 },
-    'Gama Klanı':  { slug: 'gama',  emoji: '🌿', totalXp: 145600 },
-    'Delta Klanı': { slug: 'delta', emoji: '🔸', totalXp: 98200 }
-  };
-
-  var STUDENTS = [
-    { name: 'Ege Arslan',       avatar: '🦁', xp: 28400, rank: 1 },
-    { name: 'Selin Koç',        avatar: '🦊', xp: 27150, rank: 2 },
-    { name: 'Kerem Demir',      avatar: '🐯', xp: 25800, rank: 3 },
-    { name: 'Aylin Mert',       avatar: '🦄', xp: 24500, rank: 4 },
-    { name: 'Burak Tunç',       avatar: '🐺', xp: 23200, rank: 5 },
-    { name: 'Deniz Yıldız',     avatar: '🐬', xp: 21800, rank: 6 },
-    { name: 'Cemre Ak',         avatar: '🦋', xp: 20450, rank: 7 },
-    { name: 'Ozan Polat',       avatar: '🦅', xp: 19100, rank: 8 },
-    { name: 'Elif Sarı',        avatar: '🐱', xp: 17850, rank: 9 },
-    { name: 'Arda Güneş',       avatar: '🐻', xp: 16600, rank: 10 }
+  // ---- Klanlar — dönem bazlı XP (week/month/all) ----
+  var CLANS = [
+    { name: 'Beta Klanı',    slug: 'beta',    emoji: '🔷', week: 14200, month: 61200, all: 192400 },
+    { name: 'Alfa Klanı',    slug: 'alfa',    emoji: '⚡', week: 12400, month: 58600, all: 184250, mine: true },
+    { name: 'Gama Klanı',    slug: 'gama',    emoji: '🌿', week: 9800,  month: 49800, all: 145600 },
+    { name: 'Delta Klanı',   slug: 'delta',   emoji: '🔸', week: 8600,  month: 38400, all: 112300 },
+    { name: 'Epsilon Klanı', slug: 'epsilon', emoji: '🔮', week: 7300,  month: 31200, all: 98450 }
   ];
 
-  var BLURRED_CLANS = [
-    { name: 'Epsilon Klanı', emoji: '🔮', slug: 'epsilon', totalXp: 86400, rank: 5 },
-    { name: 'Zeta Klanı',    emoji: '💫', slug: 'zeta',    totalXp: 72100, rank: 6 },
-    { name: 'Eta Klanı',     emoji: '🌙', slug: 'eta',     totalXp: 59800, rank: 7 }
+  // ---- Alfa Klanı kaşifleri (klan içi) — dönem bazlı XP ----
+  var MEMBERS = [
+    { name: 'Ege Arslan',   avatar: '🦁', week: 6420, month: 21400, all: 28400 },
+    { name: 'Selin Koç',    avatar: '🦊', week: 5850, month: 19800, all: 27150 },
+    { name: 'Kerem Demir',  avatar: '🐯', week: 4980, month: 18200, all: 25800 },
+    { name: 'Aylin Mert',   avatar: '🦄', week: 4250, month: 16500, all: 24500 },
+    { name: 'Burak Tunç',   avatar: '🐺', week: 3920, month: 15100, all: 23200 },
+    { name: 'Deniz Yıldız', avatar: '🐬', week: 3510, month: 13800, all: 21800 },
+    { name: 'Cemre Ak',     avatar: '🦋', week: 3120, month: 12400, all: 20450 }
   ];
 
-  var BLURRED_STUDENTS = [
-    { name: 'Gizli Öğrenci A', avatar: '👤', xp: 15200, rank: 11 },
-    { name: 'Gizli Öğrenci B', avatar: '👤', xp: 14100, rank: 12 },
-    { name: 'Gizli Öğrenci C', avatar: '👤', xp: 13050, rank: 13 }
-  ];
+  // Öğrencinin kendisi (klan içi #4) — global sıralama bu ekrandan çıkarıldı
+  var ME = { name: 'Furkan Çilingir', avatar: '👦🏻', week: 320, month: 1450, all: 2450, clanRank: 4 };
 
-  var PROGRAM_NAMES = {
-    'weekday-early': 'Hafta İçi Erken',
-    'weekday-late': 'Hafta İçi Geç',
-    'weekend-early': 'Hafta Sonu Sabah',
-    'weekend-late': 'Hafta Sonu Akşam'
-  };
-
-  var CLAN_PROGRAM = {
-    'Alfa Klanı': 'weekday-early',
-    'Beta Klanı': 'weekday-late',
-    'Gama Klanı': 'weekend-early',
-    'Delta Klanı': 'weekend-late'
-  };
-
-  function lsGet(k) {
-    try { return localStorage.getItem(P + k); } catch (e) { return null; }
-  }
-
-  function resolveProgramLabel(clanName) {
-    var stored = lsGet('assignedProgram');
-    var key = (stored && PROGRAM_NAMES[stored]) ? stored : (CLAN_PROGRAM[clanName] || 'weekday-early');
-    return PROGRAM_NAMES[key];
-  }
+  var period = 'week'; // varsayılan: Bu Hafta
 
   function fmtXp(n) {
     return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
-
   function escapeHtml(s) {
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function periodWord() {
+    return period === 'week' ? 'hafta' : (period === 'month' ? 'ay' : 'dönem');
   }
 
-  function resolveClan() {
-    var name = lsGet('assignedClan') || 'Alfa Klanı';
-    var meta = CLAN_CATALOG[name];
-    if (meta) {
-      return { name: name, emoji: meta.emoji, slug: meta.slug, totalXp: meta.totalXp };
-    }
-    var emoji = lsGet('assignedClanEmoji') || '⚡';
-    return { name: name, emoji: emoji, slug: 'alfa', totalXp: 184250 };
+  // ---- Klan Genel Sıralaması ----
+  function renderClanList() {
+    var el = document.getElementById('klanRankList');
+    if (!el) return;
+    var rows = CLANS.slice().sort(function (a, b) { return b[period] - a[period]; });
+    var topXp = rows.length ? rows[0][period] : 0;
+    el.innerHTML = rows.map(function (c, i) {
+      var rank = i + 1;
+      var isMine = !!c.mine;
+      var topCls = rank <= 3 ? ' is-top-' + rank : '';
+      var gap = (isMine && rank > 1) ? (topXp - c[period]) : 0;
+      return '<div class="klan-rank-row' + topCls + (isMine ? ' is-me' : '') + '" data-clan="' + c.slug + '" role="listitem">'
+        + '<div class="klan-rank-row-body">'
+        + '<span class="klan-rank-num">' + rank + '</span>'
+        + '<span class="klan-rank-emblem" aria-hidden="true">' + c.emoji + '</span>'
+        + '<div class="klan-rank-meta">'
+        + '<span class="klan-rank-name">' + escapeHtml(c.name) + '</span>'
+        + (isMine ? '<span class="klan-rank-sub">Senin Klanın</span>' : '')
+        + '</div>'
+        + '<span class="klan-rank-xp">' + fmtXp(c[period]) + ' XP</span>'
+        + '</div>'
+        + (gap > 0 ? '<div class="klan-rank-gapnote">1. sıraya <strong>' + fmtXp(gap) + ' XP</strong> kaldı</div>' : '')
+        + '</div>';
+    }).join('');
   }
 
-  function getStudentProfile() {
-    return {
-      name: lsGet('studentName') || 'Mira Yılmaz',
-      avatar: '👧🏼',
-      xp: 2450,
-      rank: 127
-    };
-  }
+  // ---- Alfa Klanı Kaşifleri (klan içi) ----
+  function renderMemberList() {
+    var el = document.getElementById('studentRankList');
+    if (!el) return;
+    var top = MEMBERS.slice().sort(function (a, b) { return b[period] - a[period]; }).slice(0, 5);
+    var html = top.map(function (s, i) {
+      var rank = i + 1;
+      var topCls = rank <= 3 ? ' is-top-' + rank : '';
+      return '<div class="klan-rank-row' + topCls + '" role="listitem">'
+        + '<div class="klan-rank-row-body">'
+        + '<span class="klan-rank-num">' + rank + '</span>'
+        + '<span class="klan-rank-avatar" aria-hidden="true">' + s.avatar + '</span>'
+        + '<div class="klan-rank-meta"><span class="klan-rank-name">' + escapeHtml(s.name) + '</span></div>'
+        + '<span class="klan-rank-xp">' + fmtXp(s[period]) + ' XP</span>'
+        + '</div></div>';
+    }).join('');
 
-  function buildClanRows(myClanName) {
-    var rows = Object.keys(CLAN_CATALOG).map(function (name) {
-      var c = CLAN_CATALOG[name];
-      return { name: name, emoji: c.emoji, slug: c.slug, totalXp: c.totalXp };
-    });
-    rows.sort(function (a, b) { return b.totalXp - a.totalXp; });
-    rows.forEach(function (r, i) { r.rank = i + 1; });
-    return rows;
-  }
-
-  function clanRowVisible(rank, isMine) {
-    return rank <= 3 || isMine;
-  }
-
-  function renderClanRow(row, isMine, blurred) {
-    var topClass = row.rank <= 3 ? ' is-top-' + row.rank : '';
-    var classes = 'klan-rank-row' + topClass + (isMine ? ' is-me' : '') + (blurred ? ' is-blurred' : '');
-    return '<div class="' + classes + '" data-clan="' + row.slug + '" role="listitem">'
+    // Öğrencinin kendi satırı — pinli
+    html += '<div class="klan-rank-gap" aria-hidden="true">···</div>';
+    html += '<div class="klan-rank-row is-me" role="listitem">'
       + '<div class="klan-rank-row-body">'
-      + '<span class="klan-rank-num">' + row.rank + '</span>'
-      + '<span class="klan-rank-emblem" aria-hidden="true">' + row.emoji + '</span>'
-      + '<div class="klan-rank-meta">'
-      + '<span class="klan-rank-name">' + escapeHtml(row.name) + '</span>'
-      + (isMine ? '<span class="klan-rank-sub">Klanın</span>' : '')
+      + '<span class="klan-rank-num">' + ME.clanRank + '</span>'
+      + '<span class="klan-rank-avatar" aria-hidden="true">' + ME.avatar + '</span>'
+      + '<div class="klan-rank-meta"><span class="klan-rank-name">' + escapeHtml(ME.name) + '</span><span class="klan-rank-sub">Klan içi sıran</span></div>'
+      + '<span class="klan-rank-xp">' + fmtXp(ME.all) + ' XP</span>'
+      + '<span class="klan-rank-you">Sen</span>'
       + '</div>'
-      + '<span class="klan-rank-xp">' + fmtXp(row.totalXp) + ' XP</span>'
-      + (isMine ? '<span class="klan-rank-you">Sen</span>' : '')
-      + '</div>'
+      + '<div class="klan-rank-menote">Bu ' + periodWord() + ' <strong>+' + fmtXp(ME[period]) + ' XP</strong> kazandırdın</div>'
       + '</div>';
+    el.innerHTML = html;
   }
 
-  function renderClanList(container, myClan) {
-    if (!container) return;
-    var rows = buildClanRows(myClan.name);
-    var html = '';
-    rows.forEach(function (row) {
-      var isMine = row.name === myClan.name;
-      var blurred = !clanRowVisible(row.rank, isMine);
-      html += renderClanRow(row, isMine, blurred);
+  function syncTabs() {
+    var btns = document.querySelectorAll('.klan-period-btn');
+    Array.prototype.forEach.call(btns, function (b) {
+      var on = b.getAttribute('data-period') === period;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
     });
-
-    BLURRED_CLANS.forEach(function (row) {
-      html += renderClanRow(row, false, true);
-    });
-
-    container.innerHTML = html;
   }
 
-  function renderStudentRow(student, opts) {
-    opts = opts || {};
-    var blurred = !!opts.blurred;
-    var isMe = !!opts.isMe;
-    var topClass = student.rank <= 3 ? ' is-top-' + student.rank : '';
-    var classes = 'klan-rank-row' + topClass + (isMe ? ' is-me' : '') + (blurred ? ' is-blurred' : '');
-    return '<div class="' + classes + '" role="listitem">'
-      + '<div class="klan-rank-row-body">'
-      + '<span class="klan-rank-num">' + student.rank + '</span>'
-      + '<span class="klan-rank-avatar" aria-hidden="true">' + student.avatar + '</span>'
-      + '<div class="klan-rank-meta">'
-      + '<span class="klan-rank-name">' + escapeHtml(student.name) + '</span>'
-      + (isMe ? '<span class="klan-rank-sub">Sıralaman</span>' : '')
-      + '</div>'
-      + '<span class="klan-rank-xp">' + fmtXp(student.xp) + ' XP</span>'
-      + (isMe ? '<span class="klan-rank-you">Sen</span>' : '')
-      + '</div>'
-      + '</div>';
+  function setPeriod(p) {
+    if (!p || p === period) return;
+    period = p;
+    syncTabs();
+    renderClanList();
+    renderMemberList();
   }
 
-  function renderStudentList(container, me) {
-    if (!container) return;
-    var html = '';
-    var inTop5 = me.rank <= 5;
-
-    STUDENTS.slice(0, 5).forEach(function (s) {
-      var isMe = s.name === me.name;
-      html += renderStudentRow(isMe ? me : s, { isMe: isMe, blurred: false });
-    });
-
-    if (!inTop5) {
-      html += '<div class="klan-rank-gap" aria-hidden="true">···</div>';
-      html += renderStudentRow(me, { isMe: true, blurred: false });
-    }
-
-    BLURRED_STUDENTS.forEach(function (s) {
-      html += renderStudentRow(s, { blurred: true });
-    });
-
-    container.innerHTML = html;
-  }
-
+  // ---- Bootstrap ----
   var card = document.getElementById('klanDetailCard');
   if (!card) return;
 
-  var clan = resolveClan();
-  var me = getStudentProfile();
-  var clans = buildClanRows(clan.name);
-  var myRank = clans.filter(function (c) { return c.name === clan.name; })[0].rank;
+  var btns = document.querySelectorAll('.klan-period-btn');
+  Array.prototype.forEach.call(btns, function (b) {
+    b.addEventListener('click', function () { setPeriod(b.getAttribute('data-period')); });
+  });
 
-  card.setAttribute('data-clan', clan.slug);
-
-  var emblem = document.getElementById('klanEmblem');
-  var nameEl = document.getElementById('klanName');
-  var xpEl = document.getElementById('klanTotalXp');
-  var rankEl = document.getElementById('klanRank');
-  var programEl = document.getElementById('klanProgramType');
-
-  if (emblem) emblem.textContent = clan.emoji;
-  if (nameEl) nameEl.textContent = clan.name;
-  if (xpEl) xpEl.textContent = fmtXp(clan.totalXp);
-  if (rankEl) rankEl.textContent = '#' + myRank;
-  if (programEl) programEl.textContent = resolveProgramLabel(clan.name);
-
-  renderClanList(document.getElementById('klanRankList'), clan);
-  renderStudentList(document.getElementById('studentRankList'), me);
+  syncTabs();
+  renderClanList();
+  renderMemberList();
 })();

@@ -6751,6 +6751,10 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span class="nav-item-label">Ödevler</span>
     </a>
+    <a class="nav-item" href="klan.html" title="Klanım">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span class="nav-item-label">Klanım</span>
+    </a>
     <a class="nav-item" href="tekrarlar.html" title="Ders Tekrarları">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
       <span class="nav-item-label">Ders Tekrarları</span>
@@ -6838,27 +6842,27 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       </div>
 
       <div class="ov-filters">
-        <div class="ov-status-filter" id="ovStatusFilter">
-          <button type="button" class="ov-status-filter-btn" id="ovStatusFilterBtn" aria-haspopup="true" aria-expanded="false">
-            <span id="ovStatusFilterLabel">Tüm Ödevler</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="ov-status-filter-menu" id="ovStatusFilterMenu" role="menu">
-            <button type="button" class="ov-status-filter-item is-active" data-hw-status="all" role="menuitem">Tüm Ödevler</button>
-            <button type="button" class="ov-status-filter-item" data-hw-status="active" role="menuitem">Aktif Ödev</button>
-            <button type="button" class="ov-status-filter-item" data-hw-status="overdue" role="menuitem">Geciken</button>
-            <button type="button" class="ov-status-filter-item" data-hw-status="done" role="menuitem">Tamamlanan</button>
+        <div class="ov-filter-group" id="ovStatusFilter">
+          <span class="ov-filter-legend">Durum</span>
+          <div class="ov-status-chips" role="tablist" aria-label="Durum filtresi">
+            <button type="button" class="ov-status-chip is-active" data-hw-status="all" role="tab" aria-selected="true">Tümü</button>
+            <button type="button" class="ov-status-chip" data-hw-status="active" role="tab" aria-selected="false">Aktif</button>
+            <button type="button" class="ov-status-chip" data-hw-status="overdue" role="tab" aria-selected="false">Geciken<span class="ov-status-chip-count" id="ovOverdueCount" hidden>0</span></button>
+            <button type="button" class="ov-status-chip" data-hw-status="done" role="tab" aria-selected="false">Tamamlanan</button>
           </div>
         </div>
 
-        <div class="ov-subj-chips" role="tablist" aria-label="Ders filtresi">
-          <button type="button" class="ov-subj-chip is-active" data-subj="all">Tümü</button>
-          <button type="button" class="ov-subj-chip" data-subj="mat" style="--c:#ff6dc6"><span class="ov-subj-chip-dot"></span>Matematik</button>
-          <button type="button" class="ov-subj-chip" data-subj="fen" style="--c:#6dd49e"><span class="ov-subj-chip-dot"></span>Fen</button>
-          <button type="button" class="ov-subj-chip" data-subj="trk" style="--c:#4ad6ff"><span class="ov-subj-chip-dot"></span>Türkçe</button>
-          <button type="button" class="ov-subj-chip" data-subj="ing" style="--c:#ff9a4a"><span class="ov-subj-chip-dot"></span>İngilizce</button>
-          <button type="button" class="ov-subj-chip" data-subj="sos" style="--c:#a8a4f0"><span class="ov-subj-chip-dot"></span>Sosyal</button>
-          <button type="button" class="ov-subj-chip" data-subj="din" style="--c:#5e9be8"><span class="ov-subj-chip-dot"></span>Din</button>
+        <div class="ov-filter-group">
+          <span class="ov-filter-legend">Ders</span>
+          <div class="ov-subj-chips" role="tablist" aria-label="Ders filtresi">
+            <button type="button" class="ov-subj-chip is-active" data-subj="all">Tümü</button>
+            <button type="button" class="ov-subj-chip" data-subj="mat" style="--c:#ff6dc6"><span class="ov-subj-chip-dot"></span>Matematik</button>
+            <button type="button" class="ov-subj-chip" data-subj="fen" style="--c:#6dd49e"><span class="ov-subj-chip-dot"></span>Fen</button>
+            <button type="button" class="ov-subj-chip" data-subj="trk" style="--c:#4ad6ff"><span class="ov-subj-chip-dot"></span>Türkçe</button>
+            <button type="button" class="ov-subj-chip" data-subj="ing" style="--c:#ff9a4a"><span class="ov-subj-chip-dot"></span>İngilizce</button>
+            <button type="button" class="ov-subj-chip" data-subj="sos" style="--c:#a8a4f0"><span class="ov-subj-chip-dot"></span>Sosyal</button>
+            <button type="button" class="ov-subj-chip" data-subj="din" style="--c:#5e9be8"><span class="ov-subj-chip-dot"></span>Din</button>
+          </div>
         </div>
       </div>
     </div>
@@ -6945,10 +6949,183 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       <span class="ov-empty-text">Seçili hafta için ödev yok</span>
       <span class="ov-empty-sub">Takvim ikonundan başka bir eğitim haftası seçebilirsin</span>
     </div>
+
+    <!-- KİD / RUD / XP kısa açıklama şeridi -->
+    <div class="ov-legend" aria-label="Kısaltmalar">
+      <span class="ov-legend-item"><span class="ov-legend-tag is-kid">KİD</span><span>Kavram İnşa Dersi · kavram pekiştirmeye odaklı ödev</span></span>
+      <span class="ov-legend-item"><span class="ov-legend-tag is-rud">RUD</span><span>Rutin Uygulama Dersi · tekrar ve pratik odaklı ödev</span></span>
+      <span class="ov-legend-item"><span class="ov-legend-tag is-xp">XP</span><span>Ödevleri tamamladıkça kazanılır; seviye ve rozet açar</span></span>
+    </div>
   </section>
 
 
 </main>
+
+<!-- ====== Ödev detay paneli + liste rafine stilleri ====== -->
+<style>
+/* —— İki etiketli filtre grubu (Durum / Ders) — açık tema —— */
+.ov-filter-group { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ov-filter-legend {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-dark-1, #6b6690);
+}
+.ov-status-chips { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ov-status-chip {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 13px;
+  background: var(--bg-subtle, #f0eef8);
+  border: 1px solid var(--brand-purple-14, rgba(62,58,142,0.14));
+  border-radius: 999px;
+  color: var(--ink-dark-1, #5c567a);
+  font-family: inherit; font-size: 12px; font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+}
+.ov-status-chip:hover {
+  background: var(--brand-purple-06, rgba(62,58,142,0.06));
+  color: var(--brand-navy, #28265a);
+  border-color: var(--brand-purple-28, rgba(62,58,142,0.28));
+  transform: translateY(-1px);
+}
+.ov-status-chip.is-active {
+  background: var(--brand-magenta-12, rgba(230,8,123,0.12));
+  border-color: var(--brand-magenta-35, rgba(230,8,123,0.35));
+  color: var(--brand-navy, #28265a);
+  box-shadow: 0 0 14px -6px rgba(230,8,123,0.5);
+}
+.ov-status-chip[data-hw-status="overdue"].is-active {
+  background: rgba(255,122,74,0.14);
+  border-color: rgba(255,122,74,0.48);
+  color: #b4531f;
+  box-shadow: 0 0 14px -6px rgba(255,122,74,0.5);
+}
+.ov-status-chip-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 17px; height: 17px; padding: 0 5px;
+  border-radius: 999px;
+  background: #ff7a4a; color: #fff;
+  font-size: 10.5px; font-weight: 800; line-height: 1;
+}
+.ov-status-chip-count[hidden] { display: none; }
+
+/* —— Kart tahmini süre çipi —— */
+.ov-card-est {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11.5px; font-weight: 700; color: var(--ink-dark-1, #6b6690);
+}
+.ov-card-est svg { width: 12px; height: 12px; opacity: 0.75; }
+
+/* —— KİD / RUD / XP açıklama şeridi — açık tema —— */
+.ov-legend {
+  display: flex; flex-wrap: wrap; gap: 10px 22px;
+  margin-top: 18px; padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--bg-subtle, #f4f2fb);
+  border: 1px solid var(--brand-purple-14, rgba(62,58,142,0.14));
+}
+.ov-legend-item {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--ink-dark-1, #5c567a);
+}
+.ov-legend-tag {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 3px 8px; border-radius: 7px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 800; letter-spacing: 0.04em;
+}
+.ov-legend-tag.is-kid { background: rgba(124,58,237,0.12); color: #6d3bd4; border: 1px solid rgba(124,58,237,0.32); }
+.ov-legend-tag.is-rud { background: rgba(16,185,129,0.12); color: #0b7a55; border: 1px solid rgba(16,185,129,0.32); }
+.ov-legend-tag.is-xp  { background: rgba(255,196,46,0.16); color: #9a6808; border: 1px solid rgba(255,196,46,0.42); }
+
+/* —— Detay paneli (açık tema): kişisel hitap —— */
+.prog-drawer-greeting {
+  margin: 0 0 2px; font-size: 13px; font-weight: 800; color: var(--brand-magenta, #e6087b);
+}
+.prog-drawer-greeting[hidden] { display: none; }
+
+/* —— Teslim çipi aciliyeti + tahmini süre çipi (light, !important ile chip temasını ez) —— */
+.prog-drawer-chip.is-est {
+  background: rgba(59,130,246,0.10) !important; border-color: rgba(59,130,246,0.30) !important; color: #1d6fd6 !important;
+}
+.prog-drawer-chip.is-urgent {
+  background: rgba(255,150,40,0.16) !important; border-color: rgba(230,120,20,0.42) !important; color: #b4531f !important;
+  animation: pdUrgentPulse 1.8s ease-in-out infinite;
+}
+.prog-drawer-chip.is-overdue-chip {
+  background: rgba(220,38,38,0.10) !important; border-color: rgba(220,38,38,0.34) !important; color: #c0392b !important;
+}
+@keyframes pdUrgentPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(230,120,20,0.0); } 50% { box-shadow: 0 0 0 4px rgba(230,120,20,0.16); } }
+
+/* —— Öğretmen notu klemp + Devamını Oku —— */
+.prog-drawer-text.is-clamped {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.prog-drawer-desc-more {
+  margin-top: 8px; padding: 0; border: 0; background: none; cursor: pointer;
+  font-family: inherit; font-size: 12.5px; font-weight: 800; color: var(--brand-magenta, #e6087b);
+}
+.prog-drawer-desc-more:hover { text-decoration: underline; }
+.prog-drawer-desc-more[hidden] { display: none; }
+
+/* —— Ödül alanı zenginleştirme (light) —— */
+.prog-drawer-game-reward-desc {
+  display: block; margin-top: 3px; font-size: 11.5px; line-height: 1.5;
+  font-weight: 500; color: var(--ink-dark-2, #7a7499);
+}
+.prog-drawer-reward-hint {
+  margin: 12px 0 0; padding: 10px 12px; border-radius: 10px;
+  font-size: 12.5px; line-height: 1.5; font-weight: 700;
+  color: #9a6808;
+  background: rgba(255,196,46,0.14); border-left: 3px solid #d4920a;
+}
+.prog-drawer-reward-hint[hidden] { display: none; }
+
+/* —— Tamamlanmış ödev kutlama bandı (light) —— */
+.prog-drawer-done-banner {
+  padding: 16px 18px; border-radius: 16px;
+  background: linear-gradient(160deg, rgba(16,185,129,0.14), rgba(16,185,129,0.05));
+  border: 1px solid rgba(16,185,129,0.34);
+}
+.prog-drawer-done-banner[hidden] { display: none; }
+.prog-drawer-done-top { display: flex; align-items: center; gap: 12px; }
+.prog-drawer-done-emoji { font-size: 30px; line-height: 1; }
+.prog-drawer-done-head { display: flex; flex-direction: column; gap: 2px; }
+.prog-drawer-done-title { font-size: 17px; font-weight: 800; color: #0b7a52; font-family: 'Plus Jakarta Sans', sans-serif; }
+.prog-drawer-done-sub { font-size: 12.5px; color: var(--ink-dark-1, #5c567a); }
+.prog-drawer-done-stats { display: flex; gap: 8px; margin-top: 14px; }
+.prog-drawer-done-stat {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 10px 6px; border-radius: 12px;
+  background: var(--bg-surface, #fff); border: 1px solid rgba(16,185,129,0.20);
+}
+.pdd-stat-num { font-size: 17px; font-weight: 800; color: #0b7a52; font-family: 'JetBrains Mono', monospace; }
+.pdd-stat-lbl { font-size: 10.5px; font-weight: 700; color: var(--ink-dark-2, #7a7499); text-transform: uppercase; letter-spacing: 0.04em; }
+.prog-drawer-done-next {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;
+  margin-top: 12px; padding: 12px 14px; border-radius: 12px; cursor: pointer;
+  background: var(--bg-surface, #fff); border: 1px solid var(--brand-purple-18, rgba(62,58,142,0.18));
+  color: var(--brand-navy, #28265a); font-family: inherit; text-align: left;
+  transition: background 0.16s, border-color 0.16s, transform 0.16s;
+}
+.prog-drawer-done-next:hover { border-color: var(--brand-magenta-35, rgba(230,8,123,0.35)); transform: translateY(-1px); }
+.prog-drawer-done-next[hidden] { display: none; }
+.pdd-next-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pdd-next-kicker { font-size: 10.5px; font-weight: 700; color: var(--ink-dark-2, #7a7499); text-transform: uppercase; letter-spacing: 0.06em; }
+.pdd-next-topic { font-size: 13.5px; font-weight: 700; color: var(--brand-navy, #28265a); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prog-drawer-done-next svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--brand-magenta, #e6087b); }
+
+/* —— CTA öne çıkarma + odak + süre —— */
+.prog-drawer-cta { position: relative; font-size: 15.5px; padding-top: 16px; padding-bottom: 16px; }
+.prog-drawer-cta .cta-time { margin-left: 8px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.prog-drawer-cta .cta-time[hidden] { display: none; }
+.prog-drawer-cta:focus-visible { outline: 3px solid var(--brand-magenta-35, rgba(230,8,123,0.45)); outline-offset: 2px; }
+
+@media (max-width: 480px) {
+  .prog-drawer-done-stats { flex-wrap: wrap; }
+  .prog-drawer-done-stat { flex: 1 1 30%; }
+}
+</style>
 
 <!-- ====== DERS DRAWER — body altı, main dışı (HUD topbar dahil her şeyin üstüne çıksın) ====== -->
 <div class="prog-drawer" id="progDrawer" role="dialog" aria-label="Ders detayı" aria-hidden="true">
@@ -6960,6 +7137,32 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 
     <!-- Body — scrollable -->
     <div class="prog-drawer-body">
+      <!-- Tamamlanmış ödev kutlama bandı -->
+      <div class="prog-drawer-done-banner" id="progDrawerDoneBanner" hidden>
+        <div class="prog-drawer-done-top">
+          <span class="prog-drawer-done-emoji" aria-hidden="true">🎉</span>
+          <div class="prog-drawer-done-head">
+            <strong class="prog-drawer-done-title">Tebrikler, tamamladın!</strong>
+            <span class="prog-drawer-done-sub" id="progDrawerDoneSub">Bu ödevi başarıyla teslim ettin.</span>
+          </div>
+        </div>
+        <div class="prog-drawer-done-stats">
+          <span class="prog-drawer-done-stat"><span class="pdd-stat-num" id="progDrawerDoneScore">—</span><span class="pdd-stat-lbl">Puan</span></span>
+          <span class="prog-drawer-done-stat"><span class="pdd-stat-num" id="progDrawerDoneXp">—</span><span class="pdd-stat-lbl">Kazanılan XP</span></span>
+          <span class="prog-drawer-done-stat"><span class="pdd-stat-num" id="progDrawerDoneBadge">⭐</span><span class="pdd-stat-lbl" id="progDrawerDoneBadgeName">Rozet</span></span>
+        </div>
+        <button type="button" class="prog-drawer-done-next" id="progDrawerDoneNext" hidden>
+          <span class="pdd-next-text">
+            <span class="pdd-next-kicker">Sonraki önerilen ödev</span>
+            <strong class="pdd-next-topic" id="progDrawerDoneNextTopic">—</strong>
+          </span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+
+      <!-- Kişisel hitap -->
+      <p class="prog-drawer-greeting" id="progDrawerGreeting" hidden>Merhaba 👋</p>
+
       <!-- Başlık satırı: ikon + subject + topic -->
       <div class="prog-drawer-titlebar">
         <span class="prog-drawer-hero-icon" id="progDrawerIcon" aria-hidden="true">📐</span>
@@ -6983,6 +7186,10 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>
           <span>—</span>
         </span>
+        <span class="prog-drawer-chip is-est" id="progDrawerEstTime" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 8 12 12 15 13"/></svg>
+          <span id="progDrawerEstTimeText">—</span>
+        </span>
         <span class="prog-drawer-chip is-edu-week" id="progDrawerEduWeek" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           <span id="progDrawerEduWeekText">—</span>
@@ -6994,8 +7201,9 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 
       <!-- Ders içeriği -->
       <div class="prog-drawer-section">
-        <span class="prog-drawer-label">Ödev Açıklaması</span>
-        <p class="prog-drawer-text" id="progDrawerDesc">—</p>
+        <span class="prog-drawer-label">Öğretmenin Notu</span>
+        <p class="prog-drawer-text is-clamped" id="progDrawerDesc">—</p>
+        <button type="button" class="prog-drawer-desc-more" id="progDrawerDescMore" hidden>Devamını Oku</button>
       </div>
 
       <!-- Öğretmen — profil + mesaj action ikonları -->
@@ -7034,9 +7242,11 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
             <span class="prog-drawer-game-reward-icon" id="progDrawerBadgeIcon">🔢</span>
             <span class="prog-drawer-game-reward-text">
               <strong id="progDrawerBadge">Sayı Avcısı</strong>
+              <span class="prog-drawer-game-reward-desc" id="progDrawerBadgeDesc">Bu dersteki ödevleri tamamladıkça kazanılır, profilinde rozet vitrininde görünür.</span>
             </span>
           </div>
         </div>
+        <p class="prog-drawer-reward-hint" id="progDrawerRewardHint" hidden>—</p>
       </div>
     </div>
 
@@ -7932,6 +8142,25 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     return null;
   }
 
+  // Çözüm ekranı yönlendirmesi için — gerçek çözüm seti olmayan ödevlerde ders bazlı yedek set.
+  // Yalnız navigasyonda kullanılır; retry/oturum mantığı resolveHwId (hwId) üzerinden kalır.
+  var SUBJECT_FALLBACK_HW = {
+    mat:'mat-koklu', fen:'fen-dongu', ing:'ing-friendship',
+    trk:'trk-paragraf', sos:'trk-paragraf', din:'trk-paragraf'
+  };
+  function getHwSolveTarget(h) {
+    if (!h) return 'mat-koklu';
+    return h.hwId || SUBJECT_FALLBACK_HW[h.subject] || 'mat-koklu';
+  }
+
+  // Tahmini çözüm süresi (dk) — sadece görsel. "N Soru / N Questions" varsa ondan, yoksa türden.
+  function estMinutes(h) {
+    if (!h) return 15;
+    var m = String(h.topic || '').match(/(\d+)\s*(soru|question)/i);
+    if (m) return Math.round(parseInt(m[1], 10) * 1.4) + 5;
+    return h.homeworkType === 'rud' ? 15 : 20;
+  }
+
   function canRetryHomework(h) {
     return !!(h && h.status === 'done' && resolveHwId(h));
   }
@@ -8132,6 +8361,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       + '</div>';
     } else {
       foot = '<div class="ov-card-foot">'
+        + '<span class="ov-card-est">' + SVG_CLOCK + '~' + estMinutes(h) + ' dk</span>'
         + '<span class="ov-card-xp">' + SVG_BOLT + '+ ' + h.xp + ' XP</span>'
         + '<span class="ov-card-go">Aç ' + SVG_ARROW + '</span>'
       + '</div>';
@@ -8481,12 +8711,20 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   }
 
   // ====== Render: Stats (sadece 4 kart) ======
+  function setOverdueBadge(n) {
+    var badge = document.getElementById('ovOverdueCount');
+    if (!badge) return;
+    badge.textContent = n;
+    badge.hidden = !n;
+  }
+
   function updateCounts() {
     if (pageView === 'overdue') {
       var allOverdue = HOMEWORKS.filter(function(h){ return h.status === 'overdue'; });
       if (currentSubject !== 'all') {
         allOverdue = allOverdue.filter(function(h){ return h.subject === currentSubject; });
       }
+      setOverdueBadge(allOverdue.length);
       document.getElementById('odevStatActive').textContent = allOverdue.length;
       document.getElementById('odevStatDoneWeek').textContent = '—';
       document.getElementById('odevStatXp').textContent = '—';
@@ -8499,6 +8737,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     }
     var counts = { active:0, done:0, overdue:0 };
     weekItems.forEach(function(h){ counts[h.status]++; });
+    setOverdueBadge(counts.overdue);
     document.getElementById('odevStatActive').textContent = counts.active + counts.overdue;
     document.getElementById('odevStatDoneWeek').textContent = counts.done;
 
@@ -8646,37 +8885,17 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     });
   });
 
-  // ====== Durum filtresi (Tüm / Aktif / Geciken / Tamamlanan) ======
-  (function(){
-    var sf = document.getElementById('ovStatusFilter');
-    var sfBtn = document.getElementById('ovStatusFilterBtn');
-    var sfMenu = document.getElementById('ovStatusFilterMenu');
-    var sfLabel = document.getElementById('ovStatusFilterLabel');
-    if (!sf || !sfBtn || !sfMenu) return;
-    sfBtn.addEventListener('click', function(e){
-      e.stopPropagation();
-      sf.classList.toggle('is-open');
-      sfBtn.setAttribute('aria-expanded', sf.classList.contains('is-open') ? 'true' : 'false');
-    });
-    sfMenu.querySelectorAll('[data-hw-status]').forEach(function(item){
-      item.addEventListener('click', function(e){
-        e.stopPropagation();
-        sfMenu.querySelectorAll('.ov-status-filter-item').forEach(function(x){ x.classList.remove('is-active'); });
-        item.classList.add('is-active');
-        if (sfLabel) sfLabel.textContent = item.textContent;
-        currentStatus = item.getAttribute('data-hw-status');
-        sf.classList.remove('is-open');
-        sfBtn.setAttribute('aria-expanded', 'false');
-        refreshAll();
+  // ====== Durum çip filtresi (Tümü / Aktif / Geciken / Tamamlanan) ======
+  document.querySelectorAll('.ov-status-chip').forEach(function(c){
+    c.addEventListener('click', function(){
+      document.querySelectorAll('.ov-status-chip').forEach(function(x){
+        x.classList.remove('is-active'); x.setAttribute('aria-selected', 'false');
       });
+      c.classList.add('is-active'); c.setAttribute('aria-selected', 'true');
+      currentStatus = c.getAttribute('data-hw-status');
+      refreshAll();
     });
-    document.addEventListener('click', function(e){
-      if (!sf.contains(e.target)) {
-        sf.classList.remove('is-open');
-        sfBtn.setAttribute('aria-expanded', 'false');
-      }
-    });
-  })();
+  });
 
   // ====== Hero CTA → drawer aç (carousel delegation initHeroCarouselNav içinde) ======
 
@@ -8706,8 +8925,68 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   var drawerHwType = document.getElementById('progDrawerHwType');
   var drawerHwTypeDesc = document.getElementById('progDrawerHwTypeDesc');
   var drawerPanel = drawerEl.querySelector('.prog-drawer-panel');
+  var drawerBody = drawerEl.querySelector('.prog-drawer-body');
+  var drawerGreeting = document.getElementById('progDrawerGreeting');
+  var drawerTimeChip = document.getElementById('progDrawerTime');
+  var drawerEstTime = document.getElementById('progDrawerEstTime');
+  var drawerEstTimeText = document.getElementById('progDrawerEstTimeText');
+  var drawerDescMore = document.getElementById('progDrawerDescMore');
+  var drawerRewardHint = document.getElementById('progDrawerRewardHint');
+  var drawerBadgeDesc = document.getElementById('progDrawerBadgeDesc');
+  var drawerDoneBanner = document.getElementById('progDrawerDoneBanner');
+  var drawerDoneSub = document.getElementById('progDrawerDoneSub');
+  var drawerDoneScore = document.getElementById('progDrawerDoneScore');
+  var drawerDoneXp = document.getElementById('progDrawerDoneXp');
+  var drawerDoneBadge = document.getElementById('progDrawerDoneBadge');
+  var drawerDoneBadgeName = document.getElementById('progDrawerDoneBadgeName');
+  var drawerDoneNext = document.getElementById('progDrawerDoneNext');
+  var drawerDoneNextTopic = document.getElementById('progDrawerDoneNextTopic');
 
   var currentHw = null;
+  var drawerCountdownTimer = null;
+  var drawerDoneNextId = null;
+
+  // Öğrenci adı (kişisel hitap için) — HUD profilinden ilk ad
+  var STUDENT_FIRST_NAME = (function () {
+    var el = document.querySelector('.player-name');
+    var full = el ? (el.textContent || '').trim() : '';
+    return full ? full.split(/\s+/)[0] : '';
+  })();
+
+  function stopDrawerCountdown() {
+    if (drawerCountdownTimer) { clearInterval(drawerCountdownTimer); drawerCountdownTimer = null; }
+  }
+
+  // Teslim çipi: durum/aciliyet + aktif ödevlerde canlı geri sayım
+  function renderDrawerTime(h) {
+    stopDrawerCountdown();
+    if (!drawerTimeChip) return;
+    drawerTimeChip.classList.remove('is-urgent', 'is-overdue-chip');
+    if (h.status === 'done') {
+      drawerTime.textContent = 'Teslim edildi · ' + (h.doneAt ? fmtDueLong(h.doneAt) : '');
+      return;
+    }
+    if (h.status === 'overdue') {
+      drawerTime.textContent = 'Süresi geçti';
+      drawerTimeChip.classList.add('is-overdue-chip');
+      return;
+    }
+    var due = parseISO(h.due);
+    function tick() {
+      var ms = due - demoNow();
+      if (ms <= 0) {
+        drawerTime.textContent = 'Süresi geçti';
+        drawerTimeChip.classList.remove('is-urgent');
+        drawerTimeChip.classList.add('is-overdue-chip');
+        stopDrawerCountdown();
+        return;
+      }
+      drawerTime.textContent = fmtCountdown(ms) + ' kaldı';
+      drawerTimeChip.classList.toggle('is-urgent', ms < 24 * 3600000);
+    }
+    tick();
+    drawerCountdownTimer = setInterval(tick, 1000);
+  }
 
   function setRetryNote(visible) {
     if (drawerRetryNote) drawerRetryNote.hidden = !visible;
@@ -8750,7 +9029,14 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     var h = currentHw;
     var hwId = resolveHwId(h);
     var inProgress = isHwInProgress(h);
-    if (drawerCtaTime) drawerCtaTime.hidden = true;
+    if (drawerCtaTime) {
+      if (h.status === 'done') {
+        drawerCtaTime.hidden = true;
+      } else {
+        drawerCtaTime.textContent = '~' + estMinutes(h) + ' dk';
+        drawerCtaTime.hidden = false;
+      }
+    }
     drawerCta.className = 'prog-drawer-cta';
     drawerCta.disabled = false;
     setRetryNote(false);
@@ -8804,15 +9090,38 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     if (drawerEl) drawerEl.setAttribute('data-hw-type', hwType);
 
     drawerDate.textContent = 'Teslim: ' + fmtDueLong(h.due);
-    if (h.status === 'done') {
-      drawerTime.textContent = 'Teslim edildi · ' + (h.doneAt ? fmtDueLong(h.doneAt) : '');
-    } else if (h.status === 'overdue') {
-      drawerTime.textContent = 'Süresi geçti';
-    } else {
-      drawerTime.textContent = fmtDueShort(parseISO(h.due));
+    renderDrawerTime(h);
+
+    // Tahmini süre çipi (tamamlanmışta gizli)
+    if (drawerEstTime && drawerEstTimeText) {
+      if (h.status === 'done') {
+        drawerEstTime.hidden = true;
+      } else {
+        drawerEstTimeText.textContent = 'Yaklaşık ' + estMinutes(h) + ' dk';
+        drawerEstTime.hidden = false;
+      }
     }
 
-    drawerDesc.textContent = h.desc || 'Bu ödev için detaylı açıklama yakında eklenecek.';
+    // Kişisel hitap (tamamlanmış ödevde kutlama bandı olduğundan gizli)
+    if (drawerGreeting) {
+      if (h.status === 'done') {
+        drawerGreeting.hidden = true;
+      } else {
+        drawerGreeting.textContent = STUDENT_FIRST_NAME
+          ? 'Merhaba ' + STUDENT_FIRST_NAME + ', bu ödeve birlikte bakalım 👋'
+          : 'Bu ödeve birlikte bakalım 👋';
+        drawerGreeting.hidden = false;
+      }
+    }
+
+    // Öğretmen notu — uzunsa klempele + "Devamını Oku"
+    var descText = h.desc || 'Bu ödev için detaylı açıklama yakında eklenecek.';
+    drawerDesc.textContent = descText;
+    drawerDesc.classList.add('is-clamped');
+    if (drawerDescMore) {
+      drawerDescMore.textContent = 'Devamını Oku';
+      drawerDescMore.hidden = descText.length <= 140;
+    }
 
     var weekLabel = formatEduWeek(h.eduWeek);
     if (drawerEduWeek && drawerEduWeekText) {
@@ -8843,21 +9152,87 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     drawerBadgeIcon.textContent = badge.icon;
     drawerBadge.textContent = badge.name;
 
+    // Ödül motivasyon ipucu (aktif ödevlerde)
+    if (drawerRewardHint) {
+      if (h.status === 'active') {
+        drawerRewardHint.textContent = 'Zamanında tamamla: +' + getHwBaseXp(h) + ' XP ve “' + badge.name + '” rozetine ilerleme kazan.';
+        drawerRewardHint.hidden = false;
+      } else {
+        drawerRewardHint.hidden = true;
+      }
+    }
+
+    // Tamamlanmış ödev → kutlama görünümü
+    renderDoneBanner(h, badge);
+
     setDrawerStatus(h);
     updateCta();
 
     drawerEl.classList.add('is-open');
     drawerEl.setAttribute('aria-hidden', 'false');
+    if (drawerBody) drawerBody.scrollTop = 0;
     if (drawerCta) {
       requestAnimationFrame(function () {
-        drawerCta.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        try { drawerCta.focus({ preventScroll: true }); } catch (e) { drawerCta.focus(); }
       });
     }
   }
+
+  // Sonraki önerilen ödev: en yakın aktif; yoksa en yeni geciken (bu ödev hariç)
+  function pickNextSuggestion(currentId) {
+    var pool = HOMEWORKS.filter(function (x) {
+      return x.id !== currentId && (x.status === 'active' || x.status === 'overdue');
+    });
+    if (!pool.length) return null;
+    pool.sort(function (a, b) {
+      if (a.status !== b.status) return a.status === 'active' ? -1 : 1;
+      return a.status === 'active'
+        ? parseISO(a.due) - parseISO(b.due)
+        : parseISO(b.due) - parseISO(a.due);
+    });
+    return pool[0];
+  }
+
+  function renderDoneBanner(h, badge) {
+    var isDone = h.status === 'done';
+    if (drawerBody) drawerBody.classList.toggle('is-completed', isDone);
+    if (!drawerDoneBanner) return;
+    if (!isDone) { drawerDoneBanner.hidden = true; drawerDoneNextId = null; return; }
+    if (drawerDoneSub) drawerDoneSub.textContent = h.doneAt
+      ? (fmtDueLong(h.doneAt) + ' tarihinde teslim ettin.')
+      : 'Bu ödevi başarıyla teslim ettin.';
+    if (drawerDoneScore) drawerDoneScore.textContent = (h.score != null ? h.score : '—') + '/100';
+    if (drawerDoneXp) drawerDoneXp.textContent = '+' + getHwBaseXp(h);
+    if (drawerDoneBadge) drawerDoneBadge.textContent = badge.icon;
+    if (drawerDoneBadgeName) drawerDoneBadgeName.textContent = badge.name;
+    var next = pickNextSuggestion(h.id);
+    drawerDoneNextId = next ? next.id : null;
+    if (drawerDoneNext && drawerDoneNextTopic) {
+      if (next) { drawerDoneNextTopic.textContent = next.topic; drawerDoneNext.hidden = false; }
+      else { drawerDoneNext.hidden = true; }
+    }
+    drawerDoneBanner.hidden = false;
+  }
   function closeDrawer() {
+    stopDrawerCountdown();
     drawerEl.classList.remove('is-open');
     drawerEl.setAttribute('aria-hidden', 'true');
     currentHw = null;
+  }
+
+  // Öğretmen notu — Devamını Oku / Daha Az
+  if (drawerDescMore) {
+    drawerDescMore.addEventListener('click', function () {
+      var clamped = drawerDesc.classList.toggle('is-clamped');
+      drawerDescMore.textContent = clamped ? 'Devamını Oku' : 'Daha Az Göster';
+    });
+  }
+
+  // Kutlama bandı — sonraki önerilen ödeve geç
+  if (drawerDoneNext) {
+    drawerDoneNext.addEventListener('click', function () {
+      if (drawerDoneNextId != null) openDrawer(drawerDoneNextId);
+    });
   }
 
   sectionsEl.addEventListener('click', function(ev){
@@ -8877,22 +9252,15 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   if (drawerCta) {
     drawerCta.addEventListener('click', function(){
       if (!currentHw || drawerCta.disabled) return;
-      var hwId = resolveHwId(currentHw);
-      if (hwId) {
-        var url = 'odev-coz.html?hw=' + encodeURIComponent(hwId);
-        if (currentHw.status === 'done') {
-          url += '&retry=1';
-          clearHwSession(hwId);
-        }
-        location.href = url;
-        return;
+      // Her ödev çözüm ekranına gider (sessiz tamamlama yok). Gerçek çözüm seti olmayan
+      // ödevlerde ders bazlı yedek set kullanılır (getHwSolveTarget).
+      var url = 'odev-coz.html?hw=' + encodeURIComponent(getHwSolveTarget(currentHw));
+      if (currentHw.status === 'done') {
+        url += '&retry=1';
+        var realId = resolveHwId(currentHw);
+        if (realId) clearHwSession(realId);
       }
-      if (currentHw.status === 'done') return;
-      currentHw.status = 'done';
-      currentHw.doneAt = isoStrNow();
-      currentHw.score = Math.floor(80 + Math.random() * 20);
-      refreshAll();
-      updateCta();
+      location.href = url;
     });
   }
 

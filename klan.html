@@ -101,7 +101,7 @@ a { text-decoration: none; color: inherit; }
 <main class="stage">
   <div class="stage-nav">
     <aside class="nav-rail" aria-label="Ana menü">
-      <a class="nav-item is-active" href="ogrenci-dashboard.html" title="Merkez" aria-current="page">
+      <a class="nav-item" href="ogrenci-dashboard.html" title="Merkez">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span class="nav-item-label">Merkez</span>
       </a>
@@ -112,6 +112,10 @@ a { text-decoration: none; color: inherit; }
       <a class="nav-item" href="ogrenci-odevler.html" title="Ödevler">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
         <span class="nav-item-label">Ödevler</span>
+      </a>
+      <a class="nav-item is-active" href="klan.html" title="Klanım" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span class="nav-item-label">Klanım</span>
       </a>
       <a class="nav-item" href="tekrarlar.html" title="Ders Tekrarları">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
@@ -130,37 +134,74 @@ a { text-decoration: none; color: inherit; }
 
   <section class="klan-page" aria-labelledby="klanPageTitle">
     <header class="klan-pagehead">
-      <h1 class="klan-pagehead-title" id="klanPageTitle">Klan Detayları</h1>
+      <h1 class="klan-pagehead-title" id="klanPageTitle">Klanım</h1>
       <span class="klan-pagehead-line" aria-hidden="true"></span>
     </header>
 
-    <article class="klan-detail-card" id="klanDetailCard" data-clan="alfa">
-      <div class="klan-detail-visual">
-        <div class="klan-detail-emblem" id="klanEmblem" aria-hidden="true">⚡</div>
-      </div>
-      <div class="klan-detail-body">
-        <span class="klan-detail-eyebrow">Klanın</span>
-        <h2 class="klan-detail-name" id="klanName">Alfa Klanı</h2>
-        <div class="klan-detail-stats">
-          <div class="klan-stat">
-            <span class="klan-stat-label">Toplam XP</span>
-            <span class="klan-stat-val" id="klanTotalXp">184.250</span>
-          </div>
-          <div class="klan-stat">
-            <span class="klan-stat-label">Genel Sıralama</span>
-            <span class="klan-stat-val is-rank" id="klanRank">#2</span>
-          </div>
-          <div class="klan-stat">
-            <span class="klan-stat-label">Program Türü</span>
-            <span class="klan-stat-val is-program" id="klanProgramType">Hafta İçi Erken</span>
+    <!-- 1. Üst klan kartı + Yumi mesajı -->
+    <div class="klan-top">
+      <article class="klan-detail-card" id="klanDetailCard" data-clan="alfa">
+        <div class="klan-detail-visual">
+          <div class="klan-detail-emblem" id="klanEmblem" aria-hidden="true">⚡</div>
+        </div>
+        <div class="klan-detail-body">
+          <span class="klan-detail-eyebrow">Klanın</span>
+          <h2 class="klan-detail-name" id="klanName">Alfa Klanı</h2>
+          <div class="klan-detail-stats">
+            <div class="klan-stat">
+              <span class="klan-stat-label">Toplam XP</span>
+              <span class="klan-stat-val" id="klanTotalXp">184.250</span>
+            </div>
+            <div class="klan-stat">
+              <span class="klan-stat-label">Genel Sıralama</span>
+              <span class="klan-stat-val is-rank" id="klanRank">#2</span>
+            </div>
+            <div class="klan-stat">
+              <span class="klan-stat-label">Kaşif Sayısı</span>
+              <span class="klan-stat-val" id="klanMemberCount">24</span>
+            </div>
           </div>
         </div>
-      </div>
-    </article>
+      </article>
+      <aside class="klan-yumi" aria-label="Yumi mesajı">
+        <span class="klan-yumi-ava" aria-hidden="true">🤖</span>
+        <p class="klan-yumi-msg">Alfa Klanı zirveye çok yakın! Beta Klanı ile aranızda <strong>8.150 XP</strong> kaldı.</p>
+      </aside>
+    </div>
 
+    <!-- 2. Klan Yörüngesi -->
+    <section class="klan-orbit" aria-label="Klan Yörüngesi">
+      <div class="klan-orbit-badge" aria-hidden="true"><span class="klan-orbit-lvl">12</span></div>
+      <div class="klan-orbit-main">
+        <div class="klan-orbit-head">
+          <span class="klan-orbit-title">Klan Yörüngesi · <strong>Seviye 12</strong></span>
+          <span class="klan-orbit-xp">184.250 / 200.000 XP</span>
+        </div>
+        <div class="klan-orbit-track"><div class="klan-orbit-fill" style="width:92%"></div></div>
+        <span class="klan-orbit-sub">Sonraki yörüngeye <strong>15.750 XP</strong> kaldı</span>
+      </div>
+      <div class="klan-orbit-week">
+        <span class="klan-orbit-week-label">Bu hafta</span>
+        <strong class="klan-orbit-week-val">+12.400 XP</strong>
+      </div>
+    </section>
+
+    <!-- 3. Klanıma Katkım -->
+    <section class="klan-contrib" aria-label="Klanıma Katkım">
+      <h3 class="klan-contrib-title"><span aria-hidden="true">🙋</span> Klanıma Katkım</h3>
+      <div class="klan-contrib-grid">
+        <div class="klan-contrib-item is-accent"><span class="klan-contrib-num">+320 XP</span><span class="klan-contrib-lbl">Bu hafta kazandırdın</span></div>
+        <div class="klan-contrib-item"><span class="klan-contrib-num">%2,6</span><span class="klan-contrib-lbl">Klan XP'sinin payın</span></div>
+        <div class="klan-contrib-item"><span class="klan-contrib-num">#4</span><span class="klan-contrib-lbl">Klan içi sıran</span></div>
+        <div class="klan-contrib-item"><span class="klan-contrib-num">4</span><span class="klan-contrib-lbl">Tamamlanan ödev</span></div>
+        <div class="klan-contrib-item"><span class="klan-contrib-num">3</span><span class="klan-contrib-lbl">Katıldığın canlı ders</span></div>
+      </div>
+    </section>
+
+    <!-- 4. Sıralamalar + dönem filtresi -->
     <section class="klan-rankings" aria-labelledby="klanRankingsTitle">
       <header class="klan-section-head">
-        <h2 class="klan-section-title" id="klanRankingsTitle">Klan ve Bireysel Sıralama</h2>
+        <h2 class="klan-section-title" id="klanRankingsTitle">Sıralamalar</h2>
         <span class="klan-section-line" aria-hidden="true"></span>
       </header>
       <div class="klan-rankings-grid">
@@ -168,17 +209,73 @@ a { text-decoration: none; color: inherit; }
           <header class="klan-rank-panel-head">
             <span class="klan-rank-panel-icon" aria-hidden="true">🏆</span>
             <h3 class="klan-rank-panel-title">Klan Genel Sıralaması</h3>
-            <span class="klan-rank-panel-line" aria-hidden="true"></span>
+            <div class="klan-period" role="tablist" aria-label="Dönem filtresi">
+              <button type="button" class="klan-period-btn is-active" data-period="week" role="tab" aria-selected="true">Bu Hafta</button>
+              <button type="button" class="klan-period-btn" data-period="month" role="tab" aria-selected="false">Bu Ay</button>
+              <button type="button" class="klan-period-btn" data-period="all" role="tab" aria-selected="false">Tüm Zamanlar</button>
+            </div>
           </header>
           <div class="klan-rank-list" id="klanRankList" role="list"></div>
         </div>
         <div class="klan-rank-panel klan-rank-panel--student">
           <header class="klan-rank-panel-head">
             <span class="klan-rank-panel-icon" aria-hidden="true">🪐</span>
-            <h3 class="klan-rank-panel-title">Öğrenci Bireysel Sıralaması</h3>
-            <span class="klan-rank-panel-line" aria-hidden="true"></span>
+            <h3 class="klan-rank-panel-title">Alfa Klanı Kaşifleri</h3>
+            <div class="klan-period" role="tablist" aria-label="Dönem filtresi">
+              <button type="button" class="klan-period-btn is-active" data-period="week" role="tab" aria-selected="true">Bu Hafta</button>
+              <button type="button" class="klan-period-btn" data-period="month" role="tab" aria-selected="false">Bu Ay</button>
+              <button type="button" class="klan-period-btn" data-period="all" role="tab" aria-selected="false">Tüm Zamanlar</button>
+            </div>
           </header>
           <div class="klan-rank-list" id="studentRankList" role="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Bu Haftanın Klan Görevi -->
+    <section class="klan-quest" aria-label="Bu Haftanın Klan Görevi">
+      <div class="klan-quest-main">
+        <div class="klan-quest-head">
+          <h3 class="klan-quest-title"><span aria-hidden="true">🎯</span> Bu Haftanın Klan Görevi</h3>
+          <span class="klan-quest-pct">%76 tamamlandı</span>
+        </div>
+        <p class="klan-quest-goal">Birlikte <strong>50.000 XP</strong> kazanın</p>
+        <div class="klan-quest-track"><div class="klan-quest-fill" style="width:76%"></div></div>
+        <div class="klan-quest-foot">
+          <span class="klan-quest-cur">38.200 / 50.000 XP</span>
+          <span class="klan-quest-left">11.800 XP kaldı</span>
+        </div>
+        <p class="klan-quest-note">Ders ve ödevlerini yaptıkça ortak hedef otomatik ilerler.</p>
+      </div>
+      <div class="klan-quest-reward">
+        <span class="klan-quest-reward-label">Ödül</span>
+        <span class="klan-quest-reward-ic" aria-hidden="true">🎁</span>
+        <span class="klan-quest-reward-txt">Tüm klana özel rozet <strong>+100 XP</strong></span>
+      </div>
+    </section>
+
+    <!-- 6. Klan Başarıları -->
+    <section class="klan-ach" aria-label="Klan Başarıları">
+      <header class="klan-section-head">
+        <h2 class="klan-section-title">Klan Başarıları</h2>
+        <span class="klan-section-line" aria-hidden="true"></span>
+      </header>
+      <div class="klan-ach-grid">
+        <div class="klan-ach-item">
+          <span class="klan-ach-ic" aria-hidden="true">🔥</span>
+          <div class="klan-ach-body"><strong>7 Günlük Seri</strong><span>Klan olarak 7 gün üst üste XP kazandınız.</span><span class="klan-ach-date">12 Mayıs 2026</span></div>
+        </div>
+        <div class="klan-ach-item">
+          <span class="klan-ach-ic" aria-hidden="true">📚</span>
+          <div class="klan-ach-body"><strong>Ödev Ustaları</strong><span>Bu hafta en çok ödev tamamlayan klan oldunuz.</span><span class="klan-ach-date">9 Mayıs 2026</span></div>
+        </div>
+        <div class="klan-ach-item">
+          <span class="klan-ach-ic" aria-hidden="true">👑</span>
+          <div class="klan-ach-body"><strong>Haftanın En Aktif Klanı</strong><span>Haftalık XP sıralamasında 1. oldunuz.</span><span class="klan-ach-date">5 Mayıs 2026</span></div>
+        </div>
+        <div class="klan-ach-item">
+          <span class="klan-ach-ic" aria-hidden="true">⭐</span>
+          <div class="klan-ach-body"><strong>Yörünge Avcıları</strong><span>Bu yörünge seviyesini tamamladınız.</span><span class="klan-ach-date">1 Mayıs 2026</span></div>
         </div>
       </div>
     </section>

@@ -2327,6 +2327,59 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   opacity: 1; transform: translateX(-50%) translateY(0);
 }
 
+/* Klan adı — tıklanabilir link */
+a.d3-profile-clan { text-decoration: none; cursor: pointer; transition: color 0.15s, opacity 0.15s; }
+a.d3-profile-clan:hover { color: var(--p-brand-light, #e35c97); }
+
+/* Anchor olan stat kutuları için reset */
+a.d3-profile-stat { text-decoration: none; color: inherit; }
+
+/* Zengin stat tooltip'i — koyu balon, açıklama + ikonlu dinamik satır */
+.d3-profile-stat { overflow: visible; }
+.d3-profile-tip {
+  position: absolute;
+  bottom: calc(100% + 10px); left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  width: max-content; max-width: 230px;
+  display: flex; flex-direction: column; gap: 7px;
+  padding: 11px 13px; border-radius: 12px;
+  background: linear-gradient(165deg, #201b45, #17123a);
+  border: 1px solid rgba(168,164,240,0.28);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.55);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 600;
+}
+.d3-profile-tip::after {
+  content: ''; position: absolute;
+  top: 100%; left: 50%; transform: translateX(-50%);
+  border: 6px solid transparent; border-top-color: #17123a;
+}
+.d3-profile-tip-desc {
+  font-family: var(--font-sans);
+  font-size: 12px; font-weight: 600; line-height: 1.45;
+  color: rgba(255,255,255,0.82); text-align: left;
+}
+.d3-profile-tip-foot {
+  display: flex; align-items: center; gap: 7px;
+  padding-top: 7px; border-top: 1px solid rgba(168,164,240,0.16);
+  font-family: var(--font-sans);
+  font-size: 11.5px; font-weight: 600; line-height: 1.4;
+  color: rgba(255,255,255,0.72); text-align: left;
+}
+.d3-profile-tip-foot strong { color: var(--p-brand-light, #f072b6); font-weight: 800; }
+.d3-profile-tip-ic { font-size: 13px; line-height: 1; flex-shrink: 0; }
+.d3-profile-stat:hover .d3-profile-tip {
+  opacity: 1; transform: translateX(-50%) translateY(0);
+}
+/* Alt satır kutularının tooltip'i aşağı açılsın (üstte yer yok) */
+.d3-profile-stats .d3-profile-stat:nth-child(n+3) .d3-profile-tip {
+  bottom: auto; top: calc(100% + 10px);
+}
+.d3-profile-stats .d3-profile-stat:nth-child(n+3) .d3-profile-tip::after {
+  top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: #201b45;
+}
+
 /* CTA — pembe brand */
 .d3-profile-cta {
   flex-shrink: 0;
@@ -5245,6 +5298,10 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span class="nav-item-label">Ödevler</span>
     </a>
+    <a class="nav-item" href="klan.html" title="Klanım">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span class="nav-item-label">Klanım</span>
+    </a>
     <a class="nav-item" href="tekrarlar.html" title="Ders Tekrarları">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
       <span class="nav-item-label">Ders Tekrarları</span>
@@ -5595,7 +5652,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   <section class="d3-card d3-card-profile">
     <div class="d3-head">
       <span class="d3-head-title">Öğrenci Kartı</span>
-      <a href="#" class="d3-head-link">Profilim ›</a>
+      <a href="performans.html" class="d3-head-link">Profilim ›</a>
     </div>
     <!-- KIMLIK satırı: avatar + isim + sınıf + klan -->
     <div class="d3-profile-id">
@@ -5603,48 +5660,54 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       <div class="d3-profile-info">
         <span class="d3-profile-name">Furkan Çilingir</span>
         <span class="d3-profile-grade">8. Sınıf · LGS</span>
-        <span class="d3-profile-clan">⚡ Alfa Klanı</span>
+        <a class="d3-profile-clan" href="klan.html" title="Klan sayfana git">⚡ Alfa Klanı</a>
       </div>
     </div>
     <!-- STAT GRID — 2x2 -->
     <div class="d3-profile-stats">
-      <div class="d3-profile-stat"
-           data-tip="Tamamlanan ödev, ders ve quizlerden kazanılan toplam puan.">
+      <div class="d3-profile-stat">
         <span class="d3-profile-stat-icon" aria-hidden="true">⚡</span>
         <div class="d3-profile-stat-text">
           <span class="d3-profile-stat-label">Toplam XP</span>
           <span class="d3-profile-stat-val">2.450</span>
         </div>
+        <div class="d3-profile-tip" role="tooltip">
+          <span class="d3-profile-tip-desc">Dersler, ödevler ve görevlerden kazandığın deneyim puanı.</span>
+          <span class="d3-profile-tip-foot"><span class="d3-profile-tip-ic">⚡</span>Sonraki seviyeye <strong>350 XP</strong> kaldı.</span>
+        </div>
       </div>
-      <div class="d3-profile-stat"
-           data-tip="Arka arkaya çalışılan gün sayısı. Seri bozulursa sıfırlanır.">
+      <div class="d3-profile-stat">
         <span class="d3-profile-stat-icon" aria-hidden="true">🔥</span>
         <div class="d3-profile-stat-text">
           <span class="d3-profile-stat-label">Seri</span>
           <span class="d3-profile-stat-val">7 gün</span>
         </div>
+        <div class="d3-profile-tip" role="tooltip">
+          <span class="d3-profile-tip-desc">7 gündür öğrenme serini devam ettiriyorsun.</span>
+          <span class="d3-profile-tip-foot"><span class="d3-profile-tip-ic">🔥</span>En iyi serin: <strong>12 gün</strong></span>
+        </div>
       </div>
-      <div class="d3-profile-stat d3-profile-stat-link" role="button" tabindex="0"
-           data-tip="Bilenyum'daki tüm öğrenciler arasındaki XP sıralaması.">
+      <div class="d3-profile-stat">
         <span class="d3-profile-stat-icon" aria-hidden="true">🪐</span>
         <div class="d3-profile-stat-text">
           <span class="d3-profile-stat-label">Genel Sıralama</span>
           <span class="d3-profile-stat-val">#127</span>
         </div>
-        <span class="d3-profile-stat-arrow" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </span>
+        <div class="d3-profile-tip" role="tooltip">
+          <span class="d3-profile-tip-desc">Tüm Bilenyum kaşifleri arasında 127. sıradasın.</span>
+          <span class="d3-profile-tip-foot"><span class="d3-profile-tip-ic">↗</span>Bu hafta <strong>12 sıra</strong> yükseldin.</span>
+        </div>
       </div>
-      <div class="d3-profile-stat d3-profile-stat-link" role="button" tabindex="0"
-           data-tip="Aynı klana kayıtlı öğrenciler arasındaki XP sıralaması.">
+      <div class="d3-profile-stat">
         <span class="d3-profile-stat-icon" aria-hidden="true">⚡</span>
         <div class="d3-profile-stat-text">
           <span class="d3-profile-stat-label">Klan İçi</span>
           <span class="d3-profile-stat-val">#4</span>
         </div>
-        <span class="d3-profile-stat-arrow" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </span>
+        <div class="d3-profile-tip" role="tooltip">
+          <span class="d3-profile-tip-desc">Alfa Klanında 4. sıradasın.</span>
+          <span class="d3-profile-tip-foot"><span class="d3-profile-tip-ic">↗</span>Bu hafta <strong>2 sıra</strong> yükseldin.</span>
+        </div>
       </div>
     </div>
     <!-- CTA -->

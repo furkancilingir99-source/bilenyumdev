@@ -1,0 +1,177 @@
+/* ============================================================
+   PRE-JOIN v2 — Derse öncesi hazırlık paneli (3 sütun dashboard)
+   Öğrenci canlı ders giriş ekranı. Tema tokenları live-class-theme.css.
+   ============================================================ */
+.lc-screen--prejoin.is-active{align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px}
+.pj2-wrap{width:min(1240px,100%);margin:0 auto;display:flex;flex-direction:column;gap:16px}
+
+/* Üst şerit */
+.pj2-topbar{position:relative;display:flex;justify-content:center;align-items:center;min-height:48px}
+.pj2-status{display:inline-flex;align-items:center;gap:10px;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:700;border:1px solid var(--lc-border);background:var(--lc-surface);color:var(--lc-text-2)}
+.pj2-status-ico{display:inline-flex;width:22px;height:22px;align-items:center;justify-content:center;border-radius:50%}
+.pj2-status-ico svg{width:14px;height:14px}
+.pj2-status .pj2-ico-check{display:none}
+.pj2-status[data-ready="true"]{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.12);color:#86efac}
+.pj2-status[data-ready="true"] .pj2-status-ico{background:var(--lc-success);color:#04150a}
+.pj2-status[data-ready="true"] .pj2-ico-check{display:block}
+.pj2-status[data-ready="true"] .pj2-ico-info{display:none}
+.pj2-status[data-ready="false"] .pj2-status-ico{background:var(--lc-class-secondary-soft,rgba(59,130,255,.16));color:var(--lc-blue)}
+.pj2-help-pill{position:absolute;right:0;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid var(--lc-border);background:var(--lc-surface);color:var(--lc-blue);font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s}
+.pj2-help-pill:hover{background:var(--lc-surface-soft);border-color:var(--lc-blue)}
+.pj2-help-pill svg{width:16px;height:16px}
+
+/* Izgara */
+.pj2-grid{display:grid;grid-template-columns:300px minmax(0,1fr) 322px;gap:16px;align-items:start}
+.pj2-col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.pj2-card{background:var(--lc-surface);border:1px solid var(--lc-border);border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.pj2-card-title{margin:0 0 4px;font-size:15px;font-weight:800;color:var(--lc-text);display:flex;align-items:center;gap:8px;font-family:var(--lc-display)}
+.pj2-card-sub{margin:0 0 14px;font-size:12.5px;line-height:1.5;color:var(--lc-text-2)}
+.pj2-title-ico{display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.pj2-title-ico svg{width:18px;height:18px}
+.pj2-ico-shield{color:var(--lc-success)}
+.pj2-block-label{display:block;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--lc-text-2);margin-bottom:8px}
+
+/* SOL — ders kartı */
+.pj2-live-tag{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;background:var(--lc-class-primary-soft,rgba(255,45,170,.16));color:#ff9dd6;font-size:11px;font-weight:800;letter-spacing:.05em}
+.pj2-live-dot{width:7px;height:7px;border-radius:50%;background:var(--lc-accent);animation:pj2Pulse 1.6s infinite}
+@keyframes pj2Pulse{0%{box-shadow:0 0 0 0 rgba(255,45,170,.5)}70%{box-shadow:0 0 0 7px rgba(255,45,170,0)}100%{box-shadow:0 0 0 0 rgba(255,45,170,0)}}
+.pj2-lesson-title{margin:14px 0 8px;font-size:22px;line-height:1.2;font-weight:800;color:var(--lc-text);font-family:var(--lc-display)}
+.pj2-lesson-sub{display:flex;align-items:center;gap:7px;margin:0 0 18px;font-size:13px;font-weight:700;color:var(--lc-blue)}
+.pj2-lesson-sub svg{width:16px;height:16px}
+.pj2-teachers{padding:16px 0;border-top:1px solid var(--lc-border);border-bottom:1px solid var(--lc-border)}
+.pj2-teacher{display:flex;align-items:center;gap:10px;margin-top:10px}
+.pj2-teacher:first-of-type{margin-top:0}
+.pj2-avatar{flex:0 0 auto;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;background:linear-gradient(135deg,#3b82ff,#1e40af)}
+.pj2-avatar--b{background:linear-gradient(135deg,#ff2daa,#c0066a)}
+.pj2-teacher-info{display:flex;flex-direction:column;gap:3px;min-width:0}
+.pj2-teacher-info strong{font-size:13.5px;font-weight:700;color:var(--lc-text)}
+.pj2-chip{font-size:10.5px;font-weight:700;color:var(--lc-blue);background:var(--lc-class-secondary-soft,rgba(59,130,255,.16));padding:2px 8px;border-radius:6px;align-self:flex-start}
+.pj2-countdown{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding:14px 16px;border-radius:14px;background:var(--lc-surface-soft);border:1px solid var(--lc-border)}
+.pj2-cd-time{display:flex;align-items:baseline;gap:4px;margin-top:2px}
+.pj2-cd-time strong{font-size:26px;font-weight:800;color:var(--lc-text);font-family:var(--lc-mono);letter-spacing:-.02em}
+.pj2-cd-time span{font-size:11px;color:var(--lc-text-2);margin-right:4px}
+.pj2-cd-clock{width:38px;height:38px;color:var(--lc-blue);opacity:.85}
+.pj2-facts{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:12px}
+.pj2-facts li{display:flex;align-items:center;gap:10px;font-size:13px}
+.pj2-fact-ico{flex:0 0 auto;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--lc-surface-soft);color:var(--lc-blue)}
+.pj2-fact-ico svg{width:16px;height:16px}
+.pj2-fact-lbl{color:var(--lc-text-2)}
+.pj2-fact-val{margin-left:auto;font-weight:700;color:var(--lc-text)}
+
+/* ORTA — kamera + hazırlık */
+.pj2-preview{padding:0;overflow:hidden;border:none;background:transparent;box-shadow:none}
+.pj2-preview-stage{position:relative;aspect-ratio:16/10;border-radius:18px;overflow:hidden;border:1px solid var(--lc-border);background:radial-gradient(120% 120% at 50% 0%,#171e3b 0%,#0b1024 70%);display:flex;align-items:center;justify-content:center}
+.pj2-preview-stage[data-cam="on"]{background:linear-gradient(135deg,#241b3d 0%,#0f1530 55%,#1a1140 100%)}
+.pj2-preview-stage[data-cam="on"] .pj2-cam-off{display:none}
+.pj2-preview-stage[data-cam="on"]::after{content:"Kamera önizlemesi açık";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.35);font-size:13px;font-weight:700;letter-spacing:.02em}
+.pj2-cam-off{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--lc-text-2)}
+.pj2-cam-off svg{width:52px;height:52px;opacity:.7}
+.pj2-cam-off span{font-size:13px;font-weight:600}
+.pj2-preview-tools{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:10px;z-index:2}
+.pj2-round{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid var(--lc-border);background:rgba(9,12,28,.72);backdrop-filter:blur(8px);color:var(--lc-text);cursor:pointer;transition:background .15s,transform .12s}
+.pj2-round:hover{background:rgba(9,12,28,.9);transform:translateY(-1px)}
+.pj2-round svg{width:20px;height:20px}
+.pj2-round[aria-pressed="true"]{background:var(--lc-accent);border-color:transparent;color:#fff}
+.pj2-round[aria-pressed="true"] .pj2-camoff-ic,.pj2-round[aria-pressed="true"] .pj2-micoff-ic{display:none}
+
+.pj2-prep .pj2-card-title{margin-bottom:12px}
+.pj2-checklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.pj2-checklist li label{display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:10px;font-size:13.5px;color:var(--lc-text);cursor:pointer;transition:background .12s}
+.pj2-checklist li label:hover{background:var(--lc-surface-soft)}
+.pj2-checklist input{appearance:none;-webkit-appearance:none;flex:0 0 auto;width:20px;height:20px;border-radius:6px;border:2px solid var(--lc-class-border-strong,rgba(255,255,255,.18));background:transparent;position:relative;cursor:pointer;transition:background .12s,border-color .12s}
+.pj2-checklist input:checked{background:var(--lc-success);border-color:var(--lc-success)}
+.pj2-checklist input:checked::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #04150a;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.pj2-checklist input:checked+*{color:var(--lc-text-2);text-decoration:line-through;text-decoration-color:rgba(170,178,213,.5)}
+.pj2-prep-done{display:flex;align-items:center;gap:9px;margin:12px 0 0;padding:11px 14px;border-radius:12px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);color:#86efac;font-size:13.5px;font-weight:700}
+.pj2-prep-done svg{width:18px;height:18px}
+
+.pj2-actions{display:flex;gap:12px}
+.pj2-actions .lc-btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:15px 20px;font-size:15px;border-radius:14px}
+.pj2-actions .lc-btn svg{width:18px;height:18px}
+.pj2-join:disabled{opacity:.5;filter:grayscale(.4);cursor:not-allowed;box-shadow:none;transform:none}
+.pj2-back{flex:0 0 auto !important;min-width:140px}
+.pj2-mute-note{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0 0;font-size:12.5px;color:var(--lc-text-2)}
+.pj2-mute-note svg{width:14px;height:14px}
+
+/* SAĞ — sistem kontrolü */
+.pj2-syscheck-btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 16px;border-radius:12px;border:none;background:linear-gradient(135deg,#3b82ff,#2563eb);color:#fff;font-size:14px;font-weight:800;cursor:pointer;transition:filter .15s,transform .12s;box-shadow:0 8px 22px rgba(59,130,255,.35)}
+.pj2-syscheck-btn:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.pj2-syscheck-btn:disabled{opacity:.7;cursor:default;transform:none}
+.pj2-syscheck-btn svg{width:18px;height:18px}
+.pj2-syslist{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.pj2-sysrow{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:12px;background:var(--lc-surface-soft);border:1px solid transparent;transition:border-color .2s,background .2s}
+.pj2-sys-ico{flex:0 0 auto;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.05);color:var(--lc-text-2)}
+.pj2-sys-ico svg{width:18px;height:18px}
+.pj2-sys-body{display:flex;flex-direction:column;gap:2px;min-width:0}
+.pj2-sys-name{font-size:13px;font-weight:700;color:var(--lc-text)}
+.pj2-sys-detail{font-size:11px;color:var(--lc-text-2)}
+.pj2-sys-status{margin-left:auto;flex:0 0 auto;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.pj2-mic-meter{display:none;margin-top:5px}
+.pj2-mic-meter .lc-meter-bar{width:110px;height:5px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden;display:block}
+.pj2-mic-meter .lc-meter-fill{height:100%;width:0;background:linear-gradient(90deg,var(--lc-success),var(--lc-blue));border-radius:4px;transition:width .12s}
+.pj2-sysrow[data-state="checking"]{border-color:rgba(59,130,255,.4)}
+.pj2-sysrow[data-state="checking"] .pj2-sys-ico{background:var(--lc-class-secondary-soft,rgba(59,130,255,.16));color:var(--lc-blue)}
+.pj2-sysrow[data-state="checking"] .pj2-sys-status::before{content:"";width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.2);border-top-color:var(--lc-blue);animation:pj2Spin .7s linear infinite}
+.pj2-sysrow[data-state="ok"]{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.08)}
+.pj2-sysrow[data-state="ok"] .pj2-sys-ico{background:rgba(34,197,94,.16);color:var(--lc-success)}
+.pj2-sysrow[data-state="ok"] .pj2-mic-meter{display:block}
+.pj2-sysrow[data-state="ok"] .pj2-sys-status::before{content:"✓";width:22px;height:22px;border-radius:50%;background:var(--lc-success);color:#04150a;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;line-height:1}
+@keyframes pj2Spin{to{transform:rotate(360deg)}}
+
+/* SAĞ — hatırlatma */
+.pj2-remind-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:12px}
+.pj2-remind-list li{display:flex;align-items:flex-start;gap:11px;font-size:13px;line-height:1.5;color:var(--lc-text-2)}
+.pj2-remind-ico{flex:0 0 auto;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--lc-surface-soft);color:var(--lc-warning);font-size:14px}
+.pj2-remind-ico svg{width:16px;height:16px}
+
+/* SAĞ — sorun giderme (akordeon) */
+.pj2-trouble-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column}
+.pj2-trouble{border-top:1px solid var(--lc-border)}
+.pj2-trouble:first-child{border-top:none}
+.pj2-trouble-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 4px;background:none;border:none;color:var(--lc-text);font-size:13px;font-weight:600;text-align:left;cursor:pointer}
+.pj2-trouble-btn svg{width:16px;height:16px;color:var(--lc-text-2);transition:transform .18s;flex:0 0 auto}
+.pj2-trouble.is-open .pj2-trouble-btn svg{transform:rotate(90deg);color:var(--lc-blue)}
+.pj2-trouble-tip{max-height:0;overflow:hidden;margin:0;padding:0 4px;font-size:12.5px;line-height:1.55;color:var(--lc-text-2);transition:max-height .22s ease,padding .22s ease}
+.pj2-trouble.is-open .pj2-trouble-tip{max-height:160px;padding:0 4px 12px}
+
+/* Responsive */
+@media (max-width:1080px){
+  .pj2-grid{grid-template-columns:minmax(0,1fr) 300px}
+  .pj2-left{grid-column:1 / -1;order:-1}
+  .pj2-left .pj2-lesson{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
+  .pj2-left .pj2-live-tag,.pj2-left .pj2-lesson-title,.pj2-left .pj2-lesson-sub{grid-column:1 / -1}
+}
+@media (max-width:760px){
+  .lc-screen--prejoin.is-active{padding:14px}
+  .pj2-grid{grid-template-columns:minmax(0,1fr)}
+  .pj2-right,.pj2-left{grid-column:auto}
+  .pj2-left .pj2-lesson{grid-template-columns:1fr}
+  .pj2-topbar{flex-direction:column;gap:10px}
+  .pj2-help-pill{position:static;transform:none}
+  .pj2-actions{flex-wrap:wrap}
+  .pj2-back{width:100%}
+}
+
+/* Kamera altı cihaz seçim çubuğu */
+.pj2-preview{display:flex;flex-direction:column;gap:12px;overflow:visible}
+.pj2-devbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pj2-dev{position:relative}
+.pj2-dev-btn{display:inline-flex;align-items:center;gap:8px;max-width:230px;padding:9px 12px;border-radius:11px;border:1px solid var(--lc-border);background:var(--lc-surface);color:var(--lc-text);font-size:12.5px;font-weight:600;cursor:pointer;transition:background .14s,border-color .14s}
+.pj2-dev-btn:hover{background:var(--lc-surface-soft);border-color:var(--lc-class-border-strong,rgba(255,255,255,.18))}
+.pj2-dev-btn[aria-expanded="true"]{border-color:var(--lc-blue)}
+.pj2-dev-ic{width:16px;height:16px;flex:0 0 auto;color:var(--lc-text-2)}
+.pj2-dev-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pj2-dev-caret{width:14px;height:14px;flex:0 0 auto;color:var(--lc-text-2)}
+.pj2-dev--bg .pj2-dev-ic{color:var(--lc-blue)}
+.pj2-dev-test{display:inline-flex;align-items:center;gap:7px;margin-left:auto;padding:9px 12px;border-radius:11px;border:1px solid var(--lc-class-secondary-soft,rgba(59,130,255,.3));background:var(--lc-class-secondary-soft,rgba(59,130,255,.12));color:var(--lc-blue);font-size:12.5px;font-weight:700;cursor:pointer;transition:background .14s}
+.pj2-dev-test:hover{background:rgba(59,130,255,.2)}
+.pj2-dev-test svg{width:15px;height:15px}
+@media (max-width:760px){.pj2-dev-test{margin-left:0;width:100%;justify-content:center}.pj2-dev-btn{max-width:none;flex:1}}
+
+/* Toast */
+.pj2-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(10px);z-index:9999;padding:11px 18px;border-radius:12px;background:var(--lc-surface-raised,#20284A);border:1px solid var(--lc-class-border-strong,rgba(255,255,255,.18));color:var(--lc-text);font-size:13px;font-weight:600;box-shadow:0 14px 40px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.pj2-toast.is-show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Yardım flash */
+.pj2-flash{animation:pj2Flash 1.2s ease}
+@keyframes pj2Flash{0%,100%{box-shadow:0 10px 30px rgba(0,0,0,.25)}30%,60%{box-shadow:0 0 0 3px rgba(59,130,255,.5),0 10px 30px rgba(0,0,0,.25)}}

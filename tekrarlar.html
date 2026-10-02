@@ -7678,6 +7678,146 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 </style>
 <link rel="stylesheet" href="assets/dashboard-light.css">
 <link rel="stylesheet" href="assets/dashboard-polish.css">
+<style>
+/* ===== Ders Tekrarları revizyonu — açık tema ek stilleri ===== */
+
+/* Davranış (durum) filtre satırı */
+.tk-filter-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.tk-filter-legend {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-dark-1, #6b6690);
+}
+.tk-status-chips { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.tk-status-chip {
+  padding: 7px 14px; border-radius: 999px;
+  background: var(--bg-subtle, #f0eef8);
+  border: 1px solid var(--brand-purple-14, rgba(62,58,142,0.14));
+  color: var(--ink-dark-1, #5c567a);
+  font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+}
+.tk-status-chip:hover { background: var(--brand-purple-06, rgba(62,58,142,0.06)); color: var(--brand-navy, #28265a); transform: translateY(-1px); }
+.tk-status-chip.is-active {
+  background: var(--brand-magenta-12, rgba(230,8,123,0.12));
+  border-color: var(--brand-magenta-35, rgba(230,8,123,0.35));
+  color: var(--brand-navy, #28265a);
+}
+
+/* "Bu Hafta" butonu */
+.tk-thisweek-btn {
+  margin-left: 4px; padding: 8px 14px; border-radius: 999px;
+  background: var(--brand-magenta-12, rgba(230,8,123,0.12));
+  border: 1px solid var(--brand-magenta-35, rgba(230,8,123,0.35));
+  color: var(--brand-magenta, #e6087b);
+  font-family: inherit; font-size: 12.5px; font-weight: 800; cursor: pointer; white-space: nowrap;
+  transition: background 0.15s, transform 0.15s;
+}
+.tk-thisweek-btn:hover { background: var(--brand-magenta-20, rgba(230,8,123,0.20)); transform: translateY(-1px); }
+.tk-thisweek-btn[hidden] { display: none; }
+
+/* Bölüm panelleri (Telafi Bekliyor / Haftanın Dersleri) */
+.tk-panel {
+  padding: 20px 22px; border-radius: 20px; margin-bottom: 18px;
+  background: var(--bg-surface, #fff);
+  border: 1px solid var(--brand-purple-14, rgba(62,58,142,0.14));
+  box-shadow: var(--shadow-sm, 0 6px 20px rgba(40,38,90,0.06));
+}
+.tk-panel-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.tk-panel-ic { width: 34px; height: 34px; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.tk-panel-ic svg { width: 18px; height: 18px; }
+.tk-panel-ic.is-missed { background: var(--brand-magenta-12, rgba(230,8,123,0.12)); color: var(--brand-magenta, #e6087b); }
+.tk-panel-ic.is-week { background: rgba(124,58,237,0.12); color: #7c3aed; }
+.tk-panel-title { margin: 0; flex-shrink: 0; font-family: var(--font-display, 'Montserrat', sans-serif); font-size: 18px; font-weight: 800; color: var(--brand-navy, #28265a); letter-spacing: -0.02em; }
+.tk-panel-count { color: var(--brand-magenta, #e6087b); font-weight: 800; }
+.tk-panel-sub { font-size: 13px; color: var(--ink-dark-1, #6b6690); font-weight: 500; }
+
+/* Telafi Bekliyor — büyük yatay kartlar */
+.tk-mgrid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+.tk-mcard {
+  display: grid; grid-template-columns: minmax(140px, 40%) 1fr;
+  text-align: left; padding: 0; border: 1px solid var(--brand-purple-14, rgba(62,58,142,0.14));
+  border-radius: 16px; overflow: hidden; cursor: pointer; font-family: inherit;
+  background: var(--bg-subtle, #f6f5fb);
+  transition: box-shadow .18s, border-color .18s, transform .18s;
+}
+.tk-mcard:hover { box-shadow: var(--shadow-md); border-color: var(--brand-magenta-35, rgba(230,8,123,0.35)); transform: translateY(-2px); }
+.tk-mcard-thumb { position: relative; min-height: 168px; overflow: hidden; }
+.tk-mcard-thumb .tk-card-thumb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tk-mcard-thumb .tk-card-thumb-glyph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+.tk-mcard-body { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; min-width: 0; }
+.tk-mcard-title { margin: 0; font-family: var(--font-display, 'Montserrat', sans-serif); font-size: 17px; font-weight: 800; color: var(--brand-navy, #28265a); line-height: 1.25; }
+.tk-mcard-teacher { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-dark-1, #5c567a); font-weight: 600; }
+.tk-mcard-meta { display: flex; flex-wrap: wrap; gap: 14px; }
+.tk-mcard-meta-item { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--ink-dark-1, #6b6690); font-weight: 600; }
+.tk-mcard-meta-item svg { width: 14px; height: 14px; opacity: .8; }
+.tk-mcard .tk-card-btn { margin-top: 6px; }
+
+/* Haftanın Dersleri — dikey kart ızgarası */
+.tk-wgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.tk-wgrid .tk-card { display: flex; flex-direction: column; }
+.tk-wgrid .tk-card-body { display: flex; flex-direction: column; flex: 1; }
+.tk-wgrid .tk-card-foot { margin-top: auto; }
+
+/* İlerleme metni */
+.tk-card-progress-text { margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--ink-dark-1, #6b6690); }
+.tk-card-progress-text strong { color: var(--brand-navy, #28265a); font-weight: 800; }
+
+/* Tam-genişlik / prominent aksiyon butonu (görsel span) */
+.tk-card-foot { margin-top: 12px; }
+.tk-card-btn {
+  display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%;
+  padding: 11px 16px; border-radius: 12px;
+  font-family: inherit; font-size: 13px; font-weight: 800; letter-spacing: -0.01em;
+  transition: filter .15s, transform .15s;
+}
+.tk-card-btn svg { width: 15px; height: 15px; }
+.tk-card:hover .tk-card-btn, .tk-mcard:hover .tk-card-btn { filter: brightness(1.05); }
+.tk-card-btn.is-resume { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; }
+.tk-card-btn.is-watch  { background: #3b82ff; color: #fff; }
+.tk-card-btn.is-done   { background: var(--bg-subtle, #eceaf5); color: var(--ink-dark-1, #5c567a); border: 1px solid var(--brand-purple-14, rgba(62,58,142,0.14)); }
+.tk-card-btn.is-resume-primary { width: auto; align-self: flex-start; padding: 10px 18px; background: linear-gradient(135deg, var(--brand-magenta, #e6087b), var(--p-brand-deep, #c0066a)); color: #fff; }
+
+/* Kart durum rozeti — davranış renkleri (thumb üstü) */
+.tk-card-status {
+  position: absolute; top: 10px; left: 10px; z-index: 3;
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 8px;
+  font-size: 11px; font-weight: 800; letter-spacing: -0.01em;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.tk-card-status svg { width: 12px; height: 12px; }
+.tk-card-status.is-missed { background: var(--brand-magenta, #e6087b); color: #fff; }
+.tk-card-status.is-resuming { background: #7c3aed; color: #fff; }
+.tk-card-status.is-unwatched { background: rgba(255,255,255,0.92); color: var(--brand-navy, #28265a); }
+.tk-card-status.is-watched { background: rgba(16,185,129,0.92); color: #fff; font-weight: 700; }
+
+/* Yumi rehber çubuğu */
+.tk-yumibar {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 20px; border-radius: 18px; margin-top: 2px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.10), rgba(230,8,123,0.06)), var(--bg-surface, #fff);
+  border: 1px solid var(--brand-purple-14, rgba(62,58,142,0.14));
+  box-shadow: var(--shadow-sm, 0 6px 20px rgba(40,38,90,0.06));
+}
+.tk-yumibar-ava { flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; background: linear-gradient(135deg, #7c3aed, #3b82ff); box-shadow: 0 8px 20px rgba(124,58,237,0.4); }
+.tk-yumibar-ava img { width: 28px; height: 28px; }
+.tk-yumibar-msg { flex: 1; margin: 0; font-size: 14px; font-weight: 600; color: var(--brand-navy, #28265a); line-height: 1.5; }
+.tk-yumibar-msg strong { color: var(--brand-magenta, #e6087b); font-weight: 800; }
+.tk-yumibar-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 7px; padding: 10px 18px; border-radius: 12px; text-decoration: none; background: var(--brand-magenta-12, rgba(230,8,123,0.12)); border: 1px solid var(--brand-magenta-35, rgba(230,8,123,0.35)); color: var(--brand-magenta, #e6087b); font-size: 13px; font-weight: 800; transition: background .15s, transform .15s; }
+.tk-yumibar-btn:hover { background: var(--brand-magenta-20, rgba(230,8,123,0.20)); transform: translateY(-1px); }
+.tk-yumibar-btn svg { width: 15px; height: 15px; }
+
+@media (max-width: 860px) {
+  .tk-mgrid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .tk-mcard { grid-template-columns: 1fr; }
+  .tk-mcard-thumb { min-height: 150px; }
+  .tk-yumibar { flex-wrap: wrap; }
+  .tk-yumibar-msg { flex: 1 1 100%; order: 2; }
+}
+</style>
 </head>
 <body>
 
@@ -7763,6 +7903,10 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     <a class="nav-item" href="ogrenci-odevler.html" title="Ödevler">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span class="nav-item-label">Ödevler</span>
+    </a>
+    <a class="nav-item" href="klan.html" title="Klanım">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span class="nav-item-label">Klanım</span>
     </a>
     <a class="nav-item is-active" href="tekrarlar.html" title="Ders Tekrarları" aria-current="page">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
@@ -7851,6 +7995,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
           <button type="button" class="ov-week-btn" id="tkNextWeek" aria-label="Sonraki hafta">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
+          <button type="button" class="tk-thisweek-btn" id="tkThisWeek" hidden>Bu Hafta</button>
           <div class="ov-week-picker" id="tkWeekPicker" hidden role="dialog" aria-label="Eğitim haftası seç">
             <div class="ov-week-picker-head">Eğitim Haftası Seç</div>
             <div class="ov-week-picker-list" id="tkWeekPickerList"></div>
@@ -7865,6 +8010,17 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
           <button type="button" class="ov-subj-chip" data-subj="ing" style="--c:#ff9a4a"><span class="ov-subj-chip-dot"></span>İngilizce</button>
           <button type="button" class="ov-subj-chip" data-subj="sos" style="--c:#a8a4f0"><span class="ov-subj-chip-dot"></span>Sosyal</button>
           <button type="button" class="ov-subj-chip" data-subj="din" style="--c:#5e9be8"><span class="ov-subj-chip-dot"></span>Din</button>
+        </div>
+      </div>
+
+      <!-- DAVRANIŞ (izleme durumu) filtresi -->
+      <div class="tk-filter-row">
+        <span class="tk-filter-legend">Durum</span>
+        <div class="tk-status-chips" role="tablist" aria-label="İzleme durumu filtresi">
+          <button type="button" class="tk-status-chip is-active" data-status="all" role="tab" aria-selected="true">Tümü</button>
+          <button type="button" class="tk-status-chip" data-status="resume" role="tab" aria-selected="false">Devam Et</button>
+          <button type="button" class="tk-status-chip" data-status="unwatched" role="tab" aria-selected="false">İzlenmedi</button>
+          <button type="button" class="tk-status-chip" data-status="done" role="tab" aria-selected="false">Tamamlandı</button>
         </div>
       </div>
     </div>
@@ -9126,6 +9282,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 
   // ====== STATE ======
   var currentSubject = 'all';
+  var currentStatus = 'all'; // all | resume | unwatched | done  (davranış filtresi)
   function addDays(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
   var EDU_TERM_START = new Date(2026, 2, 10);
   var MAX_EDU_WEEK = 16;
@@ -9210,9 +9367,33 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   function updateWeekLabel() {
     var eyebrow = document.getElementById('tkWeekEyebrow');
     var label = document.getElementById('tkDateLabel');
-    if (eyebrow) eyebrow.textContent = formatEduWeek(selectedEduWeek);
+    var isCurrent = (selectedEduWeek === findEduWeekForDate(TODAY));
+    if (eyebrow) eyebrow.textContent = isCurrent ? 'Bu Hafta' : formatEduWeek(selectedEduWeek);
     if (label) label.textContent = formatWeekRange(selectedEduWeek);
   }
+
+  // ====== İlerleme kalıcılığı (localStorage) — kaldığı yerden devam ======
+  var PROGRESS_KEY = 'bilenyum.tekrarProgress';
+  function loadProgress() {
+    try {
+      var raw = localStorage.getItem(PROGRESS_KEY);
+      if (!raw) return;
+      var map = JSON.parse(raw) || {};
+      LESSONS.forEach(function(l){
+        if (map[l.id] != null) l.watchedPct = Math.max(0, Math.min(100, map[l.id]));
+      });
+    } catch (e) { /* sessiz */ }
+  }
+  function saveProgress(lesson) {
+    if (!lesson) return;
+    try {
+      var raw = localStorage.getItem(PROGRESS_KEY);
+      var map = raw ? (JSON.parse(raw) || {}) : {};
+      map[lesson.id] = Math.round(Math.max(0, Math.min(100, lesson.watchedPct || 0)));
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(map));
+    } catch (e) { /* sessiz */ }
+  }
+  loadProgress();
 
   // Lesson status helper
   // attended:false & watchedPct:0..99 → missed
@@ -9227,8 +9408,8 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     return 'attended';
   }
   function statusInfo(s) {
-    if (s === 'missed') return { cls:'is-missed', label:'Kaçırdın', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' };
-    if (s === 'watched') return { cls:'is-watched', label:'İzledin', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' };
+    if (s === 'missed') return { cls:'is-missed', label:'Telafi Bekliyor', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><polyline points="3 3 3 8 8 8"/></svg>' };
+    if (s === 'watched') return { cls:'is-watched', label:'Tamamlandı', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' };
     if (s === 'resuming') return { cls:'is-resuming', label:'Yarım', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/></svg>' };
     return { cls:'is-attended', label:'Katıldın', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0 1 7.07 17.07"/></svg>' };
   }
@@ -9239,6 +9420,59 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 
   function isSameDay(a, b) {
     return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+  }
+
+  // Öğrenci adı (Yumi mesajı için) — HUD profilinden ilk ad
+  var STUDENT_FIRST_NAME = (function(){
+    var el = document.querySelector('.player-name');
+    var full = el ? (el.textContent || '').trim() : '';
+    return full ? full.split(/\s+/)[0] : '';
+  })();
+
+  var DAY_FULL = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+  function fmtDateFull(s) {
+    var d = parseISO(s);
+    return d.getDate() + ' ' + MONTH_NAMES[d.getMonth()] + ' ' + DAY_FULL[d.getDay()];
+  }
+
+  // Hafta kartı durum rozeti (davranış etiketi + renk sınıfı)
+  function weekBadgeInfo(st) {
+    if (st === 'resuming') return { cls:'is-resuming', label:'Devam Et' };
+    if (st === 'watched')  return { cls:'is-watched',  label:'Tamamlandı' };
+    return { cls:'is-unwatched', label:'İzlenmedi' }; // attended
+  }
+
+  var SVG_CLOCK_S = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 13"/></svg>';
+  var SVG_CAL_S = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+  var SVG_ARROW_S = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+  var SVG_PLAY_S = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>';
+
+  // Telafi Bekliyor — büyük yatay kart
+  function renderMissedCard(l) {
+    var subjectName = SUBJECT_NAMES[l.subject] || l.subject;
+    var teacher = (TEACHERS[l.teacher] && TEACHERS[l.teacher].full) || l.teacher;
+    var avatar = (TEACHERS[l.teacher] && TEACHERS[l.teacher].avatar) || '';
+    var thumbImg = LESSON_IMAGES[l.id] || SUBJECT_IMAGES[l.subject] || '';
+    var fallbackImg = SUBJECT_IMAGES[l.subject] || '';
+    var fmt = resolveLessonFormat(l);
+    return '<button type="button" class="tk-mcard" data-subject="' + l.subject + '" data-id="' + l.id + '" data-lesson-format="' + fmt + '">'
+      + '<div class="tk-mcard-thumb">'
+        + (thumbImg ? '<img class="tk-card-thumb-img" src="' + thumbImg + '" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'' + fallbackImg + '\';" />' : '<span class="tk-card-thumb-glyph">' + (SUBJECT_ICONS[l.subject]||'📚') + '</span>')
+        + '<span class="tk-card-overlay"></span>'
+        + '<span class="tk-card-status is-missed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><polyline points="3 3 3 8 8 8"/></svg>Telafi Bekliyor</span>'
+        + '<span class="tk-card-play" aria-hidden="true">' + SVG_PLAY_S + '</span>'
+      + '</div>'
+      + '<div class="tk-mcard-body">'
+        + '<div class="tk-card-subject-row"><span class="tk-card-subject">' + subjectName + '</span>' + lessonFormatBadgeHtml(l) + '</div>'
+        + '<h3 class="tk-mcard-title">' + l.topic + '</h3>'
+        + '<div class="tk-mcard-teacher">' + (avatar ? '<span class="tk-card-meta-ava"><img src="' + avatar + '" alt="" /></span>' : '') + '<span class="tk-card-meta-name">' + teacher + '</span></div>'
+        + '<div class="tk-mcard-meta">'
+          + '<span class="tk-mcard-meta-item">' + SVG_CLOCK_S + fmtDuration(l.durationMin) + '</span>'
+          + '<span class="tk-mcard-meta-item">' + SVG_CAL_S + fmtDateFull(l.date) + '</span>'
+        + '</div>'
+        + '<span class="tk-card-btn is-resume-primary">Tekrarı İzle' + SVG_ARROW_S + '</span>'
+      + '</div>'
+    + '</button>';
   }
 
   function renderCard(l) {
@@ -9256,10 +9490,22 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       ? '<div class="tk-card-progress"><div class="tk-card-progress-fill" style="width:' + pct + '%"></div></div>'
       : '';
 
-    // Status pill: sadece 'missed' (Kaçırdın) ve 'watched' (İzledin) gösterilir
-    var statusPill = (st === 'missed' || st === 'watched')
-      ? '<span class="tk-card-status ' + info.cls + '">' + info.icon + info.label + '</span>'
+    // Yarım kalan derste "X / Y dk izlendi · %Z" metni
+    var watchedMin = Math.round((l.durationMin || 0) * pct / 100);
+    var progressText = (st === 'resuming')
+      ? '<div class="tk-card-progress-text"><strong>' + watchedMin + '</strong> / ' + (l.durationMin || 0) + ' dk izlendi · <strong>%' + Math.round(pct) + '</strong></div>'
       : '';
+
+    // Duruma göre tam-genişlik aksiyon butonu (görsel span; kart handler'ı oynatıcıyı açar)
+    var btnLabel, btnCls;
+    if (st === 'watched') { btnLabel = 'Tekrar İzle'; btnCls = 'is-done'; }
+    else if (st === 'resuming') { btnLabel = 'Devam Et'; btnCls = 'is-resume'; }
+    else { btnLabel = 'İzle'; btnCls = 'is-watch'; }
+    var btnHtml = '<span class="tk-card-btn ' + btnCls + '">' + btnLabel + SVG_ARROW_S + '</span>';
+
+    // Durum rozeti — tüm durumlarda renkli davranış etiketi
+    var badge = weekBadgeInfo(st);
+    var statusPill = '<span class="tk-card-status ' + badge.cls + '">' + badge.label + '</span>';
 
     // Önce dersin kendine özel görseli, yoksa subject fallback
     var thumbImg = LESSON_IMAGES[l.id] || SUBJECT_IMAGES[l.subject] || '';
@@ -9270,8 +9516,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
         + (thumbImg ? '<img class="tk-card-thumb-img" src="' + thumbImg + '" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'' + fallbackImg + '\';" />' : '<span class="tk-card-thumb-glyph">' + (SUBJECT_ICONS[l.subject]||'📚') + '</span>')
         + '<span class="tk-card-overlay"></span>'
         + statusPill
-        + '<span class="tk-card-duration">' + fmtDuration(l.durationMin) + '</span>'
-        + '<span class="tk-card-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg></span>'
+        + '<span class="tk-card-play" aria-hidden="true">' + SVG_PLAY_S + '</span>'
         + progressBar
       + '</div>'
       + '<div class="tk-card-body">'
@@ -9285,16 +9530,29 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
             + (avatar ? '<span class="tk-card-meta-ava"><img src="' + avatar + '" alt="" /></span>' : '')
             + '<span class="tk-card-meta-name">' + teacher + '</span>'
           + '</span>'
-          + '<span class="tk-card-meta-date">' + dateLabel + '</span>'
+          + '<span class="tk-card-meta-dur">' + SVG_CLOCK_S + fmtDuration(l.durationMin) + '</span>'
         + '</div>'
+        + progressText
+        + '<div class="tk-card-foot">' + btnHtml + '</div>'
       + '</div>'
     + '</button>';
   }
 
   // ====== SMART SECTIONS render ======
+  // Davranış filtresi: resume=yarım, unwatched=hiç izlenmemiş (missed+attended), done=tamamlandı
+  function statusMatch(l) {
+    if (currentStatus === 'all') return true;
+    var s = lessonStatus(l);
+    if (currentStatus === 'resume') return s === 'resuming';
+    if (currentStatus === 'unwatched') return s === 'missed' || s === 'attended';
+    if (currentStatus === 'done') return s === 'watched';
+    return true;
+  }
+
   function renderSections() {
     var subjFiltered = LESSONS.filter(function(l){
-      return currentSubject === 'all' || l.subject === currentSubject;
+      if (!(currentSubject === 'all' || l.subject === currentSubject)) return false;
+      return statusMatch(l);
     });
 
     var bucket = { missed: [], thisWeek: [] };
@@ -9327,28 +9585,55 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     }
     emptyEl.hidden = true;
 
-    // Tarih sıralaması (yeniden eskiye)
+    // Kaçırdıkların: tarih (yeni→eski)
     function sortDesc(a,b){ return parseISO(b.date) - parseISO(a.date); }
     bucket.missed.sort(sortDesc);
-    bucket.thisWeek.sort(sortDesc);
+
+    // Haftanın dersleri: davranış önceliği (Devam Et → İzlenmedi → Tamamlandı), sonra tarih
+    var statusOrder = { resuming: 0, attended: 1, watched: 2 };
+    bucket.thisWeek.sort(function(a,b){
+      var oa = statusOrder[lessonStatus(a)]; if (oa == null) oa = 3;
+      var ob = statusOrder[lessonStatus(b)]; if (ob == null) ob = 3;
+      if (oa !== ob) return oa - ob;
+      return parseISO(b.date) - parseISO(a.date);
+    });
 
     var html = '';
-    function sectionBlock(key, title, items, gridVariant) {
-      if (!items.length) return '';
-      var gridCls = 'ov-grid' + (gridVariant ? ' ov-grid--' + gridVariant : '');
-      return '<section class="ov-section ov-section--' + key + '">'
-        + '<header class="ov-section-head">'
-          + '<span class="ov-section-dot"></span>'
-          + '<h3 class="ov-section-title">' + title + '</h3>'
-          + '<span class="ov-section-line"></span>'
+
+    // ── Telafi Bekliyor — büyük yatay kartlar ──
+    if (bucket.missed.length) {
+      html += '<section class="tk-panel tk-panel--missed">'
+        + '<header class="tk-panel-head">'
+          + '<span class="tk-panel-ic is-missed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 13"/></svg></span>'
+          + '<h3 class="tk-panel-title">Telafi Bekliyor <span class="tk-panel-count">(' + bucket.missed.length + ')</span></h3>'
+          + '<span class="tk-panel-sub">Kaçırdığın dersleri tamamlayarak öğrenimine kaldığın yerden devam edebilirsin.</span>'
         + '</header>'
-        + '<div class="' + gridCls + '">' + items.map(renderCard).join('') + '</div>'
+        + '<div class="tk-mgrid">' + bucket.missed.map(renderMissedCard).join('') + '</div>'
       + '</section>';
     }
 
-    // Kaçırdıkların — yatay scroll (Netflix-style continue watching)
-    html += sectionBlock('missed', 'Kaçırdığın Dersler', bucket.missed, 'hscroll');
-    html += sectionBlock('this-week', 'Haftanın Dersleri', bucket.thisWeek);
+    // ── Haftanın Dersleri — dikey kartlar ──
+    if (bucket.thisWeek.length) {
+      html += '<section class="tk-panel tk-panel--week">'
+        + '<header class="tk-panel-head">'
+          + '<span class="tk-panel-ic is-week"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg></span>'
+          + '<h3 class="tk-panel-title">Haftanın Dersleri</h3>'
+          + '<span class="tk-panel-sub">Derslerine devam et veya tekrar izlemek istediğin konuları seç.</span>'
+        + '</header>'
+        + '<div class="tk-wgrid">' + bucket.thisWeek.map(renderCard).join('') + '</div>'
+      + '</section>';
+    }
+
+    // ── Yumi rehber çubuğu (davranış yönlendirmesi) ──
+    var greet = STUDENT_FIRST_NAME ? ('Harika gidiyorsun ' + STUDENT_FIRST_NAME + '! ') : 'Harika gidiyorsun! ';
+    var yumiMsg = bucket.missed.length
+      ? greet + 'Telafi bekleyen <strong>' + bucket.missed.length + ' dersini</strong> tamamladığında yıldızlarını toplayabilirsin.'
+      : (STUDENT_FIRST_NAME ? (STUDENT_FIRST_NAME + ', telafilerin tamamlandı! ') : 'Telafilerin tamamlandı! ') + 'Bu haftanın kaçırdığın <strong>tüm derslerini</strong> yakaladın. 🎉';
+    html += '<div class="tk-yumibar" role="status">'
+      + '<span class="tk-yumibar-ava" aria-hidden="true"><img src="assets/bilenyum-app-icon.svg" alt="" onerror="this.onerror=null;this.replaceWith(document.createTextNode(\'🤖\'));" /></span>'
+      + '<p class="tk-yumibar-msg">' + yumiMsg + '</p>'
+      + '<a class="tk-yumibar-btn" href="klan.html"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Klanını Güçlendir</a>'
+    + '</div>';
 
     sectionsEl.innerHTML = html;
   }
@@ -9415,6 +9700,8 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     updateWeekLabel();
     renderWeekPicker();
     renderSections();
+    var thisWeekBtn = document.getElementById('tkThisWeek');
+    if (thisWeekBtn) thisWeekBtn.hidden = (selectedEduWeek === findEduWeekForDate(TODAY));
   }
 
   document.getElementById('tkPrevWeek').addEventListener('click', function(){ shiftEduWeek(-1); });
@@ -9451,6 +9738,28 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       refreshAll();
     });
   });
+
+  // ====== Davranış (izleme durumu) chip filtresi ======
+  document.querySelectorAll('.tk-status-chip').forEach(function(c){
+    c.addEventListener('click', function(){
+      document.querySelectorAll('.tk-status-chip').forEach(function(x){
+        x.classList.remove('is-active'); x.setAttribute('aria-selected', 'false');
+      });
+      c.classList.add('is-active'); c.setAttribute('aria-selected', 'true');
+      currentStatus = c.getAttribute('data-status');
+      refreshAll();
+    });
+  });
+
+  // ====== "Bu Hafta" → mevcut haftaya dön ======
+  (function(){
+    var btn = document.getElementById('tkThisWeek');
+    if (!btn) return;
+    btn.addEventListener('click', function(){
+      selectedEduWeek = findEduWeekForDate(TODAY);
+      refreshAll();
+    });
+  })();
 
   // ====== FULLSCREEN VIDEO PLAYER MODAL ======
   var playerEl = document.getElementById('tkPlayer');
@@ -9525,6 +9834,8 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     document.body.style.overflow = 'hidden';
   }
   function closePlayer() {
+    saveProgress(currentLesson);
+    refreshAll();
     playerEl.hidden = true;
     document.body.style.overflow = '';
     playerShell.removeAttribute('data-lesson-format');
@@ -9537,7 +9848,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 
   // Card click → player aç
   sectionsEl.addEventListener('click', function(ev){
-    var card = ev.target.closest('.tk-card');
+    var card = ev.target.closest('.tk-card, .tk-mcard');
     if (!card) return;
     var id = parseInt(card.getAttribute('data-id'), 10);
     if (!isNaN(id)) openPlayer(id);
@@ -9553,7 +9864,6 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   document.getElementById('tkPlayerBigPlay').addEventListener('click', function(){
     if (!currentLesson) return;
     currentLesson.watchedPct = 100;
-    refreshAll();
     closePlayer();
   });
 

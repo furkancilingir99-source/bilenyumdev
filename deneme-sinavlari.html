@@ -9904,6 +9904,74 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 <link rel="stylesheet" href="assets/dashboard-light.css">
 <link rel="stylesheet" href="assets/dashboard-polish.css">
 <link rel="stylesheet" href="assets/dashboard-sn-perf.css">
+<style>
+/* ===== Deneme Sınavları revizyonu — açık tema ===== */
+
+/* 1) Tek satır geri sayım */
+.sn-countdown { display: flex; align-items: center; gap: 12px; }
+.sn-countdown-ic { flex-shrink: 0; width: 40px; height: 40px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; background: var(--brand-magenta-12, rgba(230,8,123,0.12)); color: var(--brand-magenta, #e6087b); }
+.sn-countdown-ic svg { width: 20px; height: 20px; }
+.sn-countdown-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.sn-countdown-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-dark-1, #6b6690); }
+.sn-countdown-text { font-family: var(--font-display, 'Montserrat', sans-serif); font-size: 18px; font-weight: 800; color: var(--brand-navy, #28265a); line-height: 1.15; }
+.sn-countdown.is-soon .sn-countdown-ic { background: rgba(255,122,74,0.16); color: #e0561f; animation: snSoonPulse 1.6s ease-in-out infinite; }
+.sn-countdown.is-soon .sn-countdown-text { color: #e0561f; }
+@keyframes snSoonPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(224,86,31,0); } 50% { box-shadow: 0 0 0 5px rgba(224,86,31,0.14); } }
+
+/* 2) CTA kilitli durumu — Hatırlatma Kur birincil olur */
+.sn-upcoming-join.is-locked { filter: grayscale(0.95) opacity(0.7) !important; cursor: not-allowed !important; box-shadow: none !important; }
+.sn-upcoming-join.is-locked svg { display: none; }
+.sn-upcoming[data-exam-state="locked"] .sn-upcoming-remind { background: linear-gradient(135deg, var(--brand-magenta, #e6087b), var(--p-brand-deep, #c0066a)) !important; color: #fff !important; border-color: transparent !important; box-shadow: 0 8px 22px -8px rgba(230,8,123,0.5) !important; }
+.sn-upcoming[data-exam-state="locked"] .sn-upcoming-remind svg { color: #fff; }
+
+/* 3) Geçmiş satır — net değişim rozeti */
+.sn-row-delta { display: inline-flex; align-items: center; margin-left: 8px; padding: 2px 8px; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.sn-row-delta.is-up { background: rgba(46,168,106,0.14); color: #1f8a54; }
+.sn-row-delta.is-down { background: rgba(244,63,94,0.12); color: #d33b52; }
+
+/* 5/6) Grafik genel/branş toggle + alt filtre + tooltip */
+.sn-chart-toggle { display: inline-flex; gap: 4px; padding: 3px; border-radius: 999px; background: var(--bg-subtle, #f0eef8); border: 1px solid var(--brand-purple-14, rgba(62,58,142,0.14)); }
+.sn-chart-toggle-btn { padding: 6px 13px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-dark-1, #6b6690); font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background .15s, color .15s; }
+.sn-chart-toggle-btn:hover { color: var(--brand-navy, #28265a); }
+.sn-chart-toggle-btn.is-active { background: linear-gradient(135deg, var(--brand-magenta, #e6087b), var(--p-brand-deep, #c0066a)); color: #fff; }
+.sn-chart-subfilter { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 2px; }
+.sn-chart-subfilter[hidden] { display: none; }
+.sn-chart-subchip { padding: 5px 12px; border-radius: 999px; background: var(--bg-subtle, #f0eef8); border: 1px solid var(--brand-purple-14, rgba(62,58,142,0.14)); color: var(--ink-dark-1, #5c567a); font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.sn-chart-subchip.is-active { background: var(--brand-magenta-12, rgba(230,8,123,0.12)); border-color: var(--brand-magenta-35, rgba(230,8,123,0.35)); color: var(--brand-navy, #28265a); }
+.sn-chart-empty { fill: var(--ink-dark-1, #8a86a8); font-family: inherit; font-size: 14px; font-weight: 600; }
+.sn-chart-tip-delta { margin-left: 6px; font-weight: 800; }
+.sn-chart-tip-delta.is-up { color: #3ad07a; }
+.sn-chart-tip-delta.is-down { color: #ff8ea3; }
+
+/* 7) Ders bazlı — yüzde + değişim */
+.sn-subj-pct { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 800; color: var(--brand-navy, #28265a); min-width: 40px; text-align: right; }
+.sn-subj-delta { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 800; white-space: nowrap; }
+.sn-subj-delta.is-up { background: rgba(46,168,106,0.14); color: #1f8a54; }
+.sn-subj-delta.is-down { background: rgba(244,63,94,0.12); color: #d33b52; }
+
+/* 9) Sonraki Adım — tek Yumi önerisi */
+.sn-reco-mount { margin-top: 8px; }
+.sn-reco-mount[hidden] { display: none; }
+.sn-reco { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-radius: 18px; background: linear-gradient(135deg, rgba(124,58,237,0.10), rgba(230,8,123,0.06)), var(--bg-surface, #fff); border: 1px solid var(--brand-purple-14, rgba(62,58,142,0.14)); box-shadow: var(--shadow-sm, 0 6px 20px rgba(40,38,90,0.06)); }
+.sn-reco-ava { flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; background: linear-gradient(135deg, #7c3aed, #3b82ff); box-shadow: 0 8px 20px rgba(124,58,237,0.4); }
+.sn-reco-ava img { width: 28px; height: 28px; }
+.sn-reco-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sn-reco-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--brand-magenta, #e6087b); }
+.sn-reco-msg { margin: 0; font-size: 14px; font-weight: 600; color: var(--brand-navy, #28265a); line-height: 1.5; }
+.sn-reco-msg strong { color: var(--brand-magenta, #e6087b); font-weight: 800; }
+.sn-reco-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 7px; padding: 11px 18px; border-radius: 12px; text-decoration: none; background: linear-gradient(135deg, var(--brand-magenta, #e6087b), var(--p-brand-deep, #c0066a)); color: #fff; font-size: 13px; font-weight: 800; transition: filter .15s, transform .15s; }
+.sn-reco-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+.sn-reco-btn svg { width: 15px; height: 15px; }
+.sn-reco-close { flex-shrink: 0; width: 30px; height: 30px; border-radius: 9px; border: 0; background: transparent; color: var(--ink-dark-1, #8a86a8); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.sn-reco-close:hover { background: var(--bg-subtle, #f0eef8); }
+.sn-reco-close svg { width: 16px; height: 16px; }
+
+@media (max-width: 720px) {
+  .sn-reco { flex-wrap: wrap; }
+  .sn-reco-btn { flex: 1 1 100%; justify-content: center; order: 3; }
+  .sn-chart-toggle { flex-wrap: wrap; }
+}
+</style>
 </head>
 <body>
 
@@ -9992,6 +10060,10 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     <a class="nav-item" href="ogrenci-odevler.html" title="Ödevler">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span class="nav-item-label">Ödevler</span>
+    </a>
+    <a class="nav-item" href="klan.html" title="Klanım">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span class="nav-item-label">Klanım</span>
     </a>
     <a class="nav-item" href="tekrarlar.html" title="Ders Tekrarları">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
@@ -10090,16 +10162,13 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
         </div>
 
         <div class="sn-upcoming-right">
-          <div class="sn-countdown" aria-label="Sınava kalan süre">
-            <div class="sn-countdown-eyebrow">Sınava Kalan</div>
-            <div class="sn-countdown-units">
-              <div class="sn-countdown-unit"><strong id="snCdDay">07</strong><span>gün</span></div>
-              <div class="sn-countdown-sep">:</div>
-              <div class="sn-countdown-unit"><strong id="snCdHour">12</strong><span>saat</span></div>
-              <div class="sn-countdown-sep">:</div>
-              <div class="sn-countdown-unit"><strong id="snCdMin">34</strong><span>dk</span></div>
-              <div class="sn-countdown-sep">:</div>
-              <div class="sn-countdown-unit"><strong id="snCdSec">21</strong><span>sn</span></div>
+          <div class="sn-countdown" id="snCountdown" aria-label="Sınava kalan süre">
+            <span class="sn-countdown-ic" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </span>
+            <div class="sn-countdown-body">
+              <div class="sn-countdown-eyebrow">Sınava Kalan</div>
+              <div class="sn-countdown-text" id="snCountdownText">—</div>
             </div>
           </div>
           <button type="button" class="sn-upcoming-join" id="snJoinBtn">
@@ -10189,16 +10258,20 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
         <div class="sn-card sn-chart-card">
           <div class="sn-card-head">
             <div>
-              <h4 class="sn-card-title">Deneme Sınavları Net Ortalaması</h4>
-              <p class="sn-card-sub">Son 10 deneme sınavında elde ettiğin toplam netleri görebilirsin</p>
+              <h4 class="sn-card-title">Denemelerde Gelişimim</h4>
+              <p class="sn-card-sub">Genel ve branş denemelerini ayrı ayrı, adil biçimde incele</p>
             </div>
-            <div class="sn-chart-legend">
-              <span class="sn-chart-legend-item"><span class="sn-chart-legend-dot"></span>Net</span>
+            <div class="sn-chart-toggle" role="tablist" aria-label="Deneme türü">
+              <button type="button" class="sn-chart-toggle-btn is-active" data-chart-mode="genel" role="tab" aria-selected="true">Genel Denemeler</button>
+              <button type="button" class="sn-chart-toggle-btn" data-chart-mode="brans" role="tab" aria-selected="false">Branş Denemeleri</button>
             </div>
+          </div>
+          <div class="sn-chart-subfilter" id="snChartSubfilter" hidden aria-label="Branş dersi filtresi">
+            <!-- JS: branş ders chip'leri -->
           </div>
           <div class="sn-chart-wrap" id="snChartWrap">
             <!-- SVG chart JS ile dolduruluyor -->
-            <svg id="snChart" aria-label="Deneme sınavları net ortalaması grafiği"></svg>
+            <svg id="snChart" aria-label="Deneme net gelişimi grafiği"></svg>
           </div>
         </div>
 
@@ -10282,6 +10355,9 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
         </div>
       </div>
     </section>
+
+    <!-- SONRAKİ ADIM — tek öneri (Yumi) -->
+    <div class="sn-reco-mount" id="snReco" hidden><!-- JS ile dolduruluyor --></div>
   </section>
 
 
@@ -11063,6 +11139,32 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
 
   // ====== DENEME NET ORTALAMASI CHART için son 8 (eskiden yeniye) ======
   function calcNet(e) { return Math.max(0, e.dogru - e.yanlis / 3); }
+
+  // Net değişimi: aynı tipte kronolojik önceki sınava göre (+/−)
+  function fmtDelta(n) {
+    var v = Math.round(n * 10) / 10;
+    var sign = v > 0 ? '+' : (v < 0 ? '−' : '');
+    return sign + Math.abs(v).toFixed(1).replace('.', ',');
+  }
+  var _deltaMap = null;
+  function deltaGroupKey(e) {
+    // Genel/Kurum kendi içinde; branş ise DERS bazında (Fen branşı ↔ Fen branşı) karşılaştırılır
+    return e.type === 'brans' ? ('brans:' + inferBransSubjectCode(e)) : e.type;
+  }
+  function buildDeltaMap() {
+    if (_deltaMap) return _deltaMap;
+    _deltaMap = {};
+    var groups = {};
+    EXAMS.forEach(function (e) { var k = deltaGroupKey(e); (groups[k] = groups[k] || []).push(e); });
+    Object.keys(groups).forEach(function (k) {
+      var arr = groups[k].slice().sort(function (a, b) { return new Date(a.date) - new Date(b.date); });
+      for (var i = 1; i < arr.length; i++) {
+        _deltaMap[arr[i].id] = calcNet(arr[i]) - calcNet(arr[i - 1]);
+      }
+    });
+    return _deltaMap;
+  }
+
   var snOpenDetailDrawer = null;
 
   function fmtNet(n) {
@@ -11089,25 +11191,32 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   }
 
   // ====== COUNTDOWN — 14 Haziran 2026, 10:00 ======
+  // Demo-now: demo tarihi (TODAY) + gerçek saat — sayaç canlı akar
+  function demoNowMs() {
+    var r = new Date();
+    return new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate(), r.getHours(), r.getMinutes(), r.getSeconds()).getTime();
+  }
   (function countdown() {
     var TARGET = new Date(2026, 5, 14, 10, 0, 0).getTime();
-    var dayEl = document.getElementById('snCdDay');
-    var hourEl = document.getElementById('snCdHour');
-    var minEl = document.getElementById('snCdMin');
-    var secEl = document.getElementById('snCdSec');
-    if (!dayEl) return;
-    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+    var textEl = document.getElementById('snCountdownText');
+    var cdEl = document.getElementById('snCountdown');
+    if (!textEl) return;
     function tick() {
-      var now = Date.now();
-      var diff = Math.max(0, TARGET - now);
+      var diff = TARGET - demoNowMs();
+      if (diff <= 0) {
+        textEl.textContent = 'Deneme başladı';
+        if (cdEl) cdEl.classList.add('is-soon');
+        return;
+      }
       var d = Math.floor(diff / 86400000);
       var h = Math.floor((diff % 86400000) / 3600000);
       var m = Math.floor((diff % 3600000) / 60000);
-      var s = Math.floor((diff % 60000) / 1000);
-      dayEl.textContent = pad(d);
-      hourEl.textContent = pad(h);
-      minEl.textContent = pad(m);
-      secEl.textContent = pad(s);
+      var txt;
+      if (d >= 1) txt = 'Sınava ' + d + ' gün ' + h + ' saat kaldı';
+      else if (h >= 1) txt = 'Sınava ' + h + ' saat ' + m + ' dakika kaldı';
+      else txt = 'Sınava ' + Math.max(1, m) + ' dakika kaldı';
+      textEl.textContent = txt;
+      if (cdEl) cdEl.classList.toggle('is-soon', diff < 86400000);
     }
     tick();
     setInterval(tick, 1000);
@@ -11120,23 +11229,38 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     if (!svg || !wrap) return;
 
     var CHART_COUNT = 10;
-    // Son 10 sınav, eskiden yeniye (kronolojik)
-    var series = EXAMS.slice(0, CHART_COUNT).reverse();
-    var nets = series.map(calcNet);
-    // Dinamik Y aralığı — veriye göre adapt
-    var dataMin = Math.min.apply(null, nets);
-    var dataMax = Math.max.apply(null, nets);
-    var minNet = Math.max(0, Math.floor(dataMin / 10) * 10 - 10);
-    var maxNet = Math.min(100, Math.ceil(dataMax / 10) * 10 + 5);
-    if (maxNet - minNet < 30) { maxNet = Math.min(100, minNet + 30); }
+    var chartMode = 'genel';       // 'genel' (genel+kurum, 80'lik) | 'brans' (40'lık)
+    var chartBransSubj = 'all';
+    var series, nets, minNet, maxNet;
+
+    function getPool() {
+      var pool;
+      if (chartMode === 'genel') {
+        pool = EXAMS.filter(function (e) { return e.type === 'genel' || e.type === 'kurum'; });
+      } else {
+        pool = EXAMS.filter(function (e) { return e.type === 'brans'; });
+        if (chartBransSubj !== 'all') pool = pool.filter(function (e) { return inferBransSubjectCode(e) === chartBransSubj; });
+      }
+      return pool.slice(0, CHART_COUNT).reverse(); // en yeni 10, kronolojik
+    }
+    function computeSeries() {
+      series = getPool();
+      nets = series.map(calcNet);
+      if (!nets.length) { minNet = 0; maxNet = 30; return; }
+      var dataMin = Math.min.apply(null, nets);
+      var dataMax = Math.max.apply(null, nets);
+      minNet = Math.max(0, Math.floor(dataMin / 10) * 10 - 10);
+      maxNet = Math.min(100, Math.ceil(dataMax / 10) * 10 + 5);
+      if (maxNet - minNet < 30) { maxNet = Math.min(100, minNet + 30); }
+    }
+    computeSeries();
 
     function shortName(e) {
-      if (e.type === 'genel') return 'GD' + e.name.split('·')[1].trim();
-      if (e.type === 'brans') {
-        var t = e.name.split(' ')[0];
-        return t.substr(0, 3).toUpperCase() + e.name.split('·')[1].trim();
-      }
-      return 'KR' + (e.id);
+      var num = (e.name.indexOf('·') >= 0) ? e.name.split('·')[1].trim() : '';
+      if (e.type === 'genel') return 'Genel ' + num;
+      if (e.type === 'brans') return (SUBJECT_LABELS[inferBransSubjectCode(e)] || 'Branş') + ' ' + num;
+      var d = new Date(e.date);
+      return 'İl ' + MONTH_NAMES[d.getMonth()];
     }
 
     // Tooltip (bir kere oluştur)
@@ -11165,6 +11289,11 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
       svg.setAttribute('width', W);
       svg.setAttribute('height', H);
+
+      if (!series.length) {
+        svg.innerHTML = '<text x="' + (W/2) + '" y="' + (H/2) + '" text-anchor="middle" class="sn-chart-empty">Bu filtrede deneme bulunmuyor</text>';
+        return;
+      }
 
       function xAt(i) {
         if (series.length <= 1) return PAD_L + innerW / 2;
@@ -11247,8 +11376,12 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       if (isNaN(i) || !series[i]) return;
       var e = series[i];
       var examNet = nets[i];
+      var dl = buildDeltaMap()[e.id];
+      var deltaTxt = (dl != null)
+        ? ' <span class="sn-chart-tip-delta ' + (dl >= 0 ? 'is-up' : 'is-down') + '">' + fmtDelta(dl) + '</span>'
+        : '';
       tipName.textContent = e.name;
-      tipNet.innerHTML = '<strong>' + fmtNet(examNet) + '</strong> net';
+      tipNet.innerHTML = formatDate(e.date) + ' · <strong>' + fmtNet(examNet) + '</strong> net' + deltaTxt;
       tip.style.left = parseFloat(target.getAttribute('cx')) + 'px';
       tip.style.top = parseFloat(target.getAttribute('cy')) + 'px';
       tip.classList.add('is-active');
@@ -11278,6 +11411,40 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       var hit = e.target.closest('.sn-chart-point-hit');
       if (!hit) return;
       openChartExamDetail(hit.getAttribute('data-exam-id'));
+    });
+
+    // ── Genel/Branş toggle + branş ders alt-filtresi ──
+    function rebuild() { computeSeries(); render(); }
+
+    var subfilterEl = document.getElementById('snChartSubfilter');
+    var bransSubjs = [];
+    EXAMS.forEach(function (e) {
+      if (e.type === 'brans') { var c = inferBransSubjectCode(e); if (bransSubjs.indexOf(c) < 0) bransSubjs.push(c); }
+    });
+    if (subfilterEl) {
+      subfilterEl.innerHTML = '<button type="button" class="sn-chart-subchip is-active" data-brans-subj="all">Tümü</button>'
+        + bransSubjs.map(function (c) { return '<button type="button" class="sn-chart-subchip" data-brans-subj="' + c + '">' + (SUBJECT_LABELS[c] || c) + '</button>'; }).join('');
+      subfilterEl.addEventListener('click', function (ev) {
+        var b = ev.target.closest('.sn-chart-subchip'); if (!b) return;
+        chartBransSubj = b.getAttribute('data-brans-subj');
+        Array.prototype.forEach.call(subfilterEl.querySelectorAll('.sn-chart-subchip'), function (x) { x.classList.toggle('is-active', x === b); });
+        rebuild();
+      });
+    }
+    var toggleBtns = document.querySelectorAll('.sn-chart-toggle-btn');
+    Array.prototype.forEach.call(toggleBtns, function (btn) {
+      btn.addEventListener('click', function () {
+        chartMode = btn.getAttribute('data-chart-mode');
+        Array.prototype.forEach.call(toggleBtns, function (x) {
+          var on = x === btn; x.classList.toggle('is-active', on); x.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        if (subfilterEl) subfilterEl.hidden = (chartMode !== 'brans');
+        if (chartMode !== 'brans') {
+          chartBransSubj = 'all';
+          if (subfilterEl) Array.prototype.forEach.call(subfilterEl.querySelectorAll('.sn-chart-subchip'), function (x) { x.classList.toggle('is-active', x.getAttribute('data-brans-subj') === 'all'); });
+        }
+        rebuild();
+      });
     });
 
     // İlk render
@@ -11428,6 +11595,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     listEl.innerHTML = pageItems.map(function(e){
       var net = calcNet(e);
       var nc = netColor(net, e.total);
+      var delta = buildDeltaMap()[e.id];
       var meta = TYPE_META[e.type];
       var dPct = (e.dogru / e.total) * 100;
       var yPct = (e.yanlis / e.total) * 100;
@@ -11455,6 +11623,7 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
         +   '<div class="sn-row-net-main">'
         +     '<span class="sn-row-net-eyebrow">Net</span>'
         +     '<span class="sn-row-net-value" style="--net-c:'+nc+';">' + net.toFixed(2).replace('.', ',') + '<small>/' + e.total + '</small></span>'
+        +     (delta != null ? '<span class="sn-row-delta ' + (delta >= 0 ? 'is-up' : 'is-down') + '" title="Önceki ' + meta.name.toLowerCase() + 'ne göre">' + fmtDelta(delta) + ' net</span>' : '')
         +   '</div>'
         +   '<div class="sn-row-net-breakdown">'
         +     '<div class="sn-row-net-bar">'
@@ -11470,12 +11639,8 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
         +   '</div>'
         + '</div>'
         + '<div class="sn-row-actions">'
-        +   '<button type="button" class="sn-row-btn" data-act="key" title="Cevap anahtarını gör">'
-        +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>'
-        +     '<span>Cevap Anahtarı</span>'
-        +   '</button>'
-        +   '<button type="button" class="sn-row-btn sn-row-btn-primary" data-act="detail" title="Sınav sonucu raporu">'
-        +     '<span>Detay</span>'
+        +   '<button type="button" class="sn-row-btn sn-row-btn-primary" data-act="detail" title="Sonucunu incele — cevap anahtarı ve analiz">'
+        +     '<span>Sonucumu İncele</span>'
         +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>'
         +   '</button>'
         + '</div>'
@@ -12497,21 +12662,49 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     }));
   }
 
+  // Sınav durumu: giriş penceresi başlamadan 15 dk öncesi açılır, süre + 30 dk sonrası kapanır
+  function examJoinState() {
+    var now = demoNowMs();
+    var start = UPCOMING_EXAM.at.getTime();
+    var openFrom = start - JOIN_EARLY_MS;                 // 15 dk erken giriş
+    var closeAt = start + (UPCOMING_EXAM.durationMin + 30) * 60000;
+    if (now < openFrom) return 'locked';
+    if (now <= closeAt) return 'open';
+    return 'expired';
+  }
+
   function updateJoinButtonUI() {
     if (!joinBtn) return;
-    joinBtn.classList.remove('is-joined', 'is-enrolled');
+    var st = examJoinState();
+    var upc = document.getElementById('snUpcoming');
+    if (upc) upc.setAttribute('data-exam-state', st);
+    joinBtn.classList.remove('is-joined', 'is-enrolled', 'is-locked');
     var label = joinBtn.querySelector('.sn-upcoming-join-default span:last-child');
-    var doneLabel = joinBtn.querySelector('.sn-upcoming-join-done span:last-child');
-    if (label) label.textContent = 'Deneme sınavına katıl';
-    if (doneLabel) doneLabel.textContent = 'Deneme sınavına katıl';
-    joinBtn.setAttribute('aria-label', 'Deneme sınavına katıl');
-    joinBtn.setAttribute('aria-disabled', 'false');
+    if (st === 'open') {
+      if (label) label.textContent = 'Denemeye Başla';
+      joinBtn.setAttribute('aria-disabled', 'false');
+      joinBtn.setAttribute('aria-label', 'Denemeye başla');
+    } else if (st === 'locked') {
+      var at = UPCOMING_EXAM.at;
+      var txt = at.getDate() + ' ' + MONTH_NAMES[at.getMonth()] + ' · ' + pad2(at.getHours()) + ':' + pad2(at.getMinutes()) + '\'da açılacak';
+      if (label) label.textContent = txt;
+      joinBtn.classList.add('is-locked');
+      joinBtn.setAttribute('aria-disabled', 'true');
+      joinBtn.setAttribute('aria-label', txt);
+    } else {
+      if (label) label.textContent = 'Giriş süresi doldu';
+      joinBtn.classList.add('is-locked');
+      joinBtn.setAttribute('aria-disabled', 'true');
+      joinBtn.setAttribute('aria-label', 'Giriş süresi doldu');
+    }
   }
 
   updateJoinButtonUI();
+  setInterval(updateJoinButtonUI, 30000); // durum sınıra yaklaşınca güncellensin
 
   if (joinBtn) {
     joinBtn.addEventListener('click', function(){
+      if (examJoinState() !== 'open') return; // kilitli/süresi dolmuş → aksiyon yok
       localStorage.setItem('bilenyum.denemeExamName', UPCOMING_EXAM.name);
       if (!loadJoinState()) {
         saveJoinState();
@@ -12624,6 +12817,11 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
   };
   var currentSubjRange = monthRangeKey(TODAY.getFullYear(), TODAY.getMonth());
 
+  function subjectMax(key) {
+    for (var i = 0; i < SUBJECTS.length; i++) if (SUBJECTS[i].key === key) return SUBJECTS[i].total;
+    return 20;
+  }
+
   function examSubjectNets(exam) {
     var report = buildExamReport(exam);
     var nets = {};
@@ -12632,12 +12830,34 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
       if (!key && !isLgsExam(exam)) {
         key = inferBransSubjectCode(exam);
       }
-      if (key) nets[key] = row.net;
+      if (!key) return;
+      var val = row.net;
+      // Branş sınavı: 40-soru netini dersin kendi bazına (örn. /20) normalize et,
+      // aksi halde genel-bölüm netleriyle kıyaslanamaz ve cap'i aşar (21,5/20 bug'ı).
+      if (!isLgsExam(exam) && exam.total > 0) {
+        val = row.net * (subjectMax(key) / exam.total);
+      }
+      nets[key] = Math.min(val, subjectMax(key)); // güvenlik: cap'i aşmasın
     });
     if (isLgsExam(exam) && nets.ing == null) {
       nets.ing = Math.min(10, Math.max(0, calcNet(exam) * 0.11));
     }
     return nets;
+  }
+
+  // Ders bazlı değişim: o dersi içeren en son iki sınavın neti farkı (yeni − önceki)
+  function subjectDeltas() {
+    var sorted = EXAMS.slice().sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
+    var out = {};
+    SUBJECTS.forEach(function (s) {
+      var vals = [];
+      for (var i = 0; i < sorted.length && vals.length < 2; i++) {
+        var nets = examSubjectNets(sorted[i]);
+        if (nets[s.key] != null) vals.push(nets[s.key]);
+      }
+      out[s.key] = vals.length === 2 ? (vals[0] - vals[1]) : null;
+    });
+    return out;
   }
 
   function computeSubjectAverages(range) {
@@ -12667,15 +12887,50 @@ button.d3-status.is-join:hover { background: rgba(229,4,123,0.32); }
     var list = document.getElementById('snSubjList');
     if (!list) return;
     var data = computeSubjectAverages(currentSubjRange);
+    var deltas = subjectDeltas();
     list.innerHTML = SUBJECTS.map(function (s) {
-      var net = data[s.key] || 0;
+      var net = Math.min(data[s.key] || 0, s.total); // cap'i aşmasın
       var pct = Math.min(100, Math.round((net / s.total) * 100));
+      var dl = deltas[s.key];
+      var deltaHtml = (dl != null && Math.abs(Math.round(dl * 10) / 10) >= 0.1)
+        ? '<span class="sn-subj-delta ' + (dl >= 0 ? 'is-up' : 'is-down') + '">' + fmtDelta(dl) + ' net</span>'
+        : '';
       return '<div class="sn-subj-row" style="--c:' + s.c + ';">'
         + '<span class="sn-subj-name"><span class="sn-subj-name-dot"></span>' + s.name + '</span>'
         + '<div class="sn-subj-track"><div class="sn-subj-fill" style="width:' + pct + '%"></div></div>'
+        + '<span class="sn-subj-pct">%' + pct + '</span>'
         + '<span class="sn-subj-net">' + net.toFixed(1).replace('.', ',') + '<small>/' + s.total + '</small></span>'
+        + deltaHtml
         + '</div>';
     }).join('');
+    renderReco();
+  }
+
+  // ====== SONRAKİ ADIM — tek öneri bileşeni (en zayıf ders) ======
+  function renderReco() {
+    var el = document.getElementById('snReco');
+    if (!el) return;
+    if (el.getAttribute('data-dismissed') === '1') { el.hidden = true; return; }
+    var avgs = computeSubjectAverages(currentSubjRange);
+    var weakest = null, weakestPct = Infinity;
+    SUBJECTS.forEach(function (s) {
+      var net = Math.min(avgs[s.key] || 0, s.total);
+      var pct = (net / s.total) * 100;
+      if (pct < weakestPct) { weakestPct = pct; weakest = s; }
+    });
+    if (!weakest) { el.hidden = true; return; }
+    var msg = 'Son denemelerde en düşük başarın <strong>' + weakest.name + '</strong> dersinde (<strong>%' + Math.round(weakestPct) + '</strong>). Kısa bir tekrar seni bekliyor.';
+    el.hidden = false;
+    el.innerHTML = '<div class="sn-reco">'
+      + '<span class="sn-reco-ava" aria-hidden="true"><img src="assets/bilenyum-app-icon.svg" alt="" onerror="this.onerror=null;this.replaceWith(document.createTextNode(\'🤖\'));" /></span>'
+      + '<div class="sn-reco-body"><span class="sn-reco-eyebrow">Sonraki Adımın</span><p class="sn-reco-msg">' + msg + '</p></div>'
+      + '<a class="sn-reco-btn" href="tekrarlar.html">' + weakest.name + ' Tekrarına Git'
+      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>'
+      + '<button type="button" class="sn-reco-close" aria-label="Öneriyi kapat">'
+      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'
+    + '</div>';
+    var cl = el.querySelector('.sn-reco-close');
+    if (cl) cl.addEventListener('click', function () { el.setAttribute('data-dismissed', '1'); el.hidden = true; });
   }
 
   (function subjDropdown() {

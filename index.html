@@ -3397,7 +3397,9 @@
       <a href="iletisim.html">İletişim</a>
     </div>
     <div class="nav-cta">
-      <a href="giris.html" class="btn btn-secondary btn-sm">Giriş Yap</a>
+      <a href="giris.html" class="btn btn-secondary btn-sm" data-auth-guest>Giriş Yap</a>
+      <a href="ogrenci-dashboard.html" class="btn btn-secondary btn-sm" data-auth-user hidden>Panelim</a>
+      <button class="btn btn-secondary btn-sm" type="button" data-auth-user data-logout hidden>Çıkış Yap</button>
       <button class="btn btn-primary btn-sm" data-trial-open type="button">Ücretsiz Deneme Dersi</button>
     </div>
   </div>
@@ -5713,6 +5715,21 @@
 </script>
 <script src="assets/trial-modal.js"></script>
 <script src="assets/auth-tab-session.js"></script>
+<style>.nav-cta [hidden]{display:none !important;}</style>
+<script>
+/* Giriş yapmış kullanıcıya Panelim + Çıkış Yap göster (çıkış auth-tab-session.js içinde işlenir) */
+(function () {
+  function loggedIn() {
+    try { return !!localStorage.getItem('bilenyum.browserSession'); } catch (e) { return false; }
+  }
+  function apply() {
+    var on = loggedIn();
+    Array.prototype.forEach.call(document.querySelectorAll('[data-auth-user]'), function (el) { el.hidden = !on; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-auth-guest]'), function (el) { el.hidden = on; });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply); else apply();
+})();
+</script>
 <script src="assets/input-rules.js"></script>
 <script src="assets/footer.js"></script>
 </body>

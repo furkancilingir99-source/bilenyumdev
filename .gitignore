@@ -31,3 +31,6 @@ build/
 .vercel
 .netlify
 .env*
+
+# Windows klasör ayar dosyaları
+desktop.ini
