@@ -196,6 +196,20 @@
     logout();
   });
 
+  // Son kullanılan panel — ana sayfadaki "Panelim" için yedek
+  (function rememberPanel() {
+    var p = (location.pathname || '').toLowerCase();
+    var home = '';
+    if (p.indexOf('veli-') !== -1) home = 'veli-dashboard.html';
+    else if (p.indexOf('ogretmen-') !== -1) home = 'ogretmen-dashboard.html';
+    else if (p.indexOf('deneme-dersi-yoneticisi') !== -1) home = 'deneme-dersi-yoneticisi-dashboard.html';
+    else if (p.indexOf('soru-yazari') !== -1) home = 'soru-yazari-dashboard.html';
+    else if (p.indexOf('ogrenci-') !== -1 ||
+      /(program|tekrarlar|klan|rozetler|performans|deneme-sinavlari)(.html)?$/.test(p)) home = 'ogrenci-dashboard.html';
+    if (!home) return;
+    try { localStorage.setItem('bilenyum.lastPanel', home); } catch (e) {}
+  })();
+
   window.BilenyumBrowserSession = {
     markLoggedIn: markBrowserSession,
     clear: clearBrowserSession,

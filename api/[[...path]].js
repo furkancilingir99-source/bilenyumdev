@@ -171,7 +171,7 @@ async function handleSessionCheck(req, res) {
   var session = accessToken ? await verifyAccessToken(accessToken) : null;
 
   res.statusCode = 200;
-  res.end(JSON.stringify({ authenticated: !!session }));
+  res.end(JSON.stringify({ authenticated: !!session, role: (session && session.role) || null }));
 }
 
 export default async function handler(req, res) {

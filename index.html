@@ -5717,15 +5717,40 @@
 <script src="assets/auth-tab-session.js"></script>
 <style>.nav-cta [hidden]{display:none !important;}</style>
 <script>
-/* Giriş yapmış kullanıcıya Panelim + Çıkış Yap göster (çıkış auth-tab-session.js içinde işlenir) */
+/* Giriş yapmış kullanıcıya Panelim + Çıkış Yap göster; Panelim rolüne göre yönlenir */
 (function () {
+  var ROLE_HOME = {
+    ogrenci: 'ogrenci-dashboard.html', 'öğrenci': 'ogrenci-dashboard.html', student: 'ogrenci-dashboard.html',
+    veli: 'veli-dashboard.html', parent: 'veli-dashboard.html',
+    ogretmen: 'ogretmen-dashboard.html', 'öğretmen': 'ogretmen-dashboard.html', teacher: 'ogretmen-dashboard.html',
+    'deneme-dersi-yoneticisi': 'deneme-dersi-yoneticisi-dashboard.html', 'trial-manager': 'deneme-dersi-yoneticisi-dashboard.html',
+    'soru-yazari': 'soru-yazari-dashboard.html', 'question-author': 'soru-yazari-dashboard.html'
+  };
+  var DEFAULT_HOME = 'ogrenci-dashboard.html';
+
   function loggedIn() {
     try { return !!localStorage.getItem('bilenyum.browserSession'); } catch (e) { return false; }
+  }
+  function lastPanel() {
+    try { return localStorage.getItem('bilenyum.lastPanel') || ''; } catch (e) { return ''; }
+  }
+  function panelHref(role) {
+    if (role && ROLE_HOME[role]) return ROLE_HOME[role];
+    return lastPanel() || DEFAULT_HOME;
+  }
+  function setPanelHref(href) {
+    Array.prototype.forEach.call(document.querySelectorAll('a[data-auth-user]'), function (a) { a.href = href; });
   }
   function apply() {
     var on = loggedIn();
     Array.prototype.forEach.call(document.querySelectorAll('[data-auth-user]'), function (el) { el.hidden = !on; });
     Array.prototype.forEach.call(document.querySelectorAll('[data-auth-guest]'), function (el) { el.hidden = on; });
+    if (!on) return;
+    setPanelHref(panelHref(null));
+    fetch('/api/session-check', { credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { if (d && d.authenticated) setPanelHref(panelHref(d.role)); })
+      .catch(function () {});
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply); else apply();
 })();
